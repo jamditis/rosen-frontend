@@ -13,18 +13,24 @@
 // cover on its own (two off-repo storage copies).
 //
 // Usage:
-//   node preservation/create-baseline-manifest.mjs [--output <dir>]
+//   node preservation/create-baseline-manifest.mjs [--output <dir>] [--pin-justification <text>]
 //   npm run baseline:create -- --output <dir>
 //
 // With no --output, writes to a fresh directory under the OS temp folder, so
 // a baseline is never accidentally committed to the frontend git history —
 // large or generated artifacts belong outside normal git history, not in it.
+//
+// The acceptance-criteria commit named in issue #702 (43bb423) exists in this
+// repository, so pinning HEAD instead of it needs a recorded reason.
+// --pin-justification overrides the default one from baseline-manifest-lib.mjs
+// (DEFAULT_PIN_JUSTIFICATION); most runs do not need to pass it.
 
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   BaselineManifestError,
+  DEFAULT_PIN_JUSTIFICATION,
   buildBaselineBag,
   computeCommitProvenance,
   resolveBaselineFiles,
@@ -32,16 +38,24 @@ import {
 
 function parseArgs(argv) {
   let outputDir = null;
+  let pinJustification = null;
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--output' || arg === '-o') {
+      if (i + 1 >= argv.length) throw new BaselineManifestError(`"${arg}" requires a value (usage: ${arg} <dir>)`);
       outputDir = argv[i + 1];
       i += 1;
+    } else if (arg === '--pin-justification') {
+      if (i + 1 >= argv.length) {
+        throw new BaselineManifestError(`"${arg}" requires a value (usage: ${arg} <text>)`);
+      }
+      pinJustification = argv[i + 1];
+      i += 1;
     } else {
-      throw new BaselineManifestError(`unknown argument "${arg}" (usage: --output <dir>)`);
+      throw new BaselineManifestError(`unknown argument "${arg}" (usage: --output <dir> [--pin-justification <text>])`);
     }
   }
-  return { outputDir };
+  return { outputDir, pinJustification };
 }
 
 function defaultOutputDir() {
@@ -50,11 +64,13 @@ function defaultOutputDir() {
 }
 
 export function runCreateBaseline(repoRoot, argv) {
-  const { outputDir } = parseArgs(argv);
+  const { outputDir, pinJustification } = parseArgs(argv);
   const resolvedOutputDir = outputDir ? path.resolve(outputDir) : defaultOutputDir();
 
   const files = resolveBaselineFiles(repoRoot);
-  const commitInfo = computeCommitProvenance(repoRoot);
+  const commitInfo = computeCommitProvenance(repoRoot, {
+    pinJustification: pinJustification ?? DEFAULT_PIN_JUSTIFICATION,
+  });
   const manifest = buildBaselineBag({
     repoRoot, outputDir: resolvedOutputDir, files, commitInfo,
   });

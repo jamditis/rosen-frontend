@@ -20,6 +20,7 @@ import path from 'node:path';
 
 import {
   ACCEPTANCE_CRITERIA_COMMIT,
+  DEFAULT_PIN_JUSTIFICATION,
   BaselineManifestError,
   BASELINE_CATEGORIES,
   buildBaselineBag,
@@ -156,10 +157,29 @@ describe('computeCommitProvenance', () => {
       if (args[0] === 'status') return Buffer.from(' M data/sample-a.csv\n');
       throw new Error(`unexpected git invocation: ${args.join(' ')}`);
     };
-    const info = computeCommitProvenance(root, { execFile });
+    const info = computeCommitProvenance(root, { execFile, pinJustification: 'test reason' });
     assert.equal(info.requestedCommitExists, true);
     assert.equal(info.gitStatus, 'dirty');
+    assert.equal(info.pinJustification, 'test reason');
     assert.match(info.note, /exists in this repository/);
+    assert.match(info.note, /test reason/);
+  });
+
+  it('requires a pinJustification when the acceptance-criteria commit exists', () => {
+    const execFile = (cmd, args) => {
+      if (args[0] === 'rev-parse') return Buffer.from('cafef00ddeadbeef\n');
+      if (args[0] === 'cat-file') return Buffer.from('');
+      if (args[0] === 'status') return Buffer.from('');
+      throw new Error(`unexpected git invocation: ${args.join(' ')}`);
+    };
+    assert.throws(
+      () => computeCommitProvenance(root, { execFile }),
+      (err) => err instanceof BaselineManifestError && /requires an explicit pinJustification/.test(err.message),
+    );
+    assert.throws(
+      () => computeCommitProvenance(root, { execFile, pinJustification: '   ' }),
+      (err) => err instanceof BaselineManifestError && /requires an explicit pinJustification/.test(err.message),
+    );
   });
 
   it('is non-fatal when the working-tree status cannot be read', () => {
@@ -183,13 +203,28 @@ describe('computeCommitProvenance', () => {
     );
   });
 
-  it('confirms, against the real repository, that commit 43bb423 named in issue #702 is absent', () => {
-    const info = computeCommitProvenance(realRepoRoot);
+  it('confirms, against the real repository, that commit 43bb423 named in issue #702 exists and pins HEAD anyway', () => {
+    const info = computeCommitProvenance(realRepoRoot, { pinJustification: DEFAULT_PIN_JUSTIFICATION });
     const actualHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: realRepoRoot }).toString().trim();
+    const requestedExists = (() => {
+      try {
+        execFileSync('git', ['cat-file', '-e', '43bb423^{commit}'], { cwd: realRepoRoot, stdio: 'ignore' });
+        return true;
+      } catch {
+        return false;
+      }
+    })();
+
     assert.equal(info.commit, actualHead);
     assert.equal(info.requestedCommit, '43bb423');
-    assert.equal(info.requestedCommitExists, false);
+    // This asserts the real, checkable state of this repository's history,
+    // not a fixed expectation: 43bb423 exists (it is "Refine archival
+    // record-reading surfaces (#690)", the day before issue #702 opened).
+    assert.equal(requestedExists, true);
+    assert.equal(info.requestedCommitExists, requestedExists);
     assert.match(info.note, /43bb423/);
+    assert.match(info.note, /exists in this repository/);
+    assert.equal(info.pinJustification, DEFAULT_PIN_JUSTIFICATION);
   });
 });
 
@@ -369,6 +404,17 @@ describe('CLI wrappers', () => {
     );
   });
 
+  it('runCreateBaseline errors on a flag with a missing value instead of silently falling back', () => {
+    assert.throws(
+      () => runCreateBaseline(root, ['--output']),
+      (err) => err instanceof BaselineManifestError && /requires a value/.test(err.message),
+    );
+    assert.throws(
+      () => runCreateBaseline(root, ['--pin-justification']),
+      (err) => err instanceof BaselineManifestError && /requires a value/.test(err.message),
+    );
+  });
+
   it('creates a real baseline bag from this repository and verifies it end to end', () => {
     const outputDir = freshDir('real-repo-cli');
     fs.rmSync(outputDir, { recursive: true, force: true });
@@ -376,10 +422,23 @@ describe('CLI wrappers', () => {
 
     assert.equal(created.outputDir, outputDir);
     assert.ok(created.manifest.totalFiles > 0);
-    assert.equal(created.commitInfo.requestedCommitExists, false);
+    // 43bb423 exists in this repository (see the computeCommitProvenance
+    // real-repo test above); runCreateBaseline still pins HEAD, with the
+    // library's default recorded reason.
+    assert.equal(created.commitInfo.requestedCommitExists, true);
+    assert.equal(created.commitInfo.pinJustification, DEFAULT_PIN_JUSTIFICATION);
+    assert.equal(created.manifest.pinJustification, DEFAULT_PIN_JUSTIFICATION);
 
     const verified = runVerifyBaseline([outputDir]);
     assert.equal(verified.result.ok, true);
     assert.equal(verified.result.checkedFiles, created.manifest.totalFiles);
+  });
+
+  it('runCreateBaseline records a caller-supplied --pin-justification instead of the default', () => {
+    const outputDir = freshDir('pin-justification-cli');
+    fs.rmSync(outputDir, { recursive: true, force: true });
+    const created = runCreateBaseline(realRepoRoot, ['--output', outputDir, '--pin-justification', 'custom reason']);
+    assert.equal(created.commitInfo.pinJustification, 'custom reason');
+    assert.equal(created.manifest.pinJustification, 'custom reason');
   });
 });

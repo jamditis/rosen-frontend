@@ -27,23 +27,44 @@ path is missing or renamed, so a baseline never silently shrinks. If you move
 or rename one of these files, update `BASELINE_CATEGORIES` in
 `preservation/baseline-manifest-lib.mjs` in the same change.
 
-## Commit `43bb423` does not exist in this repository
+## Commit `43bb423` exists, but this tool pins HEAD instead
 
 Issue #702's acceptance criteria ask this tool to record commit `43bb423`, or
-document the newer commit used instead. `43bb423` is not a valid commit in
-this repository (`git cat-file -e 43bb423^{commit}` fails). Every baseline
-this tool produces therefore records:
+document the newer commit used instead. `43bb423` **is** a valid commit in
+this repository — `git cat-file -e 43bb423^{commit}` succeeds, and
+`git log -1 43bb423` shows it as "Refine archival record-reading surfaces
+(#690)", dated the day before issue #702 was opened. Run either command
+yourself to re-check this at any time.
+
+This tool still pins the current `HEAD` commit instead of baselining
+`43bb423`'s tree, for two checkable reasons:
+
+- the relationship-adjacency shard files this baseline covers
+  (`data/relationship-adjacency-*.json`) were added to the repository after
+  `43bb423` — they do not exist in that commit's tree, so a baseline of it
+  would be missing files this tool is supposed to include;
+- the source CSVs have changed in dozens of commits since `43bb423` — a
+  baseline of that commit's tree would freeze stale record and post data, not
+  the current archive.
+
+Every baseline this tool produces records that decision, not just the plain
+fact of which commit it used:
 
 - the actual current `HEAD` commit, as `Source-Commit` in `bag-info.txt` and
   `commit` in `baseline-manifest.json`;
-- an explicit note (`Source-Commit-Note` / `commitNote`) stating that
-  `43bb423` does not exist and that `HEAD` was used instead.
+- that `43bb423` exists (`Requested-Acceptance-Commit-Present: yes` /
+  `requestedAcceptanceCommitPresent: true`);
+- the reason HEAD was pinned instead, as `Pin-Justification` in
+  `bag-info.txt` and `pinJustification` in `baseline-manifest.json`.
 
-`computeCommitProvenance()` checks this with `git cat-file` every time it
-runs, so the note keeps itself honest if the commit graph ever changes (for
-example after a rebase that introduces that hash). The tool always freezes
-the files on disk at the current `HEAD` — it does not check out and archive
-an arbitrary historical commit's tree.
+`computeCommitProvenance()` checks whether `43bb423` exists with `git cat-file`
+every time it runs, so the note stays accurate if the commit graph ever
+changes. It requires a non-empty justification string whenever the requested
+commit exists — `preservation/create-baseline-manifest.mjs` supplies
+`DEFAULT_PIN_JUSTIFICATION` from `baseline-manifest-lib.mjs` by default, or
+pass `--pin-justification "<text>"` to record a different reason. The tool
+always freezes the files on disk at the current `HEAD` — it does not check
+out and archive a different commit's tree.
 
 If the working tree has uncommitted changes when a baseline is created,
 `bag-info.txt` records `Source-Tree-Status: dirty` and the CLI prints a
@@ -143,8 +164,10 @@ verified copy until that follow-up is done.
 ## Commands
 
 ```bash
-npm run baseline:create -- --output <dir>          # build a baseline bag
-npm run baseline:verify -- <bag-dir>                # verify a bag in place
-npm run baseline:verify -- <bag-dir> --data-dir <d> # verify a restored data/ tree
-node --test tests/baseline-manifest.test.js         # run the test suite for this tool
+npm run baseline:create -- --output <dir>              # build a baseline bag
+npm run baseline:create -- --output <dir> \
+  --pin-justification "<text>"                          # override the default HEAD-pin reason
+npm run baseline:verify -- <bag-dir>                    # verify a bag in place
+npm run baseline:verify -- <bag-dir> --data-dir <d>     # verify a restored data/ tree
+node --test tests/baseline-manifest.test.js             # run the test suite for this tool
 ```

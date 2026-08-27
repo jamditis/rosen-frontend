@@ -23,10 +23,23 @@ export class BaselineManifestError extends Error {
   }
 }
 
-// The commit named in issue #702's acceptance criteria. It does not exist in
-// this repository (verified with `git cat-file -e` below) — see
-// preservation/BASELINE.md for the discrepancy note this drives.
+// The commit named in issue #702's acceptance criteria. It does exist in this
+// repository (checked with `git cat-file -e` below) — see
+// preservation/BASELINE.md for why this tool still pins the current HEAD
+// commit instead of that older one, and what it records about that choice.
 export const ACCEPTANCE_CRITERIA_COMMIT = '43bb423';
+
+// Why this tool pins the current HEAD commit instead of building a baseline
+// of ACCEPTANCE_CRITERIA_COMMIT's tree, even though that commit exists. Two
+// checkable facts drive this: the relationship-adjacency shard files in
+// BASELINE_CATEGORIES were added to the repository after that commit (they
+// do not exist in its tree), and the source CSVs have changed in dozens of
+// commits since. A baseline of the older commit's tree would both miss files
+// this tool is supposed to cover and freeze stale CSV content. See
+// preservation/BASELINE.md for how to re-check these facts.
+export const DEFAULT_PIN_JUSTIFICATION = 'the requested commit predates the relationship-adjacency shard files '
+  + 'this baseline covers, and its source CSVs are dozens of commits behind the current data; pinning HEAD '
+  + 'captures the complete, current category list instead of an incomplete historical one.';
 
 export const TOOL_VERSION = '1.0.0';
 
@@ -116,9 +129,20 @@ export function resolveBaselineFiles(repoRoot, categories = BASELINE_CATEGORIES)
 // Resolve the commit this baseline pins, plus the documented status of the
 // commit named in the issue's acceptance criteria. `execFile` is injectable
 // for tests; it defaults to a real `git` call.
+//
+// When the requested commit exists, pinning HEAD instead of it is a
+// deliberate choice, not a fallback — this function requires and records a
+// non-empty `pinJustification` string for that case, so a baseline never
+// silently pins a different commit than the one named in the acceptance
+// criteria without a documented reason. Callers that always want the
+// project's standard reasoning should pass `DEFAULT_PIN_JUSTIFICATION`.
 export function computeCommitProvenance(
   repoRoot,
-  { requestedCommit = ACCEPTANCE_CRITERIA_COMMIT, execFile = execFileSync } = {},
+  {
+    requestedCommit = ACCEPTANCE_CRITERIA_COMMIT,
+    execFile = execFileSync,
+    pinJustification = null,
+  } = {},
 ) {
   let commit;
   try {
@@ -135,6 +159,14 @@ export function computeCommitProvenance(
     requestedCommitExists = false;
   }
 
+  if (requestedCommitExists && (!pinJustification || !pinJustification.trim())) {
+    throw new BaselineManifestError(
+      `acceptance criteria commit ${requestedCommit} exists in this repository, so pinning HEAD (${commit}) `
+      + 'instead requires an explicit pinJustification string explaining why. Pass DEFAULT_PIN_JUSTIFICATION '
+      + 'or a specific reason.',
+    );
+  }
+
   let gitStatus = null;
   try {
     const porcelain = execFile('git', ['status', '--porcelain'], { cwd: repoRoot }).toString();
@@ -144,14 +176,19 @@ export function computeCommitProvenance(
   }
 
   const note = requestedCommitExists
-    ? `Acceptance criteria commit ${requestedCommit} exists in this repository. This baseline still `
-      + `freezes the files on disk at the current HEAD (${commit}); see preservation/BASELINE.md.`
+    ? `Acceptance criteria commit ${requestedCommit} exists in this repository. This baseline pins the `
+      + `current HEAD (${commit}) instead. Reason: ${pinJustification}`
     : `Acceptance criteria commit ${requestedCommit} does not exist in this repository's history `
       + `(checked with \`git cat-file -e\`). Recording the current reviewed HEAD commit ${commit} instead. `
       + 'See preservation/BASELINE.md for the full discrepancy note.';
 
   return {
-    commit, requestedCommit, requestedCommitExists, gitStatus, note,
+    commit,
+    requestedCommit,
+    requestedCommitExists,
+    gitStatus,
+    pinJustification: requestedCommitExists ? pinJustification : null,
+    note,
   };
 }
 
@@ -214,6 +251,7 @@ export function buildBaselineBag({
     `Payload-Oxum: ${payloadOxum}`,
   ];
   if (commitInfo.gitStatus) bagInfoLines.push(`Source-Tree-Status: ${commitInfo.gitStatus}`);
+  if (commitInfo.pinJustification) bagInfoLines.push(`Pin-Justification: ${commitInfo.pinJustification}`);
   fs.writeFileSync(path.join(outputDir, 'bag-info.txt'), `${bagInfoLines.join('\n')}\n`);
 
   const baselineManifest = {
@@ -224,6 +262,7 @@ export function buildBaselineBag({
     requestedAcceptanceCommit: commitInfo.requestedCommit,
     requestedAcceptanceCommitPresent: commitInfo.requestedCommitExists,
     commitNote: commitInfo.note,
+    pinJustification: commitInfo.pinJustification ?? null,
     sourceTreeStatus: commitInfo.gitStatus ?? null,
     description,
     totalFiles: fileEntries.length,
