@@ -33,6 +33,8 @@ the route classes live in `scripts/layout-shift-budgets.js`;
 environment switches help when the machine is unusual:
 
 - `PREVIEW_AUDIT_CHROMIUM_PATH` — use a Chromium binary already on the machine.
+- `PREVIEW_AUDIT_ROUTES` — a comma-separated list of route slugs, for
+  re-measuring one route after a fix. Leave it unset for a release run.
 - `PREVIEW_AUDIT_LAYOUT_SHIFT_SEED=1` — measure and write
   `preview-audit-results/layout-shift-baseline.json` without failing on
   budget. Use it to refresh the baseline in `scripts/layout-shift-budgets.js`.

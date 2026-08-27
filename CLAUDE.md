@@ -282,7 +282,8 @@ standalone) in `scripts/layout-shift-budgets.js`, and the run exits non-zero on
 a regression. `PREVIEW_AUDIT_LAYOUT_SHIFT_SEED=1` measures without failing and
 writes `preview-audit-results/layout-shift-baseline.json`, which is how the
 baseline in that file is refreshed. `PREVIEW_AUDIT_CHROMIUM_PATH` points the
-audit at a Chromium binary already on the machine.
+audit at a Chromium binary already on the machine, and `PREVIEW_AUDIT_ROUTES`
+narrows a run to a comma-separated list of route slugs.
 
 ## Testing
 

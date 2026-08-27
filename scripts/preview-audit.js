@@ -221,6 +221,24 @@ if (REQUESTED_VIEWPORT && VIEWPORTS.length === 0) {
   throw new Error(`Unknown PREVIEW_AUDIT_VIEWPORT "${REQUESTED_VIEWPORT}". Expected mobile, tablet, or desktop.`);
 }
 
+// PREVIEW_AUDIT_ROUTES takes a comma-separated list of route slugs. It narrows
+// a run to the routes you are working on, which is useful when re-measuring
+// one route after a layout fix. A release run leaves it unset.
+const REQUESTED_ROUTES = (process.env.PREVIEW_AUDIT_ROUTES || '')
+  .split(',')
+  .map((slug) => slug.trim())
+  .filter(Boolean);
+const isAuditedRoute = (route) => REQUESTED_ROUTES.length === 0
+  || REQUESTED_ROUTES.includes(route.slug);
+const AUDITED_ROUTE_COUNT = ROUTES.filter(isAuditedRoute).length;
+
+const unknownRoutes = REQUESTED_ROUTES.filter(
+  (slug) => !ROUTES.some((route) => route.slug === slug),
+);
+if (unknownRoutes.length > 0) {
+  throw new Error(`Unknown PREVIEW_AUDIT_ROUTES entries: ${unknownRoutes.join(', ')}`);
+}
+
 async function startServer() {
   const proc = spawn('node', ['scripts/preview-server.js'], {
     env: { ...process.env, PREVIEW_PORT: String(PORT) },
@@ -2015,7 +2033,7 @@ function renderReport(rows) {
   <div class="summary">
     <div>Generated: ${new Date().toISOString()}</div>
     <div>Standard: WCAG 2.1 AA (axe-core)</div>
-    <div>Routes audited: ${ROUTES.length} &times; ${VIEWPORTS.length} viewports = ${ROUTES.length * VIEWPORTS.length} runs</div>
+    <div>Routes audited: ${AUDITED_ROUTE_COUNT} &times; ${VIEWPORTS.length} viewports = ${AUDITED_ROUTE_COUNT * VIEWPORTS.length} runs</div>
     <div>Total violations: <span class="${totalViolations === 0 ? 'ok' : 'bad'}">${totalViolations}</span></div>
     <div>Layout-shift budget failures: <span class="${budgetFailures.length === 0 ? 'ok' : 'bad'}">${budgetFailures.length}</span></div>
   </div>
@@ -2071,6 +2089,7 @@ async function main() {
         const page = await context.newPage();
         try {
           for (const route of ROUTES) {
+            if (!isAuditedRoute(route)) continue;
             console.log(`  ${viewport.name.padEnd(8)} ${route.url}`);
             const pageErrors = [];
             const consoleErrors = [];

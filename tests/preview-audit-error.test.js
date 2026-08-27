@@ -19,3 +19,18 @@ describe('preview audit browser error handling', () => {
     assert.match(source, /executablePath \? \{ executablePath \} : \{\}/);
   });
 });
+
+describe('preview audit run scoping', () => {
+  it('audits every route when no filter is set', () => {
+    assert.match(source, /REQUESTED_ROUTES\.length === 0/);
+    assert.match(source, /if \(!isAuditedRoute\(route\)\) continue;/);
+  });
+
+  it('rejects a filter that names a route the audit does not have', () => {
+    assert.match(source, /Unknown PREVIEW_AUDIT_ROUTES entries/);
+  });
+
+  it('counts the audited routes, not the configured routes, in the report', () => {
+    assert.match(source, /Routes audited: \$\{AUDITED_ROUTE_COUNT\}/);
+  });
+});
