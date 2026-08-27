@@ -98,7 +98,7 @@
     },
     "Cites": {
       "description": "Entity A cites or references entity B as source material",
-      "valid_source_types": ["Person", "Work"],
+      "valid_source_types": ["Person", "Work", "Concept"],
       "valid_target_types": ["Work", "Person", "Organization", "Concept"]
     },
     "Discusses": {

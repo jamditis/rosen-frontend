@@ -204,7 +204,7 @@
         ],
         "note": "31 entity pairs (74 rows) currently have Mentions asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
-      "directionNote": "Reversed pairs are two separate, independently true facts, not the same fact recorded twice (issue #737 curator ruling, 2026-08-27). Direction stays as declared. The directionalContradictions list below is historical evidence for that ruling, not a review to-do list."
+      "directionNote": "Reversed pairs are two separate, independently true facts, not the same fact recorded twice (issue #737 curator ruling, 2026-08-27). Direction stays as declared. The directionalContradictions list above is historical evidence for that ruling, not a review to-do list."
     },
     "Criticizes": {
       "status": "accepted",
@@ -271,12 +271,13 @@
         ],
         "note": "7 entity pairs (19 rows) currently have Criticizes asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
-      "directionNote": "Reversed pairs are two separate, independently true facts, not the same fact recorded twice (issue #737 curator ruling, 2026-08-27). Direction stays as declared. The directionalContradictions list below is historical evidence for that ruling, not a review to-do list."
+      "directionNote": "Reversed pairs are two separate, independently true facts, not the same fact recorded twice (issue #737 curator ruling, 2026-08-27). Direction stays as declared. The directionalContradictions list above is historical evidence for that ruling, not a review to-do list."
     },
     "Cites": {
       "status": "accepted",
       "description": "Entity A cites or references entity B as source material.",
       "allowedSourceTypes": [
+        "Concept",
         "Person",
         "Work"
       ],
@@ -297,17 +298,17 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
-        "violatingRows": 21,
+        "violatingRows": 16,
         "totalRows": 166,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00499_REL_040",
           "RECORD-00505_REL_022",
           "RECORD-00505_REL_023",
-          "RECORD-00651_REL_006",
-          "RECORD-00680_REL_016"
+          "RECORD-00687_REL_007",
+          "RECORD-00689_REL_014"
         ],
-        "note": "21 of 166 current Cites rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedTargetTypes (citing an idea, not just a person, work, or organization, is normal usage). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "16 of 166 current Cites rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes (an idea can cite another idea as source material, matching the same ruling for Criticizes, Discusses, Expands On, and Pioneered) and to allowedTargetTypes (citing an idea, not just a person, work, or organization, is normal usage). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 3,
@@ -335,7 +336,7 @@
         ],
         "note": "3 entity pairs (7 rows) currently have Cites asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
-      "directionNote": "Reversed pairs are two separate, independently true facts, not the same fact recorded twice (issue #737 curator ruling, 2026-08-27). Direction stays as declared. The directionalContradictions list below is historical evidence for that ruling, not a review to-do list."
+      "directionNote": "Reversed pairs are two separate, independently true facts, not the same fact recorded twice (issue #737 curator ruling, 2026-08-27). Direction stays as declared. The directionalContradictions list above is historical evidence for that ruling, not a review to-do list."
     },
     "Discusses": {
       "status": "accepted",
@@ -402,7 +403,7 @@
         ],
         "note": "10 entity pairs (20 rows) currently have Discusses asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
-      "directionNote": "Direction stays deferred (issue #737 curator ruling, 2026-08-27): the sheet found the data genuinely split and both readings stay documented. Cross-record pairs (like Jay Rosen and Mark Jacob discussing each other in different pieces) read as two independent facts. The one same-record pair, RECORD-00067_REL_003 and RECORD-00067_REL_005 (\"Public Journalism\" and \"The press,\" both asserted from RECORD-00067), reads more like a single passage parsed both ways and is flagged individually in data/relationship-review-report.json rather than resolved either way."
+      "directionNote": "Direction stays deferred (issue #737 curator ruling, 2026-08-27): the sheet found the data genuinely split and both readings stay documented. Cross-record pairs (like Jay Rosen and Mark Jacob discussing each other in different pieces) read as two independent facts. The one same-record pair, RECORD-00067_REL_003 and RECORD-00067_REL_005 (\"Public Journalism\" and \"The press,\" both asserted from RECORD-00067), reads more like a single passage parsed both ways; it is captured above in directionalContradictions as evidence for that split, not resolved either way. Both rows' endpoint types already conform to the declared allowlist, so this pair does not appear in data/relationship-review-report.json -- that file only collects endpoint-type mismatches, never directional contradictions."
     },
     "Expands On": {
       "status": "accepted",
@@ -459,7 +460,7 @@
         ],
         "note": "3 entity pairs (7 rows) currently have Expands On asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
-      "directionNote": "Reversed pairs are two separate, independently true facts, not the same fact recorded twice (issue #737 curator ruling, 2026-08-27). Direction stays as declared. The directionalContradictions list below is historical evidence for that ruling, not a review to-do list."
+      "directionNote": "Reversed pairs are two separate, independently true facts, not the same fact recorded twice (issue #737 curator ruling, 2026-08-27). Direction stays as declared. The directionalContradictions list above is historical evidence for that ruling, not a review to-do list."
     },
     "Affiliated With": {
       "status": "accepted",
@@ -519,7 +520,7 @@
         ],
         "note": "55 entity pairs (211 rows) currently have Affiliated With asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
-      "directionNote": "Reversed rows are the same employment or membership fact recorded backward, not a second fact (issue #737 curator ruling, 2026-08-27) — unlike Mentions or Criticizes, \"employer affiliated with employee\" and \"employee affiliated with employer\" describe one relationship. Each reversed row is a candidate for a swap or a drop, listed in data/relationship-review-report.json for curator review."
+      "directionNote": "Reversed rows are the same employment or membership fact recorded backward, not a second fact (issue #737 curator ruling, 2026-08-27) -- unlike Mentions or Criticizes, \"employer affiliated with employee\" and \"employee affiliated with employer\" describe one relationship. Each reversed row is a candidate for a swap or a drop, listed in data/relationship-review-report.json for curator review."
     },
     "Published In": {
       "status": "accepted",
@@ -640,7 +641,7 @@
         ],
         "note": "44 entity pairs (138 rows) currently have Originated By asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
-      "directionNote": "The issue #737 curator ruling, 2026-08-27, flips the declared direction from Concept (source) / Person (target) to Person (source) / Concept (target), matching the intuitive \"Rosen originated View from Nowhere\" reading. The 125 rows in the old Concept -> Person order (the pre-ruling minority) are now the ones flagged in data/relationship-review-report.json for curator review, not the 638 that were flagged before the flip. Reviewing them is a curator decision (issue #737), not a validator failure; separately, Person -> Work pairs among the flagged rows (like Ron Brynaert and \"Does the New York Times Have a Learning Disability?\") likely belong to Authored By instead of Originated By."
+      "directionNote": "The issue #737 curator ruling, 2026-08-27, flips the declared direction from Concept (source) / Person (target) to Person (source) / Concept (target), matching the intuitive \"Rosen originated View from Nowhere\" reading. The ruling sheet's premise -- that 638 of 763 rows (84%) already ran Person -> Concept -- does not hold up against the data: Person -> Concept is only 197 of 763 rows (26%), Concept -> Person is 125 (16%), and the remaining 441 rows are spread across 16 other endpoint shapes (Work -> Person, Person -> Work, Concept -> Organization, and 13 more). The flip moves the share that already conformed from 125 rows to 197, not to 638. The 566 rows that do not fit the new Person -> Concept allowlist -- including the 125 in the old Concept -> Person order -- are the ones flagged in data/relationship-review-report.json for curator review; see endpointDivergence above for the current count. Reviewing them is a curator decision (issue #737), not a validator failure; separately, Person -> Work pairs among the flagged rows (like Ron Brynaert and \"Does the New York Times Have a Learning Disability?\") likely belong to Authored By instead of Originated By."
     },
     "Occurred At": {
       "status": "accepted",
@@ -759,7 +760,7 @@
         ],
         "note": "8 entity pairs (22 rows) currently have Supports asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
-      "directionNote": "Reversed pairs are two separate, independently true facts, not the same fact recorded twice (issue #737 curator ruling, 2026-08-27). Direction stays as declared. The directionalContradictions list below is historical evidence for that ruling, not a review to-do list."
+      "directionNote": "Reversed pairs are two separate, independently true facts, not the same fact recorded twice (issue #737 curator ruling, 2026-08-27). Direction stays as declared. The directionalContradictions list above is historical evidence for that ruling, not a review to-do list."
     },
     "Owns": {
       "status": "accepted",
@@ -781,7 +782,7 @@
       "forwardLabel": "owns",
       "inverseLabel": null,
       "evidenceStandard": "pipeline-default",
-      "inverseNote": "The candidate inverse label \"Owned By\" is recorded as candidateInverseType so the validator can detect when the same fact is asserted under both labels, but it is not a formal inverseType: Owned By's own endpoint ordering is inconsistent (see the Owned By entry below), so which row (if either) is correct is a pending curator decision, not something this registry asserts.",
+      "inverseNote": "The candidate inverse label \"Owned By\" is recorded as candidateInverseType so the validator can detect when the same fact is asserted under both labels. The issue #737 curator ruling, 2026-08-27, confirms Owned By as Owns' inverse in meaning (see directionNote below and the Owned By entry's rulingNote); inverseType stays null here anyway, because Owned By remains status: \"deferred\" -- it sits outside the active extraction schema (backend/entity_extraction_schema_v3.json), and inverseType is reserved for a formal pairing between two accepted types. candidateInverseType is now a deliberate, permanent hold on that promotion, not an unresolved question.",
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
         "violatingRows": 4,
@@ -817,7 +818,7 @@
       "forwardLabel": "founded",
       "inverseLabel": null,
       "evidenceStandard": "pipeline-default",
-      "inverseNote": "The candidate inverse label \"Founded By\" is recorded as candidateInverseType so the validator can detect when the same fact is asserted under both labels, but it is not a formal inverseType: Founded By's own endpoint ordering is inconsistent (see the Founded By entry below), so which row (if either) is correct is a pending curator decision, not something this registry asserts.",
+      "inverseNote": "The candidate inverse label \"Founded By\" is recorded as candidateInverseType so the validator can detect when the same fact is asserted under both labels. The issue #737 curator ruling, 2026-08-27, confirms Founded By as Founded's inverse in meaning (see the Founded By entry's rulingNote); inverseType stays null here anyway, because Founded By remains status: \"deferred\" -- it sits outside the active extraction schema (backend/entity_extraction_schema_v3.json), and inverseType is reserved for a formal pairing between two accepted types. candidateInverseType is now a deliberate, permanent hold on that promotion, not an unresolved question.",
       "endpointEnforcement": "enforced",
       "candidateInverseType": "Founded By"
     },
@@ -924,6 +925,27 @@
     "Founded By": {
       "status": "deferred",
       "description": "Legacy label used as an apparent inverse of Founded (\"A Founded By B\" intended to mean B founded A).",
+      "allowedSourceTypes": [
+        "Organization"
+      ],
+      "allowedTargetTypes": [
+        "Organization",
+        "Person"
+      ],
+      "endpointEnforcement": "reviewed",
+      "endpointDivergence": {
+        "violatingRows": 108,
+        "totalRows": 129,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00010_REL_002",
+          "RECORD-00010_REL_004",
+          "RECORD-00069_REL_001",
+          "RECORD-00301_REL_007",
+          "RECORD-00324_REL_001"
+        ],
+        "note": "108 of 129 held Founded By rows read backward under the curator-confirmed direction (source = founded entity, target = founder; issue #737 curator ruling, 2026-08-27) -- for example \"Jay Rosen -> PressThink\" instead of the confirmed \"PressThink -> Jay Rosen.\" This is a majority of the type, matching the ruling's own conclusion that most Founded By rows need an individual pass. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures, since this type stays outside the active extraction schema and every row is already held."
+      },
       "observedSourceTypes": [
         "Event",
         "Organization",
@@ -945,7 +967,7 @@
       "forwardLabel": "founded by",
       "inverseLabel": null,
       "evidenceStandard": "pipeline-default",
-      "deferralReason": "Endpoint ordering is inconsistent across existing assertions: the source entity is sometimes the founder and sometimes the founded organization or work. Direction, formal inverse-of-Founded status, and symmetry cannot be inferred safely from current usage and are held pending curator review (see data/graph-validation-holds.json).",
+      "deferralReason": "Founded By stays outside the active extraction schema (backend/entity_extraction_schema_v3.json), so status cannot move to \"accepted\" regardless of direction. Endpoint ordering was inconsistent across existing assertions: the source entity is sometimes the founder and sometimes the founded organization or work. The issue #737 curator ruling, 2026-08-27 (see rulingNote below) resolved direction and formal inverse-of-Founded status -- what is still held is cleaning up the rows that read backward under that direction (see endpointDivergence above) and, separately, deciding whether to promote this label into the writer schema (see data/graph-validation-holds.json).",
       "relatedIssues": [
         737
       ],
@@ -975,54 +997,11 @@
         ],
         "note": "7 entity pairs (31 rows) assert Founded By in both directions for the same two entities. This is the same endpoint-ordering inconsistency named in deferralReason above, made concrete."
       },
-      "allowedSourceTypes": [
-        "Organization"
-      ],
-      "allowedTargetTypes": [
-        "Organization",
-        "Person"
-      ],
-      "endpointEnforcement": "reviewed",
-      "endpointDivergence": {
-        "violatingRows": 108,
-        "totalRows": 129,
-        "asOfDate": "2026-08-27",
-        "exampleRelationshipIds": [
-          "RECORD-00010_REL_002",
-          "RECORD-00010_REL_004",
-          "RECORD-00069_REL_001",
-          "RECORD-00301_REL_007",
-          "RECORD-00324_REL_001"
-        ],
-        "note": "108 of 129 held Founded By rows read backward under the curator-confirmed direction (source = founded entity, target = founder; issue #737 curator ruling, 2026-08-27) -- for example \"Jay Rosen -> PressThink\" instead of the confirmed \"PressThink -> Jay Rosen.\" This is a majority of the type, matching the ruling's own conclusion that most Founded By rows need an individual pass. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures, since this type stays outside the active extraction schema and every row is already held."
-      },
       "rulingNote": "The issue #737 curator ruling, 2026-08-27, adopts \"source = founded entity, target = founder\" as the formal direction, confirming Founded By as Founded's inverse in meaning (2 of the 3 sampled pairs and the plain-English reading support it). This type stays \"deferred\" here because it is not part of the active extraction schema (backend/entity_extraction_schema_v3.json) -- the ruling settles what the label means, not whether the pipeline should write it going forward. Separately, book or article targets (like \"What Are Journalists For?\") likely belong to Authored By instead of Founded By or Founded, since Founded's own schema is scoped to organizations, not works."
     },
     "Owned By": {
       "status": "deferred",
       "description": "Legacy label used as an apparent inverse of Owns (\"A Owned By B\" intended to mean B owns A).",
-      "observedSourceTypes": [
-        "Organization",
-        "Person",
-        "Work"
-      ],
-      "observedTargetTypes": [
-        "Organization",
-        "Person"
-      ],
-      "directionality": "directed",
-      "inverseType": null,
-      "allowSelfLinks": false,
-      "allowMultipleAssertions": true,
-      "temporalScope": "deferred",
-      "disputedAssertionsAllowed": false,
-      "forwardLabel": "owned by",
-      "inverseLabel": null,
-      "evidenceStandard": "pipeline-default",
-      "deferralReason": "Endpoint ordering is inconsistent across existing assertions, matching the same issue as Founded By. Direction and formal inverse-of-Owns status are held pending curator review (see data/graph-validation-holds.json).",
-      "relatedIssues": [
-        737
-      ],
       "allowedSourceTypes": [
         "Organization",
         "Work"
@@ -1041,6 +1020,28 @@
         ],
         "note": "1 of 40 held Owned By rows reads backward under the curator-confirmed direction (source = owned entity, target = owner; issue #737 curator ruling, 2026-08-27) -- \"Graham family -> The Washington Post\" instead of \"The Washington Post -> Graham family.\" Every other traced example already reads correctly. This row is listed in data/relationship-review-report.json for curator review; it is not a validation failure, since this type stays outside the active extraction schema and every row is already held."
       },
+      "observedSourceTypes": [
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "observedTargetTypes": [
+        "Organization",
+        "Person"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "deferred",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "owned by",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "deferralReason": "Owned By stays outside the active extraction schema (backend/entity_extraction_schema_v3.json), so status cannot move to \"accepted\" regardless of direction. Endpoint ordering was inconsistent across existing assertions, matching the same issue as Founded By. The issue #737 curator ruling, 2026-08-27 (see rulingNote below) resolved direction and formal inverse-of-Owns status -- what is still held is cleaning up any rows that read backward under that direction (see endpointDivergence above) and, separately, deciding whether to promote this label into the writer schema (see data/graph-validation-holds.json).",
+      "relatedIssues": [
+        737
+      ],
       "rulingNote": "The issue #737 curator ruling, 2026-08-27, adopts the same direction as Founded By and Owns' inverse -- source = owned entity, target = owner. It is the only reading that makes every traced example agree with its Owns counterpart. This type stays \"deferred\" here because it is not part of the active extraction schema (backend/entity_extraction_schema_v3.json); the ruling settles what the label means, not whether the pipeline should write it going forward."
     },
     "Created": {
@@ -1066,7 +1067,7 @@
         737
       ],
       "recommendedRetypeTo": "Pioneered",
-      "rulingNote": "The issue #737 curator ruling, 2026-08-27, retires this type. The single row, TWTR-17930_REL_001 (Murdoch -> \"resentment news\"), fits Pioneered's own definition exactly (a person who pioneered a concept). It is listed in data/relationship-review-report.json as a retype recommendation; the CSV row itself keeps its current \"Created\" label here, since fixing it is a data edit, not something this registry or validator change makes on its own."
+      "rulingNote": "The issue #737 curator ruling, 2026-08-27, retires this type. The single row, TWTR-17930_REL_001 (Murdoch -> \"resentment news\"), fits Pioneered's own definition exactly (a person who pioneered a concept), hence recommendedRetypeTo: \"Pioneered\" above. Created has no allowedSourceTypes, allowedTargetTypes, or endpointEnforcement here, so it cannot generate a review-report row: data/relationship-review-report.json only collects endpoint-type mismatches for types marked endpointEnforcement: \"reviewed\", and it has no Created section or retype-recommendation channel. This rulingNote is the record of the retype recommendation; the CSV row itself keeps its current \"Created\" label, since fixing it is a data edit, not something this registry or validator change makes on its own."
     },
     "Covers": {
       "status": "deferred",
