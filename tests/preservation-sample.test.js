@@ -7,6 +7,8 @@ import {
   buildPreservationSample,
   formatPreservationSampleJson,
   formatPreservationSampleMarkdown,
+  buildBlindSourcesView,
+  formatPreservationSampleSourcesJson,
   parseArgs,
   DEFAULT_QUOTAS
 } from '../scripts/select-preservation-sample.mjs';
@@ -270,6 +272,21 @@ describe('preservation sample selection (real corpus, default quotas)', () => {
       assert.ok(!('url_status' in item));
       assert.ok(item.objectType === 'archive-record' || item.objectType === 'social-post');
     }
+  });
+
+  it('emits a standalone blind file with no stratum/reason/audit field, matching `sources` exactly', () => {
+    const blind = buildBlindSourcesView(manifest);
+    assert.deepEqual(Object.keys(blind).sort(), ['credential_policy', 'input', 'sample_size', 'schema', 'seed', 'sources']);
+    assert.deepEqual(blind.sources, manifest.sources);
+    for (const item of blind.sources) {
+      assert.deepEqual(Object.keys(item).sort(), ['id', 'objectType', 'url']);
+    }
+
+    const json = formatPreservationSampleSourcesJson(manifest);
+    assert.ok(json.endsWith('\n'));
+    const parsed = JSON.parse(json);
+    assert.equal(parsed.sources.length, manifest.sources.length);
+    assert.ok(!('selection' in parsed), 'the blind file must never carry the audit-only `selection` array');
   });
 
   it('requires no private credentials: URLs carry no embedded auth, and any paywalled host is covered by a stated no-credential policy', () => {

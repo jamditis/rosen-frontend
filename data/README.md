@@ -22,8 +22,9 @@ The metadata and derived data (entities, relationships) are licensed [CC BY 4.0]
 | `wiki-seed.json` | ~125 KB | Seed pages for the public archive wiki (`#wiki` route) |
 | `stewardship-census.json` | ~150 KB | Machine-readable source/runtime, graph, field, URL, and preservation coverage census |
 | `stewardship-census.md` | ~4 KB | Concise human-readable census summary and 2026-07-22 baseline comparison |
-| `preservation-sample.json` | ~60 KB | Versioned 100-source manifest for the preservation pilot (issue #704) |
-| `preservation-sample.md` | ~2 KB | Human-readable coverage summary for the same pilot sample |
+| `preservation-sample.json` | ~60 KB | Versioned 100-source manifest for the preservation pilot (issue #704); curator/reviewer eyes only |
+| `preservation-sample.md` | ~2 KB | Human-readable coverage summary for the same pilot sample; curator/reviewer eyes only |
+| `preservation-sample.sources.json` | ~10 KB | Blind worker-facing projection of the same sample: id, objectType, url only, no stratum or reason |
 
 ### Source CSVs (the source of truth)
 
@@ -136,7 +137,9 @@ Regenerate the 100-source preservation pilot sample (issue #704, epic #696) from
 npm run sample:preservation
 ```
 
-The command writes `preservation-sample.json` and `preservation-sample.md`. The JSON contract is `preservation-sample/1.0.0`, and output carries no wall-clock timestamp: the same seed against unchanged inputs reproduces byte-identical output, which is the property `tests/preservation-sample.test.js` checks directly. Pass `--seed <value>` for a different reproducible sample, or `--sample-size <n>` to change the target count from the default 100.
+The command writes `preservation-sample.json`, `preservation-sample.md`, and `preservation-sample.sources.json`. The JSON contract is `preservation-sample/1.0.0`, and output carries no wall-clock timestamp: the same seed against unchanged inputs reproduces byte-identical output, which is the property `tests/preservation-sample.test.js` checks directly. Pass `--seed <value>` for a different reproducible sample, or `--sample-size <n>` to change the target count from the default 100.
+
+Hand `preservation-sample.sources.json` to whoever runs the blind pilot capture pass — it carries only `id`, `objectType`, and `url` for each source, plus the schema, provenance, and credential policy, with no stratum, reason, or expected-outcome field. `preservation-sample.json` and `preservation-sample.md` carry the full curator/reviewer view (`selection`, with the stratum and reason behind every pick) and must never be handed to the worker.
 
 The sample is stratified across curated and social platforms (PressThink long-form writing, newspaper clippings, Tumblr, threads, Twitter/X, Bluesky, Mastodon), URL outcome (missing, a documented redirector host, a documented capture-difficult host, or an otherwise live-looking URL), verified/unverified status, presence or absence of raw text and extracted-graph links, a few notable (heavily cross-referenced or single-point-of-failure) sources, and page shape (PDF, media, dynamic social timeline, static HTML) — plus a seeded uniform-random slice of at least 10% of the sample to catch whatever the named strata miss. `data/preservation-sample.json`'s `quotas` array records each stratum's target, actual selection, and shortfall.
 

@@ -15,15 +15,20 @@
 // provenance stamp (see scripts/build-stewardship-census.mjs for precedent).
 //
 // Blind-worker split (acceptance criterion: "expected success is not encoded
-// into the sample labels used by the worker"). The manifest has two parallel
-// arrays, same IDs, same order:
-//   - `sources`    -- id, objectType, url only. This is what the pilot worker
-//                     should see. It carries no hint about why a source was
+// into the sample labels used by the worker"). This writes three files:
+//   - preservation-sample.sources.json -- schema, provenance, the credential
+//                     policy, and `sources` (id, objectType, url) only. This
+//                     is the file to hand to whoever runs the blind pilot
+//                     capture pass. It carries no hint about why a source was
 //                     picked or what outcome is expected.
-//   - `selection`  -- id, stratum, group, reason, and the audit fields behind
-//                     the pick (platform, url_status, verified, ...). This is
-//                     for curator/reviewer eyes -- it must never be handed to
-//                     whoever runs the blind capture pass.
+//   - preservation-sample.json         -- the full manifest, including
+//                     `selection` (id, stratum, group, reason, and the audit
+//                     fields behind the pick: platform, url_status, verified,
+//                     ...). This is for curator/reviewer eyes -- it must never
+//                     be handed to whoever runs the blind capture pass.
+//   - preservation-sample.md           -- human-readable coverage summary of
+//                     the full manifest, curator/reviewer eyes only.
+// `sources` and `selection` share the same IDs in the same order.
 // A `url_status` of "known_difficult" or "redirector" is a documented,
 // domain-level heuristic (no network probe: the stewardship census keeps
 // liveness out of its own deterministic contract, and this script follows
@@ -519,6 +524,27 @@ export function formatPreservationSampleJson(manifest) {
   return `${JSON.stringify(manifest, null, 2)}\n`;
 }
 
+// The worker-facing projection promised by the header comment's "Blind-worker
+// split": schema, provenance, the credential policy, and `sources` only.
+// Nothing here says why a source was picked or what outcome is expected --
+// that lives exclusively in `manifest.selection`, which this function never
+// touches. Whoever runs the blind pilot capture pass should be handed this
+// file (preservation-sample.sources.json), never preservation-sample.json.
+export function buildBlindSourcesView(manifest) {
+  return {
+    schema: manifest.schema,
+    input: manifest.input,
+    credential_policy: manifest.credential_policy,
+    seed: manifest.seed,
+    sample_size: manifest.sample_size,
+    sources: manifest.sources
+  };
+}
+
+export function formatPreservationSampleSourcesJson(manifest) {
+  return `${JSON.stringify(buildBlindSourcesView(manifest), null, 2)}\n`;
+}
+
 function markdownTable(headers, rows) {
   const head = `| ${headers.join(' | ')} |`;
   const rule = `| ${headers.map(() => '---').join(' | ')} |`;
@@ -612,6 +638,10 @@ export function writePreservationSample({ rootDir = ROOT_DIR, dataDir, outputDir
   fs.mkdirSync(resolvedOutputDir, { recursive: true });
   fs.writeFileSync(path.join(resolvedOutputDir, 'preservation-sample.json'), formatPreservationSampleJson(manifest));
   fs.writeFileSync(path.join(resolvedOutputDir, 'preservation-sample.md'), formatPreservationSampleMarkdown(manifest));
+  fs.writeFileSync(
+    path.join(resolvedOutputDir, 'preservation-sample.sources.json'),
+    formatPreservationSampleSourcesJson(manifest)
+  );
   return manifest;
 }
 
