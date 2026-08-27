@@ -9,8 +9,13 @@ describe('preview audit browser error handling', () => {
     assert.match(source, /async function launchBrowser\(\)/);
     assert.match(source, /playwright browser is not installed/i);
     assert.match(source, /npx playwright install chromium/);
-    assert.match(source, /chromium\.launch\(\)/);
+    assert.match(source, /chromium\.launch\(/);
     assert.match(source, /await main\(\)\.catch/);
     assert.match(source, /console\.error\(err\.message\)/);
+  });
+
+  it('points at a Chromium that is already on the machine', () => {
+    assert.match(source, /PREVIEW_AUDIT_CHROMIUM_PATH/);
+    assert.match(source, /executablePath \? \{ executablePath \} : \{\}/);
   });
 });

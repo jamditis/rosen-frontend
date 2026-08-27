@@ -66,8 +66,10 @@ with `PREVIEW_PORT=8765 npm run preview`; override the bind address with
 
 `npm run preview:audit` starts the preview server, walks key routes at mobile
 and desktop viewports, runs `axe-core` for WCAG 2.1 AA, and writes
-`preview-audit-results/axe-report.html` plus per-route screenshots. It exits
-non-zero if violations are found.
+`preview-audit-results/axe-report.html` plus per-route screenshots. It also
+measures layout shift per route and checks it against the budgets in
+`scripts/layout-shift-budgets.js`. It exits non-zero if violations or budget
+regressions are found.
 
 Backend pipeline work lives in `backend/` and uses Poetry:
 

@@ -22,7 +22,20 @@ Tests use Node's built-in test runner for frontend/data paths and pytest for bac
 - `npm run test:workers` — the source-discovery Worker subset.
 - `npm run test:okf` — the OKF bundle, flight-recorder, and blindfold subset.
 - `npm run preview` — local static preview at `http://127.0.0.1:8000/` by default.
-- `npm run preview:audit` — starts preview, walks key routes at mobile and desktop sizes, runs axe, and writes `preview-audit-results/`.
+- `npm run preview:audit` — starts preview, walks key routes at mobile and desktop sizes, runs axe, measures layout shift, and writes `preview-audit-results/`.
+
+The preview audit also budgets layout shift per route. It records every
+Layout Instability entry, splits each route into a hydration phase and a
+settled phase at the point the route first goes quiet, and fails the run when
+either phase goes over the budget for its route class. Budgets, baselines, and
+the route classes live in `scripts/layout-shift-budgets.js`;
+`tests/layout-shift-budget.test.js` covers the evaluation logic. Two
+environment switches help when the machine is unusual:
+
+- `PREVIEW_AUDIT_CHROMIUM_PATH` — use a Chromium binary already on the machine.
+- `PREVIEW_AUDIT_LAYOUT_SHIFT_SEED=1` — measure and write
+  `preview-audit-results/layout-shift-baseline.json` without failing on
+  budget. Use it to refresh the baseline in `scripts/layout-shift-budgets.js`.
 
 The subgroup scripts are development conveniences, not the merge-coverage boundary. Frontend Validation runs for every pull request to `main` and invokes `npm test`, whose globs automatically include new root Node tests. `tests/ci-node-suite-coverage.test.js` fails if an active Node test moves outside the canonical globs, the workflow stops invoking the complete suite, or a pull-request path filter can skip it.
 

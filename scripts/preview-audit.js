@@ -14,6 +14,14 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { AxeBuilder } from '@axe-core/playwright';
+import {
+  LAYOUT_SHIFT_TIMING,
+  LAYOUT_SHIFT_BASELINE_RUN,
+  summarizeLayoutShifts,
+  evaluateLayoutShiftBudget,
+  collectLayoutShiftFailures,
+  formatLayoutShiftFailure,
+} from './layout-shift-budgets.js';
 
 const PORT = Number(process.env.PREVIEW_PORT || 8765);
 // Pick a connect target for Playwright that's always routable, regardless
@@ -32,6 +40,9 @@ const URL_HOST = CLIENT_HOST.includes(':') && !CLIENT_HOST.startsWith('[')
   : CLIENT_HOST;
 const BASE = `http://${URL_HOST}:${PORT}`;
 const REQUESTED_VIEWPORT = (process.env.PREVIEW_AUDIT_VIEWPORT || '').trim();
+// Seeding mode measures layout shift and writes the values, but never fails on
+// budget. Use it to refresh the baseline in scripts/layout-shift-budgets.js.
+const LAYOUT_SHIFT_SEED_MODE = process.env.PREVIEW_AUDIT_LAYOUT_SHIFT_SEED === '1';
 const OUT_DIR_ROOT = resolve(fileURLToPath(import.meta.url), '..', '..', 'preview-audit-results');
 const OUT_DIR = REQUESTED_VIEWPORT
   ? resolve(OUT_DIR_ROOT, 'shards', REQUESTED_VIEWPORT)
@@ -229,6 +240,64 @@ async function startServer() {
   return proc;
 }
 
+// Collect Layout Instability entries from the first paint on. The script runs
+// before any document script on every navigation, so each route starts with an
+// empty list. `buffered: true` still hands over entries the browser recorded
+// before the observer attached.
+function installLayoutShiftObserver(context) {
+  return context.addInitScript(() => {
+    window.__previewLayoutShifts = [];
+    try {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          window.__previewLayoutShifts.push({
+            value: entry.value,
+            startTime: entry.startTime,
+            hadRecentInput: entry.hadRecentInput,
+          });
+        }
+      });
+      observer.observe({ type: 'layout-shift', buffered: true });
+    } catch {
+      // A browser without the Layout Instability API reports no shifts.
+    }
+  });
+}
+
+// Wait for the route to stop shifting, mark that quiet point, then watch a
+// short idle window for anything that shifts afterwards. Nothing touches the
+// page during the idle window, so what it records is instability the visitor
+// would see on a page that already looked finished.
+async function measureLayoutShift(page) {
+  const readEntries = () => page.evaluate(
+    () => (window.__previewLayoutShifts || []).map((entry) => ({ ...entry })),
+  );
+  const deadline = Date.now() + LAYOUT_SHIFT_TIMING.maxGraceMs;
+  let entries = await readEntries();
+  let seen = entries.length;
+  let quietSince = Date.now();
+  let reachedGraceLimit = false;
+  for (;;) {
+    if (Date.now() - quietSince >= LAYOUT_SHIFT_TIMING.quietMs) break;
+    if (Date.now() >= deadline) {
+      reachedGraceLimit = true;
+      break;
+    }
+    await page.waitForTimeout(LAYOUT_SHIFT_TIMING.pollMs);
+    entries = await readEntries();
+    if (entries.length !== seen) {
+      seen = entries.length;
+      quietSince = Date.now();
+    }
+  }
+  const hydrationEndsAt = entries.length
+    ? Math.max(...entries.map((entry) => entry.startTime))
+    : 0;
+  await page.waitForTimeout(LAYOUT_SHIFT_TIMING.settledObservationMs);
+  const settledEntries = await readEntries();
+  return summarizeLayoutShifts(settledEntries, { hydrationEndsAt, reachedGraceLimit });
+}
+
 async function assertArchiveRootReturn(page, locator, label) {
   await locator.waitFor({ state: 'visible' });
   const box = await locator.boundingBox();
@@ -374,6 +443,9 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       `${route.slug} loaded archive-details.json ${archiveDetailsRequests.length} times; expected ${expectation}`,
     );
   }
+  // Measure before any interaction check runs, so the idle window is idle.
+  const layoutShiftMeasurement = await measureLayoutShift(page);
+  const layoutShift = evaluateLayoutShiftBudget(route, layoutShiftMeasurement);
   if (route.verifyReportFirst) {
     const reportDialog = page.getByRole('dialog', { name: 'Report a problem or suggest a record' });
     await reportDialog.waitFor();
@@ -1850,16 +1922,22 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     })),
     passes: result.passes.length,
     incomplete: result.incomplete.length,
+    layoutShift,
   };
 }
 
 async function launchBrowser() {
+  // PREVIEW_AUDIT_CHROMIUM_PATH points the audit at a Chromium binary that is
+  // already on the machine. Images that ship a pinned browser can use it
+  // instead of downloading a second copy.
+  const executablePath = (process.env.PREVIEW_AUDIT_CHROMIUM_PATH || '').trim();
   try {
-    return await chromium.launch();
+    return await chromium.launch(executablePath ? { executablePath } : {});
   } catch (err) {
     const message = [
       'Playwright browser is not installed or cannot be launched.',
       'Run `npx playwright install chromium` and then retry `npm run preview:audit`.',
+      'To use a Chromium that is already installed, set PREVIEW_AUDIT_CHROMIUM_PATH to its binary.',
       `Original error: ${err.message}`,
     ].join('\n');
     throw new Error(message);
@@ -1875,8 +1953,39 @@ const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
 ));
 
+// One layout-shift row per audited route. Every cell shows the measured value
+// next to the seeded baseline and the budget, so a reader can tell a real
+// regression from normal run-to-run movement.
+function renderLayoutShiftRows(rows) {
+  return rows.map((r) => {
+    const shift = r.layoutShift;
+    if (!shift) {
+      return `<tr><td><span class="badge">${esc(r.route)}</span></td><td>${esc(r.viewport)}</td>`
+        + '<td colspan="4" class="v-minor">not measured (route errored)</td></tr>';
+    }
+    const cell = (phase) => {
+      const measured = shift.measured?.[phase] ?? 0;
+      const baseline = shift.baseline?.[phase];
+      const over = shift.failures.some((f) => f.phase === phase);
+      return `<td class="${over ? 'v-critical' : 'v-minor'}">${esc(measured)}`
+        + ` <span class="badge">budget ${esc(shift.budget[phase])}</span>`
+        + (baseline === undefined ? '' : ` <span class="badge">baseline ${esc(baseline)}</span>`)
+        + '</td>';
+    };
+    return `<tr>
+      <td><span class="badge">${esc(r.route)}</span></td>
+      <td>${esc(r.viewport)}</td>
+      <td>${esc(shift.routeClass)}${shift.isException ? ' <span class="badge">exception</span>' : ''}</td>
+      ${cell('hydration')}
+      ${cell('settled')}
+      <td class="v-minor">${esc(shift.note)}</td>
+    </tr>`;
+  }).join('');
+}
+
 function renderReport(rows) {
   const totalViolations = rows.reduce((s, r) => s + r.violations.length, 0);
+  const budgetFailures = collectLayoutShiftFailures(rows);
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1908,6 +2017,7 @@ function renderReport(rows) {
     <div>Standard: WCAG 2.1 AA (axe-core)</div>
     <div>Routes audited: ${ROUTES.length} &times; ${VIEWPORTS.length} viewports = ${ROUTES.length * VIEWPORTS.length} runs</div>
     <div>Total violations: <span class="${totalViolations === 0 ? 'ok' : 'bad'}">${totalViolations}</span></div>
+    <div>Layout-shift budget failures: <span class="${budgetFailures.length === 0 ? 'ok' : 'bad'}">${budgetFailures.length}</span></div>
   </div>
 
   <table>
@@ -1926,6 +2036,21 @@ function renderReport(rows) {
       </tr>`).join('')}
     </tbody>
   </table>
+
+  <h2>Layout shift</h2>
+  <p>
+    Hydration covers shifts up to the point each route first goes quiet, which
+    is expected application startup. Settled covers shifts after that quiet
+    point with no user input, which is instability a visitor sees on a page
+    that already looked finished. A seeded baseline, where one is shown, comes
+    from the run dated ${esc(LAYOUT_SHIFT_BASELINE_RUN)}.
+  </p>
+  <table>
+    <thead><tr><th>Route</th><th>Viewport</th><th>Class</th><th>Hydration CLS</th><th>Settled CLS</th><th>Budget note</th></tr></thead>
+    <tbody>
+      ${renderLayoutShiftRows(rows)}
+    </tbody>
+  </table>
 </body>
 </html>`;
   return html;
@@ -1940,6 +2065,7 @@ async function main() {
     const browser = await launchBrowser();
     try {
       const context = await browser.newContext({ serviceWorkers: 'block' });
+      await installLayoutShiftObserver(context);
       const rows = [];
       for (const viewport of VIEWPORTS) {
         const page = await context.newPage();
@@ -2000,6 +2126,13 @@ async function main() {
               if (networkErrors.length > 0) {
                 throw new Error(`Same-origin network errors: ${JSON.stringify(networkErrors)}`);
               }
+              const measured = row.layoutShift?.measured;
+              if (measured) {
+                console.log(
+                  `    layout shift: hydration ${measured.hydration} settled ${measured.settled}`
+                  + (row.layoutShift.withinBudget ? '' : ' OVER BUDGET'),
+                );
+              }
               rows.push(row);
             } catch (err) {
               console.error(`  FAILED ${viewport.name} ${route.url}: ${err.message}`);
@@ -2019,10 +2152,36 @@ async function main() {
       await writeFile(resolve(OUT_DIR, 'axe-report.html'), renderReport(rows));
       await writeFile(resolve(OUT_DIR, 'axe-report.json'), JSON.stringify(rows, null, 2));
 
+      const baseline = {};
+      for (const row of rows) {
+        const measured = row.layoutShift?.measured;
+        if (!measured) continue;
+        const current = baseline[row.route] || { hydration: 0, settled: 0 };
+        baseline[row.route] = {
+          hydration: Math.max(current.hydration, measured.hydration),
+          settled: Math.max(current.settled, measured.settled),
+        };
+      }
+      await writeFile(
+        resolve(OUT_DIR, 'layout-shift-baseline.json'),
+        JSON.stringify(baseline, null, 2),
+      );
+
       const totalViolations = rows.reduce((s, r) => s + r.violations.length, 0);
+      const budgetFailures = collectLayoutShiftFailures(rows);
       console.log(`\nReport: ${resolve(OUT_DIR, 'axe-report.html')}`);
       console.log(`Total violations: ${totalViolations}`);
+      console.log(`Layout-shift budget failures: ${budgetFailures.length}`);
+      for (const failure of budgetFailures) {
+        console.error(`  ${formatLayoutShiftFailure(failure)}`);
+      }
+      if (LAYOUT_SHIFT_SEED_MODE) {
+        console.log(
+          `Seeding mode: budget failures are not fatal. Baseline written to ${resolve(OUT_DIR, 'layout-shift-baseline.json')}`,
+        );
+      }
       if (totalViolations > 0) process.exitCode = 1;
+      if (budgetFailures.length > 0 && !LAYOUT_SHIFT_SEED_MODE) process.exitCode = 1;
     } finally {
       await browser.close();
     }

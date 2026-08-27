@@ -274,6 +274,16 @@ viewports, runs `axe-core` for WCAG 2.1 AA, and writes
 `preview-audit-results/screenshots/{viewport}/`. Exits non-zero if any
 violations are found.
 
+The audit also budgets layout shift per route. Each route is split into a
+hydration phase, which ends when the route first goes quiet, and a settled
+phase, which covers shifts after that with no user input. Both phases are
+checked against the budget for the route class (archive, record, desktop, or
+standalone) in `scripts/layout-shift-budgets.js`, and the run exits non-zero on
+a regression. `PREVIEW_AUDIT_LAYOUT_SHIFT_SEED=1` measures without failing and
+writes `preview-audit-results/layout-shift-baseline.json`, which is how the
+baseline in that file is refreshed. `PREVIEW_AUDIT_CHROMIUM_PATH` points the
+audit at a Chromium binary already on the machine.
+
 ## Testing
 
 Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` covers data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, process-record, and the current design-system surfaces. Run `find tests -maxdepth 1 -name '*.test.js' -print | sort` for the current file inventory.
