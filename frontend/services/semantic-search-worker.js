@@ -31,7 +31,7 @@ import {
   normalizeInPlace,
   DEFAULT_EMBEDDINGS_BIN_URL,
   DEFAULT_EMBEDDINGS_INDEX_URL,
-} from './embeddings-worker.js?v=3.8.35';
+} from './embeddings-worker.js?v=3.8.36';
 
 // The sentence-transformer that produced data/archive-embeddings.bin. A query
 // encoded by any other model lands in a different space and ranks noise.
@@ -51,9 +51,9 @@ export const TRANSFORMERS_MODULE_URL =
 // Semantic search loads this larger social store. The similar-in-theme feature
 // continues to load only the smaller edited-record store.
 export const DEFAULT_SOCIAL_EMBEDDINGS_BIN_URL =
-  '../../data/archive-social-embeddings.bin?v=3.8.35';
+  '../../data/archive-social-embeddings.bin?v=3.8.36';
 export const DEFAULT_SOCIAL_EMBEDDINGS_INDEX_URL =
-  '../../data/archive-social-embeddings.json?v=3.8.35';
+  '../../data/archive-social-embeddings.json?v=3.8.36';
 
 /**
  * Every host this worker reaches at runtime, so the deployed Content Security

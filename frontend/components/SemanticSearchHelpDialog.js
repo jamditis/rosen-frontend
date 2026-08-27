@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
-import { html } from '../html.js?v=3.8.35';
-import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.35';
+import { html } from '../html.js?v=3.8.36';
+import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.36';
 
 const SemanticSearchHelpDialog = ({
   isOpen,
@@ -15,7 +15,7 @@ const SemanticSearchHelpDialog = ({
   const descriptionId = `${dialogId}-description`;
   const covered = Number.isFinite(coverage) && coverage > 0
     ? coverage.toLocaleString()
-    : 'the indexed archive records';
+    : 'all indexed';
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -76,7 +76,7 @@ const SemanticSearchHelpDialog = ({
             <p>
               When you turn it on, your browser downloads about 50 MB of search files.
               A small language model turns your search into a pattern of numbers and
-              compares it with stored patterns for ${covered}.
+              compares it with stored patterns for ${covered} archive records.
             </p>
             <p>The model does not write or answer anything. It only helps rank records.</p>
           </section>
