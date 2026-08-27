@@ -3,7 +3,7 @@
   "source_name": "Wayback Machine capture index for archive.pressthink.org (2004-2008)",
   "provenance": "https://web.archive.org/cdx/search/cdx?url=archive.pressthink.org*&collapse=urlkey&fl=original,timestamp,mimetype,statuscode,digest&filter=statuscode:200&filter=mimetype:text/html",
   "retrieved_at": "2026-08-27",
-  "coverage_note": "every distinct dated post url the Wayback Machine captured with a 200 html response; wide url coverage but no titles, so only the url tier can run against it",
+  "coverage_note": "every distinct dated post url the Wayback Machine captured with a 200 html response; urls only, no titles, so only the url tier can run against it. It reads the same crawl as the monthly index, so it is not an independent source",
   "entries": [
     {
       "url": "http://archive.pressthink.org/2004/01/03/inside_baseball.html",

@@ -49,14 +49,24 @@ agnostic, so an ``https://`` row in the CSV still matches.
 Match tiers
 -----------
 
-Every inventory entry lands in exactly one tier. Tiers roll up into the three
-statuses the report groups by:
+Every inventory entry lands in exactly one tier. Tiers run strongest first and
+roll up into the three statuses the report groups by:
 
     exact_url          present     canonical source URL is an archive row URL
-    title_strong       present     same publication date, title agrees
     body_fingerprint   present     opening words of the body match a row
+    title_strong       present     same publication date, title agrees
     review             needs_review weak or off-date evidence, human decides
     missing            missing     no archive row matches under any tier
+
+Title agreement is the weakest of the three present tiers, so it is the most
+guarded. A title confirms a work when the token sets nearly match, or when one
+set contains the other and the overlap still clears ``CONTAINED_JACCARD`` and
+the extra tokens are not a part marker. Movable Type serial posts differ by a
+part marker alone, so containment there is a false match, not agreement.
+
+One archive row holds one work. When two different source works both grade
+present against the same row, the weaker claim goes to review and the report
+lists the conflict, because at least one of the two must be wrong.
 
 ``missing`` means "no row in this archive matches this inventory entry". It
 does not mean the work never existed, and it does not mean a work absent from
@@ -147,6 +157,26 @@ STRONG_JACCARD = 0.8
 REVIEW_JACCARD = 0.5
 MIN_TITLE_TOKENS = 2
 
+# Containment floor. One title's tokens can sit inside another's because the
+# archive stores a shortened form of the published title, which is real
+# agreement. It can also happen because one title is a short phrase that the
+# other merely repeats, which is not. The floor keeps containment from
+# forgiving a long tail of extra words.
+CONTAINED_JACCARD = 0.6
+
+# Movable Type ran serial posts whose titles differ from their siblings by a
+# part marker alone, so one title's tokens are a subset of the other's. That is
+# the containment shape and the opposite of agreement: "... Say What They
+# Found" and "... Say What They Found (Part III)" are different posts. When the
+# only extra tokens are a serial marker, containment proves nothing and a
+# human decides.
+SERIAL_MARKER_WORDS = frozenset(
+    """part pt parts continued cont one two three four five six seven eight
+    nine ten""".split()
+)
+_ROMAN_NUMERAL_RE = re.compile(r"^[ivx]{2,4}$")
+_SMALL_NUMBER_RE = re.compile(r"^\d{1,2}$")
+
 # How many words of body text make a fingerprint. Long enough that two
 # different posts cannot collide, short enough to survive a truncated excerpt.
 FINGERPRINT_WORDS = 12
@@ -156,7 +186,10 @@ _LEGACY_POST_RE = re.compile(
 )
 _MODERN_POST_RE = re.compile(r"^pressthink\.org/(\d{4})/(\d{2})/(?:(\d{2})/)?([^/]+)$")
 
-PRESENT_TIERS = ("exact_url", "title_strong", "body_fingerprint")
+# Strongest evidence first. The order is the order the tiers run in, and the
+# order the conflict guard uses when two source works claim one archive row.
+PRESENT_TIERS = ("exact_url", "body_fingerprint", "title_strong")
+TIER_RANK = {tier: rank for rank, tier in enumerate(PRESENT_TIERS)}
 STATUS_BY_TIER = {tier: "present" for tier in PRESENT_TIERS}
 STATUS_BY_TIER["review"] = "needs_review"
 STATUS_BY_TIER["missing"] = "missing"
@@ -283,6 +316,7 @@ class ArchiveIndex(NamedTuple):
     by_year: dict[int, list[Record]]
     by_fingerprint: dict[str, str]
     titles: dict[str, str]
+    ambiguous_fingerprints: frozenset[str]
 
 
 def _record_fingerprints(row: dict, title: str) -> list[str]:
@@ -311,6 +345,7 @@ def build_archive_index(rows: Iterable[dict]) -> ArchiveIndex:
     by_month: dict[tuple[int, int], list[Record]] = defaultdict(list)
     by_year: dict[int, list[Record]] = defaultdict(list)
     by_fingerprint: dict[str, str] = {}
+    ambiguous: set[str] = set()
     titles: dict[str, str] = {}
 
     for row in rows:
@@ -327,10 +362,25 @@ def build_archive_index(rows: Iterable[dict]) -> ArchiveIndex:
             by_month[(date[0], date[1])].append(rec)
             by_year[date[0]].append(rec)
         for print_ in _record_fingerprints(row, title):
-            by_fingerprint.setdefault(print_, record_id)
+            claimed = by_fingerprint.get(print_)
+            if claimed is None:
+                by_fingerprint[print_] = record_id
+            elif claimed != record_id:
+                # Two rows open with the same twelve words. The fingerprint
+                # cannot tell them apart, so it must not pick one of them.
+                ambiguous.add(print_)
+
+    for print_ in ambiguous:
+        by_fingerprint.pop(print_, None)
 
     return ArchiveIndex(
-        by_url, dict(by_day), dict(by_month), dict(by_year), by_fingerprint, titles
+        by_url,
+        dict(by_day),
+        dict(by_month),
+        dict(by_year),
+        by_fingerprint,
+        titles,
+        frozenset(ambiguous),
     )
 
 
@@ -340,37 +390,70 @@ def _jaccard(a: frozenset[str], b: frozenset[str]) -> float:
     return len(a & b) / len(a | b)
 
 
+def _is_serial_token(token: str) -> bool:
+    """Whether one token is a part or serial marker rather than a word."""
+    return (
+        token in SERIAL_MARKER_WORDS
+        or bool(_ROMAN_NUMERAL_RE.match(token))
+        or bool(_SMALL_NUMBER_RE.match(token))
+    )
+
+
+def _serial_marker_only(extra: frozenset[str]) -> bool:
+    """Whether the tokens one title adds are nothing but a serial marker."""
+    return bool(extra) and all(_is_serial_token(t) for t in extra)
+
+
+def _title_agreement(
+    tokens: frozenset[str], rec_tokens: frozenset[str]
+) -> tuple[float, bool]:
+    """Score one title pair. Returns (jaccard, strong).
+
+    ``strong`` is the only thing that can confirm a work, so it is deliberately
+    hard to earn. High token overlap earns it. Containment earns it as well,
+    because the archive sometimes stores a shortened form of the published
+    title, but only when the overlap still clears ``CONTAINED_JACCARD`` and the
+    extra tokens are not a serial marker.
+    """
+    score = _jaccard(tokens, rec_tokens)
+    # Both sides must carry tokens, or a one-word row would "contain"
+    # everything and confirm works it does not hold.
+    if len(tokens) < MIN_TITLE_TOKENS or len(rec_tokens) < MIN_TITLE_TOKENS:
+        return score, False
+    if score >= STRONG_JACCARD:
+        return score, True
+    # Containment is checked both ways: either side can be the shortened one.
+    if tokens <= rec_tokens:
+        extra = rec_tokens - tokens
+    elif rec_tokens <= tokens:
+        extra = tokens - rec_tokens
+    else:
+        return score, False
+    if _serial_marker_only(extra):
+        return score, False
+    return score, score >= CONTAINED_JACCARD
+
+
 def _best_in_bucket(
     tokens: frozenset[str], bucket: list[Record]
 ) -> tuple[Optional[Record], float, bool]:
-    """Best-scoring record in a bucket. Returns (record, jaccard, contained)."""
-    best: Optional[Record] = None
-    best_score = 0.0
-    best_contained = False
-    for rec in bucket:
-        # Containment is checked both ways because the archive sometimes
-        # stores a shortened form of the published title. Both sides must
-        # carry tokens, or an untitled row would "contain" everything.
-        contained = (
-            len(tokens) >= MIN_TITLE_TOKENS
-            and len(rec.tokens) >= MIN_TITLE_TOKENS
-            and (tokens <= rec.tokens or rec.tokens <= tokens)
-        )
-        score = _jaccard(tokens, rec.tokens)
-        if contained and not best_contained:
-            best, best_score, best_contained = rec, score, True
-        elif contained == best_contained and score > best_score:
-            best, best_score, best_contained = rec, score, contained
-    return best, best_score, best_contained
+    """Best record in a bucket. Returns (record, jaccard, strong).
 
-
-def _is_strong_title(tokens: frozenset[str], score: float, contained: bool) -> bool:
-    """Whether a bucket's best match counts as strong title agreement.
-
-    Shared by the same-date and cross-date branches so the two can never grade
-    the same evidence differently.
+    Candidates rank by strong agreement first and by score second. Ranking on
+    containment alone would let a weakly contained title beat a near-identical
+    one; ranking on the score alone would drop a shortened archive title that
+    does agree.
     """
-    return (contained or score >= STRONG_JACCARD) and len(tokens) >= MIN_TITLE_TOKENS
+    best: Optional[Record] = None
+    best_key = (False, 0.0)
+    for rec in bucket:
+        score, strong = _title_agreement(tokens, rec.tokens)
+        if score <= 0.0:
+            continue
+        key = (strong, score)
+        if best is None or key > best_key:
+            best, best_key = rec, key
+    return best, best_key[1], best_key[0]
 
 
 # --------------------------------------------------------------------------
@@ -417,16 +500,8 @@ def classify_entry(entry: dict, index: ArchiveIndex) -> dict:
 
     tokens = title_tokens(title) if title else frozenset()
 
-    if tokens and date is not None:
-        rec, score, contained = _best_in_bucket(tokens, index.by_day.get(date, []))
-        if rec is not None and _is_strong_title(tokens, score, contained):
-            result.update(
-                matched_id=rec.record_id,
-                matched_title=rec.title,
-                score=round(score, 3),
-            )
-            return finish("title_strong")
-
+    # The body fingerprint is twelve of the post's own opening words, so it is
+    # stronger evidence than title-token agreement and runs first.
     print_ = fingerprint_body(body)
     if print_ and print_ in index.by_fingerprint:
         matched = index.by_fingerprint[print_]
@@ -439,12 +514,23 @@ def classify_entry(entry: dict, index: ArchiveIndex) -> dict:
         return finish("body_fingerprint")
 
     if tokens and date is not None:
+        day_rec, day_score, day_strong = _best_in_bucket(
+            tokens, index.by_day.get(date, [])
+        )
+        if day_rec is not None and day_strong:
+            result.update(
+                matched_id=day_rec.record_id,
+                matched_title=day_rec.title,
+                score=round(day_score, 3),
+            )
+            return finish("title_strong")
+
         # Same month, weaker title agreement: a human decides.
         month_bucket = [
             r for r in index.by_month.get((date[0], date[1]), []) if r.date != date
         ]
-        rec, score, contained = _best_in_bucket(tokens, month_bucket)
-        if rec is not None and _is_strong_title(tokens, score, contained):
+        rec, score, strong = _best_in_bucket(tokens, month_bucket)
+        if rec is not None and strong:
             result.update(
                 matched_id=rec.record_id,
                 matched_title=rec.title,
@@ -456,7 +542,6 @@ def classify_entry(entry: dict, index: ArchiveIndex) -> dict:
             )
             return finish("review")
 
-        day_rec, day_score, _ = _best_in_bucket(tokens, index.by_day.get(date, []))
         if day_rec is not None and day_score >= REVIEW_JACCARD:
             result.update(
                 matched_id=day_rec.record_id,
@@ -471,8 +556,8 @@ def classify_entry(entry: dict, index: ArchiveIndex) -> dict:
             for r in index.by_year.get(date[0], [])
             if r.date is None or r.date[1] != date[1]
         ]
-        yr_rec, yr_score, yr_contained = _best_in_bucket(tokens, year_bucket)
-        if yr_rec is not None and _is_strong_title(tokens, yr_score, yr_contained):
+        yr_rec, yr_score, yr_strong = _best_in_bucket(tokens, year_bucket)
+        if yr_rec is not None and yr_strong:
             month = yr_rec.date[1] if yr_rec.date else 0
             result.update(
                 matched_id=yr_rec.record_id,
@@ -498,13 +583,29 @@ def classify_entry(entry: dict, index: ArchiveIndex) -> dict:
 # --------------------------------------------------------------------------
 
 
+STATUS_RANK = {"present": 0, "needs_review": 1, "missing": 2}
+
+
 def _in_window(year: Optional[int], start: int, end: int) -> bool:
     return year is not None and start <= year <= end
 
 
+def _ordered_statuses(bucket: dict[str, int]) -> dict[str, int]:
+    """Put a status bucket in a fixed order.
+
+    Insertion order would otherwise follow whichever status a source listed
+    first, so two runs over the same inventories in a different order would
+    write different bytes.
+    """
+    return {
+        status: bucket[status]
+        for status in sorted(bucket, key=lambda s: STATUS_RANK[s])
+    }
+
+
 def load_inventory(path: Path) -> dict:
     """Read one inventory file and stamp its source_id onto every entry."""
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    data: dict = json.loads(Path(path).read_text(encoding="utf-8"))
     source_id = data.get("source_id") or Path(path).stem
     entries = []
     for entry in data.get("entries", []):
@@ -540,6 +641,153 @@ def _dedupe_entries(inventories: Iterable[dict]) -> list[dict]:
     return list(best.values())
 
 
+def _flag_conflicting_claims(results: list[dict]) -> list[dict]:
+    """Send a present grade to review when two works claim one archive row.
+
+    One archive row holds one work. When two different canonical source URLs
+    both grade present against the same record id, at most one of them can be
+    right, and the row itself may carry the wrong title or date. Keep the claim
+    with the strongest tier, send the rest to review, and record the conflict
+    so a curator sees it instead of a silent double count.
+    """
+    claims: dict[str, dict[str, str]] = defaultdict(dict)
+    for res in results:
+        if res["status"] != "present" or not res["matched_id"]:
+            continue
+        by_url = claims[res["matched_id"]]
+        held = by_url.get(res["canonical_url"])
+        tier = res["tier"]
+        if held is None or TIER_RANK[tier] < TIER_RANK[held]:
+            by_url[res["canonical_url"]] = tier
+
+    conflicts = []
+    kept_claim: dict[str, tuple[str, str]] = {}
+    for record_id, by_url in sorted(claims.items()):
+        ranked = sorted(by_url.items(), key=lambda kv: (TIER_RANK[kv[1]], kv[0]))
+        kept_url, kept_tier = ranked[0]
+        kept_claim[record_id] = (kept_url, kept_tier)
+        if len(by_url) < 2:
+            continue
+        dropped = ranked[1:]
+        for res in results:
+            if res["matched_id"] != record_id or res["status"] != "present":
+                continue
+            if res["canonical_url"] == kept_url:
+                continue
+            res["tier"] = "review"
+            res["status"] = STATUS_BY_TIER["review"]
+            res["note"] = (
+                f"{record_id} is already claimed by {kept_url} on the "
+                f"{kept_tier} tier; one archive row cannot hold two works, so "
+                "a curator decides which work this row holds"
+            )
+        conflicts.append(
+            {
+                "record_id": record_id,
+                "kept": {"canonical_url": kept_url, "tier": kept_tier},
+                "sent_to_review": [
+                    {"canonical_url": url, "tier": tier} for url, tier in dropped
+                ],
+            }
+        )
+
+    # A review row can point at a row another work already holds. Say so, so
+    # the curator reads the two decisions together.
+    for res in results:
+        if res["status"] != "needs_review" or not res["matched_id"]:
+            continue
+        claim = kept_claim.get(res["matched_id"])
+        if claim is None or claim[0] == res["canonical_url"]:
+            continue
+        clause = (
+            f"{res['matched_id']} is already claimed by {claim[0]} on the "
+            f"{claim[1]} tier"
+        )
+        if clause in res["note"]:
+            continue
+        res["note"] = f"{res['note']}; {clause}" if res["note"] else clause
+
+    return conflicts
+
+
+def _source_overlap(results: list[dict]) -> dict:
+    """How far the sources list the same works.
+
+    Two inventories can look like corroboration and be one measurement counted
+    twice. The report states the overlap so a reader never has to assume.
+    """
+    by_source: dict[str, set[str]] = defaultdict(set)
+    for res in results:
+        by_source[res["source_id"] or "unknown"].add(res["canonical_url"])
+
+    sets = list(by_source.values())
+    all_works: set[str] = set().union(*sets) if sets else set()
+    in_every: set[str] = set.intersection(*sets) if sets else set()
+
+    per_source = {}
+    for source, works in sorted(by_source.items()):
+        others: set[str] = set()
+        for other_source, other_works in by_source.items():
+            if other_source != source:
+                others |= other_works
+        per_source[source] = {
+            "works_listed": len(works),
+            "works_only_this_source_lists": len(works - others),
+        }
+    return {
+        "distinct_works": len(all_works),
+        "works_every_source_lists": len(in_every),
+        "by_source": per_source,
+    }
+
+
+def _row_month(row: dict) -> Optional[tuple[int, int]]:
+    """The publication month of one archive row, from its date or its URL."""
+    date = parse_date(row.get("publication_date") or "") or date_from_url(
+        canonical_source_url(row.get("url") or "")
+    )
+    return (date[0], date[1]) if date else None
+
+
+def _months_without_listings(
+    results: list[dict], rows: list[dict], start_year: int, end_year: int
+) -> list[dict]:
+    """Months of the window that no source lists anything for.
+
+    A month nobody can see is the strongest coverage limit this report has, so
+    it is measured rather than left as a caveat.
+    """
+    listed = set()
+    for res in results:
+        date = parse_date(res["date"] or "")
+        if date:
+            listed.add((date[0], date[1]))
+
+    archive_months: dict[tuple[int, int], int] = defaultdict(int)
+    legacy_months: dict[tuple[int, int], int] = defaultdict(int)
+    for row in rows:
+        row_month = _row_month(row)
+        if row_month is None:
+            continue
+        archive_months[row_month] += 1
+        if canonical_source_url(row.get("url") or "").startswith(LEGACY_HOST + "/"):
+            legacy_months[row_month] += 1
+
+    empty = []
+    for year in range(start_year, end_year + 1):
+        for month in range(1, 13):
+            if (year, month) in listed:
+                continue
+            empty.append(
+                {
+                    "month": f"{year:04d}-{month:02d}",
+                    "archive_rows": archive_months.get((year, month), 0),
+                    "legacy_host_rows": legacy_months.get((year, month), 0),
+                }
+            )
+    return empty
+
+
 def build_report(
     inventories: list[dict],
     rows: Iterable[dict],
@@ -551,19 +799,23 @@ def build_report(
     index = build_archive_index(row_list)
     entries = _dedupe_entries(inventories)
 
-    results = []
+    results: list[dict] = []
     skipped_out_of_window = 0
     for entry in entries:
         canon = canonical_source_url(entry.get("url") or "")
         date = parse_date(entry.get("date") or "") or date_from_url(canon)
-        year = date[0] if date else None
-        if not _in_window(year, start_year, end_year):
+        entry_year = date[0] if date else None
+        if not _in_window(entry_year, start_year, end_year):
             skipped_out_of_window += 1
             continue
         results.append(classify_entry(entry, index))
 
-    totals = defaultdict(int)
-    tier_counts = defaultdict(int)
+    # Runs before anything is counted, so a conflicted claim is never counted
+    # as present anywhere in the report.
+    conflicts = _flag_conflicting_claims(results)
+
+    totals: dict[str, int] = defaultdict(int)
+    tier_counts: dict[str, int] = defaultdict(int)
     by_year: dict[str, dict[str, int]] = {}
     by_source: dict[str, dict[str, int]] = {}
     by_source_year: dict[str, dict[str, dict[str, int]]] = {}
@@ -575,14 +827,14 @@ def build_report(
         status = res["status"]
         totals[status] += 1
         tier_counts[res["tier"]] += 1
-        year = str(res["year"])
+        year_key = str(res["year"])
         source = res["source_id"] or "unknown"
-        by_year.setdefault(year, {}).setdefault(status, 0)
-        bump(by_year[year], status)
+        by_year.setdefault(year_key, {}).setdefault(status, 0)
+        bump(by_year[year_key], status)
         by_source.setdefault(source, {}).setdefault(status, 0)
         bump(by_source[source], status)
-        by_source_year.setdefault(source, {}).setdefault(year, {})
-        bump(by_source_year[source][year], status)
+        by_source_year.setdefault(source, {}).setdefault(year_key, {})
+        bump(by_source_year[source][year_key], status)
 
     archive_in_window = [
         r
@@ -610,14 +862,23 @@ def build_report(
                 "coverage_note": inv.get("coverage_note"),
                 "entries_in_file": len(inv.get("entries", [])),
             }
-            for inv in inventories
+            # Sorted, so the report does not change with the order the
+            # inventory files are passed in.
+            for inv in sorted(inventories, key=lambda i: i.get("source_id") or "")
         ],
         "archive": {
             "rows_indexed": len(row_list),
             "rows_in_window": len(archive_in_window),
+            "ambiguous_fingerprints": len(index.ambiguous_fingerprints),
         },
         "candidates_considered": len(results),
         "entries_outside_window": skipped_out_of_window,
+        "months_in_window": (end_year - start_year + 1) * 12,
+        "months_without_listings": _months_without_listings(
+            results, row_list, start_year, end_year
+        ),
+        "source_overlap": _source_overlap(results),
+        "conflicting_claims": conflicts,
         "distinct_works": _distinct_works(results),
         "totals": {
             "present": totals["present"],
@@ -625,18 +886,19 @@ def build_report(
             "missing": totals["missing"],
         },
         "tier_counts": dict(sorted(tier_counts.items())),
-        "by_year": dict(sorted(by_year.items())),
-        "by_source": dict(sorted(by_source.items())),
+        "by_year": {k: _ordered_statuses(v) for k, v in sorted(by_year.items())},
+        "by_source": {k: _ordered_statuses(v) for k, v in sorted(by_source.items())},
         "by_source_year": {
-            k: dict(sorted(v.items())) for k, v in sorted(by_source_year.items())
+            source: {
+                year: _ordered_statuses(bucket)
+                for year, bucket in sorted(years.items())
+            }
+            for source, years in sorted(by_source_year.items())
         },
         "results": sorted(
             results, key=lambda r: (r["date"] or "", r["source_id"] or "", r["url"])
         ),
     }
-
-
-STATUS_RANK = {"present": 0, "needs_review": 1, "missing": 2}
 
 
 def _distinct_works(results: list[dict]) -> dict:
@@ -647,14 +909,22 @@ def _distinct_works(results: list[dict]) -> dict:
     "how many works are missing". This rollup answers the second question:
     one row per canonical URL, holding the strongest status any source reached.
     """
+
+    def rank(res: dict) -> tuple[int, int, str]:
+        # Strongest status first, then the listing that carries a title, then
+        # the source id, so the representative row never depends on the order
+        # the inventory files were read in.
+        return (
+            STATUS_RANK[res["status"]],
+            0 if res["title"] else 1,
+            res["source_id"] or "",
+        )
+
     best: dict[str, dict] = {}
     for res in results:
         key = res["canonical_url"]
         current = best.get(key)
-        if (
-            current is None
-            or STATUS_RANK[res["status"]] < STATUS_RANK[current["status"]]
-        ):
+        if current is None or rank(res) < rank(current):
             best[key] = res
 
     totals: dict[str, int] = {"present": 0, "needs_review": 0, "missing": 0}
@@ -666,13 +936,35 @@ def _distinct_works(results: list[dict]) -> dict:
         bucket = by_year.setdefault(year, {})
         bucket[status] = bucket.get(status, 0) + 1
 
+    def works(status: str) -> list[dict]:
+        return [
+            {
+                "date": r["date"],
+                "title": r["title"],
+                "url": r["url"],
+                "canonical_url": r["canonical_url"],
+                "source_id": r["source_id"],
+                "evidence": r.get("evidence"),
+                "matched_id": r["matched_id"],
+                "note": r["note"],
+            }
+            for r in sorted(
+                (r for r in best.values() if r["status"] == status),
+                key=lambda r: (r["date"] or "", r["canonical_url"]),
+            )
+        ]
+
     return {
         "count": len(best),
         "totals": totals,
-        "by_year": dict(sorted(by_year.items())),
+        "by_year": {
+            year: _ordered_statuses(bucket) for year, bucket in sorted(by_year.items())
+        },
         "missing_urls": sorted(
             r["canonical_url"] for r in best.values() if r["status"] == "missing"
         ),
+        "missing_works": works("missing"),
+        "needs_review_works": works("needs_review"),
     }
 
 
@@ -726,6 +1018,38 @@ def render_markdown(report: dict, generated_on: str) -> str:
             add(f"- **{src.get('source_id')}** — {note}")
     add("")
 
+    overlap = report.get("source_overlap") or {}
+    per_source = overlap.get("by_source") or {}
+    if len(per_source) > 1:
+        add("### How far the sources overlap")
+        add("")
+        add("| Source | Works listed | Works only this source lists |")
+        add("| --- | ---: | ---: |")
+        for source, counts in per_source.items():
+            add(
+                f"| `{source}` | {counts['works_listed']} "
+                f"| {counts['works_only_this_source_lists']} |"
+            )
+        add("")
+        only_counts = [c["works_only_this_source_lists"] for c in per_source.values()]
+        if not any(only_counts):
+            add(
+                f"The sources resolve to the same {overlap['distinct_works']} "
+                "urls for this window. Neither one lists a work the other misses. "
+                "Both also read the same Wayback Machine crawl of the same host, "
+                "so the second source is not independent evidence and their "
+                "agreement corroborates nothing. What the second source adds is "
+                "a different view of the same crawl, not extra coverage."
+            )
+        else:
+            add(
+                f"The sources list {overlap['distinct_works']} works between "
+                f"them, and {overlap['works_every_source_lists']} of those "
+                "appear in every source. Both read the Wayback Machine, so "
+                "overlap between them is not independent corroboration."
+            )
+        add("")
+
     distinct = report["distinct_works"]
     dt = distinct["totals"]
 
@@ -741,6 +1065,12 @@ def render_markdown(report: dict, generated_on: str) -> str:
     add(f"- Needs review: {dt['needs_review']}.")
     add(f"- Missing: {dt['missing']}.")
     add("")
+    add(
+        f"Only the {dt['present']} present works are confirmed. The other "
+        f"{dt['needs_review'] + dt['missing']} are not, and this report does "
+        "not count a work as held until one of the tiers confirms it."
+    )
+    add("")
     add("| Year | Present | Needs review | Missing | Works |")
     add("| --- | ---: | ---: | ---: | ---: |")
     for year, bucket in distinct["by_year"].items():
@@ -751,8 +1081,10 @@ def render_markdown(report: dict, generated_on: str) -> str:
     add("## Totals by source listing")
     add("")
     add(
-        "The same works counted once per source that lists them, so each "
-        "source's agreement with the archive can be read on its own."
+        "The same works counted once per source that lists them. These rows "
+        "show how much each source's listings could be confirmed against the "
+        "archive. They do not corroborate each other: read the overlap table "
+        "above before reading two agreeing sources as two measurements."
     )
     add("")
     add(f"- Archive rows indexed: {report['archive']['rows_indexed']}.")
@@ -772,6 +1104,14 @@ def render_markdown(report: dict, generated_on: str) -> str:
     for tier, count in report["tier_counts"].items():
         add(f"| `{tier}` | {STATUS_BY_TIER.get(tier, 'unknown')} | {count} |")
     add("")
+    tiers_used = [t for t in PRESENT_TIERS if report["tier_counts"].get(t)]
+    if tiers_used == ["exact_url"]:
+        add(
+            "Every confirmed listing in this run was confirmed on the url tier. "
+            "The title and body tiers ran and confirmed nothing, so the "
+            "measurement rests on the url join alone."
+        )
+        add("")
 
     add("## By year, counting every source listing")
     add("")
@@ -807,10 +1147,16 @@ def render_markdown(report: dict, generated_on: str) -> str:
     if not missing_rows:
         add("No source listing in the window is unmatched.")
     else:
+        listed_urls = {r["canonical_url"] for r in missing_rows}
+        unmatched = {w["canonical_url"] for w in distinct["missing_works"]}
+        outright = len(listed_urls & unmatched)
+        elsewhere = len(listed_urls) - outright
         add(
-            f"No archive row matches these source listings, which cover "
-            f"{dt['missing']} distinct works. Each row names the source that "
-            "lists it and the evidence to re-check."
+            f"No archive row matches these source listings. They cover "
+            f"{len(listed_urls)} distinct works: {outright} that no source "
+            f"could confirm, and {elsewhere} that another source's listing "
+            "carried further. Each row names the source that lists it and the "
+            "evidence to re-check."
         )
         add("")
         add("| Date | Title | Source URL | Source | Evidence |")
@@ -846,6 +1192,34 @@ def render_markdown(report: dict, generated_on: str) -> str:
             )
     add("")
 
+    conflicts = report.get("conflicting_claims") or []
+    add(f"## Conflicting claims ({len(conflicts)})")
+    add("")
+    if not conflicts:
+        add("No archive row is claimed by more than one source work.")
+    else:
+        add(
+            "Each archive row below matched more than one source work. One row "
+            "holds one work, so the weaker claim is sent to review rather than "
+            "counted present. A conflict usually means the row carries the "
+            "wrong title, url, or date, so fix the row before reading the "
+            "affected works as missing."
+        )
+        add("")
+        add("| Archive row | Kept claim | Tier | Sent to review |")
+        add("| --- | --- | --- | --- |")
+        for conflict in conflicts:
+            sent = ", ".join(
+                f"`{item['canonical_url']}` ({item['tier']})"
+                for item in conflict["sent_to_review"]
+            )
+            add(
+                f"| `{conflict['record_id']}` "
+                f"| `{conflict['kept']['canonical_url']}` "
+                f"| `{conflict['kept']['tier']}` | {sent} |"
+            )
+    add("")
+
     add("## Coverage limits")
     add("")
     add(
@@ -859,10 +1233,28 @@ def render_markdown(report: dict, generated_on: str) -> str:
         "post that was never crawled and never linked from a monthly page "
         "appears in neither."
     )
+    blind = report.get("months_without_listings") or []
+    if blind:
+        names = ", ".join(item["month"] for item in blind)
+        archive_rows = sum(item["archive_rows"] for item in blind)
+        legacy_rows = sum(item["legacy_host_rows"] for item in blind)
+        add(
+            f"- No source lists anything for {len(blind)} of the "
+            f"{report.get('months_in_window', 0)} months in the window: "
+            f"{names}. The Wayback Machine holds no usable snapshot of those "
+            "month index pages and no captured post url inside them. The "
+            f"archive holds {archive_rows} rows dated in those months, "
+            f"{legacy_rows} of them on `{LEGACY_HOST}`. Those months are "
+            "unmeasured, not empty: this report cannot say whether Rosen "
+            "published in them."
+        )
     add(
-        "- The Movable Type monthly pages are the site's own index, so they are "
-        "the stronger of the two. The capture index is wider but carries no "
-        "titles, so for that source only the url tier can run."
+        "- The two inventories are not independent. Both read the same Wayback "
+        "Machine crawl of the same host, and for this window they resolve to "
+        "the same url set, so neither one widens the other. The monthly pages "
+        "are the more useful of the two because they carry the published title "
+        "and standfirst; the capture index carries urls only, so against that "
+        "source only the url tier can run."
     )
     add(
         "- Movable Type published every post twice, as `slug.html` and the print "
@@ -878,15 +1270,63 @@ def render_markdown(report: dict, generated_on: str) -> str:
         "- Works Rosen published elsewhere in this window (HuffPost, The Nation, "
         "print) are outside both inventories. This report says nothing about them."
     )
+    ambiguous = report.get("archive", {}).get("ambiguous_fingerprints", 0)
+    if ambiguous:
+        add(
+            f"- {ambiguous} body fingerprints are shared by more than one "
+            "archive row. The fingerprint tier drops them rather than pick a "
+            "row, so those rows can only be confirmed by url or title."
+        )
     add("")
 
-    add("## Follow-up boundary")
+    add("## Follow-up recovery work")
     add("")
     add(
         "Recovery, permanent IDs, rights, taxonomy, and relationship decisions "
-        "stay out of this measurement. Decompose recovery work from the missing "
-        "set above and link it to #697 and #723."
+        "stay out of this measurement. The measured gap decomposes into two "
+        "lists, and each one has a different owner."
     )
+    add("")
+    missing_works = distinct.get("missing_works") or []
+    add(
+        f"**{len(missing_works)} works have no archive row at all.** They are "
+        "source preservation work (#697): capture the Wayback copy first, then "
+        "decide whether the work earns a record. Read the titles before "
+        "opening that work. Some of these are the site's own housekeeping "
+        "notices rather than essays, and a notice is not the same kind of loss."
+    )
+    add("")
+    if not missing_works:
+        add("No work in the window is unmatched.")
+    else:
+        add("| Date | Title | Source url | Evidence |")
+        add("| --- | --- | --- | --- |")
+        for work in missing_works:
+            title = (work["title"] or "(no title in source)").replace("|", "\\|")
+            add(
+                f"| {work['date']} | {title} | `{work['url']}` "
+                f"| {work.get('evidence') or ''} |"
+            )
+    add("")
+    review_works = distinct.get("needs_review_works") or []
+    add(
+        f"**{len(review_works)} works have a candidate archive row whose "
+        "identity is in doubt.** They are record quality work (#723): settle "
+        "what each row holds, fix the row, then re-run this report. Nothing "
+        "here needs recovery until the row is settled."
+    )
+    add("")
+    if not review_works:
+        add("No work in the window needs a curator decision.")
+    else:
+        add("| Date | Title | Closest archive row | Why |")
+        add("| --- | --- | --- | --- |")
+        for work in review_works:
+            title = (work["title"] or "(no title in source)").replace("|", "\\|")
+            add(
+                f"| {work['date']} | {title} | `{work['matched_id']}` "
+                f"| {work['note']} |"
+            )
     add("")
     return "\n".join(lines)
 
@@ -908,7 +1348,8 @@ def _http_get(url: str, timeout: int = 60, attempts: int = 8) -> str:
         req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
         try:
             with urllib.request.urlopen(req, timeout=timeout) as resp:  # noqa: S310
-                return resp.read().decode("utf-8", "replace")
+                body: str = resp.read().decode("utf-8", "replace")
+                return body
         except (urllib.error.URLError, OSError, http.client.HTTPException) as exc:
             # HTTPException covers IncompleteRead, which the Wayback Machine
             # raises when it cuts a response short. It is not an OSError, so
@@ -1093,8 +1534,9 @@ def cmd_fetch_cdx(args: argparse.Namespace) -> int:
             "retrieved_at": _today(),
             "coverage_note": (
                 "every distinct dated post url the Wayback Machine captured with "
-                "a 200 html response; wide url coverage but no titles, so only "
-                "the url tier can run against it"
+                "a 200 html response; urls only, no titles, so only the url tier "
+                "can run against it. It reads the same crawl as the monthly "
+                "index, so it is not an independent source"
             ),
             "entries": entries,
         },

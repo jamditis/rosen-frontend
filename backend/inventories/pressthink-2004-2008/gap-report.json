@@ -10,7 +10,7 @@
       "source_name": "Wayback Machine capture index for archive.pressthink.org (2004-2008)",
       "provenance": "https://web.archive.org/cdx/search/cdx?url=archive.pressthink.org*&collapse=urlkey&fl=original,timestamp,mimetype,statuscode,digest&filter=statuscode:200&filter=mimetype:text/html",
       "retrieved_at": "2026-08-27",
-      "coverage_note": "every distinct dated post url the Wayback Machine captured with a 200 html response; wide url coverage but no titles, so only the url tier can run against it",
+      "coverage_note": "every distinct dated post url the Wayback Machine captured with a 200 html response; urls only, no titles, so only the url tier can run against it. It reads the same crawl as the monthly index, so it is not an independent source",
       "entries_in_file": 342
     },
     {
@@ -24,15 +24,68 @@
   ],
   "archive": {
     "rows_indexed": 1783,
-    "rows_in_window": 452
+    "rows_in_window": 452,
+    "ambiguous_fingerprints": 31
   },
   "candidates_considered": 684,
   "entries_outside_window": 0,
+  "months_in_window": 60,
+  "months_without_listings": [
+    {
+      "month": "2007-02",
+      "archive_rows": 0,
+      "legacy_host_rows": 0
+    },
+    {
+      "month": "2007-04",
+      "archive_rows": 0,
+      "legacy_host_rows": 0
+    },
+    {
+      "month": "2008-10",
+      "archive_rows": 2,
+      "legacy_host_rows": 0
+    },
+    {
+      "month": "2008-11",
+      "archive_rows": 0,
+      "legacy_host_rows": 0
+    }
+  ],
+  "source_overlap": {
+    "distinct_works": 342,
+    "works_every_source_lists": 342,
+    "by_source": {
+      "wayback-cdx": {
+        "works_listed": 342,
+        "works_only_this_source_lists": 0
+      },
+      "wayback-monthly-index": {
+        "works_listed": 342,
+        "works_only_this_source_lists": 0
+      }
+    }
+  },
+  "conflicting_claims": [
+    {
+      "record_id": "RECORD-00429",
+      "kept": {
+        "canonical_url": "archive.pressthink.org/2005/02/07/samb_esn",
+        "tier": "exact_url"
+      },
+      "sent_to_review": [
+        {
+          "canonical_url": "archive.pressthink.org/2005/02/10/jrd_qust",
+          "tier": "title_strong"
+        }
+      ]
+    }
+  ],
   "distinct_works": {
     "count": 342,
     "totals": {
-      "present": 340,
-      "needs_review": 0,
+      "present": 338,
+      "needs_review": 2,
       "missing": 2
     },
     "by_year": {
@@ -40,7 +93,8 @@
         "present": 132
       },
       "2005": {
-        "present": 96,
+        "present": 94,
+        "needs_review": 2,
         "missing": 1
       },
       "2006": {
@@ -57,24 +111,69 @@
     "missing_urls": [
       "archive.pressthink.org/2005/08/31/gn_fshg",
       "archive.pressthink.org/2006/04/26/cmts_fxd"
+    ],
+    "missing_works": [
+      {
+        "date": "2005-08-31",
+        "title": "Gone Fishing til After Labor Day",
+        "url": "http://archive.pressthink.org/2005/08/31/gn_fshg.html",
+        "canonical_url": "archive.pressthink.org/2005/08/31/gn_fshg",
+        "source_id": "wayback-monthly-index",
+        "evidence": "https://web.archive.org/web/20100924162805/http://archive.pressthink.org/2005/08/",
+        "matched_id": null,
+        "note": ""
+      },
+      {
+        "date": "2006-04-26",
+        "title": "Comment Glitch is Fixed",
+        "url": "http://archive.pressthink.org/2006/04/26/cmts_fxd.html",
+        "canonical_url": "archive.pressthink.org/2006/04/26/cmts_fxd",
+        "source_id": "wayback-monthly-index",
+        "evidence": "https://web.archive.org/web/20100924161949/http://archive.pressthink.org/2006/04/",
+        "matched_id": null,
+        "note": ""
+      }
+    ],
+    "needs_review_works": [
+      {
+        "date": "2005-01-26",
+        "title": "Big Wigs From the Blogging & Journalism Conference Say What They Found",
+        "url": "http://archive.pressthink.org/2005/01/26/brkm_own.html",
+        "canonical_url": "archive.pressthink.org/2005/01/26/brkm_own",
+        "source_id": "wayback-monthly-index",
+        "evidence": "https://web.archive.org/web/20100924162458/http://archive.pressthink.org/2005/01/",
+        "matched_id": "RECORD-00200",
+        "note": "weak title overlap on the same publication date; RECORD-00200 is already claimed by archive.pressthink.org/2005/01/26/bkm_iii on the exact_url tier"
+      },
+      {
+        "date": "2005-02-10",
+        "title": "Blog Storm Troopers or Pack Journalism at its Best?",
+        "url": "http://archive.pressthink.org/2005/02/10/jrd_qust.html",
+        "canonical_url": "archive.pressthink.org/2005/02/10/jrd_qust",
+        "source_id": "wayback-monthly-index",
+        "evidence": "https://web.archive.org/web/20100924162749/http://archive.pressthink.org/2005/02/",
+        "matched_id": "RECORD-00429",
+        "note": "RECORD-00429 is already claimed by archive.pressthink.org/2005/02/07/samb_esn on the exact_url tier; one archive row cannot hold two works, so a curator decides which work this row holds"
+      }
     ]
   },
   "totals": {
-    "present": 678,
-    "needs_review": 0,
+    "present": 676,
+    "needs_review": 2,
     "missing": 6
   },
   "tier_counts": {
     "exact_url": 676,
     "missing": 6,
-    "title_strong": 2
+    "review": 2
   },
   "by_year": {
     "2004": {
       "present": 264
     },
     "2005": {
-      "present": 190,
+      "present": 188,
+      "needs_review": 2,
       "missing": 4
     },
     "2006": {
@@ -94,7 +193,8 @@
       "missing": 4
     },
     "wayback-monthly-index": {
-      "present": 340,
+      "present": 338,
+      "needs_review": 2,
       "missing": 2
     }
   },
@@ -123,7 +223,8 @@
         "present": 132
       },
       "2005": {
-        "present": 96,
+        "present": 94,
+        "needs_review": 2,
         "missing": 1
       },
       "2006": {
@@ -4515,9 +4616,9 @@
       "matched_id": "RECORD-00200",
       "matched_title": "Big Wigs From the Blogging & Journalism Conference Say What They Found (Part III)",
       "score": 0.778,
-      "note": "",
-      "tier": "title_strong",
-      "status": "present"
+      "note": "weak title overlap on the same publication date; RECORD-00200 is already claimed by archive.pressthink.org/2005/01/26/bkm_iii on the exact_url tier",
+      "tier": "review",
+      "status": "needs_review"
     },
     {
       "url": "http://archive.pressthink.org/2005/01/28/arch_fwp.html",
@@ -4785,9 +4886,9 @@
       "matched_id": "RECORD-00429",
       "matched_title": "Blog Storm Troopers or Pack Journalism at its Best?",
       "score": 1.0,
-      "note": "",
-      "tier": "title_strong",
-      "status": "present"
+      "note": "RECORD-00429 is already claimed by archive.pressthink.org/2005/02/07/samb_esn on the exact_url tier; one archive row cannot hold two works, so a curator decides which work this row holds",
+      "tier": "review",
+      "status": "needs_review"
     },
     {
       "url": "http://archive.pressthink.org/2005/02/11/esn_res.html",

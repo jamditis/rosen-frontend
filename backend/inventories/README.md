@@ -54,5 +54,10 @@ Inventories for the Movable Type era of PressThink, which lived at
 The script is `backend/scripts/pressthink_2004_2008_gap.py`. The written report
 is `docs/pressthink-2004-2008-gap-2026-08-27.md`.
 
+Both of these sources read the same Wayback Machine crawl of the same host, and
+for 2004-2008 they resolve to the same url set. Two sources here are not two
+independent measurements, and the report says so. A genuinely independent
+source for this era would have to come from outside the Wayback Machine.
+
 `archive.pressthink.org` serves an untrusted TLS certificate, so its URLs are
 stored and fetched over plain `http`. That is correct, not a mistake to fix.

@@ -8,7 +8,10 @@ The regression cases the issue asks for are pinned here:
 
 * the Movable Type canonical URL pair, ``slug.html`` and its ``slug_p.html``
   print twin, must fold to one key;
-* known false title matches must never be graded present.
+* known false title matches must never be graded present. Two of those are
+  taken from the real 2005 data, where a serial post and a corrupt row each
+  produced a false confirmation: they exercise the containment path and the
+  one-row-two-works path that the synthetic cross-day cases do not reach.
 """
 
 import importlib.util
@@ -28,6 +31,12 @@ FIXTURE_INVENTORY = (
     Path(__file__).resolve().parent
     / "fixtures"
     / "pressthink-2004-2008-sample-inventory.json"
+)
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+ARCHIVE_CSV = _REPO_ROOT / "data" / "archive_records-public.csv"
+CHECKED_IN_REPORT = (
+    _REPO_ROOT / "backend" / "inventories" / "pressthink-2004-2008" / "gap-report.json"
 )
 
 
@@ -285,6 +294,221 @@ def test_second_known_false_title_match_stays_out_of_present():
         index,
     )
     assert res["status"] != "present"
+
+
+def test_a_serial_sibling_is_never_graded_present():
+    # Real 2005-01-26 case. The monthly index lists three posts that day. The
+    # archive holds two of them. The tokens of the third sit inside the title
+    # of RECORD-00200, which adds only "Part III", so containment used to
+    # confirm a work the archive does not hold.
+    rows = [
+        _record(
+            "RECORD-00498",
+            "PressThink: Big Wigs Confer, Part Two",
+            "http://archive.pressthink.org/2005/01/26/bkm_two_p.html",
+            "2005-01-26",
+        ),
+        _record(
+            "RECORD-00200",
+            "Big Wigs From the Blogging & Journalism Conference Say What They "
+            "Found (Part III)",
+            "http://archive.pressthink.org/2005/01/26/bkm_iii_p.html",
+            "2005-01-26",
+        ),
+    ]
+    index = gap.build_archive_index(rows)
+    res = gap.classify_entry(
+        _entry(
+            "http://archive.pressthink.org/2005/01/26/brkm_own.html",
+            "2005-01-26",
+            title=(
+                "Big Wigs From the Blogging & Journalism Conference Say What "
+                "They Found"
+            ),
+        ),
+        index,
+    )
+    assert res["status"] != "present"
+    # the sibling that does have a row is still confirmed, by url
+    held = gap.classify_entry(
+        _entry("http://archive.pressthink.org/2005/01/26/bkm_iii.html", "2005-01-26"),
+        index,
+    )
+    assert held["tier"] == "exact_url"
+    assert held["matched_id"] == "RECORD-00200"
+
+
+def test_two_works_cannot_both_claim_one_archive_row():
+    # Real 2005-02 case. RECORD-00429 is stored at the samb_esn url but carries
+    # the title and date of jrd_qust, a different post. The url tier confirms
+    # samb_esn and the title tier confirmed jrd_qust, so one row was counted as
+    # two works. The weaker claim now goes to review and the conflict is named.
+    rows = [
+        _record(
+            "RECORD-00429",
+            "Blog Storm Troopers or Pack Journalism at its Best?",
+            "http://archive.pressthink.org/2005/02/07/samb_esn_p.html",
+            "2005-02-10",
+        )
+    ]
+    inv = {
+        "source_id": "s",
+        "entries": [
+            _entry(
+                "http://archive.pressthink.org/2005/02/07/samb_esn.html",
+                "2005-02-07",
+                title="Richard Sambrook of the BBC: What Eason Jordan Said in Davos",
+                source_id="s",
+            ),
+            _entry(
+                "http://archive.pressthink.org/2005/02/10/jrd_qust.html",
+                "2005-02-10",
+                title="Blog Storm Troopers or Pack Journalism at its Best?",
+                source_id="s",
+            ),
+        ],
+    }
+    report = gap.build_report([inv], rows)
+    assert report["totals"] == {"present": 1, "needs_review": 1, "missing": 0}
+    assert report["distinct_works"]["totals"]["present"] == 1
+
+    conflict = report["conflicting_claims"][0]
+    assert conflict["record_id"] == "RECORD-00429"
+    assert conflict["kept"]["canonical_url"].endswith("samb_esn")
+    assert conflict["kept"]["tier"] == "exact_url"
+    assert conflict["sent_to_review"][0]["canonical_url"].endswith("jrd_qust")
+
+    review = [r for r in report["results"] if r["status"] == "needs_review"][0]
+    assert review["canonical_url"].endswith("jrd_qust")
+    assert "already claimed by" in review["note"]
+
+
+def test_containment_still_needs_a_jaccard_floor():
+    # A short title sits inside a much longer one. Containment alone would
+    # confirm it; the floor stops that.
+    rows = [
+        _record(
+            "RECORD-1",
+            "PressThink: Guest Critic Juan Gonzalez on What the Unity Convention "
+            "Owes the Next Generation of Reporters",
+            "https://example.com/elsewhere",
+            "2004-08-12",
+        )
+    ]
+    index = gap.build_archive_index(rows)
+    res = gap.classify_entry(
+        _entry(
+            "http://archive.pressthink.org/2004/08/12/guest_critic.html",
+            "2004-08-12",
+            title="Guest Critic",
+        ),
+        index,
+    )
+    assert res["status"] != "present"
+
+
+def test_a_weakly_contained_row_never_beats_a_matching_one():
+    # Both rows sit on the day. One contains the source title and agrees
+    # weakly; the other is the work itself. The matcher must pick the second.
+    rows = [
+        _record(
+            "RECORD-CONTAINS",
+            "PressThink: Swift Boat Story and Everything Else the Networks "
+            "Carried That Week in August",
+            "https://example.com/one",
+            "2004-08-23",
+        ),
+        _record(
+            "RECORD-SAME",
+            "PressThink: Swift Boat Story a Sad Chord",
+            "https://example.com/two",
+            "2004-08-23",
+        ),
+    ]
+    index = gap.build_archive_index(rows)
+    res = gap.classify_entry(
+        _entry(
+            "http://archive.pressthink.org/2004/08/23/swift_sad.html",
+            "2004-08-23",
+            title="Swift Boat Story a Sad Chord",
+        ),
+        index,
+    )
+    assert res["matched_id"] == "RECORD-SAME"
+    assert res["tier"] == "title_strong"
+
+
+def test_the_body_fingerprint_outranks_title_agreement():
+    # Twelve of the post's own opening words are stronger evidence than token
+    # overlap between two titles, so the fingerprint tier runs first.
+    body = (
+        "In which the demise of the network sky box is confirmed and a conceit "
+        "of Americana is indulged."
+    )
+    rows = [
+        _record(
+            "RECORD-BODY",
+            "Untitled clipping",
+            "https://example.com/clip",
+            "2004-08-31",
+            raw_text=body,
+        ),
+        _record(
+            "RECORD-TITLE",
+            "PressThink: Down at the Tick Tock Diner, I Caught Up With CNN",
+            "https://example.com/other",
+            "2004-08-31",
+        ),
+    ]
+    index = gap.build_archive_index(rows)
+    res = gap.classify_entry(
+        _entry(
+            "http://archive.pressthink.org/2004/08/31/cnn_rnc.html",
+            "2004-08-31",
+            title="Down at the Tick Tock Diner, I Caught Up With CNN",
+            body=body,
+        ),
+        index,
+    )
+    assert res["tier"] == "body_fingerprint"
+    assert res["matched_id"] == "RECORD-BODY"
+
+
+def test_a_shared_body_fingerprint_is_dropped_rather_than_guessed():
+    # Two rows open with the same twelve words. The fingerprint cannot tell
+    # them apart, so it must confirm neither.
+    opening = (
+        "And after the big march went by saying what it came to say I went to "
+        "look at the Garden."
+    )
+    rows = [
+        _record(
+            "RECORD-1",
+            "First copy",
+            "https://example.com/one",
+            "2004-08-30",
+            raw_text=opening,
+        ),
+        _record(
+            "RECORD-2",
+            "Second copy",
+            "https://example.com/two",
+            "2004-08-30",
+            raw_text=opening,
+        ),
+    ]
+    index = gap.build_archive_index(rows)
+    assert len(index.ambiguous_fingerprints) == 1
+    assert not set(index.by_fingerprint) & index.ambiguous_fingerprints
+    res = gap.classify_entry(
+        _entry(
+            "http://archive.pressthink.org/2004/08/30/rnc_red.html",
+            "2004-08-30",
+            body=opening,
+        ),
+        index,
+    )
+    assert res["status"] == "missing"
 
 
 def test_strong_title_on_another_day_of_the_month_is_review_not_present():
@@ -744,6 +968,143 @@ def test_markdown_report_states_its_coverage_limits():
     # the source table names the inventory and its retrieval date
     assert "2026-08-27" in text
     assert "slug_p.html" in text
+
+
+def test_source_overlap_says_when_two_sources_list_the_same_works():
+    # Two inventories drawn from the same crawl are not two measurements. The
+    # report has to show that instead of leaving the reader to assume.
+    entries = [
+        _entry("http://archive.pressthink.org/2004/08/31/cnn_rnc.html", "2004-08-31"),
+        _entry("http://archive.pressthink.org/2004/08/30/rnc_red.html", "2004-08-30"),
+    ]
+    inv_a = {"source_id": "a", "entries": [dict(e, source_id="a") for e in entries]}
+    inv_b = {"source_id": "b", "entries": [dict(e, source_id="b") for e in entries]}
+    report = gap.build_report([inv_a, inv_b], [])
+    overlap = report["source_overlap"]
+    assert overlap["distinct_works"] == 2
+    assert overlap["works_every_source_lists"] == 2
+    assert overlap["by_source"]["a"]["works_only_this_source_lists"] == 0
+    assert overlap["by_source"]["b"]["works_only_this_source_lists"] == 0
+
+    text = gap.render_markdown(report, "2026-08-27")
+    assert "How far the sources overlap" in text
+    assert "not independent evidence" in text
+
+
+def test_months_no_source_can_see_are_named():
+    # A month nobody lists is the largest coverage limit the report has, so it
+    # is measured and named rather than left as a caveat.
+    inv = {
+        "source_id": "s",
+        "entries": [
+            _entry(
+                "http://archive.pressthink.org/2004/08/31/cnn_rnc.html",
+                "2004-08-31",
+                source_id="s",
+            )
+        ],
+    }
+    report = gap.build_report([inv], [], start_year=2004, end_year=2004)
+    blind = report["months_without_listings"]
+    assert report["months_in_window"] == 12
+    assert [m["month"] for m in blind] == [
+        f"2004-{month:02d}" for month in range(1, 13) if month != 8
+    ]
+    text = gap.render_markdown(report, "2026-08-27")
+    assert "No source lists anything for 11 of the 12 months" in text
+    assert "2004-02" in text
+
+
+def test_the_report_does_not_change_with_the_inventory_order():
+    # The docstring passes the inventories in one order and the default glob
+    # finds them in another. Both must write the same report.
+    inv_a = {
+        "source_id": "a",
+        "entries": [
+            _entry(
+                "http://archive.pressthink.org/2004/08/31/cnn_rnc.html",
+                "2004-08-31",
+                source_id="a",
+            )
+        ],
+    }
+    inv_b = {
+        "source_id": "b",
+        "entries": [
+            _entry(
+                "http://archive.pressthink.org/2004/08/30/rnc_red.html",
+                "2004-08-30",
+                title="RNC Drops the Battleship Style Stage",
+                source_id="b",
+            )
+        ],
+    }
+    rows = [
+        _record(
+            "RECORD-1",
+            "PressThink: Down at the Tick Tock Diner",
+            "http://archive.pressthink.org/2004/08/31/cnn_rnc_p.html",
+            "2004-08-31",
+        )
+    ]
+    forward = json.dumps(gap.build_report([inv_a, inv_b], rows), sort_keys=False)
+    backward = json.dumps(gap.build_report([inv_b, inv_a], rows), sort_keys=False)
+    assert forward == backward
+
+
+def test_markdown_decomposes_the_follow_up_work_and_links_the_owners():
+    inv = gap.load_inventory(FIXTURE_INVENTORY)
+    report = gap.build_report([inv], [])
+    text = gap.render_markdown(report, "2026-08-27")
+    assert "## Follow-up recovery work" in text
+    assert "source preservation work (#697)" in text
+    assert "record quality work (#723)" in text
+    # the missing works are named, not left as an instruction to a later reader
+    assert "Down at the Tick Tock Diner" in text
+
+
+# --------------------------------------------------------------------------
+# the real archive rows and the checked-in report
+# --------------------------------------------------------------------------
+
+
+def test_the_real_archive_csv_produces_usable_fingerprints():
+    # The fingerprint tier is only worth having if it survives production
+    # shapes: real raw_text, real excerpts, and rows that share an opening.
+    rows = gap.load_archive_rows(ARCHIVE_CSV)
+    index = gap.build_archive_index(rows)
+    assert index.by_fingerprint
+    # an ambiguous fingerprint is dropped, never resolved to whichever row was
+    # read first
+    assert not set(index.by_fingerprint) & index.ambiguous_fingerprints
+    assert all(len(p.split()) == gap.FINGERPRINT_WORDS for p in index.by_fingerprint)
+
+
+def test_the_checked_in_report_never_lets_two_works_claim_one_row():
+    # The guard has to hold on the real data, not only on fixtures.
+    report = json.loads(CHECKED_IN_REPORT.read_text(encoding="utf-8"))
+    claimed: dict[str, set[str]] = {}
+    for res in report["results"]:
+        if res["status"] != "present":
+            continue
+        claimed.setdefault(res["matched_id"], set()).add(res["canonical_url"])
+    doubled = {k: sorted(v) for k, v in claimed.items() if len(v) > 1}
+    assert doubled == {}
+
+
+def test_the_checked_in_report_keeps_the_known_false_matches_out_of_present():
+    report = json.loads(CHECKED_IN_REPORT.read_text(encoding="utf-8"))
+    false_matches = {
+        "archive.pressthink.org/2005/01/26/brkm_own",
+        "archive.pressthink.org/2005/02/10/jrd_qust",
+    }
+    graded = {
+        res["canonical_url"]: res["status"]
+        for res in report["results"]
+        if res["canonical_url"] in false_matches
+    }
+    assert set(graded) == false_matches
+    assert "present" not in graded.values()
 
 
 def test_checked_in_fixture_inventory_matches_the_documented_shape():
