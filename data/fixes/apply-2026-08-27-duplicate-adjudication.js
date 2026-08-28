@@ -163,15 +163,12 @@ function applyPlan(file, plan) {
   return { text: renderCsv(file, raws), expected, removed, edited };
 }
 
-/** Write an edited CSV, but only after it re-parses to exactly the intended records. */
-function commit(filePath, file, result, failures) {
+/** Validate an edited CSV against the intended records without writing it. */
+function validatePlan(filePath, file, result, failures) {
   const problems = verifyEdit(result.text, result.expected, file.columns);
   if (problems.length) {
     failures.push(`${path.basename(filePath)}: ${problems.slice(0, 5).join('; ')}`);
-    return;
   }
-  if (DRY_RUN) return;
-  writeAtomically(filePath, result.text);
 }
 
 /**
@@ -194,9 +191,6 @@ function writeAtomically(filePath, text) {
 function refreshGraphPolicy(relationshipRecords, entityRecords, failures) {
   const holds = pruneRelationshipTypeHolds(readFileSync(HOLDS_PATH, 'utf-8'), DROP_IDS.keys());
   for (const problem of holds.problems) failures.push(`graph-validation-holds.json: ${problem}`);
-  if (!holds.problems.length && holds.removed.length && !DRY_RUN) {
-    writeAtomically(HOLDS_PATH, holds.text);
-  }
 
   const registry = JSON.parse(readFileSync(REGISTRY_PATH, 'utf-8'));
   const census = refreshRelationshipTypeCensus(registry, {
@@ -207,9 +201,6 @@ function refreshGraphPolicy(relationshipRecords, entityRecords, failures) {
   });
   for (const problem of census.problems) {
     failures.push(`relationship-type-registry.json: ${problem}`);
-  }
-  if (!census.problems.length && census.changes.length && !DRY_RUN) {
-    writeAtomically(REGISTRY_PATH, `${JSON.stringify(census.registry, null, 2)}\n`);
   }
 
   return { holds, census };
@@ -285,13 +276,32 @@ function main() {
     };
   });
 
-  commit(RECORDS_PATH, records, recordPlan, failures);
-  commit(RELATIONSHIPS_PATH, relationships, relationshipPlan, failures);
-  commit(ENTITIES_PATH, entities, entityPlan, failures);
+  // Validate every planned output before writing the first one. These are
+  // canonical source files: a late failure in the relationship CSV or either
+  // policy file must not leave an earlier successful edit partially applied.
+  validatePlan(RECORDS_PATH, records, recordPlan, failures);
+  validatePlan(RELATIONSHIPS_PATH, relationships, relationshipPlan, failures);
+  validatePlan(ENTITIES_PATH, entities, entityPlan, failures);
 
   // Counted against the rows that survive, not the rows on disk, so a dry run
   // reports the same census a real run would write.
   const policy = refreshGraphPolicy(relationshipPlan.expected, entityPlan.expected, failures);
+
+  if (failures.length) {
+    console.error('\nValidation failed; no files were written.');
+    for (const failure of failures) console.error(`  - ${failure}`);
+    process.exit(1);
+  }
+
+  if (!DRY_RUN) {
+    writeAtomically(RECORDS_PATH, recordPlan.text);
+    writeAtomically(RELATIONSHIPS_PATH, relationshipPlan.text);
+    writeAtomically(ENTITIES_PATH, entityPlan.text);
+    if (policy.holds.removed.length) writeAtomically(HOLDS_PATH, policy.holds.text);
+    if (policy.census.changes.length) {
+      writeAtomically(REGISTRY_PATH, `${JSON.stringify(policy.census.registry, null, 2)}\n`);
+    }
+  }
 
   console.log(`\nDuplicate adjudication migration${DRY_RUN ? ' (dry run)' : ''}`);
   if (alreadyDone) console.log('  the seven records are already gone; nothing to do');
@@ -305,11 +315,6 @@ function main() {
   console.log(`  registry counts redone : ${policy.census.changes.length}`);
   for (const change of policy.census.changes) console.log(`    - ${change}`);
 
-  if (failures.length) {
-    console.error('\nAborted without writing: the edit did not verify.');
-    for (const failure of failures) console.error(`  - ${failure}`);
-    process.exit(1);
-  }
 }
 
 main();

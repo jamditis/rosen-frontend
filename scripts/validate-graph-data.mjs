@@ -545,6 +545,9 @@ function edgeKey(sourceEntityId, relationshipType, targetEntityId) {
  * duplicate not covered by that list still fails. `markExceptionUsed` is
  * called for every exception that matched at least one duplicate, so the
  * caller can reject an exception that no longer matches anything (stale).
+ * The callback also receives both exact edges in each matched pair so later
+ * reporting cannot accidentally select a different, same-entity-pair edge
+ * whose direction does not match the inverse.
  */
 function assertNoDuplicateSymmetricOrInverseEdges(
   edges,
@@ -607,8 +610,8 @@ function assertNoDuplicateSymmetricOrInverseEdges(
 
     const resolvedInverseType = registryEntry.inverseType || registryEntry.candidateInverseType;
     if (resolvedInverseType) {
-      const [inverseEdge] = edgesAt(edge.targetEntityId, resolvedInverseType, edge.sourceEntityId);
-      if (inverseEdge) {
+      const inverseEdges = edgesAt(edge.targetEntityId, resolvedInverseType, edge.sourceEntityId);
+      if (inverseEdges.length > 0) {
         const exception = findMatchingException(
           edge.sourceEntityId,
           edge.targetEntityId,
@@ -616,9 +619,12 @@ function assertNoDuplicateSymmetricOrInverseEdges(
           resolvedInverseType
         );
         if (exception) {
-          markExceptionUsed(exception);
+          for (const inverseEdge of inverseEdges) {
+            markExceptionUsed(exception, edge, inverseEdge);
+          }
           continue;
         }
+        const [inverseEdge] = inverseEdges;
         const via = registryEntry.inverseType ? 'inverse type' : 'candidate inverse type';
         throw new GraphValidationError(
           `${edge.id}: type ${edge.relationshipType} duplicates edge ${inverseEdge.id} via its ${via} ${resolvedInverseType}`
@@ -907,10 +913,40 @@ export async function validateGraphDataset(dataset) {
         });
       }
 
+      // A curator can settle a legacy label by recommending a retype without
+      // authorizing an automatic source edit. Put that action in the review
+      // report alongside endpoint exceptions (issue #868).
+      if (registryEntry?.recommendedRetypeTo) {
+        endpointReviewRows.push({
+          relationshipId: id,
+          relationshipType,
+          sourceEntityId,
+          sourceEntityType: sourceEntity.type,
+          sourceEntityName,
+          targetEntityId,
+          targetEntityType: targetEntity.type,
+          targetEntityName,
+          validationState,
+          reviewReason: 'recommended-retype',
+          recommendedType: registryEntry.recommendedRetypeTo,
+        });
+      }
+
       // Collected for the duplicate-edge check below regardless of
       // validationState: an inverse pair can straddle the accepted/held
       // boundary (issue #737), so held edges must be visible to it too.
-      graphEdges.push({ id, sourceRecordId, sourceEntityId, relationshipType, targetEntityId });
+      graphEdges.push({
+        id,
+        sourceRecordId,
+        sourceEntityId,
+        sourceEntityType: sourceEntity.type,
+        sourceEntityName,
+        relationshipType,
+        targetEntityId,
+        targetEntityType: targetEntity.type,
+        targetEntityName,
+        validationState,
+      });
 
       const confidence = relationship.confidence === null || relationship.confidence === undefined
         ? null
@@ -932,12 +968,53 @@ export async function validateGraphDataset(dataset) {
       );
     }
 
+    const duplicateExceptionMatches = [];
     assertNoDuplicateSymmetricOrInverseEdges(
       graphEdges,
       relationshipTypeRegistry,
       duplicateEdgeExceptions,
-      exception => { exception.used = true; }
+      (exception, edge, inverseEdge) => {
+        exception.used = true;
+        duplicateExceptionMatches.push({ exception, edge, inverseEdge });
+      }
     );
+
+    // The #737 ruling settled the current Owns/Owned By exceptions: keep Owns
+    // and review the Owned By rows for removal. A machine-readable registry
+    // policy identifies that side of the pair; this collector reports it but
+    // deliberately leaves the relationship CSV untouched.
+    const reportedDuplicateIds = new Set();
+    for (const { exception, edge, inverseEdge } of duplicateExceptionMatches) {
+      const canonicalType = exception.types.find(type => (
+        relationshipTypeRegistry[type]?.duplicateReviewPolicy
+      ));
+      const policy = canonicalType
+        ? relationshipTypeRegistry[canonicalType].duplicateReviewPolicy
+        : null;
+      if (!canonicalType || !policy) continue;
+
+      const reviewEdges = [edge, inverseEdge].filter(
+        matchedEdge => matchedEdge.relationshipType === policy.reviewType
+      );
+      for (const reviewEdge of reviewEdges) {
+        if (reportedDuplicateIds.has(reviewEdge.id)) continue;
+        reportedDuplicateIds.add(reviewEdge.id);
+        endpointReviewRows.push({
+          relationshipId: reviewEdge.id,
+          relationshipType: reviewEdge.relationshipType,
+          sourceEntityId: reviewEdge.sourceEntityId,
+          sourceEntityType: reviewEdge.sourceEntityType,
+          sourceEntityName: reviewEdge.sourceEntityName,
+          targetEntityId: reviewEdge.targetEntityId,
+          targetEntityType: reviewEdge.targetEntityType,
+          targetEntityName: reviewEdge.targetEntityName,
+          validationState: reviewEdge.validationState,
+          reviewReason: 'duplicate-inverse',
+          recommendedAction: policy.recommendedAction,
+          canonicalType,
+        });
+      }
+    }
 
     for (const exception of duplicateEdgeExceptions) {
       if (!exception.used) {
@@ -1031,9 +1108,9 @@ async function readJson(filePath) {
 /**
  * Turn the flat endpointReviewRows list from validateGraphDataset into the
  * committed review report (issue #868): one section per relationship type,
- * sorted for a stable diff, so a curator can open the file and see exactly
- * which rows still don't fit a curator-ruled endpoint-type or direction rule
- * -- without that backlog ever failing validation.
+ * sorted for a stable diff, so a curator can see endpoint mismatches, approved
+ * retypes, and settled inverse duplicates without any review-only action
+ * failing validation or mutating source rows.
  */
 export function buildEndpointReviewReport(endpointReviewRows) {
   // No wall-clock timestamp: the report is a pure function of the current
@@ -1058,8 +1135,9 @@ export function buildEndpointReviewReport(endpointReviewRows) {
     sourceIssue: 737,
     implementedByIssue: 868,
     note:
-      'Rows a curator-settled relationship-type rule (endpointEnforcement: "reviewed" in '
-      + 'data/relationship-type-registry.json) flags but does not fail validation on. Regenerated by '
+      'Rows a curator-settled relationship-type rule flags but does not fail validation on. This includes '
+      + 'endpointEnforcement: "reviewed" mismatches, recommended retypes, and settled inverse duplicates '
+      + 'recorded in data/relationship-type-registry.json. Regenerated by '
       + '`node scripts/validate-graph-data.mjs` every run; edit the registry or the source CSVs, not this '
       + 'file, to change its contents. Row presence here is not a claim that the row is wrong -- see each '
       + "type's endpointDivergence.note and directionNote in the registry for what the rule is and why.",
