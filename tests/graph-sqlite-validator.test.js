@@ -719,6 +719,65 @@ describe('relationship type registry enforcement (#737)', () => {
     }]);
   });
 
+  it('reports only the review-type edge that actually matches the inverse direction', async () => {
+    const fixture = validFixture();
+    fixture.policy.acceptedRelationshipTypes = ['Owns', 'Owned By'];
+    fixture.policy.relationshipTypeRegistry = {
+      Owns: {
+        candidateInverseType: 'Owned By',
+        duplicateReviewPolicy: {
+          reviewType: 'Owned By',
+          recommendedAction: 'remove-duplicate',
+        },
+      },
+    };
+    fixture.policy.duplicateEdgeExceptions = [{
+      entityIds: ['P0001', 'O0001'],
+      types: ['Owns', 'Owned By'],
+      reason: 'Only the reverse-direction Owned By row duplicates the Owns assertion.',
+    }];
+    fixture.relationships = [
+      {
+        id: 'REL-00001',
+        sourceRecordId: 'RECORD-00001',
+        sourceEntityId: 'P0001',
+        sourceEntityName: 'Jay Rosen',
+        type: 'Owns',
+        targetEntityId: 'O0001',
+        targetEntityName: 'PressThink',
+        confidence: 0.9,
+      },
+      {
+        id: 'REL-00002',
+        sourceRecordId: 'RECORD-00001',
+        sourceEntityId: 'O0001',
+        sourceEntityName: 'PressThink',
+        type: 'Owned By',
+        targetEntityId: 'P0001',
+        targetEntityName: 'Jay Rosen',
+        confidence: 0.9,
+      },
+      {
+        id: 'REL-00003',
+        sourceRecordId: 'RECORD-00001',
+        sourceEntityId: 'P0001',
+        sourceEntityName: 'Jay Rosen',
+        type: 'Owned By',
+        targetEntityId: 'O0001',
+        targetEntityName: 'PressThink',
+        confidence: 0.9,
+      },
+    ];
+
+    const summary = await validateGraphDataset(fixture);
+    assert.deepStrictEqual(
+      summary.endpointReviewRows
+        .filter(row => row.reviewReason === 'duplicate-inverse')
+        .map(row => row.relationshipId),
+      ['REL-00002'],
+    );
+  });
+
   it('rejects a duplicateEdgeException that no longer matches any duplicate edge', async () => {
     const fixture = validFixture();
     fixture.policy.duplicateEdgeExceptions = [{

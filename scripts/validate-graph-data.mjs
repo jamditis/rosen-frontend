@@ -545,6 +545,9 @@ function edgeKey(sourceEntityId, relationshipType, targetEntityId) {
  * duplicate not covered by that list still fails. `markExceptionUsed` is
  * called for every exception that matched at least one duplicate, so the
  * caller can reject an exception that no longer matches anything (stale).
+ * The callback also receives both exact edges in each matched pair so later
+ * reporting cannot accidentally select a different, same-entity-pair edge
+ * whose direction does not match the inverse.
  */
 function assertNoDuplicateSymmetricOrInverseEdges(
   edges,
@@ -607,8 +610,8 @@ function assertNoDuplicateSymmetricOrInverseEdges(
 
     const resolvedInverseType = registryEntry.inverseType || registryEntry.candidateInverseType;
     if (resolvedInverseType) {
-      const [inverseEdge] = edgesAt(edge.targetEntityId, resolvedInverseType, edge.sourceEntityId);
-      if (inverseEdge) {
+      const inverseEdges = edgesAt(edge.targetEntityId, resolvedInverseType, edge.sourceEntityId);
+      if (inverseEdges.length > 0) {
         const exception = findMatchingException(
           edge.sourceEntityId,
           edge.targetEntityId,
@@ -616,9 +619,12 @@ function assertNoDuplicateSymmetricOrInverseEdges(
           resolvedInverseType
         );
         if (exception) {
-          markExceptionUsed(exception);
+          for (const inverseEdge of inverseEdges) {
+            markExceptionUsed(exception, edge, inverseEdge);
+          }
           continue;
         }
+        const [inverseEdge] = inverseEdges;
         const via = registryEntry.inverseType ? 'inverse type' : 'candidate inverse type';
         throw new GraphValidationError(
           `${edge.id}: type ${edge.relationshipType} duplicates edge ${inverseEdge.id} via its ${via} ${resolvedInverseType}`
@@ -962,11 +968,15 @@ export async function validateGraphDataset(dataset) {
       );
     }
 
+    const duplicateExceptionMatches = [];
     assertNoDuplicateSymmetricOrInverseEdges(
       graphEdges,
       relationshipTypeRegistry,
       duplicateEdgeExceptions,
-      exception => { exception.used = true; }
+      (exception, edge, inverseEdge) => {
+        exception.used = true;
+        duplicateExceptionMatches.push({ exception, edge, inverseEdge });
+      }
     );
 
     // The #737 ruling settled the current Owns/Owned By exceptions: keep Owns
@@ -974,7 +984,7 @@ export async function validateGraphDataset(dataset) {
     // policy identifies that side of the pair; this collector reports it but
     // deliberately leaves the relationship CSV untouched.
     const reportedDuplicateIds = new Set();
-    for (const exception of duplicateEdgeExceptions.filter(item => item.used)) {
+    for (const { exception, edge, inverseEdge } of duplicateExceptionMatches) {
       const canonicalType = exception.types.find(type => (
         relationshipTypeRegistry[type]?.duplicateReviewPolicy
       ));
@@ -983,12 +993,9 @@ export async function validateGraphDataset(dataset) {
         : null;
       if (!canonicalType || !policy) continue;
 
-      const entityIds = new Set(exception.entityIds);
-      const reviewEdges = graphEdges.filter(edge => (
-        edge.relationshipType === policy.reviewType
-        && entityIds.has(edge.sourceEntityId)
-        && entityIds.has(edge.targetEntityId)
-      ));
+      const reviewEdges = [edge, inverseEdge].filter(
+        matchedEdge => matchedEdge.relationshipType === policy.reviewType
+      );
       for (const reviewEdge of reviewEdges) {
         if (reportedDuplicateIds.has(reviewEdge.id)) continue;
         reportedDuplicateIds.add(reviewEdge.id);
