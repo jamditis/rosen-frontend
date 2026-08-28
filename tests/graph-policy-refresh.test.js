@@ -10,6 +10,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readCanonicalCsv } from '../scripts/validate-graph-data.mjs';
@@ -21,6 +22,11 @@ import {
 } from '../data/lib/graph-policy-refresh.js';
 
 const rootDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+test('keeps graph-policy source reviewable as text', async () => {
+  const source = await readFile(path.join(rootDir, 'data/lib/graph-policy-refresh.js'));
+  assert.equal(source.includes(0), false, 'use an escaped separator, not a literal NUL byte');
+});
 
 const HOLDS_FIXTURE = `{
   "schemaVersion": 1,

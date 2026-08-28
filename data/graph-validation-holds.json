@@ -15,834 +15,834 @@
     {
       "relationshipId": "TWTR-07504_REL_001",
       "observedType": "Covers",
-      "reason": "Unregistered relationship semantics pending the relationship-type audit in issue #737."
+      "reason": "Relationship semantics remain deferred after the 2026-08-27 issue #737 ruling; both Covers readings stay documented."
     },
     {
       "relationshipId": "TWTR-17930_REL_001",
       "observedType": "Created",
-      "reason": "Unregistered relationship semantics and endpoint label pending the relationship-type audit in issue #737."
+      "reason": "Legacy relationship queued for the curator-approved retype to Pioneered in data/relationship-review-report.json (2026-08-27 issue #737 ruling)."
     },
     {
       "relationshipId": "RECORD-00010_REL_002",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00010_REL_004",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00069_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00301_REL_007",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00324_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00374_REL_014",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00395_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00479_REL_001",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00480_REL_003",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00483_REL_002",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00501_REL_002",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00626_REL_003",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00535_REL_003",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00837_REL_025",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00746_REL_002",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00011_REL_016",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00011_REL_042",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00011_REL_044",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00011_REL_045",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00011_REL_046",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00040_REL_005",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00375_REL_017",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00375_REL_019",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00375_REL_021",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00426_REL_023",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00481_REL_022",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00481_REL_023",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00486_REL_032",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00487_REL_022",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00488_REL_002",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00498_REL_010",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00499_REL_026",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00509_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00509_REL_018",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00637_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00639_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00674_REL_006",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00674_REL_027",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00675_REL_028",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00680_REL_009",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00680_REL_010",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00691_REL_006",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00691_REL_007",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00691_REL_008",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00696_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00698_REL_022",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00700_REL_016",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00700_REL_018",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00701_REL_025",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00701_REL_026",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00704_REL_013",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00706_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00706_REL_002",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00710_REL_012",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00716_REL_003",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00718_REL_004",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00720_REL_002",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00723_REL_008",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00724_REL_003",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00729_REL_005",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00735_REL_004",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00743_REL_005",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00743_REL_006",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00745_REL_004",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00745_REL_005",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00745_REL_012",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00745_REL_015",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00750_REL_005",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00757_REL_012",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00757_REL_013",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00758_REL_003",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00758_REL_012",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00761_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00763_REL_008",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00763_REL_012",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00763_REL_013",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00763_REL_014",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00763_REL_015",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00764_REL_002",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00766_REL_008",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00767_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00767_REL_005",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00767_REL_016",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00767_REL_017",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00767_REL_018",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00767_REL_019",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00767_REL_021",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00769_REL_007",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00769_REL_008",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00770_REL_009",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00791_REL_006",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00792_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00799_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00801_REL_002",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00803_REL_006",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00803_REL_007",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00809_REL_004",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00810_REL_027",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00814_REL_012",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00816_REL_037",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00825_REL_003",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00825_REL_004",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00825_REL_007",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00825_REL_018",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00825_REL_019",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00826_REL_015",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00826_REL_017",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00828_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00828_REL_007",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00828_REL_011",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00829_REL_007",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00829_REL_029",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00835_REL_015",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00836_REL_027",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00836_REL_028",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00838_REL_003",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00838_REL_013",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00838_REL_014",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00839_REL_003",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00839_REL_004",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00839_REL_005",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00839_REL_006",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00839_REL_017",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00839_REL_018",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00840_REL_012",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00841_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00841_REL_002",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00841_REL_003",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00841_REL_004",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00842_REL_008",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00844_REL_002",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00845_REL_023",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00847_REL_025",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00847_REL_026",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00851_REL_023",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00851_REL_024",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00854_REL_007",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00854_REL_023",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00859_REL_014",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00860_REL_003",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00870_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00876_REL_005",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00876_REL_006",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00878_REL_003",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00884_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00884_REL_003",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00888_REL_002",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00890_REL_006",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00891_REL_003",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00893_REL_001",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00893_REL_010",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00895_REL_001",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00896_REL_015",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00898_REL_003",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00898_REL_004",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00899_REL_010",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00901_REL_003",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00120_REL_010",
       "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00755_REL_011",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00755_REL_012",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00875_REL_014",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     },
     {
       "relationshipId": "RECORD-00903_REL_002",
       "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
+      "reason": "Legacy inverse relationship type held outside the active extraction schema; direction settled by the 2026-08-27 issue #737 ruling."
     }
   ],
   "duplicateEdgeExceptions": [
     {
       "entityIds": ["O0903", "O0908"],
       "types": ["Owns", "Owned By"],
-      "reason": "RECORD-00374 asserts both 'Scripps-Howard Owns Ventura Country Star' (RECORD-00374_REL_013) and 'Ventura Country Star Owned By Scripps-Howard' (RECORD-00374_REL_014) -- the same ownership fact encoded twice under Owns and its unconfirmed candidate inverse Owned By. Which row (if either) to correct or remove is a pending curator decision (issue #737)."
+      "reason": "RECORD-00374 asserts both 'Scripps-Howard Owns Ventura Country Star' (RECORD-00374_REL_013) and 'Ventura Country Star Owned By Scripps-Howard' (RECORD-00374_REL_014) -- the same ownership fact encoded twice. The 2026-08-27 issue #737 ruling keeps Owns as canonical and sends the Owned By row to data/relationship-review-report.json for removal review."
     },
     {
       "entityIds": ["P0005", "O0033"],
       "types": ["Owns", "Owned By"],
-      "reason": "Records assert 'Jay Rosen Owns PressThink' against the PressThink entity O0033 (RECORD-00501_REL_003, RECORD-00835_REL_025, RECORD-00800_REL_002, RECORD-00847_REL_023) and separately 'PressThink Owned By Jay Rosen' against the same entity (RECORD-00483_REL_002, RECORD-00716_REL_003) -- the same ownership fact encoded twice under Owns and its unconfirmed candidate inverse Owned By. Which label to keep is a pending curator decision (issue #737). PressThink's duplicate Work-typed entity W0666 was merged into O0033 on 2026-08-27 (issue #859), which is why this entry now covers relationship rows that used to be split across two exceptions, one per entity id."
+      "reason": "Records assert 'Jay Rosen Owns PressThink' against the PressThink entity O0033 (RECORD-00501_REL_003, RECORD-00835_REL_025, RECORD-00800_REL_002, RECORD-00847_REL_023) and separately 'PressThink Owned By Jay Rosen' against the same entity (RECORD-00483_REL_002, RECORD-00716_REL_003) -- the same ownership fact encoded twice. The 2026-08-27 issue #737 ruling keeps Owns as canonical and sends both Owned By rows to data/relationship-review-report.json for removal review. PressThink's duplicate Work-typed entity W0666 was merged into O0033 on 2026-08-27 (issue #859), which is why this entry covers rows that used to be split across two exceptions."
     }
   ]
 }

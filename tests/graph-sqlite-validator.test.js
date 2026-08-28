@@ -457,6 +457,34 @@ describe('relationship type registry enforcement (#737)', () => {
     assert.equal(summary.endpointReviewRows[0].validationState, 'held');
   });
 
+  it('puts a curator-approved retype recommendation in the review report', async () => {
+    const fixture = validFixture();
+    fixture.relationships[0].type = 'Created';
+    fixture.policy.relationshipTypeHolds = [{
+      relationshipId: 'REL-00001',
+      observedType: 'Created',
+      reason: 'Legacy label pending the issue #737 ruling.',
+    }];
+    fixture.policy.relationshipTypeRegistry = {
+      Created: { recommendedRetypeTo: 'Pioneered' },
+    };
+
+    const summary = await validateGraphDataset(fixture);
+    assert.deepStrictEqual(summary.endpointReviewRows, [{
+      relationshipId: 'REL-00001',
+      relationshipType: 'Created',
+      sourceEntityId: 'P0001',
+      sourceEntityType: 'Person',
+      sourceEntityName: 'Jay Rosen',
+      targetEntityId: 'O0001',
+      targetEntityType: 'Organization',
+      targetEntityName: 'PressThink',
+      validationState: 'held',
+      reviewReason: 'recommended-retype',
+      recommendedType: 'Pioneered',
+    }]);
+  });
+
   it('rejects a symmetric type asserted redundantly in both directions', async () => {
     const fixture = validFixture();
     fixture.policy.acceptedRelationshipTypes = ['Mentions'];
@@ -637,7 +665,13 @@ describe('relationship type registry enforcement (#737)', () => {
     const fixture = validFixture();
     fixture.policy.acceptedRelationshipTypes = ['Owns', 'Owned By'];
     fixture.policy.relationshipTypeRegistry = {
-      Owns: { candidateInverseType: 'Owned By' },
+      Owns: {
+        candidateInverseType: 'Owned By',
+        duplicateReviewPolicy: {
+          reviewType: 'Owned By',
+          recommendedAction: 'remove-duplicate',
+        },
+      },
     };
     fixture.policy.duplicateEdgeExceptions = [{
       entityIds: ['P0001', 'O0001'],
@@ -669,6 +703,20 @@ describe('relationship type registry enforcement (#737)', () => {
 
     const summary = await validateGraphDataset(fixture);
     assert.equal(summary.relationships, 2);
+    assert.deepStrictEqual(summary.endpointReviewRows, [{
+      relationshipId: 'REL-00002',
+      relationshipType: 'Owned By',
+      sourceEntityId: 'O0001',
+      sourceEntityType: 'Organization',
+      sourceEntityName: 'PressThink',
+      targetEntityId: 'P0001',
+      targetEntityType: 'Person',
+      targetEntityName: 'Jay Rosen',
+      validationState: 'accepted',
+      reviewReason: 'duplicate-inverse',
+      recommendedAction: 'remove-duplicate',
+      canonicalType: 'Owns',
+    }]);
   });
 
   it('rejects a duplicateEdgeException that no longer matches any duplicate edge', async () => {
@@ -1179,6 +1227,43 @@ describe('endpoint review report (#868)', () => {
     assert.deepStrictEqual(report.byType, {});
   });
 
+  it('records the settled Created retype and Owned By duplicate policy', async () => {
+    const [registry, report] = await Promise.all([
+      readFile(path.join(repositoryRoot, 'data/relationship-type-registry.json'), 'utf8').then(JSON.parse),
+      readFile(path.join(repositoryRoot, 'data/relationship-review-report.json'), 'utf8').then(JSON.parse),
+    ]);
+
+    assert.equal(registry.types.Created.recommendedRetypeTo, 'Pioneered');
+    assert.deepStrictEqual(registry.types.Owns.duplicateReviewPolicy, {
+      reviewType: 'Owned By',
+      recommendedAction: 'remove-duplicate',
+    });
+
+    assert.deepStrictEqual(
+      report.byType.Created.rows.map(row => ({
+        relationshipId: row.relationshipId,
+        reviewReason: row.reviewReason,
+        recommendedType: row.recommendedType,
+      })),
+      [{
+        relationshipId: 'TWTR-17930_REL_001',
+        reviewReason: 'recommended-retype',
+        recommendedType: 'Pioneered',
+      }],
+    );
+
+    const duplicateRows = report.byType['Owned By'].rows.filter(
+      row => row.reviewReason === 'duplicate-inverse',
+    );
+    assert.deepStrictEqual(
+      duplicateRows.map(row => row.relationshipId),
+      ['RECORD-00374_REL_014', 'RECORD-00483_REL_002', 'RECORD-00716_REL_003'],
+    );
+    assert.ok(duplicateRows.every(row => (
+      row.recommendedAction === 'remove-duplicate' && row.canonicalType === 'Owns'
+    )));
+  });
+
   it('matches the committed data/relationship-review-report.json for the current repository data', async () => {
     // The committed file is a build artifact of validateGraphDataset +
     // buildEndpointReviewReport, exactly like scripts/validate-graph-data.mjs
@@ -1201,14 +1286,12 @@ describe('endpoint review report (#868)', () => {
 });
 
 describe('data/SCHEMA.md reconciliation with the registry (#737)', () => {
-  it('does not describe Owned By or Founded By as a confirmed inverse the registry itself defers', async () => {
+  it('distinguishes settled legacy directions from active-schema admission', async () => {
     const schemaMd = await readFile(path.join(repositoryRoot, 'data/SCHEMA.md'), 'utf8');
 
-    assert.doesNotMatch(
-      schemaMd,
-      /`Owned By`[^\n]*Inverse of `Owns`/,
-      'SCHEMA.md must not claim Owned By is a confirmed inverse of Owns; relationship-type-registry.json defers that (status: "deferred")'
-    );
+    assert.match(schemaMd, /`Owned By` and `Founded By` now have a curator-confirmed direction/);
+    assert.match(schemaMd, /stay `"status": "deferred"`/);
+    assert.match(schemaMd, /`Created` has a settled review action/);
     assert.match(
       schemaMd,
       /relationship-type-registry\.json/,

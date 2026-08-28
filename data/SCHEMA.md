@@ -237,8 +237,12 @@ Three things the registry tracks that this table doesn't:
 - **`Discusses`' direction, `Occurred At`, and `Covers` stay open.** The
   2026-08-27 ruling widened `Discusses`' endpoint types but left its
   direction split — both readings are documented in its registry entry's
-  `directionNote`. `Occurred At` and `Covers` were not ruled on at all; both
-  readings stay in their `deferralReason`/`endpointDivergence.note`.
+  `directionNote`. The same ruling deliberately left `Occurred At` and
+  `Covers` deferred because the evidence split; both readings stay in their
+  `deferralReason`/`endpointDivergence.note`.
+- **`Created` has a settled review action.** Its only row is listed in
+  `relationship-review-report.json` for the approved retype to `Pioneered`;
+  the validator does not edit the source CSV automatically.
 
 ### Impact / influence (defined for #344, backfill pending)
 

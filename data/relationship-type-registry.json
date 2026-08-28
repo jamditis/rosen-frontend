@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.2.0",
+  "schemaVersion": "1.3.0",
   "description": "Machine-readable relationship-type registry for the Jay Rosen Internet Archive knowledge graph. Formalizes allowed endpoint entity types, direction, inverse relationships, self-link and multi-assertion policy, temporal scope, and disputed-assertion support for every relationship type present in data/extracted_relationships.csv or in backend/entity_extraction_schema_v3.json. See data/README.md and scripts/validate-graph-data.mjs for how this is enforced, and issue #737 for the audit that produced it.",
   "entityTypes": [
     "Concept",
@@ -27,6 +27,11 @@
       "version": "1.2.0",
       "date": "2026-08-27",
       "summary": "Applied the curator rulings recorded on issue #737 (2026-08-27 comment) to the 13 accepted types that carried endpointEnforcement: \"deferred\": widened allowedSourceTypes/allowedTargetTypes per the ruling sheet's recommendations (including concept sources for Criticizes, Cites, Discusses, Expands On, and Pioneered), flipped Originated By's declared direction to match majority usage, and moved every one of those types except Occurred At from endpointEnforcement: \"deferred\" to a new \"reviewed\" state: the endpoint-type rule is now curator-settled, but rows that still don't fit it are not validation failures -- scripts/validate-graph-data.mjs collects them into the committed data/relationship-review-report.json instead of throwing. Occurred At, Discusses' direction, and Covers stay fully deferred with both readings documented, per the ruling. Founded By and Owned By gain a curator-confirmed direction (documented via allowedSourceTypes/allowedTargetTypes, directionality, and a new rulingNote) but keep status: \"deferred\" because they remain outside the active extraction schema. Created gains a recommendedRetypeTo: \"Pioneered\" note. No extracted_entities.csv or extracted_relationships.csv row was edited by this migration; every newly-flagged row is a review-report entry, not a correction."
+    },
+    {
+      "version": "1.3.0",
+      "date": "2026-08-28",
+      "summary": "Completes issue #868's review-only routing for the 2026-08-27 rulings. The validator now includes Created's approved retype to Pioneered and the three current Owned By rows that duplicate canonical Owns assertions in data/relationship-review-report.json. Owns gains duplicateReviewPolicy so the preferred and review sides are machine-readable. The source relationship CSV remains unchanged: these are explicit curator review actions, not silent edits."
     }
   ],
   "examples": {
@@ -796,7 +801,11 @@
         "note": "3 of 64 current Owns rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Work to allowedTargetTypes (owning a publication or format, like \"Jay Rosen owns PressThink,\" is the clear dominant non-Organization pattern). The remaining rows have an Event or Concept target that looks like entity mistyping (for example \"TimesSelect\" recorded once as a Work and once as a Concept) and are listed in data/relationship-review-report.json for individual, entity-by-entity review rather than a further schema widening. New rows must follow the declared endpoint types."
       },
       "candidateInverseType": "Owned By",
-      "directionNote": "The issue #737 curator ruling, 2026-08-27, confirms Owned By as Owns' inverse (source = owned entity, target = owner). The 5 rows that already encode one ownership fact under both labels stay recorded in data/graph-validation-holds.json duplicateEdgeExceptions pending a manual cleanup that drops the Owned By side, per the ruling's recommendation to keep Owns as the canonical label; this implementation does not edit extracted_relationships.csv rows."
+      "duplicateReviewPolicy": {
+        "reviewType": "Owned By",
+        "recommendedAction": "remove-duplicate"
+      },
+      "directionNote": "The issue #737 curator ruling, 2026-08-27, confirms Owned By as Owns' inverse (source = owned entity, target = owner). The three current Owned By rows that duplicate one or more Owns assertions stay recorded in data/graph-validation-holds.json duplicateEdgeExceptions and are listed in data/relationship-review-report.json for a manual cleanup that removes the Owned By side, per the ruling's recommendation to keep Owns as the canonical label. The source relationship rows remain unchanged until that review is executed."
     },
     "Founded": {
       "status": "accepted",
@@ -1066,7 +1075,7 @@
         737
       ],
       "recommendedRetypeTo": "Pioneered",
-      "rulingNote": "The issue #737 curator ruling, 2026-08-27, retires this type. The single row, TWTR-17930_REL_001 (Murdoch -> \"resentment news\"), fits Pioneered's own definition exactly (a person who pioneered a concept), hence recommendedRetypeTo: \"Pioneered\" above. Created has no allowedSourceTypes, allowedTargetTypes, or endpointEnforcement here, so it cannot generate a review-report row: data/relationship-review-report.json only collects endpoint-type mismatches for types marked endpointEnforcement: \"reviewed\", and it has no Created section or retype-recommendation channel. This rulingNote is the record of the retype recommendation; the CSV row itself keeps its current \"Created\" label, since fixing it is a data edit, not something this registry or validator change makes on its own."
+      "rulingNote": "The issue #737 curator ruling, 2026-08-27, retires this type. The single row, TWTR-17930_REL_001 (Murdoch -> \"resentment news\"), fits Pioneered's own definition exactly (a person who pioneered a concept), hence recommendedRetypeTo: \"Pioneered\" above. The validator includes this row in data/relationship-review-report.json with reviewReason: \"recommended-retype\". The CSV row keeps its current \"Created\" label until that review action is executed."
     },
     "Covers": {
       "status": "deferred",

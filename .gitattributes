@@ -12,6 +12,10 @@ wiki/**/*.json text eol=lf
 data/wiki-content/**/*.md text eol=lf
 data/wiki-seed.json text eol=lf
 
+# The #867 migration's graph-policy helper once contained literal NUL
+# separators. Force a text diff for the cleanup commit as well as future edits.
+data/lib/graph-policy-refresh.js text eol=lf diff
+
 # This generated spreadsheet deliberately uses RFC 4180 CRLF records. Do not
 # report each changed row's carriage return as trailing whitespace.
 docs/feature-audit/feature-stories.csv -whitespace
