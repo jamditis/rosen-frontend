@@ -147,12 +147,13 @@ def update_entity_mentions(sh, master_data, master_header, dry_run=False):
 
 def run_deduplication(
         worksheet, data, header, dry_run=False,
-        sheet_tab=DEFAULT_MASTER_SHEET_TAB):
+        sheet_tab=DEFAULT_MASTER_SHEET_TAB, limit=0):
     """Runs the deduplication process on the selected sheet using batch updates.
 
     When ``dry_run`` is True the queued changes are counted and logged but no
     ``batch_update`` is sent. Returns the number of cells changed (or that would
-    have changed under a dry run).
+    have changed under a dry run). A positive ``limit`` caps changed rows while
+    clean rows remain free to scan.
     """
     print("--- Starting Data Deduplication and Cleaning Process"
           + (" (DRY RUN)" if dry_run else "") + " ---")
@@ -175,49 +176,68 @@ def run_deduplication(
 
     batch_updates = []
     total_updates = 0
+    changed_rows = 0
+
+    def flush_updates(final=False):
+        nonlocal batch_updates, total_updates
+        if not batch_updates:
+            return
+
+        if dry_run:
+            qualifier = "final " if final else ""
+            print(f"  [DRY-RUN] would send {qualifier}batch of "
+                  f"{len(batch_updates)} updates to '{sheet_tab}'")
+            total_updates += len(batch_updates)
+            batch_updates = []
+            return
+
+        try:
+            qualifier = "final " if final else ""
+            print(f"  [INFO] Sending {qualifier}batch of {len(batch_updates)} "
+                  f"updates to '{sheet_tab}' sheet...")
+            worksheet.batch_update(batch_updates)
+            total_updates += len(batch_updates)
+            batch_updates = []
+            if final:
+                print("  [SUCCESS] Final batch complete.")
+            else:
+                print(f"  [SUCCESS] Batch sent. Pausing for "
+                      f"{DELAY_BETWEEN_BATCHES} seconds...")
+                time.sleep(DELAY_BETWEEN_BATCHES)
+        except Exception as e:
+            print(f"  [FAIL] Batch update for '{sheet_tab}' sheet failed. Error: {e}")
+            raise
+
     for i, row in enumerate(data):
         sheet_row_index = i + 2
+        row_updates = []
         for col_index in col_indices_to_process:
             if col_index < len(row):
                 original_value = row[col_index]
                 cleaned_value = clean_and_dedupe_cell(original_value)
                 if cleaned_value != original_value:
-                    batch_updates.append({
+                    row_updates.append({
                         'range': gspread.utils.rowcol_to_a1(sheet_row_index, col_index + 1),
                         'values': [[cleaned_value]]
                     })
                     print(f"  [QUEUED] Update for Row {sheet_row_index}, Column '{header[col_index]}'")
 
-                    if len(batch_updates) >= BATCH_SIZE:
-                        if dry_run:
-                            print(f"  [DRY-RUN] would send batch of {len(batch_updates)} updates to '{sheet_tab}'")
-                            total_updates += len(batch_updates)
-                            batch_updates = []
-                            continue
-                        try:
-                            print(f"  [INFO] Sending batch of {len(batch_updates)} updates to '{sheet_tab}' sheet...")
-                            worksheet.batch_update(batch_updates)
-                            total_updates += len(batch_updates)
-                            print(f"  [SUCCESS] Batch sent. Pausing for {DELAY_BETWEEN_BATCHES} seconds...")
-                            batch_updates = []
-                            time.sleep(DELAY_BETWEEN_BATCHES)
-                        except Exception as e:
-                            print(f"  [FAIL] Batch update for '{sheet_tab}' sheet failed. Error: {e}")
-                            raise
+        if not row_updates:
+            continue
 
-    if batch_updates:
-        if dry_run:
-            print(f"  [DRY-RUN] would send final batch of {len(batch_updates)} updates to '{sheet_tab}'")
-            total_updates += len(batch_updates)
-        else:
-            try:
-                print(f"  [INFO] Sending final batch of {len(batch_updates)} updates to '{sheet_tab}' sheet...")
-                worksheet.batch_update(batch_updates)
-                total_updates += len(batch_updates)
-                print("  [SUCCESS] Final batch complete.")
-            except Exception as e:
-                print(f"  [FAIL] Final batch update for '{sheet_tab}' sheet failed. Error: {e}")
-                raise
+        if batch_updates and len(batch_updates) + len(row_updates) > BATCH_SIZE:
+            flush_updates()
+        batch_updates.extend(row_updates)
+        changed_rows += 1
+
+        if len(batch_updates) >= BATCH_SIZE:
+            flush_updates()
+
+        if limit > 0 and changed_rows >= limit:
+            print(f"  [limit] Stopped after {changed_rows} changed row(s).")
+            break
+
+    flush_updates(final=True)
 
     label = "would update" if dry_run else "updated"
     print(f"--- Deduplication Process Complete. Total cells {label}: {total_updates} ---")
@@ -234,7 +254,7 @@ def _parse_args(argv=None):
     )
     parser.add_argument(
         '--limit', type=int, default=0,
-        help='Cap how many master-sheet rows the dedup pass touches (0 = all). '
+        help='Cap how many master-sheet rows the dedup pass changes (0 = all). '
              'When enabled, the legacy entity-mention recompute always uses '
              'every row so valid mentions are never dropped.'
     )
@@ -275,16 +295,11 @@ def main(argv=None):
     master_header = master_values[0]
     master_data = master_values[1:]
 
-    dedup_data = master_data
-    if args.limit and args.limit > 0 and len(master_data) > args.limit:
-        dedup_data = master_data[:args.limit]
-        print(f"  [INFO] --limit {args.limit}: deduplicating the first {args.limit} "
-              f"of {len(master_data)} data rows.")
-
     try:
         dedup_writes = run_deduplication(
-            master_worksheet, dedup_data, master_header,
-            dry_run=args.dry_run, sheet_tab=master_sheet_tab)
+            master_worksheet, master_data, master_header,
+            dry_run=args.dry_run, sheet_tab=master_sheet_tab,
+            limit=args.limit)
     except Exception as e:
         print(f"  [FATAL] {e}")
         return 1
