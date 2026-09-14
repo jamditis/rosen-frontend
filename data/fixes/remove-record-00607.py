@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """Apply the curator-approved removal of the duplicate record from issue #591."""
 
-import csv
 import sys
 from pathlib import Path
 
 DATA_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(DATA_DIR))
 
-from csv_safe_write import atomic_csv_write  # noqa: E402
+from csv_safe_write import read_archive_csv, write_archive_csv  # noqa: E402
 
 
 RECORDS_PATH = DATA_DIR / "archive_records-public.csv"
@@ -17,22 +16,8 @@ ENTITIES_PATH = DATA_DIR / "extracted_entities.csv"
 DROP_ID = "RECORD-00607"
 
 
-def read_csv(path):
-    with path.open("r", encoding="utf-8-sig", newline="") as source:
-        reader = csv.DictReader(source)
-        return reader.fieldnames, list(reader)
-
-
-def write_csv(path, fieldnames, rows):
-    with atomic_csv_write(path) as destination:
-        writer = csv.DictWriter(
-            destination,
-            fieldnames=fieldnames,
-            lineterminator="\r\n",
-        )
-        writer.writeheader()
-        writer.writerows(rows)
-
+read_csv = read_archive_csv
+write_csv = write_archive_csv
 
 def main():
     fieldnames, rows = read_csv(RECORDS_PATH)

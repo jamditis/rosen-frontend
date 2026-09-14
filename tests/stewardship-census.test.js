@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync, spawnSync } from 'node:child_process';
 
 import {
   buildStewardshipCensus,
@@ -188,11 +189,40 @@ describe('stewardship coverage census', () => {
     }
   });
 
+  it('warns without blocking dirty-input pre-commit validation in CI', t => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'census-dirty-ci-'));
+    t.after(() => fs.rmSync(tempDir, { recursive: true, force: true }));
+    fs.cpSync(fixtureDir, path.join(tempDir, 'data'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, 'scripts'));
+    fs.mkdirSync(path.join(tempDir, 'tests'));
+    fs.copyFileSync(path.join(rootDir, 'scripts/build-stewardship-census.mjs'), path.join(tempDir, 'scripts/build-stewardship-census.mjs'));
+    fs.copyFileSync(path.join(rootDir, 'tests/stewardship-census.test.js'), path.join(tempDir, 'tests/stewardship-census.test.js'));
+    fs.symlinkSync(path.join(rootDir, 'data/lib'), path.join(tempDir, 'data/lib'), 'dir');
+    fs.symlinkSync(path.join(rootDir, 'node_modules'), path.join(tempDir, 'node_modules'), 'dir');
+    fs.writeFileSync(path.join(tempDir, 'package.json'), '{"type":"module"}');
+    const git = args => execFileSync('git', args, { cwd: tempDir, stdio: 'pipe' });
+    git(['init']);
+    git(['add', 'data']);
+    git(['-c', 'user.name=Joe Amditis', '-c', 'user.email=6799804+jamditis@users.noreply.github.com', 'commit', '-m', 'Census test fixture']);
+    fs.appendFileSync(path.join(tempDir, 'data/archive_records-public.csv'), '\n');
+    const childEnv = { ...process.env, CI: 'true' };
+    delete childEnv.NODE_TEST_CONTEXT;
+    const result = spawnSync(process.execPath, ['--test', '--test-name-pattern=keeps committed JSON', 'tests/stewardship-census.test.js'], {
+      cwd: tempDir, env: childEnv, encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout + result.stderr, /WARNING: CENSUS FRESHNESS NOT CHECKED/);
+    assert.match(result.stdout, /SKIP Commit census inputs/);
+  });
+
   it('keeps committed JSON and Markdown reports current', t => {
     const inputs = loadStewardshipInputs({ dataDir: path.join(rootDir, 'data') });
     const state = inspectStewardshipInputGitState({ rootDir, files: inputs.files });
     assert.equal(state.shallow, false, 'Census freshness requires complete Git history');
     if (state.dirty) {
+      // Submission and sheet-sync jobs test dirty inputs before committing them,
+      // then enforce freshness after the commit. Keep that gate reachable.
+      console.warn('WARNING: CENSUS FRESHNESS NOT CHECKED: inputs are dirty. Commit inputs and rerun this test before publication.');
       t.skip('Commit census inputs before checking the stamped reports');
       return;
     }

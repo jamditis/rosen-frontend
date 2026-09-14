@@ -8,12 +8,11 @@ Strategy:
 3. Report but don't auto-remove cross-platform duplicates.
 """
 
-import csv
 import re
 from collections import defaultdict
 from pathlib import Path
 
-from csv_safe_write import atomic_csv_write
+from csv_safe_write import read_archive_csv, write_archive_csv
 from prune_orphan_references import prune_orphan_references
 
 CSV_PATH = Path(__file__).parent / "archive_records-public.csv"
@@ -39,10 +38,7 @@ def get_regular_url(print_url):
 def main():
     print(f"Reading {CSV_PATH}...")
 
-    with open(CSV_PATH, "r", encoding="utf-8", newline="") as f:
-        reader = csv.DictReader(f)
-        fieldnames = reader.fieldnames
-        rows = list(reader)
+    fieldnames, rows = read_archive_csv(CSV_PATH)
 
     print(f"  Loaded {len(rows)} records")
 
@@ -129,10 +125,7 @@ def main():
         print(f"    {ids}: {title} ({platforms})")
 
     print(f"\n  Writing {CSV_PATH}...")
-    with atomic_csv_write(CSV_PATH) as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
+    write_archive_csv(CSV_PATH, fieldnames, rows)
 
     # Records were removed above, so prune the entity and relationship
     # extractions that referenced them — otherwise archive-entities.json

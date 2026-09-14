@@ -107,6 +107,8 @@ Adding a record by hand is a three-step process (edit a CSV, run one command, up
 
 ## Continuous stewardship
 
+Track active work in the [Rosen Archive stewardship project](https://github.com/users/jamditis/projects/4).
+
 New public work now appears mainly on Bluesky. The planned stewardship flow finds Jay Rosen's public posts, keeps meaningful public discourse as record candidates, preserves needed thread context, and sends approved work through the existing archive review and release path.
 
 Read the plain-language system map: [Bluesky-first archive stewardship pipeline](docs/bluesky-stewardship-pipeline.md).
