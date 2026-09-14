@@ -106,9 +106,10 @@ PR's own CI.
 CI runners are ephemeral, so a job's progress file does not survive between
 runs. What that means per job:
 
-- **`dedup`** is deterministic and idempotent. Re-running over already-clean
-  rows is a cheap no-op (zero writes). To cover the whole sheet in one pass, run
-  it with a high `--limit` or `0` (no cap) -- it makes no AI calls.
+- **`dedup`** is deterministic and idempotent. Its limit counts rows that need
+  changes, not the clean rows it scans. Repeated applied runs therefore advance
+  through the sheet, and the normalized sheet cells are the durable completion
+  state. Use `0` (no cap) when you want one full pass; it makes no AI calls.
 - **`key_concepts`** has no persistent cursor in CI, so each run starts from the
   top of the sheet. With a small `limit` it keeps re-touching the first rows. It
   skips filling rows that already have concepts, but it still spends a Gemini

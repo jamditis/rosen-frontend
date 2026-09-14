@@ -23,11 +23,13 @@ class _FakeWorksheet:
     def __init__(self, values):
         self._values = values
         self.batch_updates = []
+        self.batch_calls = []
 
     def get_all_values(self):
         return self._values
 
     def batch_update(self, updates):
+        self.batch_calls.append(list(updates))
         self.batch_updates.extend(updates)
 
 
@@ -137,3 +139,41 @@ def test_main_treats_empty_workflow_tab_variable_as_unset(monkeypatch):
 
     assert module.main(["--dry-run", "--limit", "1"]) == 0
     assert spreadsheet.requested_tabs == ["archive_records"]
+
+
+def test_limit_counts_changed_rows_instead_of_the_sheet_prefix(monkeypatch):
+    module = _load_module()
+    monkeypatch.delenv("ROSEN_MASTER_SHEET_TAB", raising=False)
+    worksheet = _FakeWorksheet([
+        ["id", "thematic_categories", "key_concepts", "tags"],
+        ["R1", "News", "", ""],
+        ["R2", "News, News", "View from Nowhere; View from Nowhere", ""],
+        ["R3", "Analysis, Analysis", "", ""],
+    ])
+    spreadsheet = _FakeSpreadsheet(worksheet)
+    monkeypatch.setattr(
+        module, "get_gspread_client", lambda *a, **k: _FakeClient(spreadsheet))
+
+    assert module.main(["--limit", "1"]) == 0
+    assert worksheet.batch_updates == [
+        {"range": "B3", "values": [["News"]]},
+        {"range": "C3", "values": [["View from Nowhere"]]},
+    ]
+
+
+def test_changed_rows_do_not_overfill_a_batch(monkeypatch):
+    module = _load_module()
+    monkeypatch.setattr(module, "BATCH_SIZE", 3)
+    monkeypatch.setattr(module, "DELAY_BETWEEN_BATCHES", 0)
+    header = ["id", "thematic_categories", "key_concepts", "tags"]
+    worksheet = _FakeWorksheet([
+        header,
+        ["R1", "News, News", "View from Nowhere; View from Nowhere", ""],
+        ["R2", "Analysis, Analysis", "Mindcasting; Mindcasting", ""],
+    ])
+
+    writes = module.run_deduplication(
+        worksheet, worksheet.get_all_values()[1:], header, limit=2)
+
+    assert writes == 4
+    assert [len(batch) for batch in worksheet.batch_calls] == [2, 2]
