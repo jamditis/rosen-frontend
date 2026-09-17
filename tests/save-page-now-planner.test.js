@@ -8,6 +8,7 @@ import {
 const eligibleInput = {
   objectId: 'urn:rosen:object:archive-record:RECORD-00001',
   sourceUrl: 'https://example.org/article?edition=public',
+  evaluatedAt: '2026-09-17T12:00:00.000Z',
   rightsDecision: {
     rightsStatus: 'cleared',
     accessDecision: 'public',
@@ -179,6 +180,29 @@ describe('Save Page Now dry-run planner (#715)', () => {
     }
   });
 
+  it('holds captures dated after the evaluation time despite a later inventory bound', () => {
+    const cases = [
+      ['future capture inside inventory bound', '20980101120000', '2099-01-01T12:00:00Z'],
+      ['one second after evaluation', '20260917120001', '2026-09-17T12:00:01.000Z'],
+    ];
+
+    for (const [label, captureTimestamp, asOf] of cases) {
+      const input = clone(eligibleInput);
+      input.inventory.asOf = asOf;
+      input.inventory.acceptableCapture = {
+        verified: true,
+        captureTimestamp,
+        replayUrl: `https://web.archive.org/web/${captureTimestamp}id_/https://example.org/article?edition=public`,
+      };
+
+      assert.equal(
+        planSavePageNowSubmission(input).reasonCode,
+        'acceptable-capture-not-verified',
+        label,
+      );
+    }
+  });
+
   it('rejects unsupported and credential-bearing source URLs before submission', () => {
     for (const sourceUrl of [
       'ftp://example.org/article',
@@ -231,12 +255,34 @@ describe('Save Page Now dry-run planner (#715)', () => {
   });
 
   it('uses the canonical source URL in the idempotency key', () => {
-    const equivalent = clone(eligibleInput);
-    equivalent.sourceUrl = 'https://EXAMPLE.org:443/article?edition=public';
+    const equivalents = [
+      'https://EXAMPLE.org:443/article?edition=public',
+      'https://example.org/article?edition=public#section',
+    ];
+
+    for (const sourceUrl of equivalents) {
+      const input = clone(eligibleInput);
+      input.sourceUrl = sourceUrl;
+      assert.equal(
+        planSavePageNowSubmission(input).idempotencyKey,
+        planSavePageNowSubmission(eligibleInput).idempotencyKey,
+        sourceUrl,
+      );
+    }
+  });
+
+  it('ignores fragments when matching verified replay evidence', () => {
+    const input = clone(eligibleInput);
+    input.sourceUrl = 'https://example.org/article?edition=public#section';
+    input.inventory.acceptableCapture = {
+      verified: true,
+      captureTimestamp: '20260801123045',
+      replayUrl: 'https://web.archive.org/web/20260801123045id_/https://example.org/article?edition=public',
+    };
 
     assert.equal(
-      planSavePageNowSubmission(equivalent).idempotencyKey,
-      planSavePageNowSubmission(eligibleInput).idempotencyKey,
+      planSavePageNowSubmission(input).reasonCode,
+      'acceptable-capture-exists',
     );
   });
 

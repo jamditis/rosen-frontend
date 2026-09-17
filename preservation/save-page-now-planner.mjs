@@ -13,6 +13,7 @@ const OBJECT_ID_PATTERN = new RegExp(
   + 'generated-artifact|feature-record):[A-Za-z0-9][A-Za-z0-9._:-]*$',
 );
 const UTC_TIMESTAMP_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/;
+const WAYBACK_TIMESTAMP_PATTERN = /^\d{14}$/;
 
 function result(decision, reasonCode, reason, idempotencyKey = null) {
   return { decision, reasonCode, reason, idempotencyKey };
@@ -61,7 +62,7 @@ function waybackTimestampToIso(value) {
 }
 
 function isValidWaybackTimestamp(value) {
-  if (typeof value !== 'string' || !/^\d{14}$/.test(value)) return false;
+  if (typeof value !== 'string' || !WAYBACK_TIMESTAMP_PATTERN.test(value)) return false;
   const isoTimestamp = waybackTimestampToIso(value);
   const parsed = Date.parse(isoTimestamp);
   return Number.isFinite(parsed) && new Date(parsed).toISOString() === isoTimestamp;
@@ -76,14 +77,27 @@ function parseUtcTimestamp(value) {
     : null;
 }
 
-function verifiedAcceptableCapture(inventory, sourceUrl) {
+function canonicalSubmissionUrl(value) {
+  try {
+    const url = new URL(value);
+    url.hash = '';
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
+function verifiedAcceptableCapture(inventory, sourceUrl, evaluatedAt) {
   const capture = inventory?.acceptableCapture;
   const timestamp = capture?.captureTimestamp ?? '';
   if (!isValidWaybackTimestamp(timestamp)) return false;
 
+  const captureTime = Date.parse(waybackTimestampToIso(timestamp));
+  const evaluationTime = parseUtcTimestamp(evaluatedAt);
   const inventoryAsOf = parseUtcTimestamp(inventory?.asOf);
-  if (inventoryAsOf == null
-      || Date.parse(waybackTimestampToIso(timestamp)) > inventoryAsOf) {
+  if (evaluationTime == null || inventoryAsOf == null
+      || captureTime > evaluationTime
+      || captureTime > inventoryAsOf) {
     return false;
   }
 
@@ -96,9 +110,13 @@ function verifiedAcceptableCapture(inventory, sourceUrl) {
   if (!replayMatch) return false;
 
   try {
+    const replayTarget = new URL(replayMatch[1]);
+    replayTarget.hash = '';
+    const plannedSource = new URL(sourceUrl);
+    plannedSource.hash = '';
     return capture
       && capture.verified === true
-      && new URL(replayMatch[1]).href === new URL(sourceUrl).href;
+      && replayTarget.href === plannedSource.href;
   } catch {
     return false;
   }
@@ -108,7 +126,7 @@ function makeIdempotencyKey(input) {
   const identity = JSON.stringify({
     adapterVersion: SAVE_PAGE_NOW_PLANNER_VERSION,
     objectId: input.objectId,
-    sourceUrl: new URL(input.sourceUrl).href,
+    sourceUrl: canonicalSubmissionUrl(input.sourceUrl),
     policyVersion: input.rightsDecision.policyVersion,
   });
   return `spn:${createHash('sha256').update(identity).digest('hex')}`;
@@ -130,7 +148,11 @@ export function planSavePageNowSubmission(input = {}) {
     );
   }
 
-  if (verifiedAcceptableCapture(input.inventory, input.sourceUrl)) {
+  if (verifiedAcceptableCapture(
+    input.inventory,
+    input.sourceUrl,
+    input.evaluatedAt,
+  )) {
     return result(
       'skip',
       'acceptable-capture-exists',
