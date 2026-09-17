@@ -22,10 +22,14 @@ function isSupportedPublicUrl(value) {
 
   try {
     const url = new URL(value);
-    const hostname = url.hostname.replace(/^\[|\]$/g, '').toLowerCase();
+    const hostname = url.hostname
+      .replace(/^\[|\]$/g, '')
+      .replace(/\.+$/, '')
+      .toLowerCase();
     return (url.protocol === 'http:' || url.protocol === 'https:')
       && url.username === ''
       && url.password === ''
+      && hostname.length > 0
       && hostname !== 'localhost'
       && !hostname.endsWith('.localhost')
       && !hostname.endsWith('.local')
@@ -50,18 +54,38 @@ function positiveInteger(value) {
   return Number.isInteger(value) && value > 0;
 }
 
-function verifiedAcceptableCapture(inventory) {
+function waybackTimestampToIso(value) {
+  return `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`
+    + `T${value.slice(8, 10)}:${value.slice(10, 12)}:${value.slice(12, 14)}.000Z`;
+}
+
+function isValidWaybackTimestamp(value) {
+  if (typeof value !== 'string' || !/^\d{14}$/.test(value)) return false;
+  const isoTimestamp = waybackTimestampToIso(value);
+  const parsed = Date.parse(isoTimestamp);
+  return Number.isFinite(parsed) && new Date(parsed).toISOString() === isoTimestamp;
+}
+
+function verifiedAcceptableCapture(inventory, sourceUrl) {
   const capture = inventory?.acceptableCapture;
   const timestamp = capture?.captureTimestamp ?? '';
-  if (!/^\d{14}$/.test(timestamp)) return false;
+  if (!isValidWaybackTimestamp(timestamp)) return false;
 
   const replayPattern = new RegExp(
-    `^https://web\\.archive\\.org/web/${timestamp}(?:[a-z]{2}_)?/https?://`,
+    `^https://web\\.archive\\.org/web/${timestamp}(?:[a-z]{2}_)?/(https?://.+)$`,
   );
-  return capture
-    && capture.verified === true
-    && typeof capture.replayUrl === 'string'
-    && replayPattern.test(capture.replayUrl);
+  const replayMatch = typeof capture?.replayUrl === 'string'
+    ? capture.replayUrl.match(replayPattern)
+    : null;
+  if (!replayMatch) return false;
+
+  try {
+    return capture
+      && capture.verified === true
+      && new URL(replayMatch[1]).href === new URL(sourceUrl).href;
+  } catch {
+    return false;
+  }
 }
 
 function makeIdempotencyKey(input) {
@@ -90,7 +114,7 @@ export function planSavePageNowSubmission(input = {}) {
     );
   }
 
-  if (verifiedAcceptableCapture(input.inventory)) {
+  if (verifiedAcceptableCapture(input.inventory, input.sourceUrl)) {
     return result(
       'skip',
       'acceptable-capture-exists',

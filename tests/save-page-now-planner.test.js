@@ -72,6 +72,26 @@ describe('Save Page Now dry-run planner (#715)', () => {
         captureTimestamp: '[',
         replayUrl: 'https://web.archive.org/web/invalid/https://example.org/article',
       },
+      {
+        verified: true,
+        captureTimestamp: 20260801123045,
+        replayUrl: 'https://web.archive.org/web/20260801123045id_/https://example.org/article?edition=public',
+      },
+      {
+        verified: true,
+        captureTimestamp: '20260230120000',
+        replayUrl: 'https://web.archive.org/web/20260230120000id_/https://example.org/article?edition=public',
+      },
+      {
+        verified: true,
+        captureTimestamp: '20260801123045',
+        replayUrl: 'https://web.archive.org/web/20260801123045id_/https://example.net/unrelated',
+      },
+      {
+        verified: true,
+        captureTimestamp: '20260801123045',
+        replayUrl: 'https://web.archive.org/web/20260801123045id_/http://%',
+      },
     ];
 
     for (const acceptableCapture of cases) {
@@ -123,6 +143,8 @@ describe('Save Page Now dry-run planner (#715)', () => {
       'http://169.254.169.254/latest/meta-data/',
       'http://[::1]/admin',
       'http://service.local/article',
+      'http://localhost./private',
+      'http://service.local./private',
       'not a URL',
     ]) {
       const input = clone(eligibleInput);
