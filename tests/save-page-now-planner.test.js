@@ -17,6 +17,7 @@ const eligibleInput = {
   },
   inventory: {
     state: 'complete',
+    asOf: '2026-09-17T12:00:00.000Z',
     acceptableCapture: null,
   },
   budgets: {
@@ -45,6 +46,7 @@ describe('Save Page Now dry-run planner (#715)', () => {
     const input = clone(eligibleInput);
     input.inventory = {
       state: 'partial',
+      asOf: '2026-09-17T12:00:00.000Z',
       acceptableCapture: {
         verified: true,
         captureTimestamp: '20260801123045',
@@ -84,6 +86,11 @@ describe('Save Page Now dry-run planner (#715)', () => {
       },
       {
         verified: true,
+        captureTimestamp: '20260918123045',
+        replayUrl: 'https://web.archive.org/web/20260918123045id_/https://example.org/article?edition=public',
+      },
+      {
+        verified: true,
         captureTimestamp: '20260801123045',
         replayUrl: 'https://web.archive.org/web/20260801123045id_/https://example.net/unrelated',
       },
@@ -100,6 +107,44 @@ describe('Save Page Now dry-run planner (#715)', () => {
       const plan = planSavePageNowSubmission(input);
       assert.equal(plan.decision, 'hold');
       assert.equal(plan.reasonCode, 'acceptable-capture-not-verified');
+    }
+  });
+
+  it('accepts matching evidence from an HTTP Wayback replay URL', () => {
+    const input = clone(eligibleInput);
+    input.inventory.acceptableCapture = {
+      verified: true,
+      captureTimestamp: '20260801123045',
+      replayUrl: 'http://web.archive.org/web/20260801123045id_/https://example.org/article?edition=public',
+    };
+
+    assert.equal(
+      planSavePageNowSubmission(input).reasonCode,
+      'acceptable-capture-exists',
+    );
+  });
+
+  it('holds capture evidence without a real UTC inventory timestamp', () => {
+    const cases = [
+      ['missing timestamp', undefined],
+      ['impossible calendar date', '2026-02-30T12:00:00Z'],
+      ['non-UTC timestamp', '2026-09-17T12:00:00-04:00'],
+    ];
+
+    for (const [label, asOf] of cases) {
+      const input = clone(eligibleInput);
+      input.inventory.asOf = asOf;
+      input.inventory.acceptableCapture = {
+        verified: true,
+        captureTimestamp: '20260801123045',
+        replayUrl: 'https://web.archive.org/web/20260801123045id_/https://example.org/article?edition=public',
+      };
+
+      assert.equal(
+        planSavePageNowSubmission(input).reasonCode,
+        'acceptable-capture-not-verified',
+        label,
+      );
     }
   });
 
@@ -183,6 +228,16 @@ describe('Save Page Now dry-run planner (#715)', () => {
       const input = { ...clone(eligibleInput), ...variant };
       assert.notEqual(planSavePageNowSubmission(input).idempotencyKey, original);
     }
+  });
+
+  it('uses the canonical source URL in the idempotency key', () => {
+    const equivalent = clone(eligibleInput);
+    equivalent.sourceUrl = 'https://EXAMPLE.org:443/article?edition=public';
+
+    assert.equal(
+      planSavePageNowSubmission(equivalent).idempotencyKey,
+      planSavePageNowSubmission(eligibleInput).idempotencyKey,
+    );
   });
 
   it('holds input without a valid stable archive object ID', () => {

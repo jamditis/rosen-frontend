@@ -12,6 +12,7 @@ const OBJECT_ID_PATTERN = new RegExp(
   + '(?:archive-record|social-post|entity|relationship|dataset|source-file|'
   + 'generated-artifact|feature-record):[A-Za-z0-9][A-Za-z0-9._:-]*$',
 );
+const UTC_TIMESTAMP_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/;
 
 function result(decision, reasonCode, reason, idempotencyKey = null) {
   return { decision, reasonCode, reason, idempotencyKey };
@@ -66,13 +67,28 @@ function isValidWaybackTimestamp(value) {
   return Number.isFinite(parsed) && new Date(parsed).toISOString() === isoTimestamp;
 }
 
+function parseUtcTimestamp(value) {
+  if (typeof value !== 'string' || !UTC_TIMESTAMP_PATTERN.test(value)) return null;
+  const normalized = value.includes('.') ? value : value.replace(/Z$/, '.000Z');
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) && new Date(parsed).toISOString() === normalized
+    ? parsed
+    : null;
+}
+
 function verifiedAcceptableCapture(inventory, sourceUrl) {
   const capture = inventory?.acceptableCapture;
   const timestamp = capture?.captureTimestamp ?? '';
   if (!isValidWaybackTimestamp(timestamp)) return false;
 
+  const inventoryAsOf = parseUtcTimestamp(inventory?.asOf);
+  if (inventoryAsOf == null
+      || Date.parse(waybackTimestampToIso(timestamp)) > inventoryAsOf) {
+    return false;
+  }
+
   const replayPattern = new RegExp(
-    `^https://web\\.archive\\.org/web/${timestamp}(?:[a-z]{2}_)?/(https?://.+)$`,
+    `^https?://web\\.archive\\.org/web/${timestamp}(?:[a-z]{2}_)?/(https?://.+)$`,
   );
   const replayMatch = typeof capture?.replayUrl === 'string'
     ? capture.replayUrl.match(replayPattern)
@@ -92,7 +108,7 @@ function makeIdempotencyKey(input) {
   const identity = JSON.stringify({
     adapterVersion: SAVE_PAGE_NOW_PLANNER_VERSION,
     objectId: input.objectId,
-    sourceUrl: input.sourceUrl,
+    sourceUrl: new URL(input.sourceUrl).href,
     policyVersion: input.rightsDecision.policyVersion,
   });
   return `spn:${createHash('sha256').update(identity).digest('hex')}`;
