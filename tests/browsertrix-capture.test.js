@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { describe, it } from 'node:test';
+import { gzipSync } from 'node:zlib';
 
 import {
   BROWSERTRIX_IMAGE,
@@ -14,8 +16,10 @@ import {
   assertEgressNetwork,
   assertPublicSeedResolution,
   finalizeBrowsertrixCapture,
+  inspectWacz,
   planBrowsertrixCapture,
   resolveFinalUrl,
+  runBrowsertrixCapture,
 } from '../preservation/browsertrix-capture.mjs';
 
 function optionValue(args, option) {
@@ -33,6 +37,55 @@ function plan(overrides = {}) {
     taskType: 'static-article',
     ...overrides,
   });
+}
+
+function sha256(value) {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+function createWaczFixture(outputDir, options = {}) {
+  const stagingDir = path.join(outputDir, 'wacz-fixture');
+  const waczPath = path.join(outputDir, 'fixture.wacz');
+  const pageList = Buffer.from(`${JSON.stringify({ url: 'https://example.org/article' })}\n`);
+  const cdx = Buffer.from('org,example)/article 20260921110000 '
+    + '{"url":"https://example.org/article","status":"200","mime":"text/html"}\n');
+  const files = new Map([
+    ['indexes/index.cdx.gz', gzipSync(cdx)],
+    ['pages/pages.jsonl', pageList],
+  ]);
+  if (options.includeWarc !== false) {
+    files.set('archive/data.warc.gz', Buffer.from('fixture WARC payload'));
+  }
+
+  for (const [filename, contents] of files) {
+    const absolutePath = path.join(stagingDir, filename);
+    mkdirSync(path.dirname(absolutePath), { recursive: true });
+    writeFileSync(absolutePath, contents);
+  }
+  const resources = [...files].map(([filename, contents]) => ({
+    name: path.basename(filename),
+    path: filename,
+    hash: `sha256:${sha256(contents)}`,
+    bytes: contents.length,
+  }));
+  if (options.badWarcDigest) {
+    resources.find(resource => resource.path.startsWith('archive/')).hash = `sha256:${'0'.repeat(64)}`;
+  }
+  writeFileSync(path.join(stagingDir, 'datapackage.json'), JSON.stringify({
+    profile: 'wacz',
+    created: '2026-09-21T11:00:01Z',
+    software: 'Browsertrix-Crawler 1.14.3',
+    wacz_version: '1.1.1',
+    resources,
+  }));
+
+  const zip = spawnSync(
+    'zip',
+    ['-q', '-0', waczPath, 'datapackage.json', ...files.keys()],
+    { cwd: stagingDir, encoding: 'utf8' },
+  );
+  assert.equal(zip.status, 0, zip.stderr);
+  return waczPath;
 }
 
 describe('bounded Browsertrix capture profile (#716)', () => {
@@ -157,6 +210,54 @@ describe('bounded Browsertrix capture profile (#716)', () => {
     assert.equal(result.status, 0, result.stderr);
   });
 
+  it('keeps signal handling active until finalization quarantines the capture', async () => {
+    const outputDir = mkdtempSync(path.join(tmpdir(), 'rosen-browsertrix-signal-'));
+    const originalListeners = process.listenerCount('SIGTERM');
+    let stopped = false;
+    try {
+      const result = await runBrowsertrixCapture({
+        captureId: 'signal-finalize',
+        sourceUrl: 'https://example.org/article',
+        outputDir,
+        network: 'rosen-public-egress',
+      }, {
+        inspectNetwork: async () => 'restricted',
+        resolveHostname: async () => [{ address: '93.184.216.34' }],
+        stopContainer: async () => { stopped = true; },
+        execute: async () => {
+          const capture = plan({ captureId: 'signal-finalize', outputDir });
+          mkdirSync(capture.collectionDir, { recursive: true });
+          writeFileSync(capture.waczPath, 'fixture WACZ');
+          writeFileSync(capture.statsPath, JSON.stringify({
+            crawled: 1,
+            failed: 0,
+            pending: 0,
+            total: 1,
+          }));
+          setTimeout(() => process.emit('SIGTERM'), 20);
+          return { exitCode: 0, error: null };
+        },
+        inspectArchive: async () => {
+          await new Promise(resolve => setTimeout(resolve, 60));
+          return {
+            finalUrl: 'https://example.org/article',
+            interruptionReason: null,
+            metadata: {},
+            resourceSummary: { loadedResources: 1 },
+            sha256: 'c'.repeat(64),
+          };
+        },
+      });
+
+      assert.equal(result.status, 'quarantined');
+      assert.equal(result.quarantine.reason, 'Adapter received SIGTERM.');
+      assert.equal(stopped, true);
+      assert.equal(process.listenerCount('SIGTERM'), originalListeners);
+    } finally {
+      rmSync(outputDir, { recursive: true, force: true });
+    }
+  });
+
   it('uses CDX and log redirect evidence instead of the queued page URL', () => {
     const requestedUrl = 'https://example.org/go/report';
     const logEntries = [
@@ -196,6 +297,48 @@ describe('bounded Browsertrix capture profile (#716)', () => {
       'file:///etc/passwd',
     ]) {
       assert.throws(() => plan({ sourceUrl }), /public HTTP or HTTPS URL/, sourceUrl);
+    }
+  });
+
+  it('validates declared WACZ resources, WARC payloads, and SHA-256 digests', async () => {
+    for (const fixture of [
+      { name: 'valid', options: {}, error: null },
+      { name: 'missing-warc', options: { includeWarc: false }, error: /no WARC resource/ },
+      { name: 'bad-digest', options: { badWarcDigest: true }, error: /digest does not match/ },
+    ]) {
+      const outputDir = mkdtempSync(path.join(tmpdir(), `rosen-wacz-${fixture.name}-`));
+      try {
+        const waczPath = createWaczFixture(outputDir, fixture.options);
+        if (fixture.error) {
+          await assert.rejects(inspectWacz(waczPath, 'https://example.org/article'), fixture.error);
+        } else {
+          const inspection = await inspectWacz(waczPath, 'https://example.org/article');
+          assert.equal(inspection.finalUrl, 'https://example.org/article');
+          assert.equal(inspection.resourceSummary.loadedResources, 1);
+          assert.match(inspection.sha256, /^[0-9a-f]{64}$/);
+        }
+      } finally {
+        rmSync(outputDir, { recursive: true, force: true });
+      }
+    }
+  });
+
+  it('refuses to reuse a capture id after its collection was quarantined', async () => {
+    for (const artifact of ['resultPath', 'statsPath']) {
+      const outputDir = mkdtempSync(path.join(tmpdir(), `rosen-browsertrix-${artifact}-`));
+      try {
+        const capture = plan({ captureId: `existing-${artifact.toLowerCase()}`, outputDir });
+        mkdirSync(path.dirname(capture[artifact]), { recursive: true });
+        writeFileSync(capture[artifact], '{}');
+        await assert.rejects(runBrowsertrixCapture({
+          captureId: capture.captureId,
+          sourceUrl: capture.sourceUrl,
+          outputDir,
+          network: capture.network,
+        }), new RegExp(`Capture artifact already exists: ${capture[artifact]}`));
+      } finally {
+        rmSync(outputDir, { recursive: true, force: true });
+      }
     }
   });
 
@@ -259,6 +402,9 @@ describe('bounded Browsertrix capture profile (#716)', () => {
       { name: 'failed', exitCode: 0, pending: 0, failed: 1, inspectError: null },
       { name: 'queued', exitCode: 0, pending: 0, failed: 0, crawled: 1, total: 2, inspectError: null },
       { name: 'interrupted', exitCode: 0, pending: 0, failed: 0, interrupted: true, inspectError: null },
+      { name: 'missing-pending', exitCode: 0, stats: { failed: 0, crawled: 1, total: 1 } },
+      { name: 'missing-failed', exitCode: 0, stats: { pending: 0, crawled: 1, total: 1 } },
+      { name: 'negative-pending', exitCode: 0, stats: { pending: -1, failed: 0, crawled: 1, total: 1 } },
     ]) {
       const outputDir = mkdtempSync(path.join(tmpdir(), `rosen-${failure.name}-`));
       try {
@@ -266,7 +412,7 @@ describe('bounded Browsertrix capture profile (#716)', () => {
         mkdirSync(capture.collectionDir, { recursive: true });
         mkdirSync(path.dirname(capture.statsPath), { recursive: true });
         writeFileSync(capture.waczPath, 'partial WACZ');
-        writeFileSync(capture.statsPath, JSON.stringify({
+        writeFileSync(capture.statsPath, JSON.stringify(failure.stats ?? {
           pending: failure.pending,
           failed: failure.failed ?? 0,
           crawled: failure.crawled ?? 1,

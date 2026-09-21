@@ -291,6 +291,95 @@ function parseJsonLines(value) {
     .map(line => JSON.parse(line));
 }
 
+function inspectZipEntry(waczPath, entryPath) {
+  return new Promise((resolve, reject) => {
+    const hash = createHash('sha256');
+    const unzip = spawn('unzip', ['-p', waczPath, entryPath], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    let bytes = 0;
+    let stderr = '';
+    let tooLarge = false;
+
+    unzip.stdout.on('data', chunk => {
+      bytes += chunk.length;
+      if (bytes > CAPTURE_LIMITS.sizeBytes) {
+        tooLarge = true;
+        unzip.kill();
+        return;
+      }
+      hash.update(chunk);
+    });
+    unzip.stderr.on('data', chunk => {
+      if (stderr.length < 65_536) stderr += chunk.toString('utf8');
+    });
+    unzip.once('error', reject);
+    unzip.once('close', exitCode => {
+      if (tooLarge) {
+        reject(new Error(`WACZ resource exceeds the capture size limit: ${entryPath}.`));
+      } else if (exitCode !== 0) {
+        reject(new Error(stderr.trim() || `Could not read WACZ resource: ${entryPath}.`));
+      } else {
+        resolve({ bytes, sha256: hash.digest('hex') });
+      }
+    });
+  });
+}
+
+function safeWaczResourcePath(value) {
+  return typeof value === 'string'
+    && value.length > 0
+    && !value.startsWith('-')
+    && !value.includes('\\')
+    && !path.posix.isAbsolute(value)
+    && path.posix.normalize(value) === value
+    && value !== '.';
+}
+
+async function validateWaczResources(waczPath, entries, dataPackage) {
+  if (!Array.isArray(dataPackage.resources) || dataPackage.resources.length === 0) {
+    throw new Error('WACZ data package has no resources.');
+  }
+
+  const resourcePaths = new Set();
+  for (const resource of dataPackage.resources) {
+    if (!safeWaczResourcePath(resource?.path)) {
+      throw new Error('WACZ data package has an invalid resource path.');
+    }
+    if (resourcePaths.has(resource.path)) {
+      throw new Error(`WACZ data package repeats resource ${resource.path}.`);
+    }
+    resourcePaths.add(resource.path);
+    if (!entries.includes(resource.path)) {
+      throw new Error(`WACZ is missing declared resource ${resource.path}.`);
+    }
+    if (!Number.isInteger(resource.bytes) || resource.bytes < 0) {
+      throw new Error(`WACZ resource has an invalid byte count: ${resource.path}.`);
+    }
+    const hashMatch = /^sha256:([0-9a-f]{64})$/i.exec(resource.hash ?? '');
+    if (!hashMatch) {
+      throw new Error(`WACZ resource has no valid SHA-256 digest: ${resource.path}.`);
+    }
+
+    const actual = await inspectZipEntry(waczPath, resource.path);
+    if (actual.bytes !== resource.bytes) {
+      throw new Error(`WACZ resource byte count does not match: ${resource.path}.`);
+    }
+    if (actual.sha256 !== hashMatch[1].toLowerCase()) {
+      throw new Error(`WACZ resource digest does not match: ${resource.path}.`);
+    }
+  }
+
+  for (const required of ['indexes/index.cdx.gz', 'pages/pages.jsonl']) {
+    if (!resourcePaths.has(required)) {
+      throw new Error(`WACZ data package does not declare ${required}.`);
+    }
+  }
+  if (![...resourcePaths].some(resourcePath => /^archive\/.+\.warc(?:\.gz)?$/.test(resourcePath))) {
+    throw new Error('WACZ data package has no WARC resource.');
+  }
+}
+
 function cdxRecords(compressedCdx) {
   return gunzipSync(compressedCdx, { maxOutputLength: MAX_CDX_BYTES })
     .toString('utf8').split('\n')
@@ -370,6 +459,7 @@ export async function inspectWacz(waczPath, requestedUrl) {
     .filter(entry => /^logs\/.*\.log$/.test(entry))
     .flatMap(entry => parseJsonLines(runChecked('unzip', ['-p', waczPath, entry])));
   const dataPackage = JSON.parse(runChecked('unzip', ['-p', waczPath, 'datapackage.json']));
+  await validateWaczResources(waczPath, entries, dataPackage);
   const compressedCdx = runChecked(
     'unzip',
     ['-p', waczPath, 'indexes/index.cdx.gz'],
@@ -438,8 +528,9 @@ function quarantineCollection(plan, reason) {
 
 export async function finalizeBrowsertrixCapture(plan, processResult, dependencies = {}) {
   const inspectArchive = dependencies.inspectArchive ?? inspectWacz;
+  const terminationError = () => dependencies.getTerminationError?.() ?? null;
   let inspection = null;
-  let invalidReason = processResult.error ?? null;
+  let invalidReason = processResult.error ?? terminationError();
 
   if (!invalidReason && processResult.exitCode !== 0) {
     invalidReason = `Browsertrix exited with status ${processResult.exitCode}.`;
@@ -451,24 +542,27 @@ export async function finalizeBrowsertrixCapture(plan, processResult, dependenci
     try {
       inspection = await inspectArchive(plan.waczPath, plan.sourceUrl);
     } catch (error) {
-      invalidReason = `WACZ validation failed: ${error.message}`;
+      invalidReason = terminationError() ?? `WACZ validation failed: ${error.message}`;
     }
   }
+  if (!invalidReason) invalidReason = terminationError();
 
   const stats = readStats(plan.statsPath);
   if (!invalidReason && !stats) {
     invalidReason = 'Browsertrix stats are missing or invalid.';
-  } else if (!invalidReason && stats.pending > 0) {
+  } else if (!invalidReason && !['crawled', 'failed', 'pending', 'total']
+    .every(field => Number.isInteger(stats[field]) && stats[field] >= 0)) {
+    invalidReason = 'Browsertrix stats counters are missing or invalid.';
+  } else if (!invalidReason && stats.pending !== 0) {
     invalidReason = 'Browsertrix stopped with pending pages.';
-  } else if (!invalidReason && stats.failed > 0) {
+  } else if (!invalidReason && stats.failed !== 0) {
     invalidReason = 'Browsertrix stopped with failed pages.';
-  } else if (!invalidReason && (!Number.isInteger(stats.crawled)
-      || !Number.isInteger(stats.total)
-      || stats.crawled !== stats.total)) {
+  } else if (!invalidReason && stats.crawled !== stats.total) {
     invalidReason = 'Browsertrix did not complete every queued page.';
   } else if (!invalidReason && inspection?.interruptionReason) {
     invalidReason = inspection.interruptionReason;
   }
+  if (!invalidReason) invalidReason = terminationError();
 
   const completedAt = new Date().toISOString();
   const result = {
@@ -512,46 +606,66 @@ function stopNamedContainer(containerName) {
   });
 }
 
+function createTerminationController(options = {}) {
+  let child = null;
+  let terminationSignal = null;
+  let shutdownPromise = null;
+  const onSigint = () => onSignal('SIGINT');
+  const onSigterm = () => onSignal('SIGTERM');
+  const onSignal = signal => {
+    if (terminationSignal) return;
+    terminationSignal = signal;
+    const stopContainer = options.stopContainer ?? stopNamedContainer;
+    shutdownPromise = Promise.resolve()
+      .then(() => stopContainer(options.containerName))
+      .catch(() => {});
+    try {
+      child?.kill(signal);
+    } catch {
+      // The crawler may already have exited while finalization is still active.
+    }
+  };
+
+  process.once('SIGINT', onSigint);
+  process.once('SIGTERM', onSigterm);
+  return {
+    attach(childProcess) {
+      child = childProcess;
+      if (terminationSignal) child.kill(terminationSignal);
+    },
+    dispose() {
+      process.off('SIGINT', onSigint);
+      process.off('SIGTERM', onSigterm);
+    },
+    error() {
+      return terminationSignal ? `Adapter received ${terminationSignal}.` : null;
+    },
+    waitForShutdown() {
+      return shutdownPromise ?? Promise.resolve();
+    },
+  };
+}
+
 export function runProcess(executable, args, options = {}) {
   return new Promise(resolve => {
     const child = spawn(executable, args, { stdio: 'inherit' });
+    const ownsTerminationController = !options.terminationController;
+    const terminationController = options.terminationController
+      ?? createTerminationController(options);
     let settled = false;
-    let terminationSignal = null;
-    let shutdownPromise = null;
-    const onSigint = () => onSignal('SIGINT');
-    const onSigterm = () => onSignal('SIGTERM');
     const finish = result => {
       if (settled) return;
       settled = true;
-      process.off('SIGINT', onSigint);
-      process.off('SIGTERM', onSigterm);
-      resolve(result);
-    };
-    const onSignal = signal => {
-      if (terminationSignal) return;
-      terminationSignal = signal;
-      const stopContainer = options.stopContainer ?? stopNamedContainer;
-      shutdownPromise = Promise.resolve()
-        .then(() => stopContainer(options.containerName))
-        .catch(() => {});
-      child.kill(signal);
-      void shutdownPromise.then(() => finish({
-        exitCode: null,
-        error: `Adapter received ${signal}.`,
-      }));
+      void terminationController.waitForShutdown().then(() => {
+        const error = terminationController.error() ?? result.error;
+        if (ownsTerminationController) terminationController.dispose();
+        resolve({ ...result, error });
+      });
     };
 
-    process.once('SIGINT', onSigint);
-    process.once('SIGTERM', onSigterm);
+    terminationController.attach(child);
     child.once('error', error => finish({ exitCode: null, error: error.message }));
     child.once('exit', (exitCode, signal) => {
-      if (terminationSignal) {
-        void shutdownPromise.then(() => finish({
-          exitCode,
-          error: `Adapter received ${terminationSignal}.`,
-        }));
-        return;
-      }
       finish({
         exitCode,
         error: signal ? `Browsertrix stopped after signal ${signal}.` : null,
@@ -562,8 +676,10 @@ export function runProcess(executable, args, options = {}) {
 
 export async function runBrowsertrixCapture(input, dependencies = {}) {
   const plan = planBrowsertrixCapture(input);
-  if (existsSync(plan.collectionDir)) {
-    throw new Error(`Capture collection already exists: ${plan.collectionDir}`);
+  const existingArtifact = [plan.collectionDir, plan.resultPath, plan.statsPath]
+    .find(filename => existsSync(filename));
+  if (existingArtifact) {
+    throw new Error(`Capture artifact already exists: ${existingArtifact}`);
   }
   mkdirSync(path.dirname(plan.resultPath), { recursive: true });
 
@@ -571,15 +687,28 @@ export async function runBrowsertrixCapture(input, dependencies = {}) {
   await assertEgressNetwork(plan.network, dependencies.inspectNetwork ?? inspectDockerNetwork);
   await assertPublicSeedResolution(plan.sourceUrl, dependencies.resolveHostname ?? lookup);
   const execute = dependencies.execute ?? runProcess;
-  const processResult = await execute(plan.crawler.executable, plan.crawler.args, {
+  const terminationController = createTerminationController({
     containerName: plan.containerName,
     stopContainer: dependencies.stopContainer,
   });
-  return finalizeBrowsertrixCapture(
-    plan,
-    { ...processResult, startedAt },
-    dependencies,
-  );
+  try {
+    const processResult = await execute(plan.crawler.executable, plan.crawler.args, {
+      containerName: plan.containerName,
+      stopContainer: dependencies.stopContainer,
+      terminationController,
+    });
+    return await finalizeBrowsertrixCapture(
+      plan,
+      { ...processResult, startedAt },
+      {
+        ...dependencies,
+        getTerminationError: () => terminationController.error(),
+      },
+    );
+  } finally {
+    await terminationController.waitForShutdown();
+    terminationController.dispose();
+  }
 }
 
 function usage() {
