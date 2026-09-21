@@ -17,6 +17,7 @@
     "validate:preservation": "node preservation/validate-preservation-manifests.mjs && node preservation/import-winer-evidence.mjs --verify && node preservation/import-social-baseline.mjs --verify && node preservation/import-preservation-sample.mjs --verify",
     "baseline:create": "node preservation/create-baseline-manifest.mjs",
     "baseline:verify": "node preservation/verify-baseline-manifest.mjs",
+    "capture:browsertrix": "node preservation/browsertrix-capture.mjs",
     "build-wiki": "node data/build-wiki-seed.js",
     "okf:flight-recorder": "node scripts/okf-flight-recorder.js",
     "okf:blindfold": "node scripts/okf-blindfold-test.js",

@@ -27,6 +27,8 @@ manifest instead of editing it.
   rows into a schema v1 baseline without making a live network call.
 - `import-preservation-sample.mjs` projects `data/preservation-sample.json`'s
   100 pilot sources into schema v1 objects without changing the sample file.
+- `browsertrix-capture.mjs` runs a pinned, resource-limited Browsertrix
+  container for one source and writes a machine-readable capture result.
 - `examples/` contains successful capture, existing Wayback, bot-wall,
   oversize-abort, and rights-hold manifests.
 - `MIGRATING.md` defines compatibility and migration rules.
@@ -43,6 +45,49 @@ Validate one or more manifests directly:
 ```text
 node preservation/validate-preservation-manifests.mjs path/to/manifest.json
 ```
+
+## Bounded browser capture
+
+The Browsertrix adapter requires a public HTTP or HTTPS seed, verifies its DNS
+answers before execution, blocks private-address URL targets, and does not load
+browser profiles, cookies, or credentials. Static articles, PDF URLs, and
+redirect checks use Browsertrix's `page` scope. Dynamic social pages use
+`page-spa`. Both profiles keep one worker and one page. A five-page prefix crawl
+is available only when `linked-pages` and `--allow-outlinks` are both explicit.
+The URL and DNS checks supplement the network policy of the host that runs the
+container; they do not replace an egress-filtered Docker network.
+
+Execution requires an operator-managed Docker network labeled
+`org.rosen-archive.public-egress=restricted`. The label is an attestation that
+the network blocks private and host destinations. The adapter checks it and
+passes the network name to Docker; it does not create or modify firewall rules.
+
+Create a WACZ and its JSON result from the repository root:
+
+```text
+npm run capture:browsertrix -- \
+  --capture-id example-article \
+  --source-url https://example.org/article \
+  --output-dir /absolute/path/to/captures \
+  --network rosen-public-egress \
+  --task-type static-article
+```
+
+Use `--plan` to inspect the exact Docker command without starting a crawl. The
+profile pins Browsertrix Crawler 1.14.3, one CPU, 1.5 GB of memory, one worker,
+a 300-second crawl ceiling, a 256 MB capture ceiling, and bounded page behavior.
+It records the requested and final URLs, crawl counts, loaded-resource counts,
+MIME and status summaries, WACZ size, and SHA-256 digest under `results/`.
+The result also records the exact scope, limits, behaviors, screenshot choices,
+user-agent suffix, crawler image, and the WACZ software string that identifies
+the crawler and browser build.
+
+The adapter accepts a package only when Browsertrix exits successfully, every
+queued page completes, and the WACZ ZIP contains its data package, CDX index,
+and page list. It moves failed, interrupted, partial, or invalid directories under
+`quarantine/` and still writes the JSON result. A successful WACZ can be served
+without network access by a local ReplayWeb.page installation for the replay
+acceptance check; keep the replay server offline while testing the sample.
 
 ## Data shape
 
