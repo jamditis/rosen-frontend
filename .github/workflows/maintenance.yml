@@ -105,7 +105,7 @@ jobs:
       # Node + npm deps are only needed by sync_to_archive (JSON regen + tests),
       # but installing them unconditionally keeps a single job path.
       - name: Install root npm dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Configure git identity
         run: |

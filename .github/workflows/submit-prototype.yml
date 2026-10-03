@@ -117,7 +117,7 @@ jobs:
         run: poetry run playwright install --with-deps chromium
 
       - name: Install root npm dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Configure git identity
         run: |
