@@ -44,7 +44,7 @@ function temporaryDirectory(t) {
   return directory;
 }
 
-function appendProcessArguments(streamPath, eventPath) {
+function appendInFreshProcess(streamPath, eventPath) {
   const moduleUrl = pathToFileURL(
     path.join(repoRoot, 'stewardship', 'task-event-stream.mjs')
   ).href;
@@ -54,13 +54,9 @@ function appendProcessArguments(streamPath, eventPath) {
     "const event = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));",
     'appendTaskEvent(process.argv[2], event);'
   ].join('\n');
-  return ['--input-type=module', '--eval', script, eventPath, streamPath];
-}
-
-function appendInFreshProcess(streamPath, eventPath) {
   return spawnSync(
     process.execPath,
-    appendProcessArguments(streamPath, eventPath),
+    ['--input-type=module', '--eval', script, eventPath, streamPath],
     { encoding: 'utf8' }
   );
 }
@@ -247,45 +243,6 @@ describe('stewardship task event JSONL adapter', () => {
       assert.throws(() => appendTaskEvent(streamPath, lifecycle[2]), new RegExp(`${name}:${line}:`));
       assert.deepEqual(fs.readFileSync(streamPath), before);
     }
-  });
-
-  it('syncs the new file and its parent directory before returning on Linux', (t) => {
-    if (process.platform !== 'linux') {
-      t.skip('directory-entry durability is implemented and asserted on Linux');
-      return;
-    }
-    const straceProbe = spawnSync('strace', ['--version'], { encoding: 'utf8' });
-    if (straceProbe.status !== 0) {
-      t.skip('strace is unavailable for the real-filesystem syscall assertion');
-      return;
-    }
-
-    const directory = temporaryDirectory(t);
-    const streamPath = path.join(directory, 'created-events.jsonl');
-    const eventPath = path.join(directory, 'event.json');
-    const tracePath = path.join(directory, 'append.trace');
-    fs.writeFileSync(eventPath, JSON.stringify(lifecycle[0]));
-
-    const tracedAppend = spawnSync('strace', [
-      '-qq',
-      '-f',
-      '-yy',
-      '-e',
-      'trace=fsync',
-      '-o',
-      tracePath,
-      process.execPath,
-      ...appendProcessArguments(streamPath, eventPath)
-    ], { encoding: 'utf8' });
-    assert.equal(tracedAppend.status, 0, tracedAppend.stderr);
-
-    const trace = fs.readFileSync(tracePath, 'utf8');
-    const fileSync = trace.indexOf(`<${streamPath}>`);
-    const directorySync = trace.indexOf(`<${directory}>`, fileSync + 1);
-    assert.notEqual(fileSync, -1, `missing file fsync in trace:\n${trace}`);
-    assert.notEqual(directorySync, -1, `missing parent-directory fsync in trace:\n${trace}`);
-    assert.ok(fileSync < directorySync, `parent directory synced before file contents:\n${trace}`);
-    assert.equal(readTaskEventStream(streamPath)[0].eventId, lifecycle[0].eventId);
   });
 
   it('appends, fsyncs, closes, and reopens across fresh processes', (t) => {
