@@ -978,6 +978,26 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     }
     await assertFocused(desktopHomeFocusTarget, 'Desktop home after participate browser Back');
   }
+  if (viewport.width <= 1100
+      && ['archive', 'folders'].includes(route.verifyStandardExit?.appId)) {
+    const filtersButton = page.getByRole('button', { name: /^Filters/ });
+    await filtersButton.click();
+    const helpButton = page.getByRole('button', { name: 'How does this work?', exact: true });
+    await helpButton.click();
+    const helpDialog = page.getByRole('dialog', { name: 'How does this work?', exact: true });
+    await helpDialog.waitFor();
+    await page.keyboard.press('Escape');
+    await helpDialog.waitFor({ state: 'hidden' });
+    if (await filtersButton.getAttribute('aria-expanded') !== 'true') {
+      throw new Error('Closing semantic help also closed its Filters drawer');
+    }
+    await assertFocused(helpButton, 'Semantic help opener after dialog Escape');
+    await page.keyboard.press('Escape');
+    await assertFocused(filtersButton, 'Filters button after drawer Escape');
+    if (await filtersButton.getAttribute('aria-expanded') !== 'false') {
+      throw new Error('Second Escape did not close the Filters drawer');
+    }
+  }
   if (route.verifyStandardExit) {
     const {
       appId,
