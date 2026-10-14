@@ -43,9 +43,7 @@ from rosen_scraper.csv_data_service import CSVDataService
 # Constants
 # ---------------------------------------------------------------------------
 
-VALID_ENTITY_TYPES = {
-    "Person", "Organization", "Work", "Concept", "Event", "Location"
-}
+VALID_ENTITY_TYPES = {"Person", "Organization", "Work", "Concept", "Event", "Location"}
 
 ENTITY_TYPE_PREFIXES = {
     "Person": "P",
@@ -57,20 +55,31 @@ ENTITY_TYPE_PREFIXES = {
 }
 
 VALID_RELATIONSHIP_TYPES = {
-    "Mentions", "Criticizes", "Cites", "Discusses", "Expands On",
-    "Affiliated With", "Published In", "Originated By", "Occurred At",
-    "Supports", "Owns", "Owned By", "Founded By", "Pioneered",
+    "Mentions",
+    "Criticizes",
+    "Cites",
+    "Discusses",
+    "Expands On",
+    "Affiliated With",
+    "Published In",
+    "Originated By",
+    "Occurred At",
+    "Supports",
+    "Owns",
+    "Owned By",
+    "Founded By",
+    "Pioneered",
     "Inspired By",
 }
 
 # Type-specific fields that map to role_or_description in the DB
 TYPE_SPECIFIC_ROLE_FIELDS = {
-    "role",          # Person
-    "org_type",      # Organization
-    "work_type",     # Work
-    "event_type",    # Event
-    "location_type", # Location
-    "description",   # Fallback
+    "role",  # Person
+    "org_type",  # Organization
+    "work_type",  # Work
+    "event_type",  # Event
+    "location_type",  # Location
+    "description",  # Fallback
 }
 
 PROVIDER_DEFAULTS = {
@@ -196,9 +205,7 @@ def format_post_for_extraction(
         "params": {
             "model": model,
             "max_tokens": max_tokens,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
+            "messages": [{"role": "user", "content": prompt}],
         },
     }
 
@@ -232,9 +239,7 @@ def format_post_for_extraction_openai(
         "body": {
             "model": model,
             "max_tokens": max_tokens,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
+            "messages": [{"role": "user", "content": prompt}],
         },
     }
 
@@ -263,9 +268,7 @@ def format_post_for_extraction_gemini(
     prompt = build_extraction_prompt(full_text, post_id)
 
     return {
-        "contents": [
-            {"parts": [{"text": prompt}], "role": "user"}
-        ],
+        "contents": [{"parts": [{"text": prompt}], "role": "user"}],
         "config": {"response_modalities": ["TEXT"]},
     }
 
@@ -421,31 +424,40 @@ class BatchEntityExtractor:
             if self.provider == "anthropic":
                 try:
                     from anthropic import Anthropic
+
                     self._client = Anthropic()
                 except ImportError:
-                    print("[BATCH] ERROR: anthropic package not installed. Run: pip install anthropic")
+                    print(
+                        "[BATCH] ERROR: anthropic package not installed. Run: pip install anthropic"
+                    )
                     sys.exit(1)
             elif self.provider == "openai":
                 try:
                     from openai import OpenAI
+
                     api_key = os.environ.get("OPENAI_API_KEY")
                     if not api_key:
                         print("[BATCH] ERROR: OPENAI_API_KEY not set")
                         sys.exit(1)
                     self._client = OpenAI(api_key=api_key)
                 except ImportError:
-                    print("[BATCH] ERROR: openai package not installed. Run: pip install openai")
+                    print(
+                        "[BATCH] ERROR: openai package not installed. Run: pip install openai"
+                    )
                     sys.exit(1)
             elif self.provider == "gemini":
                 try:
                     from google import genai
+
                     api_key = os.environ.get("GEMINI_API_KEY")
                     if not api_key:
                         print("[BATCH] ERROR: GEMINI_API_KEY not set")
                         sys.exit(1)
                     self._client = genai.Client(api_key=api_key)
                 except ImportError:
-                    print("[BATCH] ERROR: google-genai package not installed. Run: pip install google-genai")
+                    print(
+                        "[BATCH] ERROR: google-genai package not installed. Run: pip install google-genai"
+                    )
                     sys.exit(1)
             else:
                 print(f"[BATCH] ERROR: Unknown provider: {self.provider}")
@@ -484,7 +496,9 @@ class BatchEntityExtractor:
             if word_count >= 7 and len(raw_text) >= 20:
                 filtered.append(post)
 
-        print(f"[BATCH] Loaded {len(filtered)} substantive posts (from {len(posts)} total)")
+        print(
+            f"[BATCH] Loaded {len(filtered)} substantive posts (from {len(posts)} total)"
+        )
 
         # Filter out already-processed
         processed_ids = self.db.get_processed_ids()
@@ -545,7 +559,8 @@ class BatchEntityExtractor:
                     except (ValueError, IndexError):
                         pass
             filtered = [
-                p for p in posts
+                p
+                for p in posts
                 if p.get("id") not in tier1_ids and p.get("id") not in tier2_ids
             ]
 
@@ -575,7 +590,9 @@ class BatchEntityExtractor:
         """
         client = self._get_client()
 
-        print(f"[BATCH] Submitting {len(posts)} requests to {self.provider} Batch API...")
+        print(
+            f"[BATCH] Submitting {len(posts)} requests to {self.provider} Batch API..."
+        )
 
         if self.provider == "anthropic":
             return self._submit_batch_anthropic(client, posts)
@@ -589,8 +606,7 @@ class BatchEntityExtractor:
     def _submit_batch_anthropic(self, client, posts: List[Dict]) -> str:
         """Submit batch via Anthropic Batch API."""
         requests = [
-            format_post_for_extraction(post, model=self.model)
-            for post in posts
+            format_post_for_extraction(post, model=self.model) for post in posts
         ]
         batch = client.messages.batches.create(requests=requests)
         batch_id = batch.id
@@ -603,8 +619,7 @@ class BatchEntityExtractor:
         import io
 
         requests = [
-            format_post_for_extraction_openai(post, model=self.model)
-            for post in posts
+            format_post_for_extraction_openai(post, model=self.model) for post in posts
         ]
 
         # Write JSONL to a temp file
@@ -632,10 +647,7 @@ class BatchEntityExtractor:
 
     def _submit_batch_gemini(self, client, posts: List[Dict]) -> str:
         """Submit batch via Gemini Batch API (inline requests)."""
-        requests = [
-            format_post_for_extraction_gemini(post)
-            for post in posts
-        ]
+        requests = [format_post_for_extraction_gemini(post) for post in posts]
 
         # Store post_id order for result mapping (Gemini uses positional ordering)
         post_ids = [p.get("id") for p in posts]
@@ -752,7 +764,11 @@ class BatchEntityExtractor:
             counts = batch.request_counts
             result["succeeded"] = getattr(counts, "completed", 0)
             result["errored"] = getattr(counts, "failed", 0)
-            result["processing"] = getattr(counts, "total", 0) - getattr(counts, "completed", 0) - getattr(counts, "failed", 0)
+            result["processing"] = (
+                getattr(counts, "total", 0)
+                - getattr(counts, "completed", 0)
+                - getattr(counts, "failed", 0)
+            )
         return result
 
     def _check_status_gemini(self, client, batch_id: str) -> Dict:
@@ -813,8 +829,9 @@ class BatchEntityExtractor:
         entities, relationships = parse_extraction_response(response_text, post_id)
 
         if entities:
-            updated_entities, id_mapping, existing_count, new_count = \
+            updated_entities, id_mapping, existing_count, new_count = (
                 self.registry.reassign_entity_ids(entities)
+            )
 
             updated_relationships = self.registry.update_relationship_ids(
                 relationships, id_mapping
@@ -847,8 +864,10 @@ class BatchEntityExtractor:
         total_relationships: int,
     ):
         """Update tracking file after processing."""
-        print(f"[BATCH] Done: {total_posts} posts, "
-              f"{total_entities} entities, {total_relationships} relationships")
+        print(
+            f"[BATCH] Done: {total_posts} posts, "
+            f"{total_entities} entities, {total_relationships} relationships"
+        )
 
         tracking = self._load_batch_tracking()
         if batch_id in tracking:
@@ -893,7 +912,9 @@ class BatchEntityExtractor:
             if total_posts % 100 == 0:
                 print(f"[BATCH] Processed {total_posts} posts...")
 
-        self._finalize_tracking(batch_id, total_posts, total_entities, total_relationships)
+        self._finalize_tracking(
+            batch_id, total_posts, total_entities, total_relationships
+        )
         return total_posts, total_entities, total_relationships
 
     def _process_results_openai(self, client, batch_id: str) -> Tuple[int, int, int]:
@@ -949,7 +970,9 @@ class BatchEntityExtractor:
             if total_posts % 100 == 0:
                 print(f"[BATCH] Processed {total_posts} posts...")
 
-        self._finalize_tracking(batch_id, total_posts, total_entities, total_relationships)
+        self._finalize_tracking(
+            batch_id, total_posts, total_entities, total_relationships
+        )
         return total_posts, total_entities, total_relationships
 
     def _process_results_gemini(self, client, batch_id: str) -> Tuple[int, int, int]:
@@ -999,11 +1022,15 @@ class BatchEntityExtractor:
                                         response_text += part.text
 
                     if not response_text:
-                        self.db.mark_processed(post_id, entity_count=0, relationship_count=0)
+                        self.db.mark_processed(
+                            post_id, entity_count=0, relationship_count=0
+                        )
                         total_posts += 1
                         continue
 
-                    ent_count, rel_count = self._save_entity_results(post_id, response_text)
+                    ent_count, rel_count = self._save_entity_results(
+                        post_id, response_text
+                    )
                     total_entities += ent_count
                     total_relationships += rel_count
                     total_posts += 1
@@ -1016,7 +1043,9 @@ class BatchEntityExtractor:
         else:
             # Try to get results from dest file or list approach
             print(f"[BATCH] Batch {batch_id} has no inline responses.")
-            print(f"[BATCH] Batch state: {batch.state}, dest: {getattr(batch, 'dest', 'N/A')}")
+            print(
+                f"[BATCH] Batch state: {batch.state}, dest: {getattr(batch, 'dest', 'N/A')}"
+            )
             # For file-based results, we'd need to download from GCS
             # For now, try listing results if the API supports it
             try:
@@ -1026,7 +1055,9 @@ class BatchEntityExtractor:
                 print(f"[BATCH] Could not list batch jobs: {e}")
             return 0, 0, 0
 
-        self._finalize_tracking(batch_id, total_posts, total_entities, total_relationships)
+        self._finalize_tracking(
+            batch_id, total_posts, total_entities, total_relationships
+        )
         return total_posts, total_entities, total_relationships
 
     # ----- Auto mode -----
@@ -1062,10 +1093,12 @@ class BatchEntityExtractor:
                 status = self.check_batch_status(batch_id)
 
                 processing_status = status.get("status", "")
-                print(f"[BATCH] Status: {processing_status} "
-                      f"(succeeded: {status.get('succeeded', '?')}, "
-                      f"errored: {status.get('errored', '?')}, "
-                      f"processing: {status.get('processing', '?')})")
+                print(
+                    f"[BATCH] Status: {processing_status} "
+                    f"(succeeded: {status.get('succeeded', '?')}, "
+                    f"errored: {status.get('errored', '?')}, "
+                    f"processing: {status.get('processing', '?')})"
+                )
 
                 if processing_status == "ended":
                     break
@@ -1180,7 +1213,9 @@ def main():
     args = parser.parse_args()
 
     # Resolve model: explicit --model > provider default
-    model = args.model or PROVIDER_DEFAULTS.get(args.provider, {}).get("model", DEFAULT_MODEL)
+    model = args.model or PROVIDER_DEFAULTS.get(args.provider, {}).get(
+        "model", DEFAULT_MODEL
+    )
 
     extractor = BatchEntityExtractor(
         data_dir=args.data_dir,
@@ -1209,7 +1244,9 @@ def main():
             chunks.append((prov, posts[start:end]))
             start = end
 
-        print(f"\n[BATCH] Parallel submit: {len(posts)} posts across {len(providers)} providers")
+        print(
+            f"\n[BATCH] Parallel submit: {len(posts)} posts across {len(providers)} providers"
+        )
         for prov, chunk in chunks:
             print(f"  {prov}: {len(chunk)} posts")
         print()
@@ -1245,7 +1282,9 @@ def main():
         if posts:
             batch_id = extractor.submit_batch(posts)
             print(f"\n[BATCH] Batch submitted: {batch_id}")
-            print(f"[BATCH] Check status with: python {__file__} --status --batch-id {batch_id}")
+            print(
+                f"[BATCH] Check status with: python {__file__} --status --batch-id {batch_id}"
+            )
         else:
             print("[BATCH] No unprocessed posts to submit.")
 
@@ -1254,12 +1293,16 @@ def main():
             # Show tracking file info
             tracking = extractor._load_batch_tracking()
             if not tracking:
-                print("[BATCH] No batches tracked. Use --batch-id to check a specific batch.")
+                print(
+                    "[BATCH] No batches tracked. Use --batch-id to check a specific batch."
+                )
             else:
                 for bid, info in tracking.items():
-                    print(f"  {bid}: {info.get('status', '?')} "
-                          f"({info.get('post_count', '?')} posts, "
-                          f"submitted {info.get('submitted_at', '?')})")
+                    print(
+                        f"  {bid}: {info.get('status', '?')} "
+                        f"({info.get('post_count', '?')} posts, "
+                        f"submitted {info.get('submitted_at', '?')})"
+                    )
         else:
             status = extractor.check_batch_status(args.batch_id)
             for key, value in status.items():

@@ -33,10 +33,10 @@ def _empty_metadata() -> Dict:
     affecting any other failure branch.
     """
     return {
-        'role_or_description': '',
-        'affiliation': '',
-        'confidence': 0.0,
-        'text_evidence': '',
+        "role_or_description": "",
+        "affiliation": "",
+        "confidence": 0.0,
+        "text_evidence": "",
     }
 
 
@@ -56,12 +56,14 @@ class EntityMetadataBackfiller:
         if not api_key:
             raise ValueError("GEMINI_API_KEY not found in environment")
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        self.model = genai.GenerativeModel("gemini-2.0-flash-exp")
 
     def connect_to_sheets(self):
         """Connect to Google Sheets."""
         try:
-            credentials_path = BASE_DIR / os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+            credentials_path = BASE_DIR / os.environ.get(
+                "GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json"
+            )
 
             print("[BACKFILL] Connecting to Google Sheets...")
             self.gc = gspread.service_account(filename=str(credentials_path))
@@ -100,8 +102,14 @@ class EntityMetadataBackfiller:
 
         entities_needing_metadata = []
         for row_idx, row in enumerate(rows):
-            if len(row) <= max(entity_id_col, entity_type_col, entity_name_col,
-                              role_col, affiliation_col, first_mention_col):
+            if len(row) <= max(
+                entity_id_col,
+                entity_type_col,
+                entity_name_col,
+                role_col,
+                affiliation_col,
+                first_mention_col,
+            ):
                 continue
 
             entity_id = row[entity_id_col]
@@ -113,19 +121,23 @@ class EntityMetadataBackfiller:
 
             # Only process if missing role or affiliation, and has a first mention
             if (not role or not affiliation) and first_mention_record_id:
-                entities_needing_metadata.append({
-                    'row_number': row_idx + 2,  # +2 for header and 0-indexing
-                    'entity_id': entity_id,
-                    'entity_type': entity_type,
-                    'entity_name': entity_name,
-                    'role': role,
-                    'affiliation': affiliation,
-                    'first_mention_record_id': first_mention_record_id,
-                    'needs_role': not role,
-                    'needs_affiliation': not affiliation
-                })
+                entities_needing_metadata.append(
+                    {
+                        "row_number": row_idx + 2,  # +2 for header and 0-indexing
+                        "entity_id": entity_id,
+                        "entity_type": entity_type,
+                        "entity_name": entity_name,
+                        "role": role,
+                        "affiliation": affiliation,
+                        "first_mention_record_id": first_mention_record_id,
+                        "needs_role": not role,
+                        "needs_affiliation": not affiliation,
+                    }
+                )
 
-        print(f"[BACKFILL] Found {len(entities_needing_metadata)} entities needing metadata")
+        print(
+            f"[BACKFILL] Found {len(entities_needing_metadata)} entities needing metadata"
+        )
         return entities_needing_metadata
 
     def get_record_text(self, record_id: str) -> Optional[str]:
@@ -148,7 +160,9 @@ class EntityMetadataBackfiller:
             print(f"[BACKFILL] ERROR: Could not get text for {record_id}: {e}")
             return None
 
-    def extract_metadata_with_ai(self, entity_name: str, entity_type: str, text: str) -> Dict:
+    def extract_metadata_with_ai(
+        self, entity_name: str, entity_type: str, text: str
+    ) -> Dict:
         """Use AI to extract role and affiliation for an entity from text with confidence scoring."""
         prompt = f"""Analyze the following text and extract metadata about the entity "{entity_name}" (type: {entity_type}).
 
@@ -185,9 +199,14 @@ If the information is not in the text, leave fields empty and set confidence to 
                 return _empty_metadata()
 
             # Check for safety ratings or blocked content
-            if hasattr(response, 'prompt_feedback') and response.prompt_feedback:
-                if hasattr(response.prompt_feedback, 'block_reason') and response.prompt_feedback.block_reason:
-                    print(f"  [WARNING] Content blocked: {response.prompt_feedback.block_reason}")
+            if hasattr(response, "prompt_feedback") and response.prompt_feedback:
+                if (
+                    hasattr(response.prompt_feedback, "block_reason")
+                    and response.prompt_feedback.block_reason
+                ):
+                    print(
+                        f"  [WARNING] Content blocked: {response.prompt_feedback.block_reason}"
+                    )
                     return _empty_metadata()
 
             # Try to access response.text safely
@@ -195,10 +214,12 @@ If the information is not in the text, leave fields empty and set confidence to 
                 result_text = response.text
                 if not result_text:
                     print("  [WARNING] Empty text in response")
-                    if hasattr(response, 'candidates') and response.candidates:
+                    if hasattr(response, "candidates") and response.candidates:
                         print(f"  [DEBUG] Candidates: {len(response.candidates)}")
-                        if hasattr(response.candidates[0], 'finish_reason'):
-                            print(f"  [DEBUG] Finish reason: {response.candidates[0].finish_reason}")
+                        if hasattr(response.candidates[0], "finish_reason"):
+                            print(
+                                f"  [DEBUG] Finish reason: {response.candidates[0].finish_reason}"
+                            )
                     return _empty_metadata()
                 result_text = result_text.strip()
             except AttributeError as ae:
@@ -209,16 +230,18 @@ If the information is not in the text, leave fields empty and set confidence to 
             result = parse_gemini_json(result_text)
 
             return {
-                'role_or_description': result.get('role_or_description', '').strip(),
-                'affiliation': result.get('affiliation', '').strip(),
-                'confidence': float(result.get('confidence', 0.0)),
-                'text_evidence': result.get('text_evidence', '').strip()
+                "role_or_description": result.get("role_or_description", "").strip(),
+                "affiliation": result.get("affiliation", "").strip(),
+                "confidence": float(result.get("confidence", 0.0)),
+                "text_evidence": result.get("text_evidence", "").strip(),
             }
         except Exception as e:
             print(f"  [ERROR] AI extraction failed for {entity_name}: {e}")
             return _empty_metadata()
 
-    def supplement_with_web_search(self, entity_name: str, entity_type: str, existing_metadata: Dict) -> Dict:
+    def supplement_with_web_search(
+        self, entity_name: str, entity_type: str, existing_metadata: Dict
+    ) -> Dict:
         """Use web search to supplement low-confidence metadata."""
         print("    [WEB SEARCH] Low confidence - searching for additional context...")
 
@@ -281,10 +304,13 @@ Only provide information that is clearly evident from the search results."""
 
             # Merge with existing, preferring text-based info
             merged = {
-                'role_or_description': existing_metadata.get('role_or_description') or web_result.get('role_or_description', ''),
-                'affiliation': existing_metadata.get('affiliation') or web_result.get('affiliation', ''),
-                'confidence': existing_metadata.get('confidence', 0.0),
-                'text_evidence': existing_metadata.get('text_evidence', '') + ' [supplemented with web search]'
+                "role_or_description": existing_metadata.get("role_or_description")
+                or web_result.get("role_or_description", ""),
+                "affiliation": existing_metadata.get("affiliation")
+                or web_result.get("affiliation", ""),
+                "confidence": existing_metadata.get("confidence", 0.0),
+                "text_evidence": existing_metadata.get("text_evidence", "")
+                + " [supplemented with web search]",
             }
 
             print("    [WEB SEARCH] Enhanced metadata")
@@ -297,7 +323,7 @@ Only provide information that is clearly evident from the search results."""
     def update_entity_metadata(self, entity: Dict, metadata: Dict):
         """Update entity row with extracted metadata."""
         try:
-            row_number = entity['row_number']
+            row_number = entity["row_number"]
             updates = []
 
             # Get column letters
@@ -306,17 +332,21 @@ Only provide information that is clearly evident from the search results."""
             affiliation_col_idx = headers.index("affiliation") + 1
 
             # Only update if we extracted something and field was empty
-            if entity['needs_role'] and metadata['role_or_description']:
-                updates.append({
-                    'range': f'{gspread.utils.rowcol_to_a1(row_number, role_col_idx)}',
-                    'values': [[metadata['role_or_description']]]
-                })
+            if entity["needs_role"] and metadata["role_or_description"]:
+                updates.append(
+                    {
+                        "range": f"{gspread.utils.rowcol_to_a1(row_number, role_col_idx)}",
+                        "values": [[metadata["role_or_description"]]],
+                    }
+                )
 
-            if entity['needs_affiliation'] and metadata['affiliation']:
-                updates.append({
-                    'range': f'{gspread.utils.rowcol_to_a1(row_number, affiliation_col_idx)}',
-                    'values': [[metadata['affiliation']]]
-                })
+            if entity["needs_affiliation"] and metadata["affiliation"]:
+                updates.append(
+                    {
+                        "range": f"{gspread.utils.rowcol_to_a1(row_number, affiliation_col_idx)}",
+                        "values": [[metadata["affiliation"]]],
+                    }
+                )
 
             if updates:
                 self.entities_sheet.batch_update(updates)
@@ -333,9 +363,9 @@ Only provide information that is clearly evident from the search results."""
             limit: Maximum number of entities to process
             confidence_threshold: Trigger web search if confidence is below this (0.0-1.0)
         """
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("ENTITY METADATA BACKFILL")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         # Connect
         if not self.connect_to_sheets():
@@ -358,36 +388,44 @@ Only provide information that is clearly evident from the search results."""
         skipped = 0
 
         for idx, entity in enumerate(entities):
-            print(f"\n[{idx+1}/{len(entities)}] Processing {entity['entity_id']} - {entity['entity_name']}")
+            print(
+                f"\n[{idx+1}/{len(entities)}] Processing {entity['entity_id']} - {entity['entity_name']}"
+            )
 
             # Get the text from first mention
-            record_text = self.get_record_text(entity['first_mention_record_id'])
+            record_text = self.get_record_text(entity["first_mention_record_id"])
             if not record_text:
-                print(f"  [SKIP] Could not find text for record {entity['first_mention_record_id']}")
+                print(
+                    f"  [SKIP] Could not find text for record {entity['first_mention_record_id']}"
+                )
                 skipped += 1
                 continue
 
             # Extract metadata using AI
             metadata = self.extract_metadata_with_ai(
-                entity['entity_name'],
-                entity['entity_type'],
-                record_text
+                entity["entity_name"], entity["entity_type"], record_text
             )
 
-            confidence = metadata.get('confidence', 0.0)
+            confidence = metadata.get("confidence", 0.0)
             print(f"  Confidence: {confidence:.2f}")
-            print(f"  Role: {metadata['role_or_description'][:60] if metadata['role_or_description'] else '(none)'}")
-            print(f"  Affiliation: {metadata['affiliation'][:60] if metadata['affiliation'] else '(none)'}")
+            print(
+                f"  Role: {metadata['role_or_description'][:60] if metadata['role_or_description'] else '(none)'}"
+            )
+            print(
+                f"  Affiliation: {metadata['affiliation'][:60] if metadata['affiliation'] else '(none)'}"
+            )
 
             # If confidence is low, supplement with web search
             if confidence < confidence_threshold and confidence > 0.0:
                 metadata = self.supplement_with_web_search(
-                    entity['entity_name'],
-                    entity['entity_type'],
-                    metadata
+                    entity["entity_name"], entity["entity_type"], metadata
                 )
-                print(f"  Role (enhanced): {metadata['role_or_description'][:60] if metadata['role_or_description'] else '(none)'}")
-                print(f"  Affiliation (enhanced): {metadata['affiliation'][:60] if metadata['affiliation'] else '(none)'}")
+                print(
+                    f"  Role (enhanced): {metadata['role_or_description'][:60] if metadata['role_or_description'] else '(none)'}"
+                )
+                print(
+                    f"  Affiliation (enhanced): {metadata['affiliation'][:60] if metadata['affiliation'] else '(none)'}"
+                )
 
             # Update the sheet
             if self.update_entity_metadata(entity, metadata):
@@ -403,13 +441,13 @@ Only provide information that is clearly evident from the search results."""
                 time.sleep(RATE_LIMIT_DELAY)
 
         # Summary
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("BACKFILL COMPLETE")
-        print("="*80)
+        print("=" * 80)
         print(f"Processed: {processed}")
         print(f"Updated: {updated}")
         print(f"Skipped: {skipped}")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
 
 def main():
@@ -421,19 +459,19 @@ def main():
         "--limit",
         type=int,
         default=None,
-        help="Maximum number of entities to process (default: all)"
+        help="Maximum number of entities to process (default: all)",
     )
     parser.add_argument(
         "--spreadsheet",
         type=str,
         default=None,
-        help="Google Sheet name (default: from environment)"
+        help="Google Sheet name (default: from environment)",
     )
     parser.add_argument(
         "--confidence-threshold",
         type=float,
         default=0.6,
-        help="Confidence threshold for triggering web search (0.0-1.0, default: 0.6)"
+        help="Confidence threshold for triggering web search (0.0-1.0, default: 0.6)",
     )
 
     args = parser.parse_args()

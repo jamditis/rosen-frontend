@@ -17,20 +17,20 @@ service_account = pytest.importorskip("google.oauth2.service_account")
 Credentials = service_account.Credentials
 
 project_root = Path(__file__).resolve().parent.parent  # Go to backend root
-CREDS_PATH = project_root / 'google_credentials.json'
+CREDS_PATH = project_root / "google_credentials.json"
 if not CREDS_PATH.exists():
     pytest.skip(
         f"google_credentials.json absent at {CREDS_PATH}; integration test requires live Sheets access (see #184)",
         allow_module_level=True,
     )
 
-sys.path.insert(0, str(project_root / 'scripts'))
-sys.path.insert(0, str(project_root / 'scripts' / 'diagnostics'))
-sys.path.insert(0, str(project_root / 'src'))
+sys.path.insert(0, str(project_root / "scripts"))
+sys.path.insert(0, str(project_root / "scripts" / "diagnostics"))
+sys.path.insert(0, str(project_root / "src"))
 
 from diagnostics.smart_corrector.processors import (
     SoundCloudProcessor,
-    YouTubeEnhancedProcessor
+    YouTubeEnhancedProcessor,
 )
 from diagnostics.smart_corrector import AudioOptimizer
 
@@ -44,13 +44,16 @@ def test_multimedia():
     print()
 
     # Connect to sheet
-    scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+    scopes = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive",
+    ]
     creds = Credentials.from_service_account_file(str(CREDS_PATH), scopes=scopes)
     client = gspread.authorize(creds)
 
-    sheet_name = os.getenv('SPREADSHEET_NAME', '📎Rosen Archive URL List')
+    sheet_name = os.getenv("SPREADSHEET_NAME", "📎Rosen Archive URL List")
     spreadsheet = client.open(sheet_name)
-    worksheet = spreadsheet.worksheet('test_runs')
+    worksheet = spreadsheet.worksheet("test_runs")
 
     # Get all records
     all_records = worksheet.get_all_records()
@@ -74,17 +77,19 @@ def test_multimedia():
     youtube = YouTubeEnhancedProcessor()
 
     for row_num, record in test_rows:
-        url = record.get('url', '')
-        existing_raw_text = record.get('raw_text', '')
+        url = record.get("url", "")
+        existing_raw_text = record.get("raw_text", "")
 
         print("=" * 80)
         print(f"ROW {row_num}: {url[:70]}...")
         print("=" * 80)
 
         # Test based on type
-        if 'soundcloud' in url.lower():
+        if "soundcloud" in url.lower():
             print("Type: SoundCloud Audio")
-            print(f"Existing raw_text: {'Yes' if existing_raw_text else 'NO'} ({len(existing_raw_text)} chars)")
+            print(
+                f"Existing raw_text: {'Yes' if existing_raw_text else 'NO'} ({len(existing_raw_text)} chars)"
+            )
             print()
 
             try:
@@ -94,21 +99,25 @@ def test_multimedia():
                 print(f"\nStatus: {result.get('status')}")
                 print(f"Source: {result.get('source')}")
 
-                if result.get('status') == 'success':
+                if result.get("status") == "success":
                     print("\n[SUCCESS] Extracted content!")
                     print(f"  Title: {result.get('title', 'N/A')[:60]}")
                     print(f"  Author: {result.get('author', 'N/A')}")
                     print(f"  Content: {len(result.get('raw_text', ''))} chars")
 
-                    if result.get('raw_text'):
-                        preview = result['raw_text'][:200].replace('\n', ' ')
+                    if result.get("raw_text"):
+                        preview = result["raw_text"][:200].replace("\n", " ")
                         print(f"  Preview: {preview}...")
 
-                elif result.get('status') == 'needs_transcription':
+                elif result.get("status") == "needs_transcription":
                     print("\n[INFO] Audio transcription needed")
-                    print(f"  Duration: {result.get('metadata', {}).get('duration', 0)/60:.1f} min")
+                    print(
+                        f"  Duration: {result.get('metadata', {}).get('duration', 0)/60:.1f} min"
+                    )
                     print(f"  Estimated cost: ${result.get('estimated_cost', 0):.4f}")
-                    print(f"  (With 2x speed optimization: ${result.get('estimated_cost', 0):.4f})")
+                    print(
+                        f"  (With 2x speed optimization: ${result.get('estimated_cost', 0):.4f})"
+                    )
 
                 else:
                     print(f"\n[WARN] {result.get('error', 'Unknown error')}")
@@ -116,11 +125,14 @@ def test_multimedia():
             except Exception as e:
                 print(f"\n[ERROR] {e}")
                 import traceback
+
                 traceback.print_exc()
 
-        elif 'youtube' in url.lower() or 'youtu.be' in url.lower():
+        elif "youtube" in url.lower() or "youtu.be" in url.lower():
             print("Type: YouTube Video")
-            print(f"Existing raw_text: {'Yes' if existing_raw_text else 'NO'} ({len(existing_raw_text)} chars)")
+            print(
+                f"Existing raw_text: {'Yes' if existing_raw_text else 'NO'} ({len(existing_raw_text)} chars)"
+            )
             print()
 
             try:
@@ -130,7 +142,7 @@ def test_multimedia():
                 print(f"\nStatus: {result.get('status')}")
                 print(f"Source: {result.get('source')}")
 
-                if result.get('status') == 'success':
+                if result.get("status") == "success":
                     print("\n[SUCCESS] FREE captions extracted!")
                     print(f"  Transcript Type: {result.get('transcript_type')}")
                     print(f"  Title: {result.get('title', 'N/A')[:60]}")
@@ -138,15 +150,19 @@ def test_multimedia():
                     print(f"  Content: {len(result.get('raw_text', ''))} chars")
 
                     # Calculate cost savings
-                    duration_min = result.get('duration_seconds', 0) / 60
+                    duration_min = result.get("duration_seconds", 0) / 60
                     traditional_cost = duration_min * 0.024  # Transcription
                     smart_cost = 0.05  # Just AI analysis
                     savings = traditional_cost - smart_cost
 
                     print("\n  [COST SAVINGS]")
-                    print(f"    Traditional (download + transcribe): ${traditional_cost:.2f}")
+                    print(
+                        f"    Traditional (download + transcribe): ${traditional_cost:.2f}"
+                    )
                     print(f"    Smart Corrector (free captions): ${smart_cost:.2f}")
-                    print(f"    Savings: ${savings:.2f} ({(savings/traditional_cost*100) if traditional_cost > 0 else 0:.0f}%)")
+                    print(
+                        f"    Savings: ${savings:.2f} ({(savings/traditional_cost*100) if traditional_cost > 0 else 0:.0f}%)"
+                    )
 
                 else:
                     print(f"\n[WARN] {result.get('error', 'Unknown error')}")
@@ -155,6 +171,7 @@ def test_multimedia():
             except Exception as e:
                 print(f"\n[ERROR] {e}")
                 import traceback
+
                 traceback.print_exc()
 
         print()

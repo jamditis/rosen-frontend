@@ -9,9 +9,9 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Connect to sheets
-gc = gspread.service_account(filename=os.path.join(BASE_DIR, 'google_credentials.json'))
-sh = gc.open(os.environ.get('SPREADSHEET_NAME'))
-ws = sh.worksheet('extracted_entities')
+gc = gspread.service_account(filename=os.path.join(BASE_DIR, "google_credentials.json"))
+sh = gc.open(os.environ.get("SPREADSHEET_NAME"))
+ws = sh.worksheet("extracted_entities")
 
 # Get all data
 data = ws.get_all_values()
@@ -37,7 +37,7 @@ else:
     print("\nNo duplicate entity_ids found!")
 
 # Check for same entity name with different IDs
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("Checking for same entity names with different IDs...")
 
 entity_name_to_ids = {}
@@ -50,7 +50,9 @@ for row in rows:
         entity_name_to_ids[entity_name].append(entity_id)
 
 # Find entities with multiple IDs
-multi_id_entities = {name: ids for name, ids in entity_name_to_ids.items() if len(set(ids)) > 1}
+multi_id_entities = {
+    name: ids for name, ids in entity_name_to_ids.items() if len(set(ids)) > 1
+}
 
 print(f"Total unique entity names: {len(entity_name_to_ids)}")
 print(f"Entities with multiple IDs: {len(multi_id_entities)}")

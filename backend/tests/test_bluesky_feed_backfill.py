@@ -57,12 +57,14 @@ def test_fetch_page_requests_replies_in_threads_started_by_other_people(monkeypa
     captured = {}
 
     def fake_get(url, *, params, headers, timeout):
-        captured.update({
-            "url": url,
-            "params": params,
-            "headers": headers,
-            "timeout": timeout,
-        })
+        captured.update(
+            {
+                "url": url,
+                "params": params,
+                "headers": headers,
+                "timeout": timeout,
+            }
+        )
         return _Response()
 
     monkeypatch.setattr(backfill.requests, "get", fake_get)
@@ -81,45 +83,42 @@ def test_parse_since_treats_a_calendar_date_as_utc_midnight():
 
 
 def test_derive_title_skips_leading_punctuation_and_handle_mentions():
-    text = (
-        "...@scripting.com Hi, Dave. "
-        "I have something I want to dedicate to you."
-    )
+    text = "...@scripting.com Hi, Dave. " "I have something I want to dedicate to you."
 
     assert backfill.derive_title(text) == "Hi, Dave..."
 
 
 def test_collect_new_rows_honors_since_and_assigns_ids_oldest_first():
-    pages = iter([
-        {
-            "feed": [
-                _feed_item(
-                    "newest",
-                    "2026-08-14T20:00:00.000Z",
-                    "Newest substantive post.",
-                ),
-                _feed_item(
-                    "older",
-                    "2026-06-19T12:00:00.000Z",
-                    "Older substantive reply.",
-                    reply_to=(
-                        "at://did:plc:other/app.bsky.feed.post/parent"
+    pages = iter(
+        [
+            {
+                "feed": [
+                    _feed_item(
+                        "newest",
+                        "2026-08-14T20:00:00.000Z",
+                        "Newest substantive post.",
                     ),
-                ),
-            ],
-            "cursor": "page-2",
-        },
-        {
-            "feed": [
-                _feed_item(
-                    "beforewindow",
-                    "2026-06-17T23:59:59.000Z",
-                    "This post is already outside the sweep window.",
-                )
-            ],
-            "cursor": None,
-        },
-    ])
+                    _feed_item(
+                        "older",
+                        "2026-06-19T12:00:00.000Z",
+                        "Older substantive reply.",
+                        reply_to=("at://did:plc:other/app.bsky.feed.post/parent"),
+                    ),
+                ],
+                "cursor": "page-2",
+            },
+            {
+                "feed": [
+                    _feed_item(
+                        "beforewindow",
+                        "2026-06-17T23:59:59.000Z",
+                        "This post is already outside the sweep window.",
+                    )
+                ],
+                "cursor": None,
+            },
+        ]
+    )
 
     result = backfill.collect_new_rows(
         existing_urls=set(),
@@ -215,9 +214,7 @@ def test_collect_new_rows_uses_stable_did_instead_of_current_handle():
         sleep_fn=lambda _seconds: None,
     )
 
-    assert [row["url"].rsplit("/", 1)[-1] for row in result.rows] == [
-        "renamed"
-    ]
+    assert [row["url"].rsplit("/", 1)[-1] for row in result.rows] == ["renamed"]
     assert result.skipped_wrong_author == 1
 
 
@@ -290,19 +287,21 @@ def test_collect_new_rows_includes_exact_utc_midnight_and_normalizes_date():
 
 
 def test_collect_new_rows_follows_cursor_after_an_empty_page():
-    pages = iter([
-        {"feed": [], "cursor": "after-empty"},
-        {
-            "feed": [
-                _feed_item(
-                    "afterempty",
-                    "2026-07-01T12:00:00Z",
-                    "A later page must not be dropped.",
-                )
-            ],
-            "cursor": None,
-        },
-    ])
+    pages = iter(
+        [
+            {"feed": [], "cursor": "after-empty"},
+            {
+                "feed": [
+                    _feed_item(
+                        "afterempty",
+                        "2026-07-01T12:00:00Z",
+                        "A later page must not be dropped.",
+                    )
+                ],
+                "cursor": None,
+            },
+        ]
+    )
 
     result = backfill.collect_new_rows(
         existing_urls=set(),
@@ -313,9 +312,7 @@ def test_collect_new_rows_follows_cursor_after_an_empty_page():
         sleep_fn=lambda _seconds: None,
     )
 
-    assert [row["url"].rsplit("/", 1)[-1] for row in result.rows] == [
-        "afterempty"
-    ]
+    assert [row["url"].rsplit("/", 1)[-1] for row in result.rows] == ["afterempty"]
     assert result.pages == 2
     assert result.complete is True
 
@@ -342,9 +339,7 @@ def test_collect_new_rows_keeps_pinned_original_posts():
         sleep_fn=lambda _seconds: None,
     )
 
-    assert [row["url"].rsplit("/", 1)[-1] for row in result.rows] == [
-        "pinned"
-    ]
+    assert [row["url"].rsplit("/", 1)[-1] for row in result.rows] == ["pinned"]
     assert result.skipped_repost == 0
 
 
@@ -374,9 +369,7 @@ def test_collect_new_rows_does_not_stop_at_one_out_of_order_old_item():
         sleep_fn=lambda _seconds: None,
     )
 
-    assert [row["url"].rsplit("/", 1)[-1] for row in result.rows] == [
-        "stillinwindow"
-    ]
+    assert [row["url"].rsplit("/", 1)[-1] for row in result.rows] == ["stillinwindow"]
     assert result.skipped_before_since == 1
 
 
@@ -479,9 +472,7 @@ def test_collect_new_rows_deduplicates_existing_did_profile_url():
     }
 
     result = backfill.collect_new_rows(
-        existing_urls={
-            f"https://bsky.app/profile/{JAY_DID}/post/samepost"
-        },
+        existing_urls={f"https://bsky.app/profile/{JAY_DID}/post/samepost"},
         max_id=3172,
         since=backfill.parse_since("2026-06-18"),
         today="2026-08-15 12:00:00",

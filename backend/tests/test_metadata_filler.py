@@ -93,7 +93,9 @@ class TestFindRecordsMissingField:
             _make_record(id="R1", key_concepts="", content_type="Article"),
             _make_record(id="R2", key_concepts="", content_type="Tweet/Thread"),
             _make_record(id="R3", key_concepts="", content_type="Social Media Thread"),
-            _make_record(id="R4", key_concepts="", content_type="Interview (Audio/Video)"),
+            _make_record(
+                id="R4", key_concepts="", content_type="Interview (Audio/Video)"
+            ),
         ]
         missing = find_records_missing_field(records, "key_concepts")
         assert len(missing) == 2
@@ -189,47 +191,55 @@ class TestParseClassificationResponse:
 
     def test_parses_valid_categories(self):
         """Valid category names should be returned."""
-        response = json.dumps({
-            "thematic_categories": [
-                "Press & Media Criticism",
-                "Politics & Democracy",
-            ]
-        })
+        response = json.dumps(
+            {
+                "thematic_categories": [
+                    "Press & Media Criticism",
+                    "Politics & Democracy",
+                ]
+            }
+        )
         result = parse_classification_response(response, "thematic_categories")
         assert result == ["Press & Media Criticism", "Politics & Democracy"]
 
     def test_rejects_invalid_categories(self):
         """Categories not in the allowed list should be filtered out."""
-        response = json.dumps({
-            "thematic_categories": [
-                "Press & Media Criticism",
-                "Underwater Basket Weaving",
-                "Journalism Theory & Practice",
-            ]
-        })
+        response = json.dumps(
+            {
+                "thematic_categories": [
+                    "Press & Media Criticism",
+                    "Underwater Basket Weaving",
+                    "Journalism Theory & Practice",
+                ]
+            }
+        )
         result = parse_classification_response(response, "thematic_categories")
         assert "Underwater Basket Weaving" not in result
         assert len(result) == 2
 
     def test_parses_valid_concepts(self):
         """Valid key concepts should be returned."""
-        response = json.dumps({
-            "key_concepts": [
-                "View from Nowhere",
-                "Church of the Savvy",
-            ]
-        })
+        response = json.dumps(
+            {
+                "key_concepts": [
+                    "View from Nowhere",
+                    "Church of the Savvy",
+                ]
+            }
+        )
         result = parse_classification_response(response, "key_concepts")
         assert result == ["View from Nowhere", "Church of the Savvy"]
 
     def test_rejects_invalid_concepts(self):
         """Concepts not in the allowed list should be filtered out."""
-        response = json.dumps({
-            "key_concepts": [
-                "View from Nowhere",
-                "Made Up Concept",
-            ]
-        })
+        response = json.dumps(
+            {
+                "key_concepts": [
+                    "View from Nowhere",
+                    "Made Up Concept",
+                ]
+            }
+        )
         result = parse_classification_response(response, "key_concepts")
         assert result == ["View from Nowhere"]
 
@@ -246,37 +256,39 @@ class TestParseClassificationResponse:
 
     def test_handles_markdown_wrapped_json(self):
         """JSON wrapped in markdown code fences should parse correctly."""
-        inner = json.dumps({
-            "thematic_categories": ["Press & Media Criticism"]
-        })
+        inner = json.dumps({"thematic_categories": ["Press & Media Criticism"]})
         raw = f"```json\n{inner}\n```"
         result = parse_classification_response(raw, "thematic_categories")
         assert result == ["Press & Media Criticism"]
 
     def test_limits_categories_to_three(self):
         """At most 3 categories should be returned."""
-        response = json.dumps({
-            "thematic_categories": [
-                "Press & Media Criticism",
-                "Journalism Theory & Practice",
-                "Journalism Education",
-                "Politics & Democracy",
-                "Technology & Digital Media",
-            ]
-        })
+        response = json.dumps(
+            {
+                "thematic_categories": [
+                    "Press & Media Criticism",
+                    "Journalism Theory & Practice",
+                    "Journalism Education",
+                    "Politics & Democracy",
+                    "Technology & Digital Media",
+                ]
+            }
+        )
         result = parse_classification_response(response, "thematic_categories")
         assert len(result) <= 3
 
     def test_limits_concepts_to_two(self):
         """At most 2 key concepts should be returned."""
-        response = json.dumps({
-            "key_concepts": [
-                "View from Nowhere",
-                "Church of the Savvy",
-                "Horse-race journalism",
-                "False balance",
-            ]
-        })
+        response = json.dumps(
+            {
+                "key_concepts": [
+                    "View from Nowhere",
+                    "Church of the Savvy",
+                    "Horse-race journalism",
+                    "False balance",
+                ]
+            }
+        )
         result = parse_classification_response(response, "key_concepts")
         assert len(result) <= 2
 

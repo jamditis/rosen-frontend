@@ -12,9 +12,12 @@ from submission_runtime import csv_safety
 class TestSanitizeCell:
     """sanitize_cell escapes formula triggers and bounds length."""
 
-    @pytest.mark.parametrize("trigger", ['=', '+', '-', '@'])
+    @pytest.mark.parametrize("trigger", ["=", "+", "-", "@"])
     def test_leading_formula_trigger_is_quote_escaped(self, trigger):
-        assert csv_safety.sanitize_cell(f"{trigger}HYPERLINK(1)") == f"'{trigger}HYPERLINK(1)"
+        assert (
+            csv_safety.sanitize_cell(f"{trigger}HYPERLINK(1)")
+            == f"'{trigger}HYPERLINK(1)"
+        )
 
     def test_plain_text_is_unchanged(self):
         assert csv_safety.sanitize_cell("PressThink") == "PressThink"

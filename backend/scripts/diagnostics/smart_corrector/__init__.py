@@ -11,11 +11,11 @@ from .cost_tracker import CostTracker
 from .pdf_generator import SmartCorrectorPDFGenerator
 
 __all__ = [
-    'ContentDetector',
-    'QualityValidator',
-    'AudioOptimizer',
-    'CostTracker',
-    'SmartCorrectorPDFGenerator'
+    "ContentDetector",
+    "QualityValidator",
+    "AudioOptimizer",
+    "CostTracker",
+    "SmartCorrectorPDFGenerator",
 ]
 
-__version__ = '1.1.0'
+__version__ = "1.1.0"

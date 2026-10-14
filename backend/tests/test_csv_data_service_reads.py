@@ -15,7 +15,7 @@ from rosen_scraper import csv_data_service
 from rosen_scraper.csv_data_service import CSVDataService
 
 
-def _write(path, rows, encoding='utf-8-sig'):
+def _write(path, rows, encoding="utf-8-sig"):
     """
     Write a CSV fixture.
 
@@ -23,7 +23,7 @@ def _write(path, rows, encoding='utf-8-sig'):
     Sheets or Excel export writes a BOM, and that is the case the readers'
     encoding exists to handle.
     """
-    with open(path, 'w', newline='', encoding=encoding) as f:
+    with open(path, "w", newline="", encoding=encoding) as f:
         csv.writer(f).writerows(rows)
 
 
@@ -31,7 +31,7 @@ def _service(tmp_path):
     return CSVDataService(csv_dir=tmp_path)
 
 
-URL_HEADER = ['id', 'url', 'processed_on', 'notes']
+URL_HEADER = ["id", "url", "processed_on", "notes"]
 
 
 # --- get_urls_to_process ----------------------------------------------------
@@ -42,10 +42,15 @@ def test_bom_does_not_leak_into_the_first_column_name(tmp_path):
     # row.get('id') misses and the fallback id 'URL0' is returned instead of
     # 'U1'. The encoding is load-bearing, not incidental.
     service = _service(tmp_path)
-    _write(service.urls_file, [URL_HEADER, ['U1', 'https://example.com/a', '', 'note']])
+    _write(service.urls_file, [URL_HEADER, ["U1", "https://example.com/a", "", "note"]])
 
     assert service.get_urls_to_process() == [
-        {'id': 'U1', 'url': 'https://example.com/a', 'processed_on': '', 'notes': 'note'}
+        {
+            "id": "U1",
+            "url": "https://example.com/a",
+            "processed_on": "",
+            "notes": "note",
+        }
     ]
 
 
@@ -55,12 +60,19 @@ def test_a_file_written_without_a_bom_reads_the_same(tmp_path):
     # fixture here carries a BOM, so without this one nothing says whether the
     # BOM is required or merely tolerated.
     service = _service(tmp_path)
-    _write(service.urls_file,
-           [URL_HEADER, ['U1', 'https://example.com/a', '', 'note']],
-           encoding='utf-8')
+    _write(
+        service.urls_file,
+        [URL_HEADER, ["U1", "https://example.com/a", "", "note"]],
+        encoding="utf-8",
+    )
 
     assert service.get_urls_to_process() == [
-        {'id': 'U1', 'url': 'https://example.com/a', 'processed_on': '', 'notes': 'note'}
+        {
+            "id": "U1",
+            "url": "https://example.com/a",
+            "processed_on": "",
+            "notes": "note",
+        }
     ]
 
 
@@ -70,19 +82,25 @@ def test_missing_urls_file_returns_empty_and_warns(tmp_path, capsys):
     service = _service(tmp_path)
 
     assert service.get_urls_to_process() == []
-    assert 'WARNING' in capsys.readouterr().out
+    assert "WARNING" in capsys.readouterr().out
 
 
 def test_processed_rows_are_skipped_by_default_and_kept_when_asked(tmp_path):
     service = _service(tmp_path)
-    _write(service.urls_file, [
-        URL_HEADER,
-        ['U1', 'https://example.com/a', '2026-01-01', ''],
-        ['U2', 'https://example.com/b', '', ''],
-    ])
+    _write(
+        service.urls_file,
+        [
+            URL_HEADER,
+            ["U1", "https://example.com/a", "2026-01-01", ""],
+            ["U2", "https://example.com/b", "", ""],
+        ],
+    )
 
-    assert [u['id'] for u in service.get_urls_to_process()] == ['U2']
-    assert [u['id'] for u in service.get_urls_to_process(skip_processed=False)] == ['U1', 'U2']
+    assert [u["id"] for u in service.get_urls_to_process()] == ["U2"]
+    assert [u["id"] for u in service.get_urls_to_process(skip_processed=False)] == [
+        "U1",
+        "U2",
+    ]
 
 
 def test_row_bounds_index_the_file_not_the_filtered_result(tmp_path):
@@ -91,27 +109,33 @@ def test_row_bounds_index_the_file_not_the_filtered_result(tmp_path):
     # then returns only U2, rather than spanning the first two *unprocessed*
     # rows. Easy to "fix" into the other meaning during a refactor.
     service = _service(tmp_path)
-    _write(service.urls_file, [
-        URL_HEADER,
-        ['U1', 'https://example.com/a', '2026-01-01', ''],
-        ['U2', 'https://example.com/b', '', ''],
-        ['U3', 'https://example.com/c', '', ''],
-    ])
+    _write(
+        service.urls_file,
+        [
+            URL_HEADER,
+            ["U1", "https://example.com/a", "2026-01-01", ""],
+            ["U2", "https://example.com/b", "", ""],
+            ["U3", "https://example.com/c", "", ""],
+        ],
+    )
 
-    assert [u['id'] for u in service.get_urls_to_process(end_row=2)] == ['U2']
-    assert [u['id'] for u in service.get_urls_to_process(start_row=2)] == ['U3']
+    assert [u["id"] for u in service.get_urls_to_process(end_row=2)] == ["U2"]
+    assert [u["id"] for u in service.get_urls_to_process(start_row=2)] == ["U3"]
 
 
 def test_rows_without_a_url_are_dropped_and_urls_are_stripped(tmp_path):
     service = _service(tmp_path)
-    _write(service.urls_file, [
-        URL_HEADER,
-        ['U1', '', '', ''],
-        ['U2', '  https://example.com/b  ', '', ''],
-    ])
+    _write(
+        service.urls_file,
+        [
+            URL_HEADER,
+            ["U1", "", "", ""],
+            ["U2", "  https://example.com/b  ", "", ""],
+        ],
+    )
 
     assert service.get_urls_to_process() == [
-        {'id': 'U2', 'url': 'https://example.com/b', 'processed_on': '', 'notes': ''}
+        {"id": "U2", "url": "https://example.com/b", "processed_on": "", "notes": ""}
     ]
 
 
@@ -120,23 +144,30 @@ def test_capitalized_notes_column_wins_over_lowercase(tmp_path):
     # pins which one wins when a file carries both. Same idiom as the id/ID and
     # url/URL fallbacks below, and all three are pinned for the same reason.
     service = _service(tmp_path)
-    _write(service.urls_file, [
-        ['id', 'url', 'processed_on', 'Notes', 'notes'],
-        ['U1', 'https://example.com/a', '', 'from-capital', 'from-lower'],
-    ])
+    _write(
+        service.urls_file,
+        [
+            ["id", "url", "processed_on", "Notes", "notes"],
+            ["U1", "https://example.com/a", "", "from-capital", "from-lower"],
+        ],
+    )
 
-    assert service.get_urls_to_process()[0]['notes'] == 'from-capital'
+    assert service.get_urls_to_process()[0]["notes"] == "from-capital"
 
 
-def test_reading_stops_at_end_row_instead_of_parsing_the_whole_file(tmp_path, monkeypatch):
+def test_reading_stops_at_end_row_instead_of_parsing_the_whole_file(
+    tmp_path, monkeypatch
+):
     # The loop breaks at end_row, so bounded reads do not pay for the whole
     # worklist. Folding four readers into one helper is exactly where a
     # streaming read becomes a materialized list by accident, and nothing else
     # in this file would notice that.
     service = _service(tmp_path)
-    _write(service.urls_file, [URL_HEADER] + [
-        [f'U{i}', f'https://example.com/{i}', '', ''] for i in range(20)
-    ])
+    _write(
+        service.urls_file,
+        [URL_HEADER]
+        + [[f"U{i}", f"https://example.com/{i}", "", ""] for i in range(20)],
+    )
 
     consumed = []
 
@@ -149,7 +180,7 @@ def test_reading_stops_at_end_row_instead_of_parsing_the_whole_file(tmp_path, mo
             consumed.append(row)
             return row
 
-    monkeypatch.setattr(csv, 'DictReader', _CountingDictReader)
+    monkeypatch.setattr(csv, "DictReader", _CountingDictReader)
     service.get_urls_to_process(end_row=3)
 
     # Three rows kept, plus the one whose index trips the break.
@@ -163,9 +194,11 @@ def test_a_bounded_read_leaves_no_open_handle_behind(tmp_path, monkeypatch):
     # removing that still passes, since CPython finalizes the generator at
     # function exit anyway. What it catches is a reader that never closes.
     service = _service(tmp_path)
-    _write(service.urls_file, [URL_HEADER] + [
-        [f'U{i}', f'https://example.com/{i}', '', ''] for i in range(20)
-    ])
+    _write(
+        service.urls_file,
+        [URL_HEADER]
+        + [[f"U{i}", f"https://example.com/{i}", "", ""] for i in range(20)],
+    )
 
     opened = []
     real_open = open
@@ -175,10 +208,10 @@ def test_a_bounded_read_leaves_no_open_handle_behind(tmp_path, monkeypatch):
         opened.append(handle)
         return handle
 
-    monkeypatch.setattr(csv_data_service, 'open', _tracking_open, raising=False)
+    monkeypatch.setattr(csv_data_service, "open", _tracking_open, raising=False)
     service.get_urls_to_process(end_row=3)
 
-    assert opened, 'expected the reader to open the urls file'
+    assert opened, "expected the reader to open the urls file"
     assert all(handle.closed for handle in opened)
 
 
@@ -194,11 +227,11 @@ def test_record_ids_union_both_files_and_accept_either_id_spelling(tmp_path):
     service = _service(tmp_path)
     _write_records_and_social(
         service,
-        records=[['id', 'url'], ['R1', 'https://example.com/1']],
-        social=[['ID', 'URL'], ['S1', 'https://example.com/2']],
+        records=[["id", "url"], ["R1", "https://example.com/1"]],
+        social=[["ID", "URL"], ["S1", "https://example.com/2"]],
     )
 
-    assert service.get_existing_record_ids() == {'R1', 'S1'}
+    assert service.get_existing_record_ids() == {"R1", "S1"}
 
 
 def test_lowercase_id_and_url_columns_win_over_capitalized(tmp_path):
@@ -209,13 +242,20 @@ def test_lowercase_id_and_url_columns_win_over_capitalized(tmp_path):
     service = _service(tmp_path)
     _write_records_and_social(
         service,
-        records=[['id', 'ID', 'url', 'URL'],
-                 ['from-lower', 'from-upper', 'https://example.com/lower', 'https://example.com/upper']],
-        social=[['id', 'url']],
+        records=[
+            ["id", "ID", "url", "URL"],
+            [
+                "from-lower",
+                "from-upper",
+                "https://example.com/lower",
+                "https://example.com/upper",
+            ],
+        ],
+        social=[["id", "url"]],
     )
 
-    assert service.get_existing_record_ids() == {'from-lower'}
-    assert service.get_existing_urls() == {'https://example.com/lower'}
+    assert service.get_existing_record_ids() == {"from-lower"}
+    assert service.get_existing_urls() == {"https://example.com/lower"}
 
 
 def test_blank_record_ids_are_not_collected(tmp_path):
@@ -224,24 +264,28 @@ def test_blank_record_ids_are_not_collected(tmp_path):
     service = _service(tmp_path)
     _write_records_and_social(
         service,
-        records=[['id', 'url'], ['', 'https://example.com/1'], ['R2', 'https://example.com/2']],
-        social=[['id', 'url']],
+        records=[
+            ["id", "url"],
+            ["", "https://example.com/1"],
+            ["R2", "https://example.com/2"],
+        ],
+        social=[["id", "url"]],
     )
 
-    assert service.get_existing_record_ids() == {'R2'}
+    assert service.get_existing_record_ids() == {"R2"}
 
 
 def test_existing_urls_union_both_files_and_strip_whitespace(tmp_path):
     service = _service(tmp_path)
     _write_records_and_social(
         service,
-        records=[['id', 'url'], ['R1', '  https://example.com/1  ']],
-        social=[['id', 'URL'], ['S1', 'https://example.com/2']],
+        records=[["id", "url"], ["R1", "  https://example.com/1  "]],
+        social=[["id", "URL"], ["S1", "https://example.com/2"]],
     )
 
     assert service.get_existing_urls() == {
-        'https://example.com/1',
-        'https://example.com/2',
+        "https://example.com/1",
+        "https://example.com/2",
     }
 
 
@@ -256,10 +300,10 @@ def test_absent_records_and_social_files_yield_empty_sets(tmp_path):
 
 def test_one_present_file_is_read_when_the_other_is_absent(tmp_path):
     service = _service(tmp_path)
-    _write(service.records_file, [['id', 'url'], ['R1', 'https://example.com/1']])
+    _write(service.records_file, [["id", "url"], ["R1", "https://example.com/1"]])
 
-    assert service.get_existing_record_ids() == {'R1'}
-    assert service.get_existing_urls() == {'https://example.com/1'}
+    assert service.get_existing_record_ids() == {"R1"}
+    assert service.get_existing_urls() == {"https://example.com/1"}
 
 
 # --- read_social_posts ------------------------------------------------------
@@ -267,15 +311,18 @@ def test_one_present_file_is_read_when_the_other_is_absent(tmp_path):
 
 def test_social_posts_are_returned_in_file_order_as_dicts(tmp_path):
     service = _service(tmp_path)
-    _write(service.social_file, [
-        ['id', 'url', 'text'],
-        ['S1', 'https://example.com/1', 'first'],
-        ['S2', 'https://example.com/2', 'second'],
-    ])
+    _write(
+        service.social_file,
+        [
+            ["id", "url", "text"],
+            ["S1", "https://example.com/1", "first"],
+            ["S2", "https://example.com/2", "second"],
+        ],
+    )
 
     assert service.read_social_posts() == [
-        {'id': 'S1', 'url': 'https://example.com/1', 'text': 'first'},
-        {'id': 'S2', 'url': 'https://example.com/2', 'text': 'second'},
+        {"id": "S1", "url": "https://example.com/1", "text": "first"},
+        {"id": "S2", "url": "https://example.com/2", "text": "second"},
     ]
 
 
@@ -291,9 +338,12 @@ def test_headers_come_back_without_the_bom(tmp_path):
     # the #501 fold, but it shares the BOM-stripping encoding and would break
     # the same way if that were dropped.
     service = _service(tmp_path)
-    _write(service.records_file, [['id', 'url', 'title'], ['R1', 'https://example.com/1', 't']])
+    _write(
+        service.records_file,
+        [["id", "url", "title"], ["R1", "https://example.com/1", "t"]],
+    )
 
-    assert service.get_headers() == ['id', 'url', 'title']
+    assert service.get_headers() == ["id", "url", "title"]
 
 
 def test_missing_records_file_yields_no_headers(tmp_path):

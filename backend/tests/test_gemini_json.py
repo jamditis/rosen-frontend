@@ -13,7 +13,10 @@ import pytest
 
 from rosen_scraper.gemini_json import parse_gemini_json, strip_gemini_fence
 
-PAYLOAD = {"entities": [{"id": "P1", "name": "Jay Rosen", "prominence": 9}], "relationships": []}
+PAYLOAD = {
+    "entities": [{"id": "P1", "name": "Jay Rosen", "prominence": 9}],
+    "relationships": [],
+}
 BODY = json.dumps(PAYLOAD)
 
 
@@ -71,7 +74,10 @@ def test_fenced_value_with_literal_backticks():
 def test_fenced_then_trailing_prose():
     # A fenced block followed by commentary parses: raw_decode ends at the closing
     # brace and ignores the closing fence and the prose after it.
-    assert parse_gemini_json(f"```json\n{BODY}\n```\nLet me know if you need more.") == PAYLOAD
+    assert (
+        parse_gemini_json(f"```json\n{BODY}\n```\nLet me know if you need more.")
+        == PAYLOAD
+    )
 
 
 def test_bare_fenced_then_trailing_prose():

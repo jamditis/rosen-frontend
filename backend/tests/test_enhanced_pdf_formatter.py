@@ -6,6 +6,7 @@ cleanup stays behavior-preserving: it removes two no-op quote-replace lines
 module-level `create_article_pdf` convenience function. The emphasis-regex
 behavior these lines sit beside must not change.
 """
+
 from rosen_scraper.enhanced_pdf_formatter import EnhancedPDFFormatter
 
 
@@ -19,5 +20,10 @@ def test_inline_formatting_leaves_quotes_untouched():
     """The removed replace() lines were no-ops: straight quotes stay straight
     and curly quotes are not normalized to straight."""
     formatter = EnhancedPDFFormatter()
-    assert formatter._apply_inline_formatting('straight "x" and \'y\'') == 'straight "x" and \'y\''
-    assert formatter._apply_inline_formatting('curly “x” and ‘y’') == 'curly “x” and ‘y’'
+    assert (
+        formatter._apply_inline_formatting("straight \"x\" and 'y'")
+        == "straight \"x\" and 'y'"
+    )
+    assert (
+        formatter._apply_inline_formatting("curly “x” and ‘y’") == "curly “x” and ‘y’"
+    )

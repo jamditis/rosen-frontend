@@ -30,14 +30,14 @@ def load_social_posts(csv_path: Path, min_words: int = 7) -> List[Dict]:
     """
     posts = []
 
-    with open(csv_path, 'r', encoding='utf-8') as f:
+    with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            word_count = int(row.get('word_count', 0) or 0)
+            word_count = int(row.get("word_count", 0) or 0)
             if word_count < min_words:
                 continue
 
-            content = row.get('raw_text', '').strip()
+            content = row.get("raw_text", "").strip()
             if not content or len(content) < 20:
                 continue
 
@@ -62,13 +62,13 @@ def prioritize_posts(posts: List[Dict], max_posts: int) -> List[Dict]:
         score = 0
 
         # Engagement
-        likes = int(post.get('likes', 0) or 0)
-        reposts = int(post.get('reposts', 0) or 0)
+        likes = int(post.get("likes", 0) or 0)
+        reposts = int(post.get("reposts", 0) or 0)
         score += min(likes + (reposts * 2), 100)
 
         # Recency
         try:
-            year = int(post.get('publication_date', '')[:4])
+            year = int(post.get("publication_date", "")[:4])
             if year >= 2023:
                 score += 50
             elif year >= 2020:
@@ -77,7 +77,7 @@ def prioritize_posts(posts: List[Dict], max_posts: int) -> List[Dict]:
             pass
 
         # Length
-        word_count = int(post.get('word_count', 0) or 0)
+        word_count = int(post.get("word_count", 0) or 0)
         if word_count > 100:
             score += 25
         elif word_count > 50:

@@ -15,6 +15,7 @@ if str(DIAGNOSTICS_DIR) not in sys.path:
 
 from cross_reference_analyzer import ContentSimilarityAnalyzer
 
+
 def test_cross_reference_system():
     """Test the cross-reference analysis system with sample data."""
     print("Testing Cross-Reference Analysis System")
@@ -31,7 +32,7 @@ def test_cross_reference_system():
             "thematic_categories": "Journalism Theory & Practice, Technology & Digital Media",
             "key_concepts": "Digital transformation, Social media impact, Verification methods",
             "publication_date": "2024-01-15",
-            "mentioned_entities": "Twitter, Facebook, Google"
+            "mentioned_entities": "Twitter, Facebook, Google",
         },
         {
             "id": "TEST-00002",
@@ -40,7 +41,7 @@ def test_cross_reference_system():
             "thematic_categories": "Journalism Theory & Practice, Technology & Digital Media",
             "key_concepts": "Verification methods, Social media impact, Misinformation",
             "publication_date": "2024-01-18",
-            "mentioned_entities": "Twitter, Instagram, TikTok"
+            "mentioned_entities": "Twitter, Instagram, TikTok",
         },
         {
             "id": "TEST-00003",
@@ -49,8 +50,8 @@ def test_cross_reference_system():
             "thematic_categories": "Politics & Democracy, Press & Media Criticism",
             "key_concepts": "Press freedom, Government accountability, Democracy",
             "publication_date": "2024-02-20",
-            "mentioned_entities": "Government, Congress, Supreme Court"
-        }
+            "mentioned_entities": "Government, Congress, Supreme Court",
+        },
     ]
 
     print(f"Testing similarity analysis with {len(sample_records)} sample records\n")
@@ -69,7 +70,7 @@ def test_cross_reference_system():
             print(f"  Confidence: {relationship.confidence:.3f}")
             print("  Evidence:")
             for key, value in relationship.evidence.items():
-                if key == 'shared_keywords':
+                if key == "shared_keywords":
                     print(f"    {key}: {value[:5]}")  # Show first 5 keywords
                 else:
                     print(f"    {key}: {value:.3f}")
@@ -78,10 +79,11 @@ def test_cross_reference_system():
     # Test keyword extraction
     print("Testing keyword extraction:")
     for record in sample_records:
-        keywords = analyzer.extract_keywords(record['raw_text'], max_keywords=10)
+        keywords = analyzer.extract_keywords(record["raw_text"], max_keywords=10)
         print(f"{record['id']}: {keywords[:10]}")
 
     print("\nCross-reference analysis test completed!")
+
 
 if __name__ == "__main__":
     test_cross_reference_system()

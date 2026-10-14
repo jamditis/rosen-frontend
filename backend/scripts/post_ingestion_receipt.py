@@ -33,8 +33,7 @@ JAY_URI_RE = re.compile(
     rf"^at://{re.escape(JAY_DID)}/app\.bsky\.feed\.post/([A-Za-z0-9._~:-]+)$"
 )
 JAY_URL_RE = re.compile(
-    r"^https://bsky\.app/profile/jayrosen\.bsky\.social/post/"
-    r"([A-Za-z0-9._~:-]+)/?$"
+    r"^https://bsky\.app/profile/jayrosen\.bsky\.social/post/" r"([A-Za-z0-9._~:-]+)/?$"
 )
 RECORD_ID_RE = re.compile(r"^BSKY-\d{5,}$")
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -54,7 +53,7 @@ def receipt_batches(payload: dict[str, Any]) -> Iterator[dict[str, Any]]:
         yield payload
         return
     for start in range(0, len(records), MAX_RECORDS_PER_REQUEST):
-        yield {**payload, "records": records[start:start + MAX_RECORDS_PER_REQUEST]}
+        yield {**payload, "records": records[start : start + MAX_RECORDS_PER_REQUEST]}
 
 
 def _retry_delay(response: requests.Response | None, attempt: int) -> float:
@@ -116,7 +115,9 @@ def _bounded_json(response: requests.Response) -> dict[str, Any]:
         try:
             declared_size = int(declared)
         except ValueError as exc:
-            raise ValueError("candidate response has an invalid Content-Length") from exc
+            raise ValueError(
+                "candidate response has an invalid Content-Length"
+            ) from exc
         if declared_size < 0:
             raise ValueError("candidate response has an invalid Content-Length")
         if declared_size > MAX_CANDIDATE_BODY_BYTES:
@@ -150,7 +151,10 @@ def fetch_pending_candidate_uris(token: str) -> list[str]:
         payload = _bounded_json(response)
         candidates = payload.get("candidates")
         next_cursor = payload.get("nextCursor")
-        if not isinstance(candidates, list) or len(candidates) > MAX_CANDIDATES_PER_PAGE:
+        if (
+            not isinstance(candidates, list)
+            or len(candidates) > MAX_CANDIDATES_PER_PAGE
+        ):
             raise ValueError("candidate response has an invalid candidates page")
         for candidate in candidates:
             uri = candidate.get("uri") if isinstance(candidate, dict) else None
@@ -201,7 +205,9 @@ def canonical_candidate_decisions(
             if uri in matches:
                 raise ValueError(f"canonical candidate {uri} is not unique")
             if record_id in ids and ids[record_id] != uri:
-                raise ValueError(f"canonical candidate record ID {record_id} is not unique")
+                raise ValueError(
+                    f"canonical candidate record ID {record_id} is not unique"
+                )
             ids[record_id] = uri
             matches[uri] = {
                 "uri": uri,

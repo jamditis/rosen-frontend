@@ -29,6 +29,7 @@ def test_unescape_reverses_the_escape_for_every_trigger():
         CSV_INJECTION_PREFIXES,
         unescape_csv_value,
     )
+
     for trigger in CSV_INJECTION_PREFIXES:
         escaped = sanitize_csv_value(trigger + "x")
         assert unescape_csv_value(escaped) == trigger + "x"
@@ -38,6 +39,7 @@ def test_unescape_preserves_a_legitimate_leading_apostrophe():
     # A real apostrophe not followed by a formula trigger is content, not an
     # escape, so it must survive unchanged (no over-stripping).
     from rosen_scraper.csv_safety import unescape_csv_value
+
     assert unescape_csv_value("'tis the season") == "'tis the season"
     assert unescape_csv_value("'") == "'"
     assert unescape_csv_value("Jay Rosen") == "Jay Rosen"

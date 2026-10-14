@@ -10,8 +10,11 @@ from pathlib import Path
 
 # Set up credentials, anchored to backend/ so the script runs from any cwd; an
 # absolute GOOGLE_APPLICATION_CREDENTIALS overrides (pathlib resets to it).
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")  # fmt: skip
 credentials_path = Path(__file__).resolve().parents[1] / credentials_filename
 creds = Credentials.from_service_account_file(str(credentials_path), scopes=SCOPES)
 client = gspread.authorize(creds)
@@ -54,7 +57,9 @@ try:
         if len(entity_ids) == len(unique_ids):
             print("  [OK] All entity IDs are unique (no duplicates)")
         else:
-            print(f"  [WARNING] Found {len(entity_ids) - len(unique_ids)} duplicate entity IDs")
+            print(
+                f"  [WARNING] Found {len(entity_ids) - len(unique_ids)} duplicate entity IDs"
+            )
 
         # Count by entity type
         entity_types = {}
@@ -64,7 +69,9 @@ try:
                 entity_types[etype] = entity_types.get(etype, 0) + 1
 
         print("\n  Entities by type:")
-        for etype, count in sorted(entity_types.items(), key=lambda x: x[1], reverse=True):
+        for etype, count in sorted(
+            entity_types.items(), key=lambda x: x[1], reverse=True
+        ):
             print(f"    {etype}: {count}")
 
 except gspread.exceptions.WorksheetNotFound:
@@ -110,7 +117,7 @@ except gspread.exceptions.WorksheetNotFound:
 # Load progress file for comparison
 print("\n[PROGRESS FILE COMPARISON]")
 try:
-    with open('logs/entity_extraction_progress.json', 'r') as f:
+    with open("logs/entity_extraction_progress.json", "r") as f:
         progress = json.load(f)
 
     print("[OK] Progress file found")
@@ -122,19 +129,27 @@ try:
     # Compare with sheet data
     if len(entities_data) > 1:
         sheet_entities = len(entities_data) - 1
-        progress_entities = progress['entities_extracted']
+        progress_entities = progress["entities_extracted"]
         if sheet_entities == progress_entities:
-            print(f"\n  [OK] Entity count matches: {sheet_entities} rows in sheet = {progress_entities} in progress")
+            print(
+                f"\n  [OK] Entity count matches: {sheet_entities} rows in sheet = {progress_entities} in progress"
+            )
         else:
-            print(f"\n  [WARNING] Entity count mismatch: {sheet_entities} rows in sheet vs {progress_entities} in progress")
+            print(
+                f"\n  [WARNING] Entity count mismatch: {sheet_entities} rows in sheet vs {progress_entities} in progress"
+            )
 
     if len(rels_data) > 1:
         sheet_rels = len(rels_data) - 1
-        progress_rels = progress['relationships_extracted']
+        progress_rels = progress["relationships_extracted"]
         if sheet_rels == progress_rels:
-            print(f"  [OK] Relationship count matches: {sheet_rels} rows in sheet = {progress_rels} in progress")
+            print(
+                f"  [OK] Relationship count matches: {sheet_rels} rows in sheet = {progress_rels} in progress"
+            )
         else:
-            print(f"  [WARNING] Relationship count mismatch: {sheet_rels} rows in sheet vs {progress_rels} in progress")
+            print(
+                f"  [WARNING] Relationship count mismatch: {sheet_rels} rows in sheet vs {progress_rels} in progress"
+            )
 
 except FileNotFoundError:
     print("[ERROR] Progress file not found")

@@ -120,9 +120,12 @@ def test_archive_child_join_rejects_scope_escape(child):
 
 
 def test_archive_child_join_preserves_absolute_sftp_parent():
-    assert remote_transfer.scoped_archive_child(
-        "/home/rosen/public_html/j/rosen-archive", "assets/app.js"
-    ) == "/home/rosen/public_html/j/rosen-archive/assets/app.js"
+    assert (
+        remote_transfer.scoped_archive_child(
+            "/home/rosen/public_html/j/rosen-archive", "assets/app.js"
+        )
+        == "/home/rosen/public_html/j/rosen-archive/assets/app.js"
+    )
 
 
 def test_ftps_connection_requires_password_and_verified_tls():

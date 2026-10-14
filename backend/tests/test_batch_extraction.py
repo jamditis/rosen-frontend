@@ -20,6 +20,7 @@ sys.path.insert(0, str(backend_dir / "src"))
 
 # Import the module by file path since scripts/ is not a package
 import importlib.util
+
 _spec = importlib.util.spec_from_file_location(
     "batch_entity_extraction",
     backend_dir / "scripts" / "batch_entity_extraction.py",
@@ -93,7 +94,9 @@ class TestFormatPostForExtraction:
                         all_text += block["text"]
 
         for entity_type in VALID_ENTITY_TYPES:
-            assert entity_type in all_text, f"Entity type '{entity_type}' not found in prompt"
+            assert (
+                entity_type in all_text
+            ), f"Entity type '{entity_type}' not found in prompt"
 
     def test_prompt_contains_all_relationship_types(self):
         """The prompt must mention all 15 relationship types."""
@@ -117,7 +120,9 @@ class TestFormatPostForExtraction:
                         all_text += block["text"]
 
         for rel_type in VALID_RELATIONSHIP_TYPES:
-            assert rel_type in all_text, f"Relationship type '{rel_type}' not found in prompt"
+            assert (
+                rel_type in all_text
+            ), f"Relationship type '{rel_type}' not found in prompt"
 
     def test_post_content_included_in_user_message(self):
         """The actual post text must appear in the user message."""
@@ -221,9 +226,7 @@ class TestParseExtractionResponse:
             "relationships": [],
         }
 
-        entities, _ = parse_extraction_response(
-            json.dumps(response_json), "BSKY-001"
-        )
+        entities, _ = parse_extraction_response(json.dumps(response_json), "BSKY-001")
 
         assert entities[0]["role_or_description"] == "Journalism professor"
         assert "role" not in entities[0]
@@ -243,9 +246,7 @@ class TestParseExtractionResponse:
             "relationships": [],
         }
 
-        entities, _ = parse_extraction_response(
-            json.dumps(response_json), "BSKY-002"
-        )
+        entities, _ = parse_extraction_response(json.dumps(response_json), "BSKY-002")
 
         assert entities[0]["role_or_description"] == "News outlet"
         assert "org_type" not in entities[0]
@@ -266,9 +267,7 @@ class TestParseExtractionResponse:
             "relationships": [],
         }
 
-        entities, _ = parse_extraction_response(
-            json.dumps(response_json), "BSKY-003"
-        )
+        entities, _ = parse_extraction_response(json.dumps(response_json), "BSKY-003")
 
         assert entities[0]["role_or_description"] == "Blog post"
         assert "work_type" not in entities[0]
@@ -288,9 +287,7 @@ class TestParseExtractionResponse:
             "relationships": [],
         }
 
-        entities, _ = parse_extraction_response(
-            json.dumps(response_json), "BSKY-004"
-        )
+        entities, _ = parse_extraction_response(json.dumps(response_json), "BSKY-004")
 
         assert entities[0]["role_or_description"] == "Political election"
         assert "event_type" not in entities[0]
@@ -310,9 +307,7 @@ class TestParseExtractionResponse:
             "relationships": [],
         }
 
-        entities, _ = parse_extraction_response(
-            json.dumps(response_json), "BSKY-005"
-        )
+        entities, _ = parse_extraction_response(json.dumps(response_json), "BSKY-005")
 
         assert entities[0]["role_or_description"] == "City"
         assert "location_type" not in entities[0]
@@ -338,9 +333,7 @@ class TestParseExtractionResponse:
             "relationships": [],
         }
 
-        entities, _ = parse_extraction_response(
-            json.dumps(response_json), "BSKY-006"
-        )
+        entities, _ = parse_extraction_response(json.dumps(response_json), "BSKY-006")
 
         assert len(entities) == 1
         assert entities[0]["entity_type"] == "Person"
@@ -529,9 +522,20 @@ class TestValidTypes:
     def test_fifteen_relationship_types(self):
         """Must have exactly 15 relationship types."""
         expected = {
-            "Mentions", "Criticizes", "Cites", "Discusses", "Expands On",
-            "Affiliated With", "Published In", "Originated By", "Occurred At",
-            "Supports", "Owns", "Owned By", "Founded By", "Pioneered",
+            "Mentions",
+            "Criticizes",
+            "Cites",
+            "Discusses",
+            "Expands On",
+            "Affiliated With",
+            "Published In",
+            "Originated By",
+            "Occurred At",
+            "Supports",
+            "Owns",
+            "Owned By",
+            "Founded By",
+            "Pioneered",
             "Inspired By",
         }
         assert VALID_RELATIONSHIP_TYPES == expected
@@ -542,9 +546,7 @@ class TestBuildExtractionPrompt:
 
     def test_prompt_requests_json_output(self):
         """The prompt must ask for JSON output."""
-        prompt = build_extraction_prompt(
-            "Jay Rosen discusses journalism.", "BSKY-001"
-        )
+        prompt = build_extraction_prompt("Jay Rosen discusses journalism.", "BSKY-001")
         assert "JSON" in prompt or "json" in prompt
 
     def test_prompt_includes_post_content(self):

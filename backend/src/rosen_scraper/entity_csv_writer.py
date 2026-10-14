@@ -70,24 +70,38 @@ VALID_ENTITY_TYPES, VALID_RELATIONSHIP_TYPES = _load_schema_types()
 
 # Type-specific fields that map to role_or_description in the CSV.
 TYPE_SPECIFIC_ROLE_FIELDS = (
-    "role",          # Person
-    "org_type",      # Organization
-    "work_type",     # Work
-    "event_type",    # Event
-    "location_type", # Location
-    "description",   # Fallback
+    "role",  # Person
+    "org_type",  # Organization
+    "work_type",  # Work
+    "event_type",  # Event
+    "location_type",  # Location
+    "description",  # Fallback
 )
 
 # CSV headers (exact, in order) — must match the existing files byte-for-byte.
 ENTITIES_HEADER = [
-    "entity_id", "entity_type", "entity_name", "normalized_name",
-    "role_or_description", "affiliation", "prominence_score",
-    "first_mention_record_id", "total_mentions", "related_entities", "notes",
+    "entity_id",
+    "entity_type",
+    "entity_name",
+    "normalized_name",
+    "role_or_description",
+    "affiliation",
+    "prominence_score",
+    "first_mention_record_id",
+    "total_mentions",
+    "related_entities",
+    "notes",
 ]
 RELATIONSHIPS_HEADER = [
-    "relationship_id", "source_record_id", "source_entity_id",
-    "source_entity_name", "relationship_type", "target_entity_id",
-    "target_entity_name", "context_snippet", "confidence_score",
+    "relationship_id",
+    "source_record_id",
+    "source_entity_id",
+    "source_entity_name",
+    "relationship_type",
+    "target_entity_id",
+    "target_entity_name",
+    "context_snippet",
+    "confidence_score",
     "extracted_date",
 ]
 
@@ -176,9 +190,7 @@ def alloc_entity_id(prefix: str, next_seq: Dict[str, int]) -> str:
     return f"{prefix}{n:04d}"
 
 
-def next_rel_seq_for_record(
-    record_id: str, relationships: Iterable[Dict]
-) -> int:
+def next_rel_seq_for_record(record_id: str, relationships: Iterable[Dict]) -> int:
     """Return the next REL sequence number for a given record_id.
 
     Existing ids look like RECORD-00002_REL_001. If a record already has rels
@@ -378,10 +390,12 @@ def process_extraction_result(
         if not src_canonical or not tgt_canonical:
             continue
 
-        snippet = (raw_rel.get("context_snippet")
-                   or raw_rel.get("context")
-                   or raw_rel.get("evidence")
-                   or "")
+        snippet = (
+            raw_rel.get("context_snippet")
+            or raw_rel.get("context")
+            or raw_rel.get("evidence")
+            or ""
+        )
         # Escape before truncating so a trigger-led snippet at the cap keeps its
         # leading apostrophe and still fits in 200 chars (matches _sanitize_cell);
         # the write-boundary sanitize then no-ops on the already-escaped value.

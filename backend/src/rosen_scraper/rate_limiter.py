@@ -41,45 +41,46 @@ if API_RATE_LIMIT_PERIOD <= 0:
 def rate_limited_gemini_call(func):
     """
     Decorator to apply rate limiting to Gemini API calls.
-    
+
     This decorator wraps functions that make calls to the Gemini API,
     ensuring they respect the configured rate limits. If the rate limit
     is exceeded, the decorator will sleep until the next period begins.
-    
+
     Configuration is done via environment variables:
     - GEMINI_API_RATE_LIMIT_CALLS: Number of allowed calls (default: 60)
     - GEMINI_API_RATE_LIMIT_PERIOD: Time period in seconds (default: 60)
-    
+
     Args:
         func: The function to wrap with rate limiting
-        
+
     Returns:
         The wrapped function with rate limiting applied
-        
+
     Example:
         @rate_limited_gemini_call
         def call_gemini_api(prompt):
             # ... API call logic
             pass
     """
+
     @wraps(func)
     @sleep_and_retry
     @limits(calls=API_RATE_LIMIT_CALLS, period=API_RATE_LIMIT_PERIOD)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
-    
+
     return wrapper
 
 
 def get_rate_limit_info():
     """
     Get current rate limit configuration.
-    
+
     Returns:
         dict: Dictionary containing rate limit configuration
     """
     return {
         "calls": API_RATE_LIMIT_CALLS,
         "period": API_RATE_LIMIT_PERIOD,
-        "description": f"{API_RATE_LIMIT_CALLS} calls per {API_RATE_LIMIT_PERIOD} seconds"
+        "description": f"{API_RATE_LIMIT_CALLS} calls per {API_RATE_LIMIT_PERIOD} seconds",
     }

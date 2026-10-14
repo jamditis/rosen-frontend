@@ -74,7 +74,8 @@ def test_dedup_processes_present_columns_when_legacy_columns_are_absent():
     worksheet = _FakeWorksheet([header, ["R1", "News, News", "", ""]])
 
     writes = module.run_deduplication(
-        worksheet, worksheet.get_all_values()[1:], header, dry_run=True)
+        worksheet, worksheet.get_all_values()[1:], header, dry_run=True
+    )
 
     assert writes == 1
 
@@ -86,16 +87,19 @@ def test_live_sheet_write_failure_is_not_reported_as_success():
 
     with pytest.raises(RuntimeError, match="sheet write failed"):
         module.run_deduplication(
-            worksheet, worksheet.get_all_values()[1:], header, dry_run=False)
+            worksheet, worksheet.get_all_values()[1:], header, dry_run=False
+        )
 
 
 def test_legacy_entity_write_failure_is_not_reported_as_success(monkeypatch):
     module = _load_module()
     monkeypatch.setattr(module, "COLUMNS_TO_SEARCH_FOR_MENTIONS", ["title"])
-    entities = _FailingWorksheet([
-        ["entity_name", "entity_mentions"],
-        ["Jay Rosen", ""],
-    ])
+    entities = _FailingWorksheet(
+        [
+            ["entity_name", "entity_mentions"],
+            ["Jay Rosen", ""],
+        ]
+    )
 
     with pytest.raises(RuntimeError, match="sheet write failed"):
         module.update_entity_mentions(
@@ -109,13 +113,16 @@ def test_legacy_entity_write_failure_is_not_reported_as_success(monkeypatch):
 def test_main_defaults_to_archive_records_and_skips_legacy_entity_pass(monkeypatch):
     module = _load_module()
     monkeypatch.delenv("ROSEN_MASTER_SHEET_TAB", raising=False)
-    worksheet = _FakeWorksheet([
-        ["id", "thematic_categories", "key_concepts", "tags"],
-        ["R1", "News, News", "", ""],
-    ])
+    worksheet = _FakeWorksheet(
+        [
+            ["id", "thematic_categories", "key_concepts", "tags"],
+            ["R1", "News, News", "", ""],
+        ]
+    )
     spreadsheet = _FakeSpreadsheet(worksheet)
     monkeypatch.setattr(
-        module, "get_gspread_client", lambda *a, **k: _FakeClient(spreadsheet))
+        module, "get_gspread_client", lambda *a, **k: _FakeClient(spreadsheet)
+    )
 
     def _legacy_pass_must_not_run(*args, **kwargs):
         raise AssertionError("legacy entity-mentions pass must be opt-in")
@@ -129,13 +136,16 @@ def test_main_defaults_to_archive_records_and_skips_legacy_entity_pass(monkeypat
 def test_main_treats_empty_workflow_tab_variable_as_unset(monkeypatch):
     module = _load_module()
     monkeypatch.setenv("ROSEN_MASTER_SHEET_TAB", "")
-    worksheet = _FakeWorksheet([
-        ["id", "thematic_categories", "key_concepts", "tags"],
-        ["R1", "News, News", "", ""],
-    ])
+    worksheet = _FakeWorksheet(
+        [
+            ["id", "thematic_categories", "key_concepts", "tags"],
+            ["R1", "News, News", "", ""],
+        ]
+    )
     spreadsheet = _FakeSpreadsheet(worksheet)
     monkeypatch.setattr(
-        module, "get_gspread_client", lambda *a, **k: _FakeClient(spreadsheet))
+        module, "get_gspread_client", lambda *a, **k: _FakeClient(spreadsheet)
+    )
 
     assert module.main(["--dry-run", "--limit", "1"]) == 0
     assert spreadsheet.requested_tabs == ["archive_records"]
@@ -144,15 +154,18 @@ def test_main_treats_empty_workflow_tab_variable_as_unset(monkeypatch):
 def test_limit_counts_changed_rows_instead_of_the_sheet_prefix(monkeypatch):
     module = _load_module()
     monkeypatch.delenv("ROSEN_MASTER_SHEET_TAB", raising=False)
-    worksheet = _FakeWorksheet([
-        ["id", "thematic_categories", "key_concepts", "tags"],
-        ["R1", "News", "", ""],
-        ["R2", "News, News", "View from Nowhere; View from Nowhere", ""],
-        ["R3", "Analysis, Analysis", "", ""],
-    ])
+    worksheet = _FakeWorksheet(
+        [
+            ["id", "thematic_categories", "key_concepts", "tags"],
+            ["R1", "News", "", ""],
+            ["R2", "News, News", "View from Nowhere; View from Nowhere", ""],
+            ["R3", "Analysis, Analysis", "", ""],
+        ]
+    )
     spreadsheet = _FakeSpreadsheet(worksheet)
     monkeypatch.setattr(
-        module, "get_gspread_client", lambda *a, **k: _FakeClient(spreadsheet))
+        module, "get_gspread_client", lambda *a, **k: _FakeClient(spreadsheet)
+    )
 
     assert module.main(["--limit", "1"]) == 0
     assert worksheet.batch_updates == [
@@ -166,14 +179,17 @@ def test_changed_rows_do_not_overfill_a_batch(monkeypatch):
     monkeypatch.setattr(module, "BATCH_SIZE", 3)
     monkeypatch.setattr(module, "DELAY_BETWEEN_BATCHES", 0)
     header = ["id", "thematic_categories", "key_concepts", "tags"]
-    worksheet = _FakeWorksheet([
-        header,
-        ["R1", "News, News", "View from Nowhere; View from Nowhere", ""],
-        ["R2", "Analysis, Analysis", "Mindcasting; Mindcasting", ""],
-    ])
+    worksheet = _FakeWorksheet(
+        [
+            header,
+            ["R1", "News, News", "View from Nowhere; View from Nowhere", ""],
+            ["R2", "Analysis, Analysis", "Mindcasting; Mindcasting", ""],
+        ]
+    )
 
     writes = module.run_deduplication(
-        worksheet, worksheet.get_all_values()[1:], header, limit=2)
+        worksheet, worksheet.get_all_values()[1:], header, limit=2
+    )
 
     assert writes == 4
     assert [len(batch) for batch in worksheet.batch_calls] == [2, 2]

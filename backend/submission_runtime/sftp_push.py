@@ -66,9 +66,7 @@ def _read_env() -> Optional[Dict[str, Any]]:
         default_port = "21" if protocol == "ftps" else "22"
         port = int(os.environ.get("ROSEN_SFTP_PORT") or default_port)
     except (TypeError, ValueError) as exc:
-        raise TransferConfigurationError(
-            "ROSEN_SFTP_PORT must be an integer"
-        ) from exc
+        raise TransferConfigurationError("ROSEN_SFTP_PORT must be an integer") from exc
 
     return {
         "protocol": protocol,

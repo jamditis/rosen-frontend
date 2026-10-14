@@ -31,17 +31,17 @@ class CSVDataService:
             csv_dir: Path to CSV directory. Defaults to project_root/csv/
         """
         self.project_root = find_project_root()
-        self.csv_dir = csv_dir or self.project_root.parent / 'csv'
+        self.csv_dir = csv_dir or self.project_root.parent / "csv"
 
         # Define file paths
-        self.urls_file = self.csv_dir / 'urls_to_scrape.csv'
-        self.records_file = self.csv_dir / 'archive_records-public.csv'
-        self.social_file = self.csv_dir / 'social_posts.csv'
-        self.entities_file = self.csv_dir / 'extracted_entities.csv'
-        self.relationships_file = self.csv_dir / 'extracted_relationships.csv'
+        self.urls_file = self.csv_dir / "urls_to_scrape.csv"
+        self.records_file = self.csv_dir / "archive_records-public.csv"
+        self.social_file = self.csv_dir / "social_posts.csv"
+        self.entities_file = self.csv_dir / "extracted_entities.csv"
+        self.relationships_file = self.csv_dir / "extracted_relationships.csv"
 
         # Output directory for new/updated records
-        self.output_dir = self.csv_dir / 'output'
+        self.output_dir = self.csv_dir / "output"
         if self.csv_dir.exists():
             self.output_dir.mkdir(exist_ok=True)
 
@@ -60,26 +60,34 @@ class CSVDataService:
 
         # Update file paths to look in the new directory
         # Support both naming conventions (with and without 'rosen_' prefix)
-        self.urls_file = data_dir / 'urls_to_scrape.csv'
-        self.records_file = data_dir / 'archive_records-public.csv'
+        self.urls_file = data_dir / "urls_to_scrape.csv"
+        self.records_file = data_dir / "archive_records-public.csv"
 
         # Social posts - check both naming conventions
-        social_prefixed = data_dir / 'rosen_social_posts.csv'
-        social_standard = data_dir / 'social_posts.csv'
-        self.social_file = social_prefixed if social_prefixed.exists() else social_standard
+        social_prefixed = data_dir / "rosen_social_posts.csv"
+        social_standard = data_dir / "social_posts.csv"
+        self.social_file = (
+            social_prefixed if social_prefixed.exists() else social_standard
+        )
 
         # Entities - check both naming conventions
-        entities_prefixed = data_dir / 'rosen_extracted_entities.csv'
-        entities_standard = data_dir / 'extracted_entities.csv'
-        self.entities_file = entities_prefixed if entities_prefixed.exists() else entities_standard
+        entities_prefixed = data_dir / "rosen_extracted_entities.csv"
+        entities_standard = data_dir / "extracted_entities.csv"
+        self.entities_file = (
+            entities_prefixed if entities_prefixed.exists() else entities_standard
+        )
 
         # Relationships - check both naming conventions
-        relationships_prefixed = data_dir / 'rosen_extracted_relationships.csv'
-        relationships_standard = data_dir / 'extracted_relationships.csv'
-        self.relationships_file = relationships_prefixed if relationships_prefixed.exists() else relationships_standard
+        relationships_prefixed = data_dir / "rosen_extracted_relationships.csv"
+        relationships_standard = data_dir / "extracted_relationships.csv"
+        self.relationships_file = (
+            relationships_prefixed
+            if relationships_prefixed.exists()
+            else relationships_standard
+        )
 
         # Output directory
-        self.output_dir = data_dir / 'output'
+        self.output_dir = data_dir / "output"
         self.output_dir.mkdir(exist_ok=True)
 
         print(f"[CSV SERVICE] Data directory set to: {data_dir}")
@@ -116,11 +124,15 @@ class CSVDataService:
         Yields:
             One dict per data row, keyed by the header row.
         """
-        with open(path, 'r', encoding='utf-8-sig') as f:
+        with open(path, "r", encoding="utf-8-sig") as f:
             yield from csv.DictReader(f)
 
-    def get_urls_to_process(self, start_row: int = 0, end_row: Optional[int] = None,
-                            skip_processed: bool = True) -> List[Dict[str, str]]:
+    def get_urls_to_process(
+        self,
+        start_row: int = 0,
+        end_row: Optional[int] = None,
+        skip_processed: bool = True,
+    ) -> List[Dict[str, str]]:
         """
         Read URLs from the urls_to_scrape.csv file.
 
@@ -146,16 +158,18 @@ class CSVDataService:
                     break
 
                 # Skip already processed if requested
-                if skip_processed and row.get('processed_on'):
+                if skip_processed and row.get("processed_on"):
                     continue
 
-                if row.get('url'):
-                    urls.append({
-                        'id': row.get('id', f'URL{i}'),
-                        'url': row['url'].strip(),
-                        'processed_on': row.get('processed_on', ''),
-                        'notes': row.get('Notes', row.get('notes', ''))
-                    })
+                if row.get("url"):
+                    urls.append(
+                        {
+                            "id": row.get("id", f"URL{i}"),
+                            "url": row["url"].strip(),
+                            "processed_on": row.get("processed_on", ""),
+                            "notes": row.get("Notes", row.get("notes", "")),
+                        }
+                    )
 
         return urls
 
@@ -171,7 +185,7 @@ class CSVDataService:
         for csv_file in [self.records_file, self.social_file]:
             if csv_file.exists():
                 for row in self._read_dicts(csv_file):
-                    record_id = row.get('id', row.get('ID', ''))
+                    record_id = row.get("id", row.get("ID", ""))
                     if record_id:
                         ids.add(record_id)
 
@@ -189,7 +203,7 @@ class CSVDataService:
         for csv_file in [self.records_file, self.social_file]:
             if csv_file.exists():
                 for row in self._read_dicts(csv_file):
-                    url = row.get('url', row.get('URL', ''))
+                    url = row.get("url", row.get("URL", ""))
                     if url:
                         urls.add(url.strip())
 
@@ -205,11 +219,13 @@ class CSVDataService:
         if not self.records_file.exists():
             return []
 
-        with open(self.records_file, 'r', encoding='utf-8-sig') as f:
+        with open(self.records_file, "r", encoding="utf-8-sig") as f:
             reader = csv.reader(f)
             return next(reader, [])
 
-    def append_record(self, record: Dict[str, Any], headers: Optional[List[str]] = None) -> bool:
+    def append_record(
+        self, record: Dict[str, Any], headers: Optional[List[str]] = None
+    ) -> bool:
         """
         Append a new record to the output file.
 
@@ -220,7 +236,10 @@ class CSVDataService:
         Returns:
             True if successful
         """
-        output_file = self.output_dir / f'processed_records_{datetime.now().strftime("%Y%m%d")}.csv'
+        output_file = (
+            self.output_dir
+            / f'processed_records_{datetime.now().strftime("%Y%m%d")}.csv'
+        )
 
         if headers is None:
             headers = self.get_headers()
@@ -228,8 +247,8 @@ class CSVDataService:
         file_exists = output_file.exists()
 
         try:
-            with open(output_file, 'a', newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f, fieldnames=headers, extrasaction='ignore')
+            with open(output_file, "a", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=headers, extrasaction="ignore")
 
                 if not file_exists:
                     writer.writeheader()
@@ -240,7 +259,7 @@ class CSVDataService:
             print(f"ERROR: Failed to write record: {e}")
             return False
 
-    def update_url_status(self, url: str, status: str, notes: str = '') -> bool:
+    def update_url_status(self, url: str, status: str, notes: str = "") -> bool:
         """
         Update the processing status of a URL in the urls file.
 
@@ -256,23 +275,22 @@ class CSVDataService:
             True if successful
         """
         # For efficiency, we'll write to a separate log file
-        log_file = self.output_dir / f'processing_log_{datetime.now().strftime("%Y%m%d")}.csv'
+        log_file = (
+            self.output_dir / f'processing_log_{datetime.now().strftime("%Y%m%d")}.csv'
+        )
 
         file_exists = log_file.exists()
 
         try:
-            with open(log_file, 'a', newline='', encoding='utf-8') as f:
+            with open(log_file, "a", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
 
                 if not file_exists:
-                    writer.writerow(['url', 'status', 'processed_on', 'notes'])
+                    writer.writerow(["url", "status", "processed_on", "notes"])
 
-                writer.writerow([
-                    url,
-                    status,
-                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    notes
-                ])
+                writer.writerow(
+                    [url, status, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), notes]
+                )
             return True
         except Exception as e:
             print(f"ERROR: Failed to log URL status: {e}")

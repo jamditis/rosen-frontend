@@ -48,38 +48,38 @@ class RelationshipBuilder:
 
         # Weights for scoring (sum = 1.0)
         self.weights = {
-            'category_overlap': 0.30,
-            'concept_overlap': 0.25,
-            'entity_connection': 0.20,
-            'era_match': 0.10,
-            'tag_overlap': 0.10,
-            'title_similarity': 0.05,
+            "category_overlap": 0.30,
+            "concept_overlap": 0.25,
+            "entity_connection": 0.20,
+            "era_match": 0.10,
+            "tag_overlap": 0.10,
+            "title_similarity": 0.05,
         }
 
     def load_records(self, csv_path: Path) -> None:
         """Load archive records from CSV."""
         print(f"Loading records from {csv_path}...")
 
-        with open(csv_path, 'r', encoding='utf-8') as f:
+        with open(csv_path, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                record_id = row['id']
+                record_id = row["id"]
                 self.records[record_id] = row
 
                 # Build indexes for fast lookup
-                categories = self._parse_list_field(row.get('thematic_categories', ''))
+                categories = self._parse_list_field(row.get("thematic_categories", ""))
                 for cat in categories:
                     self.category_index[cat].add(record_id)
 
-                concepts = self._parse_list_field(row.get('key_concepts', ''))
+                concepts = self._parse_list_field(row.get("key_concepts", ""))
                 for concept in concepts:
                     self.concept_index[concept].add(record_id)
 
-                era = row.get('era', '').strip()
+                era = row.get("era", "").strip()
                 if era:
                     self.era_index[era].add(record_id)
 
-                tags = self._parse_list_field(row.get('tags', ''))
+                tags = self._parse_list_field(row.get("tags", ""))
                 for tag in tags:
                     self.tag_index[tag].add(record_id)
 
@@ -95,12 +95,12 @@ class RelationshipBuilder:
 
         entity_to_records: Dict[str, Set[str]] = defaultdict(set)
 
-        with open(csv_path, 'r', encoding='utf-8') as f:
+        with open(csv_path, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                record_id = row['source_record_id']
-                source_entity = row['source_entity_name']
-                target_entity = row['target_entity_name']
+                record_id = row["source_record_id"]
+                source_entity = row["source_entity_name"]
+                target_entity = row["target_entity_name"]
 
                 # Map entities to records they appear in
                 entity_to_records[source_entity].add(record_id)
@@ -113,16 +113,18 @@ class RelationshipBuilder:
                     # Add all other records sharing this entity
                     self.entity_graph[record_id].update(records - {record_id})
 
-        total_connections = sum(len(connections) for connections in self.entity_graph.values())
+        total_connections = sum(
+            len(connections) for connections in self.entity_graph.values()
+        )
         print(f"Built entity graph with {len(entity_to_records)} entities")
         print(f"  {len(self.entity_graph)} records have entity connections")
         print(f"  {total_connections} total entity-based connections")
 
     def _parse_list_field(self, field: str) -> List[str]:
         """Parse comma-separated field into list, handling empty values."""
-        if not field or field.strip() == '':
+        if not field or field.strip() == "":
             return []
-        return [item.strip() for item in field.split(',') if item.strip()]
+        return [item.strip() for item in field.split(",") if item.strip()]
 
     def calculate_similarity(self, record_id_a: str, record_id_b: str) -> float:
         """
@@ -136,18 +138,18 @@ class RelationshipBuilder:
         score = 0.0
 
         # 1. Category overlap
-        cats_a = set(self._parse_list_field(record_a.get('thematic_categories', '')))
-        cats_b = set(self._parse_list_field(record_b.get('thematic_categories', '')))
+        cats_a = set(self._parse_list_field(record_a.get("thematic_categories", "")))
+        cats_b = set(self._parse_list_field(record_b.get("thematic_categories", "")))
         if cats_a and cats_b:
             category_score = len(cats_a & cats_b) / len(cats_a | cats_b)
-            score += category_score * self.weights['category_overlap']
+            score += category_score * self.weights["category_overlap"]
 
         # 2. Concept overlap
-        concepts_a = set(self._parse_list_field(record_a.get('key_concepts', '')))
-        concepts_b = set(self._parse_list_field(record_b.get('key_concepts', '')))
+        concepts_a = set(self._parse_list_field(record_a.get("key_concepts", "")))
+        concepts_b = set(self._parse_list_field(record_b.get("key_concepts", "")))
         if concepts_a and concepts_b:
             concept_score = len(concepts_a & concepts_b) / len(concepts_a | concepts_b)
-            score += concept_score * self.weights['concept_overlap']
+            score += concept_score * self.weights["concept_overlap"]
 
         # 3. Entity connections
         if record_id_b in self.entity_graph.get(record_id_a, set()):
@@ -158,30 +160,30 @@ class RelationshipBuilder:
             total_connections = len(entities_a | entities_b)
             if total_connections > 0:
                 entity_score = shared_connections / total_connections
-                score += entity_score * self.weights['entity_connection']
+                score += entity_score * self.weights["entity_connection"]
             else:
-                score += 1.0 * self.weights['entity_connection']
+                score += 1.0 * self.weights["entity_connection"]
 
         # 4. Era match
-        era_a = record_a.get('era', '').strip()
-        era_b = record_b.get('era', '').strip()
+        era_a = record_a.get("era", "").strip()
+        era_b = record_b.get("era", "").strip()
         if era_a and era_b and era_a == era_b:
-            score += 1.0 * self.weights['era_match']
+            score += 1.0 * self.weights["era_match"]
 
         # 5. Tag overlap
-        tags_a = set(self._parse_list_field(record_a.get('tags', '')))
-        tags_b = set(self._parse_list_field(record_b.get('tags', '')))
+        tags_a = set(self._parse_list_field(record_a.get("tags", "")))
+        tags_b = set(self._parse_list_field(record_b.get("tags", "")))
         if tags_a and tags_b:
             tag_score = len(tags_a & tags_b) / len(tags_a | tags_b)
-            score += tag_score * self.weights['tag_overlap']
+            score += tag_score * self.weights["tag_overlap"]
 
         # 6. Title similarity (using fuzzy matching)
-        title_a = record_a.get('title', '').lower()
-        title_b = record_b.get('title', '').lower()
+        title_a = record_a.get("title", "").lower()
+        title_b = record_b.get("title", "").lower()
         if title_a and title_b:
             # Use SequenceMatcher for fuzzy title matching
             title_score = SequenceMatcher(None, title_a, title_b).ratio()
-            score += title_score * self.weights['title_similarity']
+            score += title_score * self.weights["title_similarity"]
 
         return score
 
@@ -195,19 +197,19 @@ class RelationshipBuilder:
         candidates = set()
 
         # Gather candidates from indexes
-        categories = set(self._parse_list_field(record.get('thematic_categories', '')))
+        categories = set(self._parse_list_field(record.get("thematic_categories", "")))
         for cat in categories:
             candidates.update(self.category_index[cat])
 
-        concepts = set(self._parse_list_field(record.get('key_concepts', '')))
+        concepts = set(self._parse_list_field(record.get("key_concepts", "")))
         for concept in concepts:
             candidates.update(self.concept_index[concept])
 
-        era = record.get('era', '').strip()
+        era = record.get("era", "").strip()
         if era:
             candidates.update(self.era_index[era])
 
-        tags = set(self._parse_list_field(record.get('tags', '')))
+        tags = set(self._parse_list_field(record.get("tags", "")))
         for tag in tags:
             candidates.update(self.tag_index[tag])
 
@@ -226,7 +228,7 @@ class RelationshipBuilder:
 
         # Sort by score descending and return top N
         scored_candidates.sort(key=lambda x: x[1], reverse=True)
-        return scored_candidates[:self.top_n]
+        return scored_candidates[: self.top_n]
 
     def build_all_relationships(self) -> Dict[str, List[str]]:
         """
@@ -248,7 +250,9 @@ class RelationshipBuilder:
             if i % 50 == 0:
                 print(f"  Processed {i}/{len(self.records)} records...")
 
-        avg_relationships = total_relationships / len(self.records) if self.records else 0
+        avg_relationships = (
+            total_relationships / len(self.records) if self.records else 0
+        )
         print("\nRelationship building complete!")
         print(f"  Total relationships: {total_relationships}")
         print(f"  Average per record: {avg_relationships:.2f}")
@@ -260,7 +264,9 @@ class RelationshipBuilder:
 
         return relationships
 
-    def update_csv(self, csv_path: Path, relationships: Dict[str, List[str]], dry_run: bool = False) -> None:
+    def update_csv(
+        self, csv_path: Path, relationships: Dict[str, List[str]], dry_run: bool = False
+    ) -> None:
         """
         Update the CSV file with new relationships.
 
@@ -277,19 +283,19 @@ class RelationshipBuilder:
 
         # Read all rows
         rows = []
-        with open(csv_path, 'r', encoding='utf-8') as f:
+        with open(csv_path, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             fieldnames = reader.fieldnames
             for row in reader:
-                record_id = row['id']
+                record_id = row["id"]
                 if record_id in relationships:
                     # Update related_to field
-                    row['related_to'] = ', '.join(relationships[record_id])
+                    row["related_to"] = ", ".join(relationships[record_id])
                 rows.append(row)
 
         # Write back
         output_path = csv_path.parent / f"{csv_path.stem}_updated{csv_path.suffix}"
-        with open(output_path, 'w', encoding='utf-8', newline='') as f:
+        with open(output_path, "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(rows)
@@ -297,42 +303,50 @@ class RelationshipBuilder:
         print(f"Updated CSV written to: {output_path}")
         print(f"To replace original: mv {output_path} {csv_path}")
 
-    def generate_report(self, relationships: Dict[str, List[str]], output_path: Path) -> None:
+    def generate_report(
+        self, relationships: Dict[str, List[str]], output_path: Path
+    ) -> None:
         """Generate a detailed relationship network report."""
         print(f"\nGenerating report to {output_path}...")
 
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write("# Archive Record Relationship Report\n")
             f.write(f"Generated: {Path(__file__).name}\n\n")
 
             f.write("## Summary Statistics\n\n")
             f.write(f"- Total records: {len(self.records)}\n")
-            f.write(f"- Records with relationships: {sum(1 for r in relationships.values() if r)}\n")
-            f.write(f"- Total relationships: {sum(len(r) for r in relationships.values())}\n")
-            f.write(f"- Average relationships per record: {sum(len(r) for r in relationships.values()) / len(self.records):.2f}\n\n")
+            f.write(
+                f"- Records with relationships: {sum(1 for r in relationships.values() if r)}\n"
+            )
+            f.write(
+                f"- Total relationships: {sum(len(r) for r in relationships.values())}\n"
+            )
+            f.write(
+                f"- Average relationships per record: {sum(len(r) for r in relationships.values()) / len(self.records):.2f}\n\n"
+            )
 
             f.write("## Relationship Strength Distribution\n\n")
             f.write("Showing top 20 most connected records:\n\n")
 
             # Sort by number of relationships
             sorted_records = sorted(
-                relationships.items(),
-                key=lambda x: len(x[1]),
-                reverse=True
+                relationships.items(), key=lambda x: len(x[1]), reverse=True
             )[:20]
 
             for record_id, related_ids in sorted_records:
                 record = self.records[record_id]
-                title = record.get('title', 'Untitled')[:80]
+                title = record.get("title", "Untitled")[:80]
                 f.write(f"- **{record_id}**: {len(related_ids)} relationships\n")
                 f.write(f"  - Title: {title}\n")
                 f.write(f"  - Related to: {', '.join(related_ids)}\n\n")
 
             f.write("\n## Sample Relationships (First 10 Records)\n\n")
 
-            for i, (record_id, related_ids) in enumerate(list(relationships.items())[:10], 1):
+            for i, (record_id, related_ids) in enumerate(
+                list(relationships.items())[:10], 1
+            ):
                 record = self.records[record_id]
-                title = record.get('title', 'Untitled')
+                title = record.get("title", "Untitled")
 
                 f.write(f"### {i}. {record_id}: {title}\n\n")
 
@@ -342,7 +356,7 @@ class RelationshipBuilder:
 
                 for related_id in related_ids:
                     related_record = self.records[related_id]
-                    related_title = related_record.get('title', 'Untitled')
+                    related_title = related_record.get("title", "Untitled")
 
                     # Calculate and display score
                     score = self.calculate_similarity(record_id, related_id)
@@ -353,17 +367,33 @@ class RelationshipBuilder:
                     # Show why they're related
                     reasons = []
 
-                    cats_a = set(self._parse_list_field(record.get('thematic_categories', '')))
-                    cats_b = set(self._parse_list_field(related_record.get('thematic_categories', '')))
+                    cats_a = set(
+                        self._parse_list_field(record.get("thematic_categories", ""))
+                    )
+                    cats_b = set(
+                        self._parse_list_field(
+                            related_record.get("thematic_categories", "")
+                        )
+                    )
                     if cats_a & cats_b:
-                        reasons.append(f"Shared categories: {', '.join(cats_a & cats_b)}")
+                        reasons.append(
+                            f"Shared categories: {', '.join(cats_a & cats_b)}"
+                        )
 
-                    concepts_a = set(self._parse_list_field(record.get('key_concepts', '')))
-                    concepts_b = set(self._parse_list_field(related_record.get('key_concepts', '')))
+                    concepts_a = set(
+                        self._parse_list_field(record.get("key_concepts", ""))
+                    )
+                    concepts_b = set(
+                        self._parse_list_field(related_record.get("key_concepts", ""))
+                    )
                     if concepts_a & concepts_b:
-                        reasons.append(f"Shared concepts: {', '.join(concepts_a & concepts_b)}")
+                        reasons.append(
+                            f"Shared concepts: {', '.join(concepts_a & concepts_b)}"
+                        )
 
-                    if record.get('era') == related_record.get('era') and record.get('era'):
+                    if record.get("era") == related_record.get("era") and record.get(
+                        "era"
+                    ):
                         reasons.append(f"Same era: {record.get('era')}")
 
                     if related_id in self.entity_graph.get(record_id, set()):
@@ -382,25 +412,23 @@ def main():
         description="Build relationships between archive records"
     )
     parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help="Don't update CSV, just generate report"
+        "--dry-run", action="store_true", help="Don't update CSV, just generate report"
     )
     parser.add_argument(
-        '--top-n',
+        "--top-n",
         type=int,
         default=5,
-        help="Maximum number of related records per record (default: 5)"
+        help="Maximum number of related records per record (default: 5)",
     )
 
     args = parser.parse_args()
 
     # Set paths
     repo_root = Path(__file__).parent.parent.parent
-    data_dir = repo_root / 'data'
-    archive_csv = data_dir / 'archive_records-public.csv'
-    relationships_csv = data_dir / 'extracted_relationships.csv'
-    report_path = repo_root / 'backend' / 'RELATIONSHIP_REPORT.md'
+    data_dir = repo_root / "data"
+    archive_csv = data_dir / "archive_records-public.csv"
+    relationships_csv = data_dir / "extracted_relationships.csv"
+    report_path = repo_root / "backend" / "RELATIONSHIP_REPORT.md"
 
     # Validate paths
     if not archive_csv.exists():
@@ -431,5 +459,5 @@ def main():
         print("(Dry run - no files were modified)")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

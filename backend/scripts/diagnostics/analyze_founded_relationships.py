@@ -21,8 +21,8 @@ load_dotenv()
 # Configuration
 SPREADSHEET_NAME = os.environ.get("SPREADSHEET_NAME", "📎Rosen Archive URL List")
 SCOPES = [
-    'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/drive'
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
 ]
 
 
@@ -38,7 +38,9 @@ def connect_to_sheets():
 
     if not creds_path or not os.path.exists(creds_path):
         print("ERROR: Could not find credentials file.")
-        print("Set GOOGLE_APPLICATION_CREDENTIALS environment variable or place credentials.json in project root.")
+        print(
+            "Set GOOGLE_APPLICATION_CREDENTIALS environment variable or place credentials.json in project root."
+        )
         sys.exit(1)
 
     creds = Credentials.from_service_account_file(creds_path, scopes=SCOPES)
@@ -52,9 +54,9 @@ def connect_to_sheets():
 def analyze_relationships(spreadsheet):
     """Analyze Founded By and Pioneered relationships."""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("ANALYZING ENTITY EXTRACTION RELATIONSHIPS")
-    print("="*80)
+    print("=" * 80)
 
     # Load relationships sheet
     print("\nLoading extracted_relationships sheet...")
@@ -69,37 +71,50 @@ def analyze_relationships(spreadsheet):
     print(f"Total entities: {len(entities_data)}")
 
     # Build entity type lookup
-    entity_types = {e.get('entity_name', ''): e.get('entity_type', 'Unknown') for e in entities_data}
+    entity_types = {
+        e.get("entity_name", ""): e.get("entity_type", "Unknown") for e in entities_data
+    }
 
     # Analyze all relationship types
-    print("\n" + "-"*60)
+    print("\n" + "-" * 60)
     print("ALL RELATIONSHIP TYPES:")
-    print("-"*60)
+    print("-" * 60)
 
-    rel_type_counts = Counter(r.get('relationship_type', 'Unknown') for r in relationships_data)
+    rel_type_counts = Counter(
+        r.get("relationship_type", "Unknown") for r in relationships_data
+    )
     for rel_type, count in rel_type_counts.most_common():
         pct = count / len(relationships_data) * 100
         print(f"  {rel_type}: {count} ({pct:.1f}%)")
 
     # Focus on Jay Rosen relationships
-    print("\n" + "-"*60)
+    print("\n" + "-" * 60)
     print("JAY ROSEN AS SOURCE (all relationship types):")
-    print("-"*60)
+    print("-" * 60)
 
-    rosen_as_source = [r for r in relationships_data if r.get('source_entity_name', '').lower() == 'jay rosen']
-    rosen_rel_counts = Counter(r.get('relationship_type', 'Unknown') for r in rosen_as_source)
+    rosen_as_source = [
+        r
+        for r in relationships_data
+        if r.get("source_entity_name", "").lower() == "jay rosen"
+    ]
+    rosen_rel_counts = Counter(
+        r.get("relationship_type", "Unknown") for r in rosen_as_source
+    )
     print(f"\nTotal relationships where Jay Rosen is source: {len(rosen_as_source)}")
     for rel_type, count in rosen_rel_counts.most_common():
         print(f"  {rel_type}: {count}")
 
     # CRITICAL: Analyze "Founded By" relationships where Jay Rosen is source
-    print("\n" + "-"*60)
+    print("\n" + "-" * 60)
     print("FOUNDED BY RELATIONSHIPS (Jay Rosen as source):")
-    print("-"*60)
+    print("-" * 60)
 
-    founded_by_rosen = [r for r in relationships_data
-                       if r.get('source_entity_name', '').lower() == 'jay rosen'
-                       and r.get('relationship_type', '') == 'Founded By']
+    founded_by_rosen = [
+        r
+        for r in relationships_data
+        if r.get("source_entity_name", "").lower() == "jay rosen"
+        and r.get("relationship_type", "") == "Founded By"
+    ]
 
     print(f"\nTotal 'Founded By' with Jay Rosen as source: {len(founded_by_rosen)}")
 
@@ -107,38 +122,43 @@ def analyze_relationships(spreadsheet):
     founded_by_type = Counter()
     founded_targets = []
     for r in founded_by_rosen:
-        target = r.get('target_entity_name', '')
-        target_type = entity_types.get(target, r.get('target_entity_type', 'Unknown'))
+        target = r.get("target_entity_name", "")
+        target_type = entity_types.get(target, r.get("target_entity_type", "Unknown"))
         founded_by_type[target_type] += 1
-        founded_targets.append({
-            'target': target,
-            'type': target_type,
-            'confidence': r.get('confidence_score', 'N/A'),
-            'context': r.get('context', '')[:100] if r.get('context') else ''
-        })
+        founded_targets.append(
+            {
+                "target": target,
+                "type": target_type,
+                "confidence": r.get("confidence_score", "N/A"),
+                "context": r.get("context", "")[:100] if r.get("context") else "",
+            }
+        )
 
     print("\nBy target entity type:")
     for entity_type, count in founded_by_type.most_common():
         print(f"  {entity_type}: {count}")
 
     # List actual organizations founded
-    print("\n" + "-"*60)
+    print("\n" + "-" * 60)
     print("ORGANIZATIONS 'Founded By' Jay Rosen:")
-    print("-"*60)
+    print("-" * 60)
 
-    org_founded = [t for t in founded_targets if t['type'] == 'Organization']
+    org_founded = [t for t in founded_targets if t["type"] == "Organization"]
     print(f"\nTotal: {len(org_founded)}")
-    for i, item in enumerate(sorted(org_founded, key=lambda x: x['target']), 1):
+    for i, item in enumerate(sorted(org_founded, key=lambda x: x["target"]), 1):
         print(f"  {i}. {item['target']} (confidence: {item['confidence']})")
 
     # CRITICAL: Analyze "Pioneered" relationships where Jay Rosen is source
-    print("\n" + "-"*60)
+    print("\n" + "-" * 60)
     print("PIONEERED RELATIONSHIPS (Jay Rosen as source):")
-    print("-"*60)
+    print("-" * 60)
 
-    pioneered_by_rosen = [r for r in relationships_data
-                         if r.get('source_entity_name', '').lower() == 'jay rosen'
-                         and r.get('relationship_type', '') == 'Pioneered']
+    pioneered_by_rosen = [
+        r
+        for r in relationships_data
+        if r.get("source_entity_name", "").lower() == "jay rosen"
+        and r.get("relationship_type", "") == "Pioneered"
+    ]
 
     print(f"\nTotal 'Pioneered' with Jay Rosen as source: {len(pioneered_by_rosen)}")
 
@@ -146,35 +166,38 @@ def analyze_relationships(spreadsheet):
     pioneered_by_type = Counter()
     pioneered_targets = []
     for r in pioneered_by_rosen:
-        target = r.get('target_entity_name', '')
-        target_type = entity_types.get(target, r.get('target_entity_type', 'Unknown'))
+        target = r.get("target_entity_name", "")
+        target_type = entity_types.get(target, r.get("target_entity_type", "Unknown"))
         pioneered_by_type[target_type] += 1
-        pioneered_targets.append({
-            'target': target,
-            'type': target_type,
-            'confidence': r.get('confidence_score', 'N/A')
-        })
+        pioneered_targets.append(
+            {
+                "target": target,
+                "type": target_type,
+                "confidence": r.get("confidence_score", "N/A"),
+            }
+        )
 
     print("\nBy target entity type:")
     for entity_type, count in pioneered_by_type.most_common():
         print(f"  {entity_type}: {count}")
 
     # List concepts pioneered
-    print("\n" + "-"*60)
+    print("\n" + "-" * 60)
     print("CONCEPTS 'Pioneered' by Jay Rosen:")
-    print("-"*60)
+    print("-" * 60)
 
-    concepts_pioneered = [t for t in pioneered_targets if t['type'] == 'Concept']
+    concepts_pioneered = [t for t in pioneered_targets if t["type"] == "Concept"]
     print(f"\nTotal: {len(concepts_pioneered)}")
-    for i, item in enumerate(sorted(concepts_pioneered, key=lambda x: x['target']), 1):
+    for i, item in enumerate(sorted(concepts_pioneered, key=lambda x: x["target"]), 1):
         print(f"  {i}. {item['target']} (confidence: {item['confidence']})")
 
     # THE REAL ANSWER
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("SUMMARY: WHAT THE DATA ACTUALLY SHOWS")
-    print("="*80)
+    print("=" * 80)
 
-    print(f"""
+    print(
+        f"""
 The R script combined these counts:
   - "Founded By" relationships (all target types): {len(founded_by_rosen)}
   - "Pioneered" relationships (all target types):  {len(pioneered_by_rosen)}
@@ -195,14 +218,15 @@ The "120+ organizations" claim conflated:
   1. "Founded By" with "Pioneered" (different relationship types)
   2. Organizations with Concepts (different entity types)
   3. Possibly Works created with Organizations founded
-""")
+"""
+    )
 
     # Check for duplicates
-    print("\n" + "-"*60)
+    print("\n" + "-" * 60)
     print("CHECKING FOR DUPLICATES IN 'Founded By':")
-    print("-"*60)
+    print("-" * 60)
 
-    org_names = [t['target'] for t in org_founded]
+    org_names = [t["target"] for t in org_founded]
     duplicates = [name for name, count in Counter(org_names).items() if count > 1]
     if duplicates:
         print(f"\nDuplicate organization names found: {len(duplicates)}")
@@ -215,13 +239,13 @@ The "120+ organizations" claim conflated:
     print(f"\nUnique organizations 'Founded By' Jay Rosen: {unique_orgs}")
 
     return {
-        'total_relationships': len(relationships_data),
-        'founded_by_rosen': len(founded_by_rosen),
-        'pioneered_by_rosen': len(pioneered_by_rosen),
-        'orgs_founded': founded_by_type.get('Organization', 0),
-        'concepts_pioneered': pioneered_by_type.get('Concept', 0),
-        'org_list': org_founded,
-        'concept_list': concepts_pioneered
+        "total_relationships": len(relationships_data),
+        "founded_by_rosen": len(founded_by_rosen),
+        "pioneered_by_rosen": len(pioneered_by_rosen),
+        "orgs_founded": founded_by_type.get("Organization", 0),
+        "concepts_pioneered": pioneered_by_type.get("Concept", 0),
+        "org_list": org_founded,
+        "concept_list": concepts_pioneered,
     }
 
 
@@ -233,9 +257,9 @@ def main():
 
     results = analyze_relationships(spreadsheet)
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("ANALYSIS COMPLETE")
-    print("="*80)
+    print("=" * 80)
 
     return results
 

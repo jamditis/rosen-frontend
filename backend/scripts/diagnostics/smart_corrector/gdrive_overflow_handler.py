@@ -28,18 +28,20 @@ class GDriveOverflowHandler:
         Args:
             folder_id: Google Drive folder ID for overflow files
         """
-        self.folder_id = folder_id or os.getenv('GDRIVE_FOLDER_ID')
+        self.folder_id = folder_id or os.getenv("GDRIVE_FOLDER_ID")
 
         # Initialize Google Drive API. Anchor credentials to backend/ so the
         # script runs from any cwd; an absolute GOOGLE_APPLICATION_CREDENTIALS
         # overrides (pathlib resets to it).
-        credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+        credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")  # fmt: skip
         creds_path = Path(__file__).resolve().parents[3] / credentials_filename
-        scopes = ['https://www.googleapis.com/auth/drive']
+        scopes = ["https://www.googleapis.com/auth/drive"]
         creds = Credentials.from_service_account_file(str(creds_path), scopes=scopes)
-        self.drive_service = build('drive', 'v3', credentials=creds)
+        self.drive_service = build("drive", "v3", credentials=creds)
 
-    def handle_large_text(self, text: str, record_id: str, content_type: str = 'transcript') -> dict:
+    def handle_large_text(
+        self, text: str, record_id: str, content_type: str = "transcript"
+    ) -> dict:
         """
         Handle text that may exceed Google Sheets limit.
 
@@ -53,25 +55,25 @@ class GDriveOverflowHandler:
         """
         if len(text) <= self.TRUNCATE_AT:
             # Fits in sheet, no overflow needed
-            return {
-                'text_for_sheet': text,
-                'gdrive_link': None,
-                'is_truncated': False
-            }
+            return {"text_for_sheet": text, "gdrive_link": None, "is_truncated": False}
 
         # Text is too long - upload full version to Google Drive
-        print(f"  [OVERFLOW] Text too long ({len(text)} chars), uploading to Google Drive...")
+        print(
+            f"  [OVERFLOW] Text too long ({len(text)} chars), uploading to Google Drive..."
+        )
 
         gdrive_link = self._upload_to_drive(text, record_id, content_type)
 
-        truncated_text = text[:self.TRUNCATE_AT] + f"\n\n... [TRUNCATED - Full text: {gdrive_link}]"
+        truncated_text = (
+            text[: self.TRUNCATE_AT] + f"\n\n... [TRUNCATED - Full text: {gdrive_link}]"
+        )
 
         return {
-            'text_for_sheet': truncated_text,
-            'gdrive_link': gdrive_link,
-            'is_truncated': True,
-            'full_length': len(text),
-            'truncated_length': len(truncated_text)
+            "text_for_sheet": truncated_text,
+            "gdrive_link": gdrive_link,
+            "is_truncated": True,
+            "full_length": len(text),
+            "truncated_length": len(truncated_text),
         }
 
     def _upload_to_drive(self, text: str, record_id: str, content_type: str) -> str:
@@ -87,40 +89,35 @@ class GDriveOverflowHandler:
             Google Drive shareable link
         """
         # Create filename
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"{content_type}_{record_id}_{timestamp}.txt"
 
         # Create file metadata
         file_metadata = {
-            'name': filename,
-            'mimeType': 'text/plain',
-            'parents': [self.folder_id] if self.folder_id else []
+            "name": filename,
+            "mimeType": "text/plain",
+            "parents": [self.folder_id] if self.folder_id else [],
         }
 
         # Create file content as BytesIO
-        file_content = BytesIO(text.encode('utf-8'))
-        media = MediaIoBaseUpload(
-            file_content,
-            mimetype='text/plain',
-            resumable=True
-        )
+        file_content = BytesIO(text.encode("utf-8"))
+        media = MediaIoBaseUpload(file_content, mimetype="text/plain", resumable=True)
 
         # Upload file
-        file = self.drive_service.files().create(
-            body=file_metadata,
-            media_body=media,
-            fields='id, webViewLink'
-        ).execute()
+        file = (
+            self.drive_service.files()
+            .create(body=file_metadata, media_body=media, fields="id, webViewLink")
+            .execute()
+        )
 
         # Make file readable by anyone with link
         self.drive_service.permissions().create(
-            fileId=file['id'],
-            body={'type': 'anyone', 'role': 'reader'}
+            fileId=file["id"], body={"type": "anyone", "role": "reader"}
         ).execute()
 
         print(f"  [OVERFLOW] Uploaded to Google Drive: {file['webViewLink']}")
 
-        return file['webViewLink']
+        return file["webViewLink"]
 
     def fetch_full_text(self, gdrive_link: str) -> str:
         """
@@ -142,19 +139,19 @@ class GDriveOverflowHandler:
         request = self.drive_service.files().get_media(fileId=file_id)
         file_content = request.execute()
 
-        return file_content.decode('utf-8')
+        return file_content.decode("utf-8")
 
     def _extract_file_id(self, gdrive_link: str) -> str:
         """Extract file ID from Google Drive link."""
         import re
 
         # Pattern: https://drive.google.com/file/d/FILE_ID/view
-        match = re.search(r'/d/([a-zA-Z0-9_-]+)', gdrive_link)
+        match = re.search(r"/d/([a-zA-Z0-9_-]+)", gdrive_link)
         if match:
             return match.group(1)
 
         # Pattern: https://drive.google.com/open?id=FILE_ID
-        match = re.search(r'id=([a-zA-Z0-9_-]+)', gdrive_link)
+        match = re.search(r"id=([a-zA-Z0-9_-]+)", gdrive_link)
         if match:
             return match.group(1)
 
@@ -162,7 +159,9 @@ class GDriveOverflowHandler:
 
 
 # Convenience function
-def handle_overflow(text: str, record_id: str, content_type: str = 'transcript') -> dict:
+def handle_overflow(
+    text: str, record_id: str, content_type: str = "transcript"
+) -> dict:
     """
     Handle text overflow for Google Sheets.
 

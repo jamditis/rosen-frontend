@@ -22,7 +22,9 @@ from rosen_scraper.rate_limiter import rate_limited_gemini_call
 
 # Configuration
 ENTITY_DEBUG_DIR = Path("logs/entity_extraction")
-ENTITY_SCHEMA_FILE = Path(__file__).parent.parent.parent / "entity_extraction_schema_v3.json"
+ENTITY_SCHEMA_FILE = (
+    Path(__file__).parent.parent.parent / "entity_extraction_schema_v3.json"
+)
 
 
 def load_entity_schema() -> Dict[str, Any]:
@@ -33,7 +35,7 @@ def load_entity_schema() -> Dict[str, Any]:
         dict: The entity extraction schema configuration
     """
     try:
-        with open(ENTITY_SCHEMA_FILE, 'r', encoding='utf-8') as f:
+        with open(ENTITY_SCHEMA_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"  [ENTITY] ERROR: Could not load entity schema: {e}")
@@ -106,20 +108,25 @@ def _normalize_relationship_list(relationships_data: Any) -> List[Dict[str, Any]
 
     if isinstance(relationships_data, dict):
         # Check if it's a single relationship
-        if "source_entity_id" in relationships_data or "source_id" in relationships_data:
+        if (
+            "source_entity_id" in relationships_data
+            or "source_id" in relationships_data
+        ):
             return [relationships_data]
         # If it's a wrapper with 'relationships' key
         if "relationships" in relationships_data:
             return _normalize_relationship_list(relationships_data["relationships"])
 
-    print(f"  [ENTITY] WARNING: Unexpected relationship data format: {type(relationships_data)}")
+    print(
+        f"  [ENTITY] WARNING: Unexpected relationship data format: {type(relationships_data)}"
+    )
     return []
 
 
 def _validate_entity_extraction(
     entities: List[Dict[str, Any]],
     relationships: List[Dict[str, Any]],
-    schema: Dict[str, Any]
+    schema: Dict[str, Any],
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[str]]:
     """
     Validate extracted entities and relationships against the schema.
@@ -150,7 +157,9 @@ def _validate_entity_extraction(
             continue
 
         if entity_type not in entity_types:
-            issues.append(f"Invalid entity type '{entity_type}' for entity: {entity_name}")
+            issues.append(
+                f"Invalid entity type '{entity_type}' for entity: {entity_name}"
+            )
             continue
 
         if not entity_name:
@@ -166,8 +175,12 @@ def _validate_entity_extraction(
     # Validate relationships
     for relationship in relationships:
         rel_type = relationship.get("relationship_type")
-        source_id = relationship.get("source_entity_id") or relationship.get("source_id")
-        target_id = relationship.get("target_entity_id") or relationship.get("target_id")
+        source_id = relationship.get("source_entity_id") or relationship.get(
+            "source_id"
+        )
+        target_id = relationship.get("target_entity_id") or relationship.get(
+            "target_id"
+        )
 
         if not rel_type:
             issues.append(f"Relationship missing type: {relationship}")
@@ -194,17 +207,18 @@ def _validate_entity_extraction(
 
     return valid_entities, valid_relationships, issues
 
+
 @rate_limited_gemini_call
 def _call_gemini_for_entity_extraction(model, prompt):
     """
     Make a rate-limited call to Gemini API for entity extraction.
-    
+
     This function is decorated with rate limiting to prevent API throttling.
-    
+
     Args:
         model: Gemini model instance
         prompt: The prompt to send
-        
+
     Returns:
         The API response object
     """
@@ -218,7 +232,7 @@ def extract_entities_and_relationships(
     schema: Optional[Dict[str, Any]] = None,
     record_title: Optional[str] = None,
     record_author: Optional[str] = None,
-    record_publication: Optional[str] = None
+    record_publication: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
     """
     Extract named entities and relationships from text using Google Gemini AI.
@@ -260,7 +274,7 @@ def extract_entities_and_relationships(
     # Configure Gemini
     genai.configure(api_key=api_key)
     # gemini-2.0-flash was retired by Google; 2.5-flash is the current default.
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    model = genai.GenerativeModel("gemini-2.5-flash")
 
     # Extract schema components
     entity_types = schema.get("entity_types", {})
@@ -268,16 +282,20 @@ def extract_entities_and_relationships(
     guidelines = schema.get("extraction_guidelines", {})
 
     # Build entity types description
-    entity_types_desc = "\n".join([
-        f"    - **{etype}** ({info['prefix']}): {info['description']}\n      Examples: {', '.join(info['examples'])}"
-        for etype, info in entity_types.items()
-    ])
+    entity_types_desc = "\n".join(
+        [
+            f"    - **{etype}** ({info['prefix']}): {info['description']}\n      Examples: {', '.join(info['examples'])}"
+            for etype, info in entity_types.items()
+        ]
+    )
 
     # Build relationship types description
-    rel_types_desc = "\n".join([
-        f"    - **{rtype}**: {info['description']}"
-        for rtype, info in relationship_types.items()
-    ])
+    rel_types_desc = "\n".join(
+        [
+            f"    - **{rtype}**: {info['description']}"
+            for rtype, info in relationship_types.items()
+        ]
+    )
 
     # Build record context section
     record_context = f"""
@@ -385,10 +403,12 @@ Focus on entities relevant to journalism, media criticism, and political coverag
 
         # Normalize and validate
         entities = _normalize_entity_list(extraction_data.get("entities", []))
-        relationships = _normalize_relationship_list(extraction_data.get("relationships", []))
+        relationships = _normalize_relationship_list(
+            extraction_data.get("relationships", [])
+        )
 
-        validated_entities, validated_relationships, issues = _validate_entity_extraction(
-            entities, relationships, schema
+        validated_entities, validated_relationships, issues = (
+            _validate_entity_extraction(entities, relationships, schema)
         )
 
         if issues:
@@ -399,7 +419,9 @@ Focus on entities relevant to journalism, media criticism, and political coverag
 
         # Check if we got meaningful results
         if not validated_entities:
-            print(f"  [ENTITY] WARNING: No valid entities extracted from record {record_id}")
+            print(
+                f"  [ENTITY] WARNING: No valid entities extracted from record {record_id}"
+            )
             _dump_entity_debug(cleaned_response, "no_entities", record_id)
             return None
 
@@ -408,31 +430,31 @@ Focus on entities relevant to journalism, media criticism, and political coverag
             "relationships": validated_relationships,
             "record_id": record_id,
             "extraction_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "validation_issues": issues
+            "validation_issues": issues,
         }
 
-        print(f"  [ENTITY] Successfully extracted {len(validated_entities)} entities and {len(validated_relationships)} relationships")
+        print(
+            f"  [ENTITY] Successfully extracted {len(validated_entities)} entities and {len(validated_relationships)} relationships"
+        )
         return result
 
     except json.JSONDecodeError as e:
         print(f"  [ENTITY] ERROR: Failed to parse AI response as JSON: {e}")
-        raw_response = response.text if 'response' in locals() else 'No response'
+        raw_response = response.text if "response" in locals() else "No response"
         print(f"  [ENTITY] Raw response preview: {raw_response[:500]}")
         _dump_entity_debug(raw_response, "json_parse_error", record_id)
         return None
 
     except Exception as e:
         print(f"  [ENTITY] ERROR: Entity extraction failed: {e}")
-        raw_response = response.text if 'response' in locals() else 'No response'
-        if raw_response != 'No response':
+        raw_response = response.text if "response" in locals() else "No response"
+        if raw_response != "No response":
             _dump_entity_debug(raw_response, "extraction_error", record_id)
         return None
 
 
 def format_entities_for_sheet(
-    entities: List[Dict[str, Any]],
-    record_id: str,
-    existing_entity_ids: set
+    entities: List[Dict[str, Any]], record_id: str, existing_entity_ids: set
 ) -> List[List[str]]:
     """
     Format extracted entities for writing to Google Sheets.
@@ -456,7 +478,14 @@ def format_entities_for_sheet(
         normalized_name = entity_name
 
         # Get type-specific attributes
-        role_or_desc = entity.get("role") or entity.get("org_type") or entity.get("work_type") or entity.get("event_type") or entity.get("location_type") or ""
+        role_or_desc = (
+            entity.get("role")
+            or entity.get("org_type")
+            or entity.get("work_type")
+            or entity.get("event_type")
+            or entity.get("location_type")
+            or ""
+        )
         affiliation = entity.get("affiliation", "")
         prominence = entity.get("prominence_score", 5)
 
@@ -476,7 +505,7 @@ def format_entities_for_sheet(
             first_mention,
             str(total_mentions),
             "",  # related_entities (to be populated by cross-reference analysis)
-            ""   # notes
+            "",  # notes
         ]
 
         rows.append(row)
@@ -485,9 +514,7 @@ def format_entities_for_sheet(
 
 
 def format_relationships_for_sheet(
-    relationships: List[Dict[str, Any]],
-    record_id: str,
-    entity_lookup: Dict[str, str]
+    relationships: List[Dict[str, Any]], record_id: str, entity_lookup: Dict[str, str]
 ) -> List[List[str]]:
     """
     Format extracted relationships for writing to Google Sheets.
@@ -527,7 +554,7 @@ def format_relationships_for_sheet(
             target_name,
             context[:200],  # Limit context to 200 chars
             str(confidence),
-            datetime.now().strftime("%Y-%m-%d")
+            datetime.now().strftime("%Y-%m-%d"),
         ]
 
         rows.append(row)
@@ -553,11 +580,13 @@ if __name__ == "__main__":
 
     if result:
         print(f"\nExtracted {len(result['entities'])} entities:")
-        for entity in result['entities']:
+        for entity in result["entities"]:
             print(f"  - {entity['entity_type']}: {entity['entity_name']}")
 
         print(f"\nExtracted {len(result['relationships'])} relationships:")
-        for rel in result['relationships']:
-            print(f"  - {rel['source_entity_id']} {rel['relationship_type']} {rel['target_entity_id']}")
+        for rel in result["relationships"]:
+            print(
+                f"  - {rel['source_entity_id']} {rel['relationship_type']} {rel['target_entity_id']}"
+            )
     else:
         print("\nEntity extraction failed")

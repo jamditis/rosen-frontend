@@ -31,12 +31,12 @@ class TaxonomyConsolidator:
         self.data_dir = data_dir
         self.changes = []
         self.stats = {
-            'era_reassigned': 0,
-            'tags_normalized': 0,
-            'key_concepts_normalized': 0,
-            'content_type_fixed': 0,
-            'scope_fixed': 0,
-            'column_removed': 0
+            "era_reassigned": 0,
+            "tags_normalized": 0,
+            "key_concepts_normalized": 0,
+            "content_type_fixed": 0,
+            "scope_fixed": 0,
+            "column_removed": 0,
         }
 
         # Era mapping based on publication_date
@@ -49,7 +49,7 @@ class TaxonomyConsolidator:
             (2016, 2019): "Trump Era & Democratic Crisis (2016-2019)",
             (2020, 2021): "COVID-19 & Misinformation Crisis (2020-2021)",
             (2022, 2024): "Post-Trump Transition (2022-2024)",
-            (2025, 2099): "Second Trump Administration (2025-Present)"
+            (2025, 2099): "Second Trump Administration (2025-Present)",
         }
 
         # Tag normalization (case standardization)
@@ -71,30 +71,30 @@ class TaxonomyConsolidator:
             "not the odds but the stakes": "Not the odds but the stakes",
             "mindcasting": "Mindcasting",
             "citizen journalism": "Citizen Journalism",
-            "pro-am journalism": "Pro-am journalism"
+            "pro-am journalism": "Pro-am journalism",
         }
 
         # content_type mapping
         self.content_type_mapping = {
-            'video': 'Video',
-            'Video': 'Interview (Audio/Video)',  # Map Video → Interview (Audio/Video)
-            'Podcast': 'Interview (Audio/Video)',
-            'Radio': 'Interview (Audio/Video)',
-            'Twitter Video': 'Tweet/Thread',
-            'Social': 'Tweet/Thread',
-            'Transcript': 'Lecture/Presentation',
-            'Appearance': 'Panel Discussion',
-            'Bio': 'Article',
-            'Book': 'Book Chapter'
+            "video": "Video",
+            "Video": "Interview (Audio/Video)",  # Map Video → Interview (Audio/Video)
+            "Podcast": "Interview (Audio/Video)",
+            "Radio": "Interview (Audio/Video)",
+            "Twitter Video": "Tweet/Thread",
+            "Social": "Tweet/Thread",
+            "Transcript": "Lecture/Presentation",
+            "Appearance": "Panel Discussion",
+            "Bio": "Article",
+            "Book": "Book Chapter",
         }
 
         # scope mapping
         self.scope_mapping = {
-            'News': 'Commentary/Critique',
-            'Media Industry Analysis': 'Commentary/Critique',
-            'Journalism Theory': 'Theoretical',
-            'Technology Analysis': 'Commentary/Critique',
-            'Commentary/Critique, Theoretical': 'Commentary/Critique'  # Split handled separately
+            "News": "Commentary/Critique",
+            "Media Industry Analysis": "Commentary/Critique",
+            "Journalism Theory": "Theoretical",
+            "Technology Analysis": "Commentary/Critique",
+            "Commentary/Critique, Theoretical": "Commentary/Critique",  # Split handled separately
         }
 
     def assign_era_from_date(self, date_str: str) -> str:
@@ -105,7 +105,7 @@ class TaxonomyConsolidator:
         try:
             # Try multiple date formats
             year = None
-            for fmt in ['%Y-%m-%d', '%m/%d/%Y', '%Y/%m/%d', '%d/%m/%Y']:
+            for fmt in ["%Y-%m-%d", "%m/%d/%Y", "%Y/%m/%d", "%d/%m/%Y"]:
                 try:
                     date = datetime.strptime(date_str.strip(), fmt)
                     year = date.year
@@ -136,7 +136,7 @@ class TaxonomyConsolidator:
             return tags_str
 
         # Split on commas
-        tags = [t.strip() for t in tags_str.split(',')]
+        tags = [t.strip() for t in tags_str.split(",")]
 
         # Normalize each tag
         normalized = []
@@ -145,12 +145,12 @@ class TaxonomyConsolidator:
             if tag_lower in tag_map:
                 normalized_tag = tag_map[tag_lower]
                 if normalized_tag != tag:
-                    self.stats['tags_normalized'] += 1
+                    self.stats["tags_normalized"] += 1
                 normalized.append(normalized_tag)
             else:
                 normalized.append(tag)
 
-        return ', '.join(normalized)
+        return ", ".join(normalized)
 
     def normalize_key_concepts(self, concepts_str: str) -> str:
         """Normalize key_concepts casing."""
@@ -158,7 +158,7 @@ class TaxonomyConsolidator:
             return concepts_str
 
         # Split on commas
-        concepts = [c.strip() for c in concepts_str.split(',')]
+        concepts = [c.strip() for c in concepts_str.split(",")]
 
         # Normalize each concept
         normalized = []
@@ -167,22 +167,22 @@ class TaxonomyConsolidator:
             if concept_lower in self.key_concepts_canonical:
                 canonical = self.key_concepts_canonical[concept_lower]
                 if canonical != concept:
-                    self.stats['key_concepts_normalized'] += 1
+                    self.stats["key_concepts_normalized"] += 1
                 normalized.append(canonical)
             else:
                 normalized.append(concept)
 
-        return ', '.join(normalized)
+        return ", ".join(normalized)
 
     def normalize_content_type(self, value: str) -> str:
         """Normalize content_type to match schema."""
         if not value or not value.strip():
-            return 'Article'  # Default
+            return "Article"  # Default
 
         cleaned = value.strip()
 
         if cleaned in self.content_type_mapping:
-            self.stats['content_type_fixed'] += 1
+            self.stats["content_type_fixed"] += 1
             return self.content_type_mapping[cleaned]
 
         return cleaned
@@ -195,14 +195,14 @@ class TaxonomyConsolidator:
         cleaned = value.strip()
 
         # Handle combined values (comma-separated)
-        if ',' in cleaned:
-            scopes = [s.strip() for s in cleaned.split(',')]
+        if "," in cleaned:
+            scopes = [s.strip() for s in cleaned.split(",")]
             # Take first scope only
             cleaned = scopes[0]
-            self.stats['scope_fixed'] += 1
+            self.stats["scope_fixed"] += 1
 
         if cleaned in self.scope_mapping:
-            self.stats['scope_fixed'] += 1
+            self.stats["scope_fixed"] += 1
             return self.scope_mapping[cleaned]
 
         return cleaned
@@ -213,9 +213,9 @@ class TaxonomyConsolidator:
 
         all_tags = []
         for record in records:
-            tags_str = record.get('tags', '').strip()
+            tags_str = record.get("tags", "").strip()
             if tags_str:
-                tags = [t.strip() for t in tags_str.split(',')]
+                tags = [t.strip() for t in tags_str.split(",")]
                 all_tags.extend(tags)
 
         # Group by lowercase
@@ -237,7 +237,9 @@ class TaxonomyConsolidator:
 
                 # Prefer Title Case if it exists
                 for variant in variants:
-                    if variant.istitle() or (variant[0].isupper() and not variant.isupper()):
+                    if variant.istitle() or (
+                        variant[0].isupper() and not variant.isupper()
+                    ):
                         most_common = variant
                         break
 
@@ -259,58 +261,63 @@ class TaxonomyConsolidator:
         record_changes = []
 
         # 1. ERA: Always reassign based on publication_date
-        old_era = cleaned.get('era', '')
-        new_era = self.assign_era_from_date(cleaned.get('publication_date', ''))
+        old_era = cleaned.get("era", "")
+        new_era = self.assign_era_from_date(cleaned.get("publication_date", ""))
         if new_era and new_era != old_era:
-            cleaned['era'] = new_era
-            record_changes.append(('era', old_era, new_era))
-            self.stats['era_reassigned'] += 1
+            cleaned["era"] = new_era
+            record_changes.append(("era", old_era, new_era))
+            self.stats["era_reassigned"] += 1
 
         # 2. TAGS: Normalize casing
-        if 'tags' in cleaned:
-            old_tags = cleaned['tags']
-            cleaned['tags'] = self.normalize_tags(old_tags, tag_map)
-            if old_tags != cleaned['tags']:
-                record_changes.append(('tags', old_tags[:100], cleaned['tags'][:100]))
+        if "tags" in cleaned:
+            old_tags = cleaned["tags"]
+            cleaned["tags"] = self.normalize_tags(old_tags, tag_map)
+            if old_tags != cleaned["tags"]:
+                record_changes.append(("tags", old_tags[:100], cleaned["tags"][:100]))
 
         # 3. KEY_CONCEPTS: Normalize casing
-        if 'key_concepts' in cleaned:
-            old_concepts = cleaned['key_concepts']
-            cleaned['key_concepts'] = self.normalize_key_concepts(old_concepts)
-            if old_concepts != cleaned['key_concepts']:
-                record_changes.append(('key_concepts', old_concepts[:100], cleaned['key_concepts'][:100]))
+        if "key_concepts" in cleaned:
+            old_concepts = cleaned["key_concepts"]
+            cleaned["key_concepts"] = self.normalize_key_concepts(old_concepts)
+            if old_concepts != cleaned["key_concepts"]:
+                record_changes.append(
+                    ("key_concepts", old_concepts[:100], cleaned["key_concepts"][:100])
+                )
 
         # 4. CONTENT_TYPE: Map to schema values
-        if 'content_type' in cleaned:
-            old_type = cleaned['content_type']
-            cleaned['content_type'] = self.normalize_content_type(old_type)
-            if old_type != cleaned['content_type']:
-                record_changes.append(('content_type', old_type, cleaned['content_type']))
+        if "content_type" in cleaned:
+            old_type = cleaned["content_type"]
+            cleaned["content_type"] = self.normalize_content_type(old_type)
+            if old_type != cleaned["content_type"]:
+                record_changes.append(
+                    ("content_type", old_type, cleaned["content_type"])
+                )
 
         # 5. SCOPE: Map to schema values
-        if 'scope' in cleaned:
-            old_scope = cleaned['scope']
-            cleaned['scope'] = self.normalize_scope(old_scope)
-            if old_scope != cleaned['scope']:
-                record_changes.append(('scope', old_scope, cleaned['scope']))
+        if "scope" in cleaned:
+            old_scope = cleaned["scope"]
+            cleaned["scope"] = self.normalize_scope(old_scope)
+            if old_scope != cleaned["scope"]:
+                record_changes.append(("scope", old_scope, cleaned["scope"]))
 
         # 6. REMOVE colQ_changes column
-        if 'colQ_changes' in cleaned:
-            del cleaned['colQ_changes']
-            self.stats['column_removed'] += 1
+        if "colQ_changes" in cleaned:
+            del cleaned["colQ_changes"]
+            self.stats["column_removed"] += 1
 
         if record_changes:
-            self.changes.append({
-                'record_id': record.get('id', 'UNKNOWN'),
-                'changes': record_changes
-            })
+            self.changes.append(
+                {"record_id": record.get("id", "UNKNOWN"), "changes": record_changes}
+            )
 
         return cleaned
 
     def create_backup(self, csv_file: Path) -> Path:
         """Create timestamped backup of original CSV."""
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        backup_file = csv_file.parent / f"{csv_file.stem}_backup_{timestamp}{csv_file.suffix}"
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_file = (
+            csv_file.parent / f"{csv_file.stem}_backup_{timestamp}{csv_file.suffix}"
+        )
         shutil.copy2(csv_file, backup_file)
         return backup_file
 
@@ -318,7 +325,7 @@ class TaxonomyConsolidator:
         """Clean CSV file and write to output."""
         print(f"\n📖 Reading: {csv_file}")
 
-        with open(csv_file, 'r', encoding='utf-8') as f:
+        with open(csv_file, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             fieldnames = list(reader.fieldnames)
             records = list(reader)
@@ -335,13 +342,13 @@ class TaxonomyConsolidator:
         print(f"✅ Cleaned {len(cleaned_records)} records")
 
         # Remove colQ_changes from fieldnames if it exists
-        if 'colQ_changes' in fieldnames:
-            fieldnames.remove('colQ_changes')
+        if "colQ_changes" in fieldnames:
+            fieldnames.remove("colQ_changes")
             print("✅ Removed 'colQ_changes' column from schema")
 
         print(f"\n💾 Writing cleaned data to: {output_file}")
 
-        with open(output_file, 'w', encoding='utf-8', newline='') as f:
+        with open(output_file, "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(cleaned_records)
@@ -350,9 +357,9 @@ class TaxonomyConsolidator:
 
     def print_change_summary(self):
         """Print summary of changes made."""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("CHANGE SUMMARY")
-        print("="*80)
+        print("=" * 80)
 
         print(f"\nTotal records with changes: {len(self.changes)}")
         print("\nChanges by type:")
@@ -364,13 +371,13 @@ class TaxonomyConsolidator:
         print(f"  - Columns removed: {self.stats['column_removed']}")
 
         if self.changes:
-            print("\n" + "-"*80)
+            print("\n" + "-" * 80)
             print("DETAILED CHANGES (first 30 records)")
-            print("-"*80)
+            print("-" * 80)
 
             for change in self.changes[:30]:
                 print(f"\n{change['record_id']}:")
-                for field, old, new in change['changes']:
+                for field, old, new in change["changes"]:
                     print(f"  {field}:")
                     print(f"    OLD: {old}")
                     print(f"    NEW: {new}")
@@ -381,18 +388,18 @@ class TaxonomyConsolidator:
 
 def main():
     """Run the consolidation process."""
-    data_dir = Path(__file__).parent.parent.parent / 'data'
-    csv_file = data_dir / 'archive_records-public.csv'
+    data_dir = Path(__file__).parent.parent.parent / "data"
+    csv_file = data_dir / "archive_records-public.csv"
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("TAXONOMY CONSOLIDATION SCRIPT")
-    print("="*80)
+    print("=" * 80)
     print("\n⚠️  SAFETY FEATURES:")
     print("  1. Creates timestamped backup")
     print("  2. Writes cleaned data to separate file for review")
     print("  3. Shows all changes made")
     print("  4. Requires manual approval before replacing original")
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
 
     if not csv_file.exists():
         print(f"\n❌ CSV file not found: {csv_file}")
@@ -405,37 +412,41 @@ def main():
     print(f"✅ Backup created: {backup_file}")
 
     # Clean data to new file
-    cleaned_file = data_dir / 'archive_records-public_TAXONOMY_CONSOLIDATED.csv'
+    cleaned_file = data_dir / "archive_records-public_TAXONOMY_CONSOLIDATED.csv"
     consolidator.clean_csv(csv_file, cleaned_file)
 
     # Show changes
     consolidator.print_change_summary()
 
     # Save change log
-    change_log = data_dir.parent / 'backend' / 'taxonomy_consolidation_changes.txt'
-    with open(change_log, 'w', encoding='utf-8') as f:
+    change_log = data_dir.parent / "backend" / "taxonomy_consolidation_changes.txt"
+    with open(change_log, "w", encoding="utf-8") as f:
         f.write(f"Taxonomy Consolidation Changes - {datetime.now().isoformat()}\n")
-        f.write("="*80 + "\n\n")
+        f.write("=" * 80 + "\n\n")
         f.write(f"Total records with changes: {len(consolidator.changes)}\n\n")
         f.write("Changes by type:\n")
         f.write(f"  - Eras reassigned: {consolidator.stats['era_reassigned']}\n")
         f.write(f"  - Tags normalized: {consolidator.stats['tags_normalized']}\n")
-        f.write(f"  - Key concepts normalized: {consolidator.stats['key_concepts_normalized']}\n")
-        f.write(f"  - Content types fixed: {consolidator.stats['content_type_fixed']}\n")
+        f.write(
+            f"  - Key concepts normalized: {consolidator.stats['key_concepts_normalized']}\n"
+        )
+        f.write(
+            f"  - Content types fixed: {consolidator.stats['content_type_fixed']}\n"
+        )
         f.write(f"  - Scopes fixed: {consolidator.stats['scope_fixed']}\n")
         f.write(f"  - Columns removed: {consolidator.stats['column_removed']}\n\n")
         for change in consolidator.changes:
             f.write(f"{change['record_id']}:\n")
-            for field, old, new in change['changes']:
+            for field, old, new in change["changes"]:
                 f.write(f"  {field}: '{old}' → '{new}'\n")
             f.write("\n")
 
     print(f"\n📄 Full change log saved to: {change_log}")
 
     # Instructions for user
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("NEXT STEPS")
-    print("="*80)
+    print("=" * 80)
     print(f"\n1. Review the cleaned file: {cleaned_file}")
     print(f"2. Review the change log: {change_log}")
     print("3. If satisfied, replace the original:")
@@ -444,7 +455,7 @@ def main():
     print(f"   rm {cleaned_file}")
     print("\n5. Backup is available if needed:")
     print(f"   {backup_file}")
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print()
 
 

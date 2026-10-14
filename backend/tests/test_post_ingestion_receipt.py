@@ -19,9 +19,7 @@ def _load_sender():
 
 
 sender = _load_sender()
-JAY_URI_PREFIX = (
-    "at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/"
-)
+JAY_URI_PREFIX = "at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/"
 
 
 def _receipt(record_count: int = 0, status: str = "published") -> dict:
@@ -52,9 +50,7 @@ def test_receipt_batches_keep_shared_totals_and_cap_decisions_at_40():
     assert [len(batch["records"]) for batch in batches] == [40, 40, 5]
     assert {batch["runId"] for batch in batches} == {"123_1"}
     assert {batch["captured"] for batch in batches} == {85}
-    assert {batch["checkedAt"] for batch in batches} == {
-        "2026-10-14T18:47:00.000Z"
-    }
+    assert {batch["checkedAt"] for batch in batches} == {"2026-10-14T18:47:00.000Z"}
 
 
 def test_failed_receipt_rejects_candidate_decisions():
@@ -133,7 +129,10 @@ def test_fetch_pending_candidates_reads_bounded_pages_before_posting():
         _candidate_response({"candidates": [{"uri": second_uri}], "nextCursor": None}),
     ]
     with patch.object(sender.requests, "get", side_effect=responses) as get:
-        assert sender.fetch_pending_candidate_uris("private-token") == [first_uri, second_uri]
+        assert sender.fetch_pending_candidate_uris("private-token") == [
+            first_uri,
+            second_uri,
+        ]
     assert get.call_count == 2
     assert get.call_args_list[0].kwargs["params"] == {}
     assert get.call_args_list[1].kwargs["params"] == {"cursor": "200"}

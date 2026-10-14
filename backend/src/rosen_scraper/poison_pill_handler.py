@@ -15,15 +15,18 @@ from dataclasses import dataclass
 
 from rosen_scraper.logger import PoisonPillType, get_logger
 
+
 @dataclass
 class PoisonPillResult:
     """Result of poison pill detection."""
+
     is_poison: bool
     pill_type: Optional[PoisonPillType]
     severity: str  # "low", "medium", "high", "critical"
     details: Dict[str, Any]
     recommended_action: str
     retry_strategy: Optional[str] = None
+
 
 class PoisonPillDetector:
     """
@@ -42,7 +45,7 @@ class PoisonPillDetector:
             "www.ft.com": "premium",
             "www.theatlantic.com": "metered",
             "www.newyorker.com": "metered",
-            "medium.com": "member_only"
+            "medium.com": "member_only",
         }
 
         # Anti-bot detection patterns
@@ -53,7 +56,7 @@ class PoisonPillDetector:
             "access denied",
             "forbidden",
             "bot detection",
-            "unusual traffic"
+            "unusual traffic",
         ]
 
         # JavaScript-heavy site patterns
@@ -64,7 +67,7 @@ class PoisonPillDetector:
             "Single Page Application",
             "React",
             "Angular",
-            "Vue.js"
+            "Vue.js",
         ]
 
         # Content quality thresholds
@@ -93,7 +96,7 @@ class PoisonPillDetector:
                 severity="medium",
                 details={"domain": domain, "paywall_type": paywall_type},
                 recommended_action="route_to_manual_access",
-                retry_strategy="manual_intervention"
+                retry_strategy="manual_intervention",
             )
 
         # Check URL patterns that indicate problems
@@ -103,7 +106,7 @@ class PoisonPillDetector:
                 pill_type=PoisonPillType.DEAD_LINK,
                 severity="high",
                 details={"url": url, "issue": "suspicious_pattern"},
-                recommended_action="skip_processing"
+                recommended_action="skip_processing",
             )
 
         # URL looks clean
@@ -112,10 +115,12 @@ class PoisonPillDetector:
             pill_type=None,
             severity="none",
             details={},
-            recommended_action="proceed"
+            recommended_action="proceed",
         )
 
-    def detect_content_poison_pill(self, content: str, url: str = None) -> PoisonPillResult:
+    def detect_content_poison_pill(
+        self, content: str, url: str = None
+    ) -> PoisonPillResult:
         """
         Detect poison pills in content after scraping.
 
@@ -132,7 +137,7 @@ class PoisonPillDetector:
                 pill_type=PoisonPillType.MALFORMED_CONTENT,
                 severity="high",
                 details={"issue": "empty_content"},
-                recommended_action="skip_processing"
+                recommended_action="skip_processing",
             )
 
         # Check content length
@@ -141,9 +146,12 @@ class PoisonPillDetector:
                 is_poison=True,
                 pill_type=PoisonPillType.CONTENT_TOO_SHORT,
                 severity="medium",
-                details={"content_length": len(content), "threshold": self.min_content_length},
+                details={
+                    "content_length": len(content),
+                    "threshold": self.min_content_length,
+                },
                 recommended_action="try_playwright_fallback",
-                retry_strategy="browser_rendering"
+                retry_strategy="browser_rendering",
             )
 
         # Check for anti-bot detection
@@ -156,7 +164,7 @@ class PoisonPillDetector:
                     severity="high",
                     details={"indicator": indicator, "url": url},
                     recommended_action="try_different_user_agent",
-                    retry_strategy="stealth_mode"
+                    retry_strategy="stealth_mode",
                 )
 
         # Check for JavaScript-heavy content
@@ -168,7 +176,7 @@ class PoisonPillDetector:
                 severity="medium",
                 details={"js_score": js_score, "url": url},
                 recommended_action="require_browser_rendering",
-                retry_strategy="playwright_required"
+                retry_strategy="playwright_required",
             )
 
         # Check word count after basic cleaning
@@ -179,7 +187,7 @@ class PoisonPillDetector:
                 pill_type=PoisonPillType.CONTENT_TOO_SHORT,
                 severity="medium",
                 details={"word_count": word_count, "threshold": self.min_word_count},
-                recommended_action="try_different_extraction_method"
+                recommended_action="try_different_extraction_method",
             )
 
         # Content looks acceptable
@@ -188,10 +196,12 @@ class PoisonPillDetector:
             pill_type=None,
             severity="none",
             details={"content_length": len(content), "word_count": word_count},
-            recommended_action="proceed"
+            recommended_action="proceed",
         )
 
-    def detect_processing_poison_pill(self, error_type: str, error_message: str, url: str = None) -> PoisonPillResult:
+    def detect_processing_poison_pill(
+        self, error_type: str, error_message: str, url: str = None
+    ) -> PoisonPillResult:
         """
         Detect poison pills from processing errors.
 
@@ -206,25 +216,30 @@ class PoisonPillDetector:
         error_lower = error_message.lower()
 
         # Network-related errors
-        if any(term in error_lower for term in ["timeout", "connection", "network", "dns"]):
+        if any(
+            term in error_lower for term in ["timeout", "connection", "network", "dns"]
+        ):
             return PoisonPillResult(
                 is_poison=True,
                 pill_type=PoisonPillType.DEAD_LINK,
                 severity="medium",
                 details={"error": error_message, "url": url},
                 recommended_action="retry_with_backoff",
-                retry_strategy="exponential_backoff"
+                retry_strategy="exponential_backoff",
             )
 
         # API-related errors
-        if any(term in error_lower for term in ["api", "quota", "rate limit", "authentication"]):
+        if any(
+            term in error_lower
+            for term in ["api", "quota", "rate limit", "authentication"]
+        ):
             return PoisonPillResult(
                 is_poison=True,
                 pill_type=PoisonPillType.API_FAILURE,
                 severity="high",
                 details={"error": error_message, "url": url},
                 recommended_action="retry_after_delay",
-                retry_strategy="api_backoff"
+                retry_strategy="api_backoff",
             )
 
         # Parsing/content errors
@@ -234,7 +249,7 @@ class PoisonPillDetector:
                 pill_type=PoisonPillType.MALFORMED_CONTENT,
                 severity="medium",
                 details={"error": error_message, "url": url},
-                recommended_action="try_alternative_processing"
+                recommended_action="try_alternative_processing",
             )
 
         # General error
@@ -243,17 +258,17 @@ class PoisonPillDetector:
             pill_type=PoisonPillType.MALFORMED_CONTENT,
             severity="medium",
             details={"error_type": error_type, "error": error_message, "url": url},
-            recommended_action="log_and_skip"
+            recommended_action="log_and_skip",
         )
 
     def _check_suspicious_url_patterns(self, url: str) -> bool:
         """Check for URL patterns that indicate problems."""
         suspicious_patterns = [
-            r'localhost',
-            r'127\.0\.0\.1',
-            r'\.onion$',
-            r'[^\w\-\./:]',  # Non-standard characters
-            r'^https?://[^/]*\.local/',
+            r"localhost",
+            r"127\.0\.0\.1",
+            r"\.onion$",
+            r"[^\w\-\./:]",  # Non-standard characters
+            r"^https?://[^/]*\.local/",
         ]
 
         for pattern in suspicious_patterns:
@@ -279,16 +294,16 @@ class PoisonPillDetector:
             "javascript:",
             "onclick=",
             "onload=",
-            "$(", # jQuery
+            "$(",  # jQuery
             "document.getElementById",
             "document.querySelector",
-            "addEventListener"
+            "addEventListener",
         ]
 
         js_count = sum(content.lower().count(indicator) for indicator in js_indicators)
 
         # Count total HTML elements (rough estimate)
-        html_element_count = content.count('<')
+        html_element_count = content.count("<")
 
         if html_element_count == 0:
             return 0.0
@@ -314,7 +329,7 @@ class PoisonPillManager:
             "api_backoff": {"max_retries": 2, "base_delay": 10},
             "stealth_mode": {"max_retries": 1, "base_delay": 5},
             "browser_rendering": {"max_retries": 1, "base_delay": 0},
-            "manual_intervention": {"max_retries": 0, "base_delay": 0}
+            "manual_intervention": {"max_retries": 0, "base_delay": 0},
         }
 
         # Track poison pills for analysis
@@ -334,18 +349,22 @@ class PoisonPillManager:
 
         if result.is_poison:
             self.logger.log_poison_pill(url, result.pill_type, result.details)
-            self.poison_pill_log.append({
-                "url": url,
-                "type": result.pill_type.value,
-                "severity": result.severity,
-                "timestamp": time.time(),
-                "action": result.recommended_action
-            })
+            self.poison_pill_log.append(
+                {
+                    "url": url,
+                    "type": result.pill_type.value,
+                    "severity": result.severity,
+                    "timestamp": time.time(),
+                    "action": result.recommended_action,
+                }
+            )
             return False, result
 
         return True, None
 
-    def check_content(self, content: str, url: str = None) -> Tuple[bool, Optional[PoisonPillResult]]:
+    def check_content(
+        self, content: str, url: str = None
+    ) -> Tuple[bool, Optional[PoisonPillResult]]:
         """
         Check if content is suitable for processing.
 
@@ -359,14 +378,18 @@ class PoisonPillManager:
         result = self.detector.detect_content_poison_pill(content, url)
 
         if result.is_poison:
-            self.logger.log_poison_pill(url or "unknown", result.pill_type, result.details)
-            self.poison_pill_log.append({
-                "url": url or "unknown",
-                "type": result.pill_type.value,
-                "severity": result.severity,
-                "timestamp": time.time(),
-                "action": result.recommended_action
-            })
+            self.logger.log_poison_pill(
+                url or "unknown", result.pill_type, result.details
+            )
+            self.poison_pill_log.append(
+                {
+                    "url": url or "unknown",
+                    "type": result.pill_type.value,
+                    "severity": result.severity,
+                    "timestamp": time.time(),
+                    "action": result.recommended_action,
+                }
+            )
 
             # Check if we should attempt recovery
             if result.retry_strategy:
@@ -376,7 +399,9 @@ class PoisonPillManager:
 
         return True, None
 
-    def handle_processing_error(self, error_type: str, error_message: str, url: str = None) -> PoisonPillResult:
+    def handle_processing_error(
+        self, error_type: str, error_message: str, url: str = None
+    ) -> PoisonPillResult:
         """
         Handle and classify processing errors.
 
@@ -388,18 +413,24 @@ class PoisonPillManager:
         Returns:
             PoisonPillResult with recommended actions
         """
-        result = self.detector.detect_processing_poison_pill(error_type, error_message, url)
+        result = self.detector.detect_processing_poison_pill(
+            error_type, error_message, url
+        )
 
         if result.is_poison:
-            self.logger.log_poison_pill(url or "unknown", result.pill_type, result.details)
-            self.poison_pill_log.append({
-                "url": url or "unknown",
-                "type": result.pill_type.value,
-                "severity": result.severity,
-                "timestamp": time.time(),
-                "action": result.recommended_action,
-                "error": error_message
-            })
+            self.logger.log_poison_pill(
+                url or "unknown", result.pill_type, result.details
+            )
+            self.poison_pill_log.append(
+                {
+                    "url": url or "unknown",
+                    "type": result.pill_type.value,
+                    "severity": result.severity,
+                    "timestamp": time.time(),
+                    "action": result.recommended_action,
+                    "error": error_message,
+                }
+            )
 
         return result
 
@@ -468,11 +499,13 @@ class PoisonPillManager:
             "total": len(self.poison_pill_log),
             "by_type": by_type,
             "by_severity": by_severity,
-            "recent_entries": self.poison_pill_log[-10:]  # Last 10 entries
+            "recent_entries": self.poison_pill_log[-10:],  # Last 10 entries
         }
+
 
 # Global poison pill manager instance
 _global_manager = None
+
 
 def get_poison_pill_manager() -> PoisonPillManager:
     """Get the global poison pill manager instance."""

@@ -245,7 +245,9 @@ class RecordCategorizer:
         }
         self.review_cases = []
 
-    def analyze_text(self, text: str, category: str, patterns: Dict[str, List[str]]) -> float:
+    def analyze_text(
+        self, text: str, category: str, patterns: Dict[str, List[str]]
+    ) -> float:
         """
         Analyze text for category-specific patterns and return confidence score.
 
@@ -341,7 +343,8 @@ class RecordCategorizer:
 
         # Select categories above threshold
         selected_categories = [
-            cat for cat, score in category_scores.items()
+            cat
+            for cat, score in category_scores.items()
             if score >= self.confidence_threshold
         ]
 
@@ -357,9 +360,7 @@ class RecordCategorizer:
         return selected_categories, max_score, reason
 
     def process_records(
-        self,
-        records_to_categorize: List[str],
-        all_records: Dict[str, Dict[str, str]]
+        self, records_to_categorize: List[str], all_records: Dict[str, Dict[str, str]]
     ) -> Dict[str, List[str]]:
         """
         Process all records and assign categories.
@@ -388,12 +389,14 @@ class RecordCategorizer:
                     self.stats["no_content"] += 1
                 else:
                     self.stats["needs_review"] += 1
-                    self.review_cases.append({
-                        "id": record_id,
-                        "title": record.get("title", ""),
-                        "reason": reason,
-                        "confidence": confidence,
-                    })
+                    self.review_cases.append(
+                        {
+                            "id": record_id,
+                            "title": record.get("title", ""),
+                            "reason": reason,
+                            "confidence": confidence,
+                        }
+                    )
             else:
                 self.stats["categorized"] += 1
                 for cat in categories:
@@ -409,14 +412,22 @@ class RecordCategorizer:
         print("AUTO-CATEGORIZATION REPORT")
         print("=" * 80)
         print(f"\nTotal records processed: {self.stats['total']}")
-        print(f"Successfully categorized: {self.stats['categorized']} ({self.stats['categorized']/self.stats['total']*100:.1f}%)")
-        print(f"Need manual review: {self.stats['needs_review']} ({self.stats['needs_review']/self.stats['total']*100:.1f}%)")
-        print(f"No content available: {self.stats['no_content']} ({self.stats['no_content']/self.stats['total']*100:.1f}%)")
+        print(
+            f"Successfully categorized: {self.stats['categorized']} ({self.stats['categorized']/self.stats['total']*100:.1f}%)"
+        )
+        print(
+            f"Need manual review: {self.stats['needs_review']} ({self.stats['needs_review']/self.stats['total']*100:.1f}%)"
+        )
+        print(
+            f"No content available: {self.stats['no_content']} ({self.stats['no_content']/self.stats['total']*100:.1f}%)"
+        )
 
         print("\n" + "-" * 80)
         print("CATEGORIES ASSIGNED:")
         print("-" * 80)
-        for category, count in sorted(self.stats["categories_assigned"].items(), key=lambda x: x[1], reverse=True):
+        for category, count in sorted(
+            self.stats["categories_assigned"].items(), key=lambda x: x[1], reverse=True
+        ):
             print(f"  {category}: {count}")
 
         if self.review_cases:
@@ -433,31 +444,29 @@ class RecordCategorizer:
 def load_records_needing_categories(filepath: Path) -> List[str]:
     """Load list of record IDs that need categorization."""
     record_ids = []
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            record_ids.append(row['id'])
+            record_ids.append(row["id"])
     return record_ids
 
 
 def load_all_records(filepath: Path) -> Dict[str, Dict[str, str]]:
     """Load all archive records into a dict keyed by ID."""
     records = {}
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            records[row['id']] = row
+            records[row["id"]] = row
     return records
 
 
 def update_archive_csv(
-    filepath: Path,
-    categorizations: Dict[str, List[str]],
-    dry_run: bool = False
+    filepath: Path, categorizations: Dict[str, List[str]], dry_run: bool = False
 ) -> None:
     """Update the archive CSV with new categories."""
     # Read all records
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         fieldnames = reader.fieldnames
         rows = list(reader)
@@ -465,17 +474,17 @@ def update_archive_csv(
     # Update records with new categories
     updated_count = 0
     for row in rows:
-        record_id = row['id']
+        record_id = row["id"]
         if record_id in categorizations and categorizations[record_id]:
             # Join categories with semicolon
-            row['thematic_categories'] = '; '.join(categorizations[record_id])
+            row["thematic_categories"] = "; ".join(categorizations[record_id])
             updated_count += 1
 
     print(f"\nUpdating {updated_count} records in CSV...")
 
     if not dry_run:
         # Write back to file
-        with open(filepath, 'w', encoding='utf-8', newline='') as f:
+        with open(filepath, "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(rows)
@@ -487,49 +496,54 @@ def update_archive_csv(
 def save_categorization_report(
     categorizations: Dict[str, List[str]],
     all_records: Dict[str, Dict[str, str]],
-    output_path: Path
+    output_path: Path,
 ) -> None:
     """Save detailed categorization report to CSV."""
-    with open(output_path, 'w', encoding='utf-8', newline='') as f:
-        fieldnames = ['id', 'title', 'url', 'assigned_categories', 'status']
+    with open(output_path, "w", encoding="utf-8", newline="") as f:
+        fieldnames = ["id", "title", "url", "assigned_categories", "status"]
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
 
         for record_id, categories in categorizations.items():
             record = all_records.get(record_id, {})
-            writer.writerow({
-                'id': record_id,
-                'title': record.get('title', ''),
-                'url': record.get('url', ''),
-                'assigned_categories': '; '.join(categories) if categories else '',
-                'status': 'Categorized' if categories else 'Needs Review',
-            })
+            writer.writerow(
+                {
+                    "id": record_id,
+                    "title": record.get("title", ""),
+                    "url": record.get("url", ""),
+                    "assigned_categories": "; ".join(categories) if categories else "",
+                    "status": "Categorized" if categories else "Needs Review",
+                }
+            )
 
     print(f"✓ Saved detailed report to {output_path}")
 
 
 def main():
     """Main execution function."""
-    parser = argparse.ArgumentParser(description='Auto-categorize archive records')
+    parser = argparse.ArgumentParser(description="Auto-categorize archive records")
     parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help='Run without modifying files'
+        "--dry-run", action="store_true", help="Run without modifying files"
     )
     parser.add_argument(
-        '--confidence-threshold',
+        "--confidence-threshold",
         type=float,
         default=0.6,
-        help='Minimum confidence score to assign category (0-1, default: 0.6)'
+        help="Minimum confidence score to assign category (0-1, default: 0.6)",
     )
     args = parser.parse_args()
 
     # Setup paths
     project_root = Path(__file__).parent.parent.parent
-    data_dir = project_root / 'data'
-    records_needing_categories = data_dir / 'records_needing_categories.csv'
-    archive_csv = data_dir / 'archive_records-public.csv'
-    report_path = project_root / 'backend' / 'reports' / f'categorization_report_{datetime.now():%Y%m%d_%H%M%S}.csv'
+    data_dir = project_root / "data"
+    records_needing_categories = data_dir / "records_needing_categories.csv"
+    archive_csv = data_dir / "archive_records-public.csv"
+    report_path = (
+        project_root
+        / "backend"
+        / "reports"
+        / f"categorization_report_{datetime.now():%Y%m%d_%H%M%S}.csv"
+    )
 
     # Ensure report directory exists
     report_path.parent.mkdir(exist_ok=True)
@@ -543,7 +557,9 @@ def main():
     print("\nLoading data...")
 
     # Load data
-    record_ids_to_categorize = load_records_needing_categories(records_needing_categories)
+    record_ids_to_categorize = load_records_needing_categories(
+        records_needing_categories
+    )
     all_records = load_all_records(archive_csv)
 
     print(f"  Records needing categorization: {len(record_ids_to_categorize)}")
@@ -574,7 +590,9 @@ def main():
         print("\n✓ Categories have been assigned to records")
         print(f"✓ Detailed report saved to: {report_path}")
         print("\nNext steps:")
-        print(f"  1. Review the {categorizer.stats['needs_review']} records marked for manual review")
+        print(
+            f"  1. Review the {categorizer.stats['needs_review']} records marked for manual review"
+        )
         print(f"  2. Check the categorization report at: {report_path}")
         print("  3. Manually categorize remaining records as needed")
 

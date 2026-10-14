@@ -16,6 +16,7 @@ if str(DIAGNOSTICS_DIR) not in sys.path:
 
 from format_converter import get_format_converter
 
+
 def test_format_converter():
     """Test the data format conversion system."""
     print("Testing Data Format Converter")
@@ -25,16 +26,16 @@ def test_format_converter():
 
     # Test sample record with CSV format
     sample_record = {
-        'id': 'TEST-00001',
-        'title': 'Sample Article',
-        'thematic_categories': 'Press & Media Criticism, Journalism Theory & Practice, Technology & Digital Media',
-        'key_concepts': 'View from Nowhere, Church of the Savvy, The People Formerly Known as the Audience',
-        'tags': 'journalism, media, criticism, analysis',
-        'mentioned_entities': 'New York Times, Washington Post, Twitter, Facebook, Congress',
-        'related_to': 'NYT-00123, WAPO-00456, CNN-00789',
-        'responds_to': 'ANALYSIS-00001',
-        'series': 'Digital Journalism Analysis',
-        'scope': 'Commentary/Critique, Historical Analysis'
+        "id": "TEST-00001",
+        "title": "Sample Article",
+        "thematic_categories": "Press & Media Criticism, Journalism Theory & Practice, Technology & Digital Media",
+        "key_concepts": "View from Nowhere, Church of the Savvy, The People Formerly Known as the Audience",
+        "tags": "journalism, media, criticism, analysis",
+        "mentioned_entities": "New York Times, Washington Post, Twitter, Facebook, Congress",
+        "related_to": "NYT-00123, WAPO-00456, CNN-00789",
+        "responds_to": "ANALYSIS-00001",
+        "series": "Digital Journalism Analysis",
+        "scope": "Commentary/Critique, Historical Analysis",
     }
 
     print("Original record (CSV format):")
@@ -74,7 +75,9 @@ def test_format_converter():
 
     # Test relationship conversion
     relations_test = "NYT-00123, WAPO-00456, CNN-00789"
-    relations_result = converter.convert_relationships_to_structured(relations_test, "related_to")
+    relations_result = converter.convert_relationships_to_structured(
+        relations_test, "related_to"
+    )
     print("\nRelationships to Structured:")
     print(f"  Input:  {relations_test}")
     print(f"  Output: {json.dumps(relations_result, indent=2)}")
@@ -87,10 +90,10 @@ def test_format_converter():
         sample_record,  # CSV format
         converted_record,  # JSON format
         {  # Mixed format
-            'id': 'MIXED-00001',
-            'thematic_categories': ['Already JSON'],  # JSON
-            'key_concepts': 'Still CSV, format'  # CSV
-        }
+            "id": "MIXED-00001",
+            "thematic_categories": ["Already JSON"],  # JSON
+            "key_concepts": "Still CSV, format",  # CSV
+        },
     ]
 
     validation_report = converter.create_format_validation_report(sample_records)
@@ -98,6 +101,7 @@ def test_format_converter():
     print(json.dumps(validation_report, indent=2))
 
     print("\nFormat conversion testing completed!")
+
 
 if __name__ == "__main__":
     test_format_converter()

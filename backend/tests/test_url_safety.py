@@ -13,27 +13,33 @@ from rosen_scraper.url_safety import (
 )
 
 
-@pytest.mark.parametrize("url", [
-    "http://127.0.0.1/admin",
-    "http://localhost:5000/",
-    "https://10.0.0.5/",
-    "http://192.168.1.1/",
-    "http://169.254.169.254/latest/meta-data/",  # cloud metadata endpoint
-    "http://[::1]/",
-    "http://0.0.0.0/",
-])
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://127.0.0.1/admin",
+        "http://localhost:5000/",
+        "https://10.0.0.5/",
+        "http://192.168.1.1/",
+        "http://169.254.169.254/latest/meta-data/",  # cloud metadata endpoint
+        "http://[::1]/",
+        "http://0.0.0.0/",
+    ],
+)
 def test_rejects_private_and_loopback(url):
     ok, reason = is_safe_public_url(url)
     assert ok is False
     assert reason
 
 
-@pytest.mark.parametrize("url", [
-    "ftp://example.com/file",
-    "file:///etc/passwd",
-    "gopher://127.0.0.1/",
-    "javascript:alert(1)",
-])
+@pytest.mark.parametrize(
+    "url",
+    [
+        "ftp://example.com/file",
+        "file:///etc/passwd",
+        "gopher://127.0.0.1/",
+        "javascript:alert(1)",
+    ],
+)
 def test_rejects_non_http_schemes(url):
     ok, _ = is_safe_public_url(url)
     assert ok is False
@@ -45,10 +51,13 @@ def test_rejects_malformed(bad):
     assert ok is False
 
 
-@pytest.mark.parametrize("url", [
-    "https://8.8.8.8/",            # public literal IP, no DNS lookup needed
-    "http://1.1.1.1/path?q=1",
-])
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://8.8.8.8/",  # public literal IP, no DNS lookup needed
+        "http://1.1.1.1/path?q=1",
+    ],
+)
 def test_allows_public_literal_ip(url):
     ok, reason = is_safe_public_url(url)
     assert ok is True, reason
@@ -61,16 +70,18 @@ def test_allows_public_literal_ip(url):
 
 
 def test_resolve_and_validate_returns_public_ips(monkeypatch):
-    monkeypatch.setattr(url_safety, "_addresses_for_host",
-                        lambda host: {"93.184.216.34"})
+    monkeypatch.setattr(
+        url_safety, "_addresses_for_host", lambda host: {"93.184.216.34"}
+    )
     ok, reason, ips = resolve_and_validate("https://example.com/page")
     assert ok is True, reason
     assert ips == ["93.184.216.34"]
 
 
 def test_resolve_and_validate_rejects_when_any_ip_private(monkeypatch):
-    monkeypatch.setattr(url_safety, "_addresses_for_host",
-                        lambda host: {"93.184.216.34", "10.0.0.5"})
+    monkeypatch.setattr(
+        url_safety, "_addresses_for_host", lambda host: {"93.184.216.34", "10.0.0.5"}
+    )
     ok, reason, ips = resolve_and_validate("https://example.com/")
     assert ok is False
     assert ips == []
@@ -96,8 +107,15 @@ def test_pinned_resolution_forces_validated_ip(monkeypatch):
     # Simulate rebinding: the live resolver now hands back a private IP, but
     # the pin must return the pre-validated public IP for the pinned host.
     def _rebind(node, port, *a, **k):
-        return [(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP,
-                 "", ("10.0.0.5", port or 0))]
+        return [
+            (
+                socket.AF_INET,
+                socket.SOCK_STREAM,
+                socket.IPPROTO_TCP,
+                "",
+                ("10.0.0.5", port or 0),
+            )
+        ]
 
     monkeypatch.setattr(socket, "getaddrinfo", _rebind)
     with pinned_resolution("example.com", ["93.184.216.34"]):
@@ -106,8 +124,15 @@ def test_pinned_resolution_forces_validated_ip(monkeypatch):
 
 
 def test_pinned_resolution_passes_through_other_hosts(monkeypatch):
-    sentinel = [(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP,
-                 "", ("203.0.113.7", 443))]
+    sentinel = [
+        (
+            socket.AF_INET,
+            socket.SOCK_STREAM,
+            socket.IPPROTO_TCP,
+            "",
+            ("203.0.113.7", 443),
+        )
+    ]
     monkeypatch.setattr(socket, "getaddrinfo", lambda *a, **k: sentinel)
     with pinned_resolution("example.com", ["93.184.216.34"]):
         other = socket.getaddrinfo("other.test", 443)
@@ -145,8 +170,7 @@ def test_chromium_host_resolver_rules_prefers_ipv4():
     # resolve_and_validate sorts addresses lexicographically, which can put an
     # IPv6 address first; pinning Chromium to an IPv6-only MAP breaks scraping on
     # IPv4-only runners. Prefer an IPv4 address when the validated set has one.
-    args = chromium_host_resolver_rules(
-        "example.com", ["2001:db8::1", "93.184.216.34"])
+    args = chromium_host_resolver_rules("example.com", ["2001:db8::1", "93.184.216.34"])
     assert args == ["--host-resolver-rules=MAP example.com 93.184.216.34"]
 
 
@@ -162,9 +186,11 @@ def test_chromium_host_resolver_rules_brackets_chosen_ipv6():
     # When the validated set is IPv6-only the chosen replacement must be
     # bracketed; an IPv4 replacement must not be.
     assert chromium_host_resolver_rules("h.test", ["::1"]) == [
-        "--host-resolver-rules=MAP h.test [::1]"]
+        "--host-resolver-rules=MAP h.test [::1]"
+    ]
     assert chromium_host_resolver_rules("h.test", ["203.0.113.9"]) == [
-        "--host-resolver-rules=MAP h.test 203.0.113.9"]
+        "--host-resolver-rules=MAP h.test 203.0.113.9"
+    ]
 
 
 def test_chromium_host_resolver_rules_canonicalizes_idn_host():
@@ -187,8 +213,15 @@ def test_pinned_resolution_no_live_fallback_on_family_mismatch(monkeypatch):
 
     def _orig(*a, **k):
         called["n"] += 1
-        return [(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP,
-                 "", ("10.0.0.5", 0))]
+        return [
+            (
+                socket.AF_INET,
+                socket.SOCK_STREAM,
+                socket.IPPROTO_TCP,
+                "",
+                ("10.0.0.5", 0),
+            )
+        ]
 
     monkeypatch.setattr(socket, "getaddrinfo", _orig)
     with pinned_resolution("example.com", ["2001:db8::1"]):
@@ -205,8 +238,15 @@ def test_pinned_resolution_matches_punycode_connect_host(monkeypatch):
     puny = unicode_host.encode("idna").decode("ascii")
 
     def _rebind(*a, **k):
-        return [(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP,
-                 "", ("10.0.0.5", 0))]
+        return [
+            (
+                socket.AF_INET,
+                socket.SOCK_STREAM,
+                socket.IPPROTO_TCP,
+                "",
+                ("10.0.0.5", 0),
+            )
+        ]
 
     monkeypatch.setattr(socket, "getaddrinfo", _rebind)
     with pinned_resolution(unicode_host, ["93.184.216.34"]):

@@ -31,9 +31,9 @@ from rosen_scraper.url_safety import (
 # A list of common user agents to rotate through for both requests and Playwright.
 # This helps mimic real browser activity and can prevent being blocked by websites.
 USER_AGENTS = [
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
 ]
 
 # Cap on redirect hops followed manually. requests' own default is 30; an
@@ -74,16 +74,16 @@ _MIN_SEMANTIC_REGION_CHARS = 100
 # byline from the semantic-region text count and pushes short, fully-rendered
 # WordPress-style posts (<article><header class="entry-header">…</header>…)
 # below the threshold, forcing an unneeded Playwright fallback.
-_NON_CONTENT_TAGS_GLOBAL = ('script', 'style', 'template', 'nav')
-_NON_CONTENT_TAGS_CHROME_ONLY = ('header', 'footer', 'aside')
+_NON_CONTENT_TAGS_GLOBAL = ("script", "style", "template", "nav")
+_NON_CONTENT_TAGS_CHROME_ONLY = ("header", "footer", "aside")
 # ARIA-role equivalents of the same chrome — cookie consent popups in
 # particular tend to be untagged <div>s carrying role="dialog".
-_NON_CONTENT_ROLES = ('navigation', 'banner', 'contentinfo',
-                      'dialog', 'alertdialog')
+_NON_CONTENT_ROLES = ("navigation", "banner", "contentinfo", "dialog", "alertdialog")
 
 
-def _get_with_retry(url: str, headers: Dict[str, str],
-                    timeout: int) -> requests.Response:
+def _get_with_retry(
+    url: str, headers: Dict[str, str], timeout: int
+) -> requests.Response:
     """GET ``url`` once, retrying transient failures with exponential backoff.
 
     A transient failure is either a network-level error
@@ -116,19 +116,22 @@ def _get_with_retry(url: str, headers: Dict[str, str],
     for attempt in range(_RETRY_MAX_ATTEMPTS):
         is_last_attempt = attempt == _RETRY_MAX_ATTEMPTS - 1
         try:
-            response = requests.get(url, headers=headers, timeout=timeout,
-                                    allow_redirects=False)
+            response = requests.get(
+                url, headers=headers, timeout=timeout, allow_redirects=False
+            )
         except requests.RequestException as exc:
             if is_last_attempt:
                 raise
-            backoff = _RETRY_BACKOFF_BASE_SECONDS * (2 ** attempt)
+            backoff = _RETRY_BACKOFF_BASE_SECONDS * (2**attempt)
             print(f"  [retry] request error ({exc}); retrying in {backoff:.1f}s")
             time.sleep(backoff)
             continue
         if response.status_code in _RETRYABLE_STATUS_CODES and not is_last_attempt:
-            backoff = _RETRY_BACKOFF_BASE_SECONDS * (2 ** attempt)
-            print(f"  [retry] HTTP {response.status_code} from {url}; "
-                  f"retrying in {backoff:.1f}s")
+            backoff = _RETRY_BACKOFF_BASE_SECONDS * (2**attempt)
+            print(
+                f"  [retry] HTTP {response.status_code} from {url}; "
+                f"retrying in {backoff:.1f}s"
+            )
             # Return the socket to requests' connection pool before sleeping
             # so retry-heavy runs do not stack idle connections until GC.
             response.close()
@@ -138,7 +141,8 @@ def _get_with_retry(url: str, headers: Dict[str, str],
     # The loop always returns or raises on the final attempt; this line only
     # satisfies static analysis that every path produces a value.
     raise requests.RequestException(  # pragma: no cover
-        f"request to {url} failed after {_RETRY_MAX_ATTEMPTS} attempts")
+        f"request to {url} failed after {_RETRY_MAX_ATTEMPTS} attempts"
+    )
 
 
 def _looks_like_rendered_content(html: str) -> bool:
@@ -171,7 +175,7 @@ def _looks_like_rendered_content(html: str) -> bool:
     """
     if not html or not html.strip():
         return False
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, "html.parser")
 
     # Drop non-content regions so site chrome and boilerplate text never
     # counts toward the article-body length. The tag selector and find_all
@@ -184,28 +188,32 @@ def _looks_like_rendered_content(html: str) -> bool:
     # toward Signal 1, or short WordPress-style posts get pushed below
     # _MIN_SEMANTIC_REGION_CHARS and forced onto Playwright.
     for tag in soup(list(_NON_CONTENT_TAGS_CHROME_ONLY)):
-        if tag.find_parent(['article', 'main']) is None:
+        if tag.find_parent(["article", "main"]) is None:
             tag.decompose()
-    for element in soup.find_all(attrs={'role': list(_NON_CONTENT_ROLES)}):
+    for element in soup.find_all(attrs={"role": list(_NON_CONTENT_ROLES)}):
         element.decompose()
 
     # Signal 1: a semantic <article>/<main> region with real text. A populated
     # one is present only when the server rendered the article, so it accepts
     # short posts, announcements, and link items that signal 2 would miss.
-    region = soup.find('article') or soup.find('main')
-    if (region is not None
-            and len(region.get_text(separator=' ', strip=True))
-            >= _MIN_SEMANTIC_REGION_CHARS):
+    region = soup.find("article") or soup.find("main")
+    if (
+        region is not None
+        and len(region.get_text(separator=" ", strip=True))
+        >= _MIN_SEMANTIC_REGION_CHARS
+    ):
         return True
 
     # Signal 2: enough body text overall, for article bodies that use plain
     # <div>/<section> markup with no semantic wrapper.
     body = soup.body or soup
-    body_text = body.get_text(separator=' ', strip=True)
+    body_text = body.get_text(separator=" ", strip=True)
     return len(body_text) >= _MIN_RENDERED_TEXT_CHARS
 
 
-def _requests_get_safe(url: str, headers: Dict[str, str], timeout: int) -> requests.Response:
+def _requests_get_safe(
+    url: str, headers: Dict[str, str], timeout: int
+) -> requests.Response:
     """GET ``url``, re-validating every redirect hop against the SSRF guard.
 
     requests follows redirects automatically, so a URL that passes the
@@ -227,7 +235,9 @@ def _requests_get_safe(url: str, headers: Dict[str, str], timeout: int) -> reque
     for _ in range(_MAX_REDIRECTS + 1):
         ok, reason, ips = resolve_and_validate(current)
         if not ok:
-            raise requests.RequestException(f"unsafe redirect target ({reason}): {current}")
+            raise requests.RequestException(
+                f"unsafe redirect target ({reason}): {current}"
+            )
         # Pin the connection to a validated IP so a low-TTL DNS record cannot
         # rebind this host to a private address between the check above and
         # requests' own resolution (DNS-rebinding TOCTOU).
@@ -235,13 +245,15 @@ def _requests_get_safe(url: str, headers: Dict[str, str], timeout: int) -> reque
         with pinned_resolution(host, ips):
             response = _get_with_retry(current, headers, timeout)
         if response.is_redirect or response.is_permanent_redirect:
-            location = response.headers.get('Location')
+            location = response.headers.get("Location")
             if not location:
                 return response
             current = urljoin(current, location)
             continue
         return response
-    raise requests.RequestException(f"exceeded {_MAX_REDIRECTS} redirects starting from {url}")
+    raise requests.RequestException(
+        f"exceeded {_MAX_REDIRECTS} redirects starting from {url}"
+    )
 
 
 @rate_limited_gemini_call
@@ -261,11 +273,10 @@ def _call_gemini_url_context(client, model_id, prompt, tools):
         The API response object
     """
     response = client.models.generate_content(
-        model=model_id,
-        contents=prompt,
-        config=GenerateContentConfig(tools=tools)
+        model=model_id, contents=prompt, config=GenerateContentConfig(tools=tools)
     )
     return response
+
 
 def fetch_with_url_context(url: str) -> Optional[Dict[str, Any]]:
     """
@@ -277,7 +288,7 @@ def fetch_with_url_context(url: str) -> Optional[Dict[str, Any]]:
         url (str): The URL of the article to fetch.
 
     Returns:
-        dict: A dictionary containing extracted content with keys like 'title', 'text', 
+        dict: A dictionary containing extracted content with keys like 'title', 'text',
               'author', 'date', etc. Returns None if the API call fails.
     """
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -287,14 +298,14 @@ def fetch_with_url_context(url: str) -> Optional[Dict[str, Any]]:
 
     try:
         print(f"Attempting URL Context fetch for: {url}")
-        
+
         # Initialize the Gemini client
         client = genai.Client(api_key=api_key)
         model_id = "gemini-2.5-flash"
-        
+
         # Configure URL Context tool
         tools = [{"url_context": {}}]
-        
+
         # Create a prompt to extract structured article data
         prompt = f"""
         Please extract the following information from the article at {url}:
@@ -311,31 +322,32 @@ def fetch_with_url_context(url: str) -> Optional[Dict[str, Any]]:
         
         If any field is not available, set it to null. Focus on extracting the main article content, excluding navigation, ads, and sidebar content.
         """
-        
+
         # Make the API call with URL Context
         response = _call_gemini_url_context(client, model_id, prompt, tools)
-        
+
         # Extract the text response
         response_text = ""
         for part in response.candidates[0].content.parts:
             if part.text:
                 response_text += part.text
-        
+
         # Try to parse as JSON
         import json
+
         try:
             # Clean up the response to extract JSON
             cleaned_response = response_text.strip()
-            if cleaned_response.startswith('```json'):
+            if cleaned_response.startswith("```json"):
                 cleaned_response = cleaned_response[7:]
-            if cleaned_response.endswith('```'):
+            if cleaned_response.endswith("```"):
                 cleaned_response = cleaned_response[:-3]
             cleaned_response = cleaned_response.strip()
-            
+
             extracted_data = json.loads(cleaned_response)
             print("URL Context fetch successful.")
             return extracted_data
-            
+
         except json.JSONDecodeError:
             # If JSON parsing fails, return the raw text
             print("URL Context returned non-JSON response, extracting text content.")
@@ -345,12 +357,13 @@ def fetch_with_url_context(url: str) -> Optional[Dict[str, Any]]:
                 "title": None,
                 "author": None,
                 "date": None,
-                "original_publication": None
+                "original_publication": None,
             }
-            
+
     except Exception as e:
         print(f"URL Context fetch failed: {e}")
         return None
+
 
 def fetch_article_content(url: str) -> Optional[str]:
     """
@@ -378,7 +391,7 @@ def fetch_article_content(url: str) -> Optional[str]:
 
     # Attempt 1: URL Context for fastest structured extraction
     url_context_data = fetch_with_url_context(url)
-    if url_context_data and url_context_data.get('text'):
+    if url_context_data and url_context_data.get("text"):
         print("URL Context extraction successful. Returning structured data.")
         # Convert the structured data back to a format compatible with trafilatura
         # by creating a mock HTML structure
@@ -398,11 +411,11 @@ def fetch_article_content(url: str) -> Optional[str]:
         </html>
         """
         return mock_html
-    
+
     print(f"URL Context failed, attempting fast scrape for: {url}")
     # Select a random User-Agent to make the request appear more like a real user.
-    headers = {'User-Agent': random.choice(USER_AGENTS)}
-    
+    headers = {"User-Agent": random.choice(USER_AGENTS)}
+
     try:
         # Attempt 2: Fast, direct request. Redirects are followed manually so
         # each hop is re-checked by the SSRF guard (see _requests_get_safe).
@@ -416,8 +429,10 @@ def fetch_article_content(url: str) -> Optional[str]:
             print("Fast scrape successful.")
             return response.text
         else:
-            print("Fast scrape returned an unrendered page. Falling back to Playwright.")
-            
+            print(
+                "Fast scrape returned an unrendered page. Falling back to Playwright."
+            )
+
     except requests.RequestException as e:
         # Handle network errors or bad status codes from the initial request.
         print(f"Fast scrape failed: {e}. Falling back to Playwright.")
@@ -461,27 +476,28 @@ def fetch_article_content(url: str) -> Optional[str]:
 
             page = context.new_page()
             Stealth().apply_stealth_sync(page)
-            
+
             # Navigate to the URL and wait until the network is idle, indicating
             # that most dynamic content has likely loaded.
-            # For more reliable scraping, it is recommended to wait for a specific selector 
+            # For more reliable scraping, it is recommended to wait for a specific selector
             # that is unique to the article content.
-            page.goto(url, timeout=90000, wait_until='networkidle')
+            page.goto(url, timeout=90000, wait_until="networkidle")
             content = page.content()
             browser.close()
-            
+
             print("Playwright scrape successful.")
             return content
-            
+
     except Exception as e:
         # Catch any exceptions during the Playwright process.
         print(f"Playwright scrape also failed for {url}: {e}")
         return None
 
+
 def fetch_article_content_enhanced(url: str) -> Tuple[Optional[Any], bool]:
     """
     Enhanced version that can return either HTML content or structured data.
-    
+
     This method first attempts Google's URL Context tool for the fastest extraction.
     If URL Context succeeds, it returns the structured data directly.
     Otherwise, it falls back to the traditional HTML scraping cascade.
@@ -490,7 +506,7 @@ def fetch_article_content_enhanced(url: str) -> Tuple[Optional[Any], bool]:
         url (str): The URL of the article to scrape.
 
     Returns:
-        tuple: (content, is_structured) where content is either HTML string or 
+        tuple: (content, is_structured) where content is either HTML string or
                structured dict, and is_structured is a boolean indicating the type.
     """
     # SSRF guard (see fetch_article_content): reject unsafe URLs up front.
@@ -501,13 +517,14 @@ def fetch_article_content_enhanced(url: str) -> Tuple[Optional[Any], bool]:
 
     # Attempt 1: URL Context for fastest structured extraction
     url_context_data = fetch_with_url_context(url)
-    if url_context_data and url_context_data.get('text'):
+    if url_context_data and url_context_data.get("text"):
         print("URL Context extraction successful. Returning structured data.")
         return url_context_data, True
-    
+
     # Fall back to traditional HTML scraping
     html_content = fetch_article_content(url)
     return html_content, False
+
 
 def extract_article_data(html_content: str, url: str) -> Optional[str]:
     """
@@ -534,9 +551,9 @@ def extract_article_data(html_content: str, url: str) -> Optional[str]:
             html_content,
             include_comments=False,
             include_tables=False,
-            output_format='json',
+            output_format="json",
             with_metadata=True,
-            url=url
+            url=url,
         )
     except Exception as e:
         # Handle any errors that occur during the extraction process.

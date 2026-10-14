@@ -13,7 +13,9 @@ from typing import Optional, Dict, Any
 from rosen_scraper.enhanced_pdf_formatter import EnhancedPDFFormatter
 
 
-def create_article_pdf(article_data: Dict[str, Any], output_dir: str = "processed_pdf_library") -> Optional[str]:
+def create_article_pdf(
+    article_data: Dict[str, Any], output_dir: str = "processed_pdf_library"
+) -> Optional[str]:
     """
     Create a formatted PDF from structured article data.
 
