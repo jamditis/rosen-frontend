@@ -1,5 +1,6 @@
 import { DISCOVERY_MODE, runDiscovery } from "./discovery.js";
 import { runLiveDiscovery } from "./ledger.js";
+import { readArchiveHealth, receiveIngestionReceipt } from "./ingestion-health.js";
 import {
   PUBLIC_SOURCE_MANIFEST,
   SOURCE_MANIFEST_VERSION,
@@ -43,13 +44,28 @@ function logRun(report) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (request.method === "POST" && url.pathname === "/ingestion-receipt") {
+      try {
+        const result = await receiveIngestionReceipt(request, env);
+        return json(result.body, result.status);
+      } catch {
+        return json({ error: "ledger_unavailable" }, 503);
+      }
+    }
     if (request.method === "GET" && url.pathname === "/health") {
-      return json({
+      const body = {
         status: "ok",
         mode: configuredMode(env.DISCOVERY_MODE),
         manifestVersion: SOURCE_MANIFEST_VERSION,
         sources: PUBLIC_SOURCE_MANIFEST,
-      });
+      };
+      if (body.mode !== DISCOVERY_MODE.LIVE) return json(body);
+      try {
+        const health = await readArchiveHealth(env.DISCOVERY_LEDGER);
+        return json({ ...body, status: health.healthy ? "ok" : "degraded", ...health }, health.healthy ? 200 : 503);
+      } catch {
+        return json({ ...body, status: "degraded", error: "ledger_unavailable" }, 503);
+      }
     }
     return json({ error: "not_found" }, 404);
   },
