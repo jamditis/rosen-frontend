@@ -74,4 +74,4 @@ Keep `pressthink.org` unconfigured. This personal account does not control that 
 
 To stop the pilot, remove the cron trigger or deploy with `DISCOVERY_MODE` set to `disabled`. Delete the Worker and its dedicated D1 database only after exporting any reviewer-needed candidate ledger.
 
-The existing pipeline remains responsible for SSRF protection, full scraping, browser rendering, extraction, entity and relationship proposals, canonical CSV writes, tests, pull-request review, and certificate-verified FTPS publication. The external hosting owner provides scoped file-transfer access; this project does not administer the domain or hosting server.
+The existing pipeline remains responsible for SSRF protection, full scraping, browser rendering, extraction, entity and relationship proposals, canonical CSV writes, tests, pull-request review, and certificate-verified FTPS publication. The external hosting owner provides the transfer account; this project does not administer the domain or hosting server. The account can list the broader PressThink document root, so the deployment client's path checks enforce the archive scope.
