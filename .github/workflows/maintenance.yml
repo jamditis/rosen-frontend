@@ -112,6 +112,10 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Materialize semantic search binaries
+        if: ${{ inputs.job == 'sync_to_archive' }}
+        run: git lfs pull --include="frontend/vendor/semantic/v1/**"
+
       - name: Set up Python 3.13
         uses: actions/setup-python@v6
         with:

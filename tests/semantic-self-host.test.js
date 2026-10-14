@@ -16,6 +16,9 @@ const assetRoot = path.join(root, 'frontend', 'vendor', 'semantic', 'v1');
 const manifestPath = path.join(assetRoot, 'manifest.json');
 const worker = fs.readFileSync(path.join(root, 'frontend', 'services', 'semantic-search-worker.js'), 'utf8');
 
+const workflowSource = (filename) =>
+  fs.readFileSync(path.join(root, '.github', 'workflows', filename), 'utf8');
+
 const EXPECTED_FILES = [
   'NOTICE.md',
   'licenses/BAAI-bge-small-en-v1.5-MIT.txt',
@@ -90,6 +93,64 @@ test('large model and WASM assets are tracked through Git LFS and materialized i
     workflow.indexOf('git lfs pull --include=') < workflow.indexOf('Run complete Node test suite'),
     'LFS materialization must precede the checksum tests',
   );
+});
+
+test('data-writing workflows materialize semantic binaries after their final checkout', () => {
+  const pipelines = [
+    {
+      filename: 'submit-record.yml',
+      checkout: '- name: Checkout current main with write token',
+      consumer: '- name: Process submission',
+    },
+    {
+      filename: 'submit-prototype.yml',
+      checkout: '- name: Checkout current main with write token',
+      consumer: '- name: Process submission',
+    },
+    {
+      filename: 'maintenance.yml',
+      checkout: '- name: Checkout main',
+      consumer: '- name: Run maintenance job',
+      condition: "if: ${{ inputs.job == 'sync_to_archive' }}",
+    },
+  ];
+
+  for (const { filename, checkout, consumer, condition } of pipelines) {
+    const workflow = workflowSource(filename);
+    const checkoutIndex = workflow.indexOf(checkout);
+    const materializeIndex = workflow.indexOf('- name: Materialize semantic search binaries');
+    const consumerIndex = workflow.indexOf(consumer);
+
+    assert.notEqual(checkoutIndex, -1, `${filename} must keep its final checkout`);
+    assert.notEqual(materializeIndex, -1, `${filename} must materialize semantic binaries`);
+    assert.notEqual(consumerIndex, -1, `${filename} must keep its data writer`);
+    assert.ok(
+      checkoutIndex < materializeIndex && materializeIndex < consumerIndex,
+      `${filename} must materialize LFS binaries after checkout and before its test-running writer`,
+    );
+    assert.match(
+      workflow.slice(materializeIndex, consumerIndex),
+      /run: git lfs pull --include="frontend\/vendor\/semantic\/v1\/\*\*"/,
+      `${filename} must materialize the scoped current semantic assets`,
+    );
+    if (condition) {
+      assert.ok(
+        workflow.slice(materializeIndex, consumerIndex).includes(condition),
+        `${filename} must limit LFS materialization to sync_to_archive`,
+      );
+    }
+  }
+
+  const submissionWriter = fs.readFileSync(
+    path.join(root, 'backend', 'scripts', 'process_submission.py'),
+    'utf8',
+  );
+  const sheetWriter = fs.readFileSync(
+    path.join(root, 'backend', 'scripts', 'sync_sheet_to_archive.py'),
+    'utf8',
+  );
+  assert.match(submissionWriter, /subprocess\.run\(\['npm', 'test'\]/);
+  assert.match(sheetWriter, /_run\(\["npm", "test"\]/);
 });
 
 test('the worker loads only archive-local model and runtime URLs', () => {
