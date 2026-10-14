@@ -17,6 +17,7 @@ import {
 
 const execFileAsync = promisify(execFile);
 const THREAD_ID_PATTERN = /^THREAD-\d{5}$/;
+const BSKY_ID_PATTERN = /^BSKY-\d{5,}$/;
 const JAY_BLUESKY_POST_PATTERN = /^https:\/\/bsky\.app\/profile\/jayrosen\.bsky\.social\/post\/([^/?#]+)\/?$/;
 const CAPTURE_NOTE_PATTERN = /app\.bsky\.feed\.(?:getAuthorFeed|getPosts|getPostThread)|source[- ]verified|public API/i;
 
@@ -32,7 +33,11 @@ function parentRkey(row) {
 }
 
 /** Validate the source rows that justify one generated thread container. */
-export function assertJayGeneratedThreadEvidence(record, socialRowById) {
+export function assertJayGeneratedThreadEvidence(
+  record,
+  socialRowById,
+  newlyCapturedRecordIds = new Set(),
+) {
   const threadId = text(record?.id);
   if (!THREAD_ID_PATTERN.test(threadId)) {
     throw new Error(`${threadId || 'generated record'}: only canonical THREAD records can be registered`);
@@ -79,7 +84,10 @@ export function assertJayGeneratedThreadEvidence(record, socialRowById) {
     if (text(source.permissions) !== 'Public Post' || !text(source.date_processed)) {
       throw new Error(`${threadId}: ${postId} lacks public capture provenance`);
     }
-    if (!CAPTURE_NOTE_PATTERN.test(text(source.notes))) {
+    if (
+      newlyCapturedRecordIds.has(postId)
+      && !CAPTURE_NOTE_PATTERN.test(text(source.notes))
+    ) {
       throw new Error(`${threadId}: ${postId} lacks named source-capture provenance`);
     }
     const verification = text(source.verified).toUpperCase();
@@ -118,7 +126,7 @@ export function assertJayGeneratedThreadEvidence(record, socialRowById) {
  */
 export function registerSourceSupportedGeneratedThreads(
   holdPolicy,
-  { publishedRecords, archiveRows, socialRows },
+  { publishedRecords, archiveRows, socialRows, newlyCapturedRecordIds = new Set() },
 ) {
   const policy = structuredClone(holdPolicy);
   if (!Array.isArray(policy.generatedPublishedRecordIds)) {
@@ -127,17 +135,43 @@ export function registerSourceSupportedGeneratedThreads(
   const registered = new Set(policy.generatedPublishedRecordIds);
   const sourceIds = new Set([...archiveRows, ...socialRows].map(row => text(row.id)).filter(Boolean));
   const socialRowById = new Map(socialRows.map(row => [text(row.id), row]));
+  if (!(newlyCapturedRecordIds instanceof Set)) {
+    throw new Error('newlyCapturedRecordIds must be a Set');
+  }
+  for (const recordId of newlyCapturedRecordIds) {
+    if (!BSKY_ID_PATTERN.test(recordId) || !socialRowById.has(recordId)) {
+      throw new Error(`newly captured source row ${recordId} is not canonical`);
+    }
+  }
   const candidates = publishedRecords
     .filter(record => !sourceIds.has(text(record.id)) && !registered.has(text(record.id)))
     .sort((left, right) => text(left.id).localeCompare(text(right.id)));
   const added = [];
   for (const record of candidates) {
-    assertJayGeneratedThreadEvidence(record, socialRowById);
+    assertJayGeneratedThreadEvidence(record, socialRowById, newlyCapturedRecordIds);
     policy.generatedPublishedRecordIds.push(record.id);
     registered.add(record.id);
     added.push(record.id);
   }
   return { policy, added };
+}
+
+export function newlyCapturedRecordIdsFromReport(report) {
+  if (report?.schema_version !== 1 || !Array.isArray(report?.decisions)) {
+    throw new Error('Bluesky batch report does not match schema version 1');
+  }
+  if (report?.canonical?.rows_appended !== report.decisions.length) {
+    throw new Error('Bluesky batch report decisions do not match appended rows');
+  }
+  const recordIds = new Set();
+  for (const decision of report.decisions) {
+    const recordId = text(decision?.record_id);
+    if (!BSKY_ID_PATTERN.test(recordId) || recordIds.has(recordId)) {
+      throw new Error('Bluesky batch report has an invalid or duplicate record ID');
+    }
+    recordIds.add(recordId);
+  }
+  return recordIds;
 }
 
 async function readJson(filePath) {
@@ -156,12 +190,15 @@ export async function runArchiveExporter(repositoryRoot) {
 
 export async function refreshSocialReleaseArtifacts(
   repositoryRoot,
-  { asOfDate, runExporter = runArchiveExporter } = {},
+  { asOfDate, batchReportPath, runExporter = runArchiveExporter } = {},
 ) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(asOfDate || '')) {
     throw new Error('refresh social artifacts: asOfDate must use YYYY-MM-DD');
   }
   const root = path.resolve(repositoryRoot);
+  const newlyCapturedRecordIds = batchReportPath
+    ? newlyCapturedRecordIdsFromReport(await readJson(path.resolve(batchReportPath)))
+    : new Set();
   await runExporter(root);
 
   const dataPath = (...parts) => path.join(root, 'data', ...parts);
@@ -187,6 +224,7 @@ export async function refreshSocialReleaseArtifacts(
     publishedRecords: archiveData.records,
     archiveRows,
     socialRows,
+    newlyCapturedRecordIds,
   });
   const census = refreshRelationshipTypeCensus(structuredClone(relationshipTypeRegistry), {
     relationshipRows,
@@ -231,10 +269,17 @@ export async function refreshSocialReleaseArtifacts(
 }
 
 function parseArgs(argv) {
-  if (argv.length !== 2 || argv[0] !== '--as-of') {
-    throw new Error('usage: node scripts/refresh-social-release-artifacts.mjs --as-of YYYY-MM-DD');
+  if (
+    ![2, 4].includes(argv.length)
+    || argv[0] !== '--as-of'
+    || (argv.length === 4 && argv[2] !== '--report')
+  ) {
+    throw new Error(
+      'usage: node scripts/refresh-social-release-artifacts.mjs '
+      + '--as-of YYYY-MM-DD [--report PATH]',
+    );
   }
-  return { asOfDate: argv[1] };
+  return { asOfDate: argv[1], batchReportPath: argv[3] };
 }
 
 async function main() {

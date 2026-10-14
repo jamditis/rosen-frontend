@@ -305,6 +305,7 @@ describe('Bluesky stewardship receipt and workflow boundary', () => {
     assert.match(workflow, /if: github\.ref == 'refs\/heads\/main'/);
     assert.match(workflow, /npm ci --ignore-scripts/);
     assert.match(publisher, /bluesky_batch_update\.py/);
+    assert.match(publisher, /'--report', paths\.reportPath/);
     assert.match(workflow, /deploy_full_site\.py/);
     assert.match(workflow, /verify-live-deploy\.mjs/);
     assert.equal((workflow.match(/git lfs pull/g) || []).length, 2);

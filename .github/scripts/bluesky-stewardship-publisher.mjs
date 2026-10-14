@@ -386,7 +386,10 @@ export function validateRecoveryRelease(root, state, {
 
 function publishChangedRelease(root, paths, state, report) {
   const asOf = safeIso(report.captured_at).slice(0, 10);
-  run(root, 'npm', ['run', 'refresh:social-release', '--', '--as-of', asOf]);
+  run(root, 'npm', [
+    'run', 'refresh:social-release', '--', '--as-of', asOf,
+    '--report', paths.reportPath,
+  ]);
   run(root, 'npm', [
     'run', 'build-social-embeddings', '--', '--incremental',
     '--previous-archive', paths.baselinePath,

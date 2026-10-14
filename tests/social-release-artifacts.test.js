@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  newlyCapturedRecordIdsFromReport,
   registerSourceSupportedGeneratedThreads,
 } from '../scripts/refresh-social-release-artifacts.mjs';
 
@@ -66,6 +67,25 @@ function generatedThread() {
   };
 }
 
+function generatedThreadFromRows(rows) {
+  return {
+    id: 'THREAD-00020',
+    type: 'social',
+    author: 'Jay Rosen',
+    pub: 'Bluesky',
+    url: rows[0].url,
+    thread_data: {
+      thread_id: rows[0].id,
+      posts: rows.map((row, index) => ({
+        id: row.id,
+        content: row.raw_text,
+        url: row.url,
+        parent_id: index === 0 ? null : rows[index - 1].id,
+      })),
+    },
+  };
+}
+
 test('registers only a source-backed Jay thread and preserves all existing holds', () => {
   const relationshipHolds = structuredClone(existingPolicy.relationshipTypeHolds);
   const duplicateHolds = structuredClone(existingPolicy.duplicateEdgeExceptions);
@@ -78,6 +98,7 @@ test('registers only a source-backed Jay thread and preserves all existing holds
       sourceRow('BSKY-10001', 'context', { parentRkey: 'root', verified: 'FALSE' }),
       sourceRow('BSKY-10002', 'final', { parentRkey: 'context' }),
     ],
+    newlyCapturedRecordIds: new Set(['BSKY-10000', 'BSKY-10001', 'BSKY-10002']),
   });
 
   assert.deepEqual(result.added, ['THREAD-00020']);
@@ -120,21 +141,60 @@ test('does not register an arbitrary generated published record', () => {
   );
 });
 
-test('requires named capture provenance for every thread member', () => {
-  const thread = generatedThread();
+test('requires named capture provenance for a newly captured thread member', () => {
   const rows = [
-    sourceRow('BSKY-10000', 'root'),
-    sourceRow('BSKY-10001', 'context', { parentRkey: 'root' }),
-    sourceRow('BSKY-10002', 'final', { parentRkey: 'context' }),
+    sourceRow('BSKY-02002', '3lbu4ybv7r22t'),
+    sourceRow('BSKY-02003', 'legacy-reply', { parentRkey: '3lbu4ybv7r22t' }),
+    sourceRow('BSKY-10002', 'new-reply', { parentRkey: 'legacy-reply' }),
   ];
+  rows[0].notes = '';
+  rows[1].notes = '';
   rows[2].notes = '';
 
   assert.throws(
     () => registerSourceSupportedGeneratedThreads(existingPolicy, {
-      publishedRecords: [thread],
+      publishedRecords: [generatedThreadFromRows(rows)],
       archiveRows: [],
       socialRows: rows,
+      newlyCapturedRecordIds: new Set(['BSKY-10002']),
     }),
     /BSKY-10002.*capture provenance/,
+  );
+});
+
+test('trusts legacy canonical members while requiring provenance for the new member', () => {
+  const rows = [
+    sourceRow('BSKY-02002', '3lbu4ybv7r22t'),
+    sourceRow('BSKY-02003', 'legacy-reply', { parentRkey: '3lbu4ybv7r22t' }),
+    sourceRow('BSKY-10002', 'new-reply', { parentRkey: 'legacy-reply' }),
+  ];
+  rows[0].notes = '';
+  rows[1].notes = '';
+  const result = registerSourceSupportedGeneratedThreads(existingPolicy, {
+    publishedRecords: [generatedThreadFromRows(rows)],
+    archiveRows: [],
+    socialRows: rows,
+    newlyCapturedRecordIds: new Set(['BSKY-10002']),
+  });
+  assert.deepEqual(result.added, ['THREAD-00020']);
+});
+
+test('derives the exact newly captured IDs from the adapter report', () => {
+  const recordIds = newlyCapturedRecordIdsFromReport({
+    schema_version: 1,
+    canonical: { rows_appended: 2 },
+    decisions: [
+      { record_id: 'BSKY-10000' },
+      { record_id: 'BSKY-10001' },
+    ],
+  });
+  assert.deepEqual([...recordIds], ['BSKY-10000', 'BSKY-10001']);
+  assert.throws(
+    () => newlyCapturedRecordIdsFromReport({
+      schema_version: 1,
+      canonical: { rows_appended: 1 },
+      decisions: [{ record_id: 'BSKY-10000' }, { record_id: 'BSKY-10001' }],
+    }),
+    /decisions do not match appended rows/,
   );
 });
