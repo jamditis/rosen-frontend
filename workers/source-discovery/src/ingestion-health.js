@@ -32,23 +32,25 @@ export async function readArchiveHealth(database, now = Date.now()) {
   const ingestion = await database.prepare(
     "SELECT run_id, checked_at, status, canonical_commit, release_version, captured_count, admitted_count, context_only_count, source_latest_at, error_class FROM archive_ingestion_runs ORDER BY checked_at DESC LIMIT 1",
   ).bind().first();
-  const ingestionHealthy = Boolean(ingestion && ingestion.status !== "failed" && fresh(ingestion.checked_at, now));
+  const ingestionFresh = Boolean(ingestion && fresh(ingestion.checked_at, now));
+  const ingestionHealthy = Boolean(ingestionFresh && ingestion.status !== "failed");
   return {
     healthy: discovery.every(source => source.healthy) && ingestionHealthy,
     discovery,
     ingestion: ingestion ? {
       runId: ingestion.run_id,
       checkedAt: ingestion.checked_at,
-      status: ingestion.status,
+      status: ingestionFresh ? ingestion.status : "receipt_stale",
+      lastReceiptStatus: ingestion.status,
       canonicalCommit: ingestion.canonical_commit,
       releaseVersion: ingestion.release_version,
       captured: ingestion.captured_count,
       admitted: ingestion.admitted_count,
       contextOnly: ingestion.context_only_count,
       sourceLatestAt: ingestion.source_latest_at,
-      errorClass: ingestion.error_class,
+      errorClass: ingestionFresh ? ingestion.error_class : "publication_receipt_stale",
       healthy: ingestionHealthy,
-    } : { status: "never_run", healthy: false },
+    } : { status: "never_run", errorClass: "publication_receipt_missing", healthy: false },
   };
 }
 

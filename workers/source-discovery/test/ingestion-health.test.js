@@ -147,10 +147,16 @@ test("health needs both recent discovery and verified ingestion, with a weekly P
   const db = await database();
   db.raw.run("INSERT INTO discovery_source_state VALUES (?,?,?,?,?,?)", ["jay-rosen-bluesky", null, null, "2026-10-14T09:17:00Z", "2026-10-14T09:17:00Z", "candidates_found"]);
   db.raw.run("INSERT INTO discovery_source_state VALUES (?,?,?,?,?,?)", ["pressthink-wordpress-posts", null, null, "2026-10-14T09:17:00Z", "2026-10-08T09:17:00Z", "skipped_interval"]);
-  assert.equal((await readArchiveHealth(db, NOW)).healthy, false);
+  const neverRun = await readArchiveHealth(db, NOW);
+  assert.equal(neverRun.healthy, false);
+  assert.equal(neverRun.ingestion.errorClass, "publication_receipt_missing");
   await receiveIngestionReceipt(request(receipt()), { DISCOVERY_LEDGER: db, INGESTION_RECEIPT_TOKEN: TOKEN }, NOW);
   assert.equal((await readArchiveHealth(db, NOW)).healthy, true);
-  assert.equal((await readArchiveHealth(db, NOW + 37 * 3_600_000)).healthy, false);
+  const stale = await readArchiveHealth(db, NOW + 37 * 3_600_000);
+  assert.equal(stale.healthy, false);
+  assert.equal(stale.ingestion.status, "receipt_stale");
+  assert.equal(stale.ingestion.errorClass, "publication_receipt_stale");
+  assert.equal(stale.ingestion.lastReceiptStatus, "published");
   const failure = receipt({ runId: "failed_run", checkedAt: "2026-10-14T18:02:00Z", status: "failed", records: [], errorClass: "validation_failed" });
   await receiveIngestionReceipt(request(failure), { DISCOVERY_LEDGER: db, INGESTION_RECEIPT_TOKEN: TOKEN }, NOW + 120_000);
   const health = await readArchiveHealth(db, NOW + 120_000);
