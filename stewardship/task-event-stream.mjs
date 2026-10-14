@@ -5,9 +5,10 @@ import {
   fsyncSync,
   openSync,
   readFileSync,
+  realpathSync,
   writeSync
 } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { TextDecoder } from 'node:util';
 
@@ -339,7 +340,7 @@ function syncCreatedFileDirectory(filePath) {
 
   let descriptor;
   try {
-    descriptor = openSync(dirname(resolve(String(filePath))), 'r');
+    descriptor = openSync(dirname(realpathSync(filePath)), 'r');
     fsyncSync(descriptor);
   } finally {
     if (descriptor !== undefined) closeSync(descriptor);

@@ -360,9 +360,12 @@ describe('stewardship task event JSONL adapter', () => {
       'const event = JSON.parse(process.argv[1]);',
       "const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'rosen-task-event-boundary-'));",
       "const restricted = path.join(directory, 'write-only-parent');",
-      "const stream = path.join(restricted, 'events.jsonl');",
+      "const target = path.join(restricted, 'events.jsonl');",
+      "const linked = process.argv[2] === 'symlink';",
+      "const stream = linked ? path.join(directory, 'events-link.jsonl') : target;",
       'fs.mkdirSync(restricted);',
-      "fs.writeFileSync(stream, '', { mode: 0o600 });",
+      "if (linked) fs.symlinkSync(target, stream);",
+      "else fs.writeFileSync(stream, '', { mode: 0o600 });",
       'fs.chmodSync(restricted, 0o300);',
       'let result;',
       'try {',
@@ -388,25 +391,28 @@ describe('stewardship task event JSONL adapter', () => {
     ].join('\n');
     const options = { encoding: 'utf8' };
     if (process.getuid() === 0) Object.assign(options, { uid: 65534, gid: 65534 });
-    const boundary = spawnSync(
-      process.execPath,
-      ['--input-type=module', '--eval', script, JSON.stringify(lifecycle[0])],
-      options
-    );
-    assert.equal(boundary.status, 0, boundary.stderr);
-    const failure = JSON.parse(boundary.stdout);
+    for (const mode of ['direct', 'symlink']) {
+      const boundary = spawnSync(
+        process.execPath,
+        ['--input-type=module', '--eval', script, JSON.stringify(lifecycle[0]), mode],
+        options
+      );
+      assert.equal(boundary.status, 0, boundary.stderr);
+      const failure = JSON.parse(boundary.stdout);
 
-    assert.equal(failure.name, TaskEventPostAppendError.name);
-    assert.match(failure.source, /write-only-parent\/events\.jsonl$/);
-    assert.equal(failure.eventId, lifecycle[0].eventId);
-    assert.equal(failure.stage, 'parent-directory-sync');
-    assert.equal(failure.recordAppended, true);
-    assert.equal(failure.fileSynced, true);
-    assert.equal(failure.causeCode, 'EACCES');
-    assert.match(failure.message, new RegExp(lifecycle[0].eventId));
-    assert.match(failure.message, /directory durability is incomplete/);
-    assert.match(failure.message, /inspect the authoritative stream before retry/);
-    assert.equal(failure.content, encodeTaskEvent(lifecycle[0]));
+      assert.equal(failure.name, TaskEventPostAppendError.name);
+      assert.match(failure.source, mode === 'symlink'
+        ? /events-link\.jsonl$/ : /write-only-parent\/events\.jsonl$/);
+      assert.equal(failure.eventId, lifecycle[0].eventId);
+      assert.equal(failure.stage, 'parent-directory-sync');
+      assert.equal(failure.recordAppended, true);
+      assert.equal(failure.fileSynced, true);
+      assert.equal(failure.causeCode, 'EACCES');
+      assert.match(failure.message, new RegExp(lifecycle[0].eventId));
+      assert.match(failure.message, /directory durability is incomplete/);
+      assert.match(failure.message, /inspect the authoritative stream before retry/);
+      assert.equal(failure.content, encodeTaskEvent(lifecycle[0]));
+    }
   });
 
   it('uses one filesystem path for a file URL append and directory sync', (t) => {
