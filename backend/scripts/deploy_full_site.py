@@ -102,8 +102,8 @@ _DEPLOY_DIRS: Tuple[str, ...] = (
     "faq",
     "dissertation-launch",
     "features/shared",
-    "features/winer-method",
-    "features/participate",
+    'features/winer-method',  # fmt: skip
+    'features/participate',  # fmt: skip
     "tools/active/dataviz",
     "data/feeds",
 )
