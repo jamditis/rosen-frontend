@@ -60,6 +60,16 @@ function assertMarkdownReportCurrent(census, committedMarkdown) {
   );
 }
 
+function assertReportsCurrent(census, committedJson, committedMarkdown) {
+  const jsonReport = JSON.parse(committedJson);
+  const commitLines = [...committedMarkdown.matchAll(/^Input commit: `([^`\n]+)` \([^\n]+\)$/gm)];
+  assert.equal(commitLines.length, 1, 'Census Markdown must contain one input commit line');
+  assert.equal(jsonReport.input?.commit, commitLines[0][1],
+    'Committed census JSON and Markdown input commits differ');
+  assertJsonReportCurrent(census, committedJson);
+  assertMarkdownReportCurrent(census, committedMarkdown);
+}
+
 describe('stewardship coverage census', () => {
   it('reconciles representative source and runtime records with first-match filters', () => {
     const inputs = loadStewardshipInputs({ dataDir: fixtureDir });
@@ -205,6 +215,13 @@ describe('stewardship coverage census', () => {
 
     assertJsonReportCurrent(census, formatStewardshipCensusJson(provenanceOnly));
     assertMarkdownReportCurrent(census, formatStewardshipCensusMarkdown(provenanceOnly));
+    assertReportsCurrent(census, formatStewardshipCensusJson(provenanceOnly),
+      formatStewardshipCensusMarkdown(provenanceOnly));
+    assert.throws(
+      () => assertReportsCurrent(census, formatStewardshipCensusJson(provenanceOnly),
+        formatStewardshipCensusMarkdown(census)),
+      /JSON and Markdown input commits differ/,
+    );
 
     const hashDrift = structuredClone(provenanceOnly);
     hashDrift.input.files[0].sha256 = '0'.repeat(64);
@@ -272,12 +289,9 @@ describe('stewardship coverage census', () => {
       census.records.reconciliation.curated.filtered + census.records.reconciliation.social.filtered
     );
 
-    assertJsonReportCurrent(
+    assertReportsCurrent(
       census,
       fs.readFileSync(path.join(rootDir, 'data', 'stewardship-census.json'), 'utf8'),
-    );
-    assertMarkdownReportCurrent(
-      census,
       fs.readFileSync(path.join(rootDir, 'data', 'stewardship-census.md'), 'utf8'),
     );
   });

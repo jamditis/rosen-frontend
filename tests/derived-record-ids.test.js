@@ -78,6 +78,21 @@ function assertDerivedIds({ curated, social, full, core, details, index, reviewe
       assertGeneratedThread(full.find(record => record.id === id), socialIds);
     }
   }
+
+  const curatedThreadIds = curated.filter(isPublishedCurated)
+    .filter(row => row.id.startsWith('THREAD-')).map(row => row.id);
+  const generatedThreadIds = reviewedGeneratedIds.filter(id => id.startsWith('THREAD-'));
+  const publishedThreadIds = fullIds.filter(id => id.startsWith('THREAD-'));
+  assertIdSet(publishedThreadIds, [...curatedThreadIds, ...generatedThreadIds], 'published THREAD registry');
+}
+
+function assertFeedCurrent(actual, expected, artifact) {
+  const normalize = xml => {
+    const buildDates = [...xml.matchAll(/<lastBuildDate>[^<]*<\/lastBuildDate>/g)];
+    assert.equal(buildDates.length, 1, `${artifact}: expected one feed build date`);
+    return xml.replace(/<lastBuildDate>[^<]*<\/lastBuildDate>/, '<lastBuildDate>informational</lastBuildDate>');
+  };
+  assert.equal(normalize(actual), normalize(expected), `${artifact}: stale feed content`);
 }
 
 function fixture() {
@@ -114,6 +129,37 @@ function fixture() {
 
 test('derived ID guard retains curated and reviewed generated thread containers', () => {
   assertDerivedIds(fixture());
+});
+
+test('derived ID guard excludes curated threads rejected by the exporter', () => {
+  const input = fixture();
+  input.curated.push(
+    { ...input.curated[1], id: 'THREAD-00002', verified: 'FALSE' },
+    { ...input.curated[1], id: 'THREAD-00003', publication_date: 'not-a-date' },
+  );
+  assertDerivedIds(input);
+});
+
+test('feed freshness ignores build time and rejects changed reader content at the same URL', () => {
+  const record = {
+    id: 'R1', type: 'article', url: 'https://example.org/story',
+    title: 'Original title', summary: 'Original summary',
+    date: '2026-01-01', categories: ['Original category'],
+  };
+  const feed = row => generateAllFeeds([row], 'https://example.org/archive')['rss.xml'];
+  const original = feed(record);
+  const olderBuild = original.replace(/<lastBuildDate>[^<]*<\/lastBuildDate>/,
+    '<lastBuildDate>Thu, 01 Jan 1970 00:00:00 GMT</lastBuildDate>');
+  assertFeedCurrent(olderBuild, original, 'fixture RSS');
+  for (const change of [
+    { title: 'Corrected title' },
+    { summary: 'Corrected summary' },
+    { categories: ['Corrected category'] },
+    { date: '2026-01-02' },
+  ]) {
+    assert.throws(() => assertFeedCurrent(original, feed({ ...record, ...change }), 'fixture RSS'),
+      /stale feed content/);
+  }
 });
 
 test('derived ID guard accepts future source-backed threads after registry review', () => {
@@ -181,16 +227,10 @@ test('committed artifacts match source IDs and the reviewed generated registry',
     reviewedGeneratedIds,
   });
 
-  const curatedThreadIds = curated.filter(row => row.id.startsWith('THREAD-')).map(row => row.id);
-  const generatedThreadIds = reviewedGeneratedIds.filter(id => id.startsWith('THREAD-'));
-  const publishedThreadIds = full.filter(record => record.id.startsWith('THREAD-')).map(record => record.id);
-  assertIdSet(publishedThreadIds, [...curatedThreadIds, ...generatedThreadIds], 'published THREAD registry');
-
-  const guids = xml => [...xml.matchAll(/<guid\b[^>]*>([^<]*)<\/guid>/g)].map(match => match[1]);
   for (const [name, expected] of Object.entries(
     generateAllFeeds(full, 'https://pressthink.org/j/rosen-archive'),
   )) {
     const actual = fs.readFileSync(path.join('data', 'feeds', name), 'utf8');
-    assert.deepEqual(guids(actual), guids(expected), `data/feeds/${name}: stale feed entries`);
+    assertFeedCurrent(actual, expected, `data/feeds/${name}`);
   }
 });
