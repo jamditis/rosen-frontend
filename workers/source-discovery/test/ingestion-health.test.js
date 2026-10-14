@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import initSqlJs from "sql.js";
 import worker from "../src/index.js";
-import { readArchiveHealth, receiveIngestionReceipt, validateIngestionReceipt } from "../src/ingestion-health.js";
+import { readArchiveHealth, readPendingIngestionCandidates, receiveIngestionReceipt, validateIngestionReceipt } from "../src/ingestion-health.js";
 
 const TOKEN = "example-test-receipt-token-with-no-real-authority";
 const NOW = Date.parse("2026-10-14T18:00:00Z");
@@ -74,6 +74,28 @@ function request(body, token = TOKEN) {
 test("receipt authentication rejects before any D1 access", async () => {
   const result = await receiveIngestionReceipt(request(receipt(), "invalid-token"), { INGESTION_RECEIPT_TOKEN: TOKEN }, NOW);
   assert.equal(result.status, 401);
+});
+
+test("pending candidate reads require authentication and paginate only Jay's unsettled URIs", async () => {
+  const get = cursor => new Request(`https://rosen-source-discovery.jamditis.workers.dev/ingestion-candidates${cursor}`, { headers: { Authorization: `Bearer ${TOKEN}` } });
+  const denied = new Request("https://rosen-source-discovery.jamditis.workers.dev/ingestion-candidates");
+  assert.equal((await readPendingIngestionCandidates(denied, {})).status, 401);
+  assert.equal((await readPendingIngestionCandidates(get("?cursor=bad"), { INGESTION_RECEIPT_TOKEN: TOKEN })).status, 400);
+  const db = await database();
+  const insert = (source, uri, status = "pending_review") => db.raw.run("INSERT INTO discovery_candidates (source_id,canonical_url,first_seen_at,last_seen_at,latest_run_id,review_status) VALUES (?,?,?,?,?,?)", [source, uri, "2026-10-14", "2026-10-14", "example", status]);
+  for (let index = 0; index < 201; index++) insert("jay-rosen-bluesky", URI + index);
+  insert("pressthink-wordpress-posts", "https://pressthink.org/example");
+  insert("jay-rosen-bluesky", URI + "accepted", "accepted");
+  const env = { DISCOVERY_LEDGER: db, INGESTION_RECEIPT_TOKEN: TOKEN };
+  const first = await readPendingIngestionCandidates(get(""), env);
+  assert.equal(first.status, 200);
+  assert.equal(first.body.candidates.length, 200);
+  assert.ok(first.body.nextCursor);
+  const last = await readPendingIngestionCandidates(get(`?cursor=${first.body.nextCursor}`), env);
+  assert.equal(last.body.candidates.length, 1);
+  assert.equal(last.body.nextCursor, null);
+  assert.deepEqual(Object.keys(last.body.candidates[0]), ["uri"]);
+  db.raw.close();
 });
 
 test("receipt validation bounds counts, source identity, duplicates and timestamps", () => {

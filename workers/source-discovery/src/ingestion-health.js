@@ -67,6 +67,25 @@ async function authorized(request, expected) {
   return difference === 0;
 }
 
+export async function readPendingIngestionCandidates(request, env) {
+  if (!await authorized(request, env.INGESTION_RECEIPT_TOKEN)) return { status: 401, body: { error: "unauthorized" } };
+  const query = new URL(request.url).searchParams;
+  const value = query.get("cursor") || "0";
+  if ([...query.keys()].some(key => key !== "cursor") || query.getAll("cursor").length > 1
+    || !/^\d{1,16}$/.test(value) || !Number.isSafeInteger(Number(value))) {
+    return { status: 400, body: { error: "invalid_cursor" } };
+  }
+  const rows = (await env.DISCOVERY_LEDGER.prepare(
+    "SELECT rowid AS cursor, canonical_url AS uri FROM discovery_candidates WHERE source_id = ? AND review_status = 'pending_review' AND rowid > ? ORDER BY rowid LIMIT 201",
+  ).bind("jay-rosen-bluesky", Number(value)).all()).results;
+  const page = rows.slice(0, 200);
+  if (page.some(row => !ACTOR_POST.test(row.uri))) throw new Error("invalid_ledger_candidate");
+  return { status: 200, body: {
+    candidates: page.map(({ uri }) => ({ uri })),
+    nextCursor: rows.length > 200 ? String(page.at(-1).cursor) : null,
+  } };
+}
+
 export function validateIngestionReceipt(value, now = Date.now()) {
   if (!value || typeof value !== "object" || Array.isArray(value) || value.version !== 1) throw new Error("invalid_receipt");
   if (!/^[A-Za-z0-9_-]{1,64}$/.test(value.runId || "")) throw new Error("invalid_run_id");

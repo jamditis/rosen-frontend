@@ -63,6 +63,11 @@ Repeated receipt delivery is idempotent. Decisions can arrive before the next
 discovery tick. Failed runs carry no admission decisions. Dry runs send no receipt
 and do not change candidate status or health history.
 
+After verified publication, the sender reads authenticated pages of pending Jay
+source URIs and matches them to canonical record IDs and admission flags. This
+settles older successful captures after an upload or receipt delivery retry. A
+candidate absent from canonical data remains pending for the next capture.
+
 An empty capture is healthy when the public bytes match the tested canonical head.
 If an earlier push reached main but its upload failed, the next run tests and
 redeploys that existing head without assigning duplicate source rows. A repeated

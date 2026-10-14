@@ -13,6 +13,7 @@ It is a read-only candidate-discovery control plane. It is not the archive scrap
 - The configuration has no KV, R2, Queue, AI, Vectorize, or route binding. The one receipt secret grants permission to record operational metadata only.
 - `GET /health` reads recent successful discovery and verified publication receipts. A missing, failed, or stale receipt returns HTTP 503.
 - `POST /ingestion-receipt` accepts authenticated, bounded receipts from the GitHub publisher. It cannot start discovery, fetch a supplied URL, write archive CSVs, or publish the site.
+- `GET /ingestion-candidates` authenticates with the same token and returns a bounded page of pending Jay source URIs. The publisher uses canonical rows to settle earlier successful captures after upload or receipt recovery.
 - It deploys only to `https://rosen-source-discovery.jamditis.workers.dev`.
 - The source manifest is fixed in source code. It allows HTTPS URLs from named origins and paths only.
 - The source manifest is versioned. Increase `SOURCE_MANIFEST_VERSION` only when a reviewed source boundary or adapter shape changes.

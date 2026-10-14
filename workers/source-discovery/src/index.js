@@ -1,6 +1,6 @@
 import { DISCOVERY_MODE, runDiscovery } from "./discovery.js";
 import { runLiveDiscovery } from "./ledger.js";
-import { readArchiveHealth, receiveIngestionReceipt } from "./ingestion-health.js";
+import { readArchiveHealth, readPendingIngestionCandidates, receiveIngestionReceipt } from "./ingestion-health.js";
 import {
   PUBLIC_SOURCE_MANIFEST,
   SOURCE_MANIFEST_VERSION,
@@ -44,6 +44,14 @@ function logRun(report) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (request.method === "GET" && url.pathname === "/ingestion-candidates") {
+      try {
+        const result = await readPendingIngestionCandidates(request, env);
+        return json(result.body, result.status);
+      } catch {
+        return json({ error: "ledger_unavailable" }, 503);
+      }
+    }
     if (request.method === "POST" && url.pathname === "/ingestion-receipt") {
       try {
         const result = await receiveIngestionReceipt(request, env);
