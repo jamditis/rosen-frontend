@@ -1,4 +1,5 @@
 import datetime
+import http.client
 import io
 import json
 from pathlib import Path
@@ -39,6 +40,12 @@ class _Response:
     def close(self):
         self.closed = True
         self._body.close()
+
+
+class _IncompleteResponse(_Response):
+    def read(self, size=-1):
+        self.read_sizes.append(size)
+        raise http.client.IncompleteRead(b'{"healthy":', 100)
 
 
 def _health_payload(
@@ -156,6 +163,37 @@ def test_native_http_redirect_response_is_rejected_without_retry(tmp_path):
     assert report["error"] == "unexpected_http_status"
     assert len(calls) == 1
     assert calls[0][0].full_url == watcher.HEALTH_URL
+
+
+def test_protocol_read_failures_follow_outage_alert_progression(tmp_path):
+    state_path = tmp_path / "state.json"
+    messages = []
+    responses = [_IncompleteResponse(body=b""), _IncompleteResponse(body=b"")]
+
+    first, first_exit = _run(
+        state_path,
+        responses[0],
+        notify=True,
+        sender=messages.append,
+    )
+    second, second_exit = _run(
+        state_path,
+        responses[1],
+        notify=True,
+        sender=messages.append,
+    )
+
+    assert first_exit == watcher.EXIT_OUTAGE
+    assert first["error"] == "request_failed"
+    assert first["consecutive_failures"] == 1
+    assert first["notification"] == {"event": None, "status": "below_threshold"}
+    assert second_exit == watcher.EXIT_OUTAGE
+    assert second["error"] == "request_failed"
+    assert second["consecutive_failures"] == 2
+    assert second["notification"] == {"event": "outage", "status": "sent"}
+    assert second["alert_active"] is True
+    assert len(messages) == 1
+    assert all(response.closed for response in responses)
 
 
 def test_reported_false_health_cannot_pass_on_http_200(tmp_path):

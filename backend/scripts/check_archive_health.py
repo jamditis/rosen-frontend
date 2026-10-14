@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import http.client
 import json
 import os
 import re
@@ -254,7 +255,7 @@ def probe_health(
                 http_status=status_code,
                 error=str(exc),
             )
-    except (urllib.error.URLError, TimeoutError, OSError):
+    except (urllib.error.URLError, http.client.HTTPException, TimeoutError, OSError):
         return ProbeResult(health="outage", error="request_failed")
     finally:
         close = getattr(response, "close", None)
