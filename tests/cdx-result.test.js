@@ -197,6 +197,44 @@ describe('offline Wayback CDX result contract (#903)', () => {
     assert.equal(validateSchema(missingCursor), false);
   });
 
+  it('rejects a resume cursor when the server omitted urlkey', () => {
+    // Upstream wayback issue #121 reports a year-skipping cursor without urlkey.
+    const rows = JSON.parse(fixture('many-with-resume.json'));
+    const index = rows[0].indexOf('urlkey');
+    for (const row of rows.slice(0, -2)) row.splice(index, 1);
+    rows.at(-1)[0] = '-+19971211122953';
+    const parameters = defaultParameters.map(parameter => parameter.name === 'fl'
+      ? { ...parameter, value: parameter.value.split(',').filter(field => field !== 'urlkey').join(',') }
+      : parameter);
+    assert.throws(
+      () => parseCdxPage(Buffer.from(JSON.stringify(rows)), metadata({ parameters })),
+      error => error instanceof CdxResultError && error.row === 1
+        && error.nextCursor === null && !Object.hasOwn(error, 'captures')
+        && /requires.*urlkey/.test(error.message),
+    );
+    const exhausted = parseCdxPage(Buffer.from(JSON.stringify(rows.slice(0, -2))), metadata({ parameters }));
+    assert.equal(exhausted.nextCursor, null);
+    assert.equal(exhausted.captures.length, 3);
+    assertSchemaAccepts(exhausted, 'non-resumable custom fields');
+  });
+
+  it('preserves valid scheme casing while keeping parser and schema URL validation aligned', () => {
+    for (const scheme of ['HTTP', 'HTTPS', 'hTtPs']) {
+      const declared = structuredClone(metadata());
+      declared.query.requestUrl = declared.query.requestUrl.replace(/^https/, scheme);
+      declared.objectMappings[0].sourceUrl = `${scheme}://Archive.org/?edition=Print`;
+      const result = parseCdxPage(fixture('one.json'), declared);
+      assert.equal(result.query.requestUrl, declared.query.requestUrl);
+      assert.equal(result.objectMappings[0].sourceUrl, declared.objectMappings[0].sourceUrl);
+      assertSchemaAccepts(result, scheme);
+    }
+    for (const sourceUrl of ['https:archive.org', 'https://archive.org/a b', 'https://archive.org/path ', 'https://例え.テスト/']) {
+      assert.throws(() => parseCdxPage(fixture('one.json'), metadata({
+        objectMappings: [{ ...defaultMappings[0], sourceUrl }],
+      })), CdxResultError);
+    }
+  });
+
   it('uses header names instead of fixed positions', () => {
     const result = parseCdxPage(fixture('reordered-header.json'), metadata());
 

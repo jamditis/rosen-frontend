@@ -72,6 +72,11 @@ they are not replay checks.
 
 The parser follows the Internet Archive's documented JSON resumption shape:
 an empty array separates capture rows from one final one-field resume-key row.
+Resumable pages must include `urlkey` in the header. The upstream server can
+produce a cursor that skips captures when custom fields omit it; see
+[Wayback issue 121](https://github.com/internetarchive/wayback/issues/121).
+Declared request and mapping URLs retain their original scheme casing and
+must satisfy the same HTTP(S) URI rules in the parser and sidecar schema.
 It returns a cursor only after the header, every capture row, and the complete
 trailer validate. An invalid page throws `CdxResultError` with a one-based JSON
 row number after the JSON structure parses and always exposes `nextCursor` as

@@ -1,8 +1,15 @@
 import { createHash } from 'node:crypto';
+import { compileJsonSchema } from '../scripts/json-schema-validator.mjs';
 
 export const CDX_RESULT_VERSION = '1.0.0';
 export const CDX_ADAPTER_NAME = 'internet-archive-wayback-cdx-json';
 export const CDX_ADAPTER_VERSION = '1.0.0';
+
+const isWebUri = compileJsonSchema({
+  type: 'string',
+  format: 'uri',
+  pattern: '^[hH][tT][tT][pP][sS]?://',
+}, { source: 'CDX web URL' });
 
 const REQUIRED_FIELDS = Object.freeze([
   'timestamp',
@@ -106,7 +113,7 @@ function validateWaybackTimestamp(value, row) {
 }
 
 function validateWebUrl(value, label) {
-  if (typeof value !== 'string' || value.length === 0) fail(`${label} must be a web URL`);
+  if (!isWebUri(value)) fail(`${label} must be a web URL`);
   try {
     const url = new URL(value);
     if (url.protocol !== 'http:' && url.protocol !== 'https:') fail(`${label} must be a web URL`);
@@ -431,6 +438,9 @@ export function parseCdxPage(bytes, declaredMetadata) {
   if (rows.length > 0) {
     const header = parseHeader(rows[0]);
     const page = splitTrailer(rows, metadata.query.parameters);
+    if (page.nextCursor !== null && !header.has('urlkey')) {
+      fail('continuation requires the urlkey field in the response header', { row: 1 });
+    }
     nextCursor = page.nextCursor;
     captures = page.captureRows.map((row, index) => (
       parseCapture(row, index + 2, header, rows[0].length, metadata.checkedAt)
