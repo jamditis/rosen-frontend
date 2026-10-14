@@ -467,4 +467,104 @@ describe('rebuildable stewardship task index', () => {
       /eventPath must be a non-empty path string/
     );
   });
+
+  it('preserves symbolic-link index and backup destinations and their targets', () => {
+    for (const role of ['index', 'backup']) {
+      for (const dangling of [false, true]) {
+        const root = directory(`symlink-${role}-${dangling}`);
+        const eventPath = path.join(root, 'events.jsonl');
+        const target = path.join(root, 'target.sqlite');
+        const link = path.join(root, 'link.sqlite');
+        fs.writeFileSync(eventPath, fixtureBytes);
+        if (!dangling) rebuildTaskIndex({ eventPath, indexPath: target });
+        const targetBytes = dangling ? null : fs.readFileSync(target);
+        fs.symlinkSync(target, link);
+        const indexPath = role === 'index' ? link : path.join(root, 'index.sqlite');
+        if (role === 'backup') rebuildTaskIndex({ eventPath, indexPath });
+        const config = { eventPath, indexPath,
+          ...(role === 'backup' ? { backupPath: link } : {}) };
+        assert.throws(() => rebuildTaskIndex(config), /must not be a symbolic link/);
+        assert.ok(fs.lstatSync(link).isSymbolicLink());
+        assert.equal(fs.readlinkSync(link), target);
+        if (dangling) assert.equal(fs.existsSync(target), false);
+        else assert.deepEqual(fs.readFileSync(target), targetBytes);
+      }
+    }
+  });
+
+  it('refuses foreign version-zero migrations without changing database bytes', () => {
+    for (const applicationId of [12345, 0]) {
+      const root = directory(`migration-foreign-${applicationId}`);
+      const filePath = path.join(root, 'foreign.sqlite');
+      const database = new DatabaseSync(filePath);
+      try {
+        database.exec('CREATE TABLE foreign_records(value TEXT)');
+        database.exec("INSERT INTO foreign_records VALUES ('retained')");
+        database.exec(`PRAGMA application_id = ${applicationId}`);
+        const before = fs.readFileSync(filePath);
+        assert.throws(() => migrateTaskIndex(database),
+          /application_id .* is not recognized|version-zero database must be empty/);
+        assert.deepEqual(fs.readFileSync(filePath), before);
+        assert.equal(database.prepare('PRAGMA application_id').get().application_id,
+          applicationId);
+        assert.equal(database.prepare('SELECT value FROM foreign_records').get().value,
+          'retained');
+      } finally {
+        database.close();
+      }
+    }
+  });
+
+  it('requires existing destination directories without creating partial state', () => {
+    for (const role of ['index', 'backup']) {
+      const root = directory(`missing-parent-${role}`);
+      const eventPath = path.join(root, 'events.jsonl');
+      const missing = path.join(root, 'not-created', 'nested');
+      fs.writeFileSync(eventPath, fixtureBytes);
+      const indexPath = role === 'index'
+        ? path.join(missing, 'index.sqlite') : path.join(root, 'index.sqlite');
+      if (role === 'backup') rebuildTaskIndex({ eventPath, indexPath });
+      const prior = role === 'backup' ? fs.readFileSync(indexPath) : null;
+      assert.throws(() => rebuildTaskIndex({ eventPath, indexPath,
+        ...(role === 'backup' ? { backupPath: path.join(missing, 'backup.sqlite') } : {})
+      }), /parent directory must already exist/);
+      assert.equal(fs.existsSync(path.join(root, 'not-created')), false);
+      if (prior) assert.deepEqual(fs.readFileSync(indexPath), prior);
+    }
+  });
+
+  it('rejects real WAL state on index and backup targets before reading or swapping', () => {
+    for (const role of ['index', 'backup']) {
+      for (const late of [false, true]) {
+        const root = directory(`wal-${role}-${late}`);
+        const eventPath = path.join(root, 'events.jsonl');
+        const indexPath = path.join(root, 'index.sqlite');
+        const backupPath = path.join(root, 'backup.sqlite');
+        fs.writeFileSync(eventPath, fixtureBytes);
+        rebuildTaskIndex({ eventPath, indexPath });
+        if (role === 'backup') fs.copyFileSync(indexPath, backupPath);
+        const target = role === 'index' ? indexPath : backupPath;
+        let writer;
+        let before;
+        const openWriter = () => {
+          writer = new DatabaseSync(target);
+          writer.exec('PRAGMA journal_mode = WAL');
+          writer.exec('PRAGMA wal_autocheckpoint = 0');
+          writer.exec('DELETE FROM tasks');
+          before = ['', '-wal', '-shm'].map(suffix => fs.readFileSync(target + suffix));
+        };
+        try {
+          if (!late) openWriter();
+          assert.throws(() => rebuildTaskIndex({ eventPath, indexPath,
+            ...(role === 'backup' ? { backupPath } : {}) },
+          late ? { beforeReplace: openWriter } : {}), /SQLite sidecar/);
+          assert.deepEqual(['', '-wal', '-shm'].map(suffix =>
+            fs.readFileSync(target + suffix)), before);
+          assert.deepEqual(fs.readdirSync(root).filter(name => name.includes('.rebuild-')), []);
+        } finally {
+          writer?.close();
+        }
+      }
+    }
+  });
 });

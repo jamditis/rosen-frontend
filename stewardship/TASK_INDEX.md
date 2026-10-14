@@ -35,11 +35,19 @@ effective lifecycle order and does not revive completed tasks after corrections.
 `backupPath` receives the prior closed index. The three paths must not resolve
 to the same location, including through a symbolic link. Operators should keep
 these mutable state files outside the source checkout.
+Create and persist the index and backup parent directories before a rebuild;
+the projector requires those directories to exist and does not create them.
+The index and backup files must not be symbolic links, including dangling links.
+Directory links are allowed when the three state paths remain distinct.
 
 An existing index or backup destination must identify itself with this task
 index's SQLite application ID and supported schema version. A rebuild refuses
 an unrelated SQLite database, a non-SQLite file, or an index from a newer
 schema without changing its bytes. There is no overwrite override.
+A destination with a SQLite `-wal`, `-shm`, or `-journal` sidecar is refused
+before it is opened and again before replacement. Close all writers and complete
+SQLite checkpoint/recovery before rebuilding. The projector does not remove
+sidecars or copy a live database.
 
 A rebuild validates the complete source stream, builds and checks a sibling
 temporary database, and records the source byte length, SHA-256, event count,
@@ -63,7 +71,8 @@ backup cannot replace the authoritative source.
 ## Schema versions
 
 SQLite `user_version` and `application_id` identify the index schema. The
-version 1 migration creates an empty index transactionally and records the
+version 1 migration requires an empty version-zero database with an unassigned
+or matching application ID, creates the index transactionally, and records the
 migration. Reopening version 1 is idempotent. A newer unknown schema fails
 without modification.
 

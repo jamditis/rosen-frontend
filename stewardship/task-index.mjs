@@ -5,7 +5,7 @@ import {
   copyFileSync,
   existsSync,
   fsyncSync,
-  mkdirSync,
+  lstatSync,
   openSync,
   readFileSync,
   realpathSync,
@@ -196,6 +196,14 @@ function assertCurrentSchema(database) {
 }
 
 function assertReplaceableIndex(filePath, label) {
+  if (lstatSync(filePath, { throwIfNoEntry: false })?.isSymbolicLink()) {
+    throw new Error(`${label} must not be a symbolic link: ${filePath}`);
+  }
+  for (const suffix of ['-wal', '-shm', '-journal']) {
+    if (lstatSync(filePath + suffix, { throwIfNoEntry: false })) {
+      throw new Error(`${label} has a SQLite sidecar; close and checkpoint it before rebuilding: ${filePath + suffix}`);
+    }
+  }
   if (!existsSync(filePath)) return;
 
   let database;
@@ -213,6 +221,10 @@ function assertReplaceableIndex(filePath, label) {
 }
 
 export function migrateTaskIndex(database) {
+  const applicationId = pragmaNumber(database, 'application_id');
+  if (applicationId !== 0 && applicationId !== TASK_INDEX_APPLICATION_ID) {
+    throw new Error(`task index application_id ${applicationId} is not recognized`);
+  }
   const version = pragmaNumber(database, 'user_version');
   if (version > TASK_INDEX_SCHEMA_VERSION) {
     throw new Error(
@@ -222,6 +234,9 @@ export function migrateTaskIndex(database) {
   if (version === TASK_INDEX_SCHEMA_VERSION) {
     assertCurrentSchema(database);
     return TASK_INDEX_SCHEMA_VERSION;
+  }
+  if (database.prepare("SELECT name FROM sqlite_schema WHERE name NOT LIKE 'sqlite_%' LIMIT 1").get()) {
+    throw new Error('task index version-zero database must be empty');
   }
 
   database.exec('BEGIN IMMEDIATE');
@@ -310,6 +325,12 @@ function fsyncDirectory(directory) {
     fsyncSync(descriptor);
   } finally {
     closeSync(descriptor);
+  }
+}
+
+function requireDestinationDirectory(filePath, label) {
+  if (!statSync(path.dirname(filePath), { throwIfNoEntry: false })?.isDirectory()) {
+    throw new Error(`${label} parent directory must already exist: ${path.dirname(filePath)}`);
   }
 }
 
@@ -458,7 +479,7 @@ function buildIndexDatabase(databasePath, snapshot) {
 }
 
 function copyPreviousIndex(indexPath, backupPath) {
-  mkdirSync(path.dirname(backupPath), { recursive: true });
+  requireDestinationDirectory(backupPath, 'backupPath');
   const temporary = siblingTemporaryPath(backupPath, 'backup');
   try {
     copyFileSync(indexPath, temporary, fsConstants.COPYFILE_EXCL);
@@ -500,12 +521,13 @@ export function rebuildTaskIndex(configValue, { beforeReplace } = {}) {
   if (beforeReplace !== undefined && typeof beforeReplace !== 'function') {
     throw new TypeError('beforeReplace must be a function');
   }
+  requireDestinationDirectory(config.indexPath, 'indexPath');
   assertReplaceableIndex(config.indexPath, 'indexPath');
   if (config.backupPath !== undefined) {
+    requireDestinationDirectory(config.backupPath, 'backupPath');
     assertReplaceableIndex(config.backupPath, 'backupPath');
   }
   const snapshot = readSourceSnapshot(config.eventPath);
-  mkdirSync(path.dirname(config.indexPath), { recursive: true });
   const temporaryIndex = siblingTemporaryPath(config.indexPath, 'rebuild');
   const descriptor = openSync(temporaryIndex, 'wx', 0o600);
   closeSync(descriptor);
