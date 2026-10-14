@@ -27,6 +27,39 @@ function buildFixtureCensus() {
   });
 }
 
+function censusForFreshness(census) {
+  assert.equal(typeof census.input?.commit, 'string', 'Census input.commit must remain present');
+  assert.ok(census.input.commit.trim(), 'Census input.commit must remain nonempty');
+  const comparable = structuredClone(census);
+  comparable.input.commit = '<informational>';
+  return comparable;
+}
+
+function markdownForFreshness(markdown) {
+  const commitLines = [...markdown.matchAll(/^Input commit: `[^`\n]+` \(([^\n]+)\)$/gm)];
+  assert.equal(commitLines.length, 1, 'Census Markdown must contain one input commit line');
+  return markdown.replace(
+    /^Input commit: `[^`\n]+` \(([^\n]+)\)$/m,
+    'Input commit: `<informational>` ($1)',
+  );
+}
+
+function assertJsonReportCurrent(census, committedJson) {
+  assert.deepEqual(
+    censusForFreshness(JSON.parse(committedJson)),
+    censusForFreshness(census),
+    'Committed census JSON is stale',
+  );
+}
+
+function assertMarkdownReportCurrent(census, committedMarkdown) {
+  assert.equal(
+    markdownForFreshness(committedMarkdown),
+    markdownForFreshness(formatStewardshipCensusMarkdown(census)),
+    'Committed census Markdown is stale',
+  );
+}
+
 describe('stewardship coverage census', () => {
   it('reconciles representative source and runtime records with first-match filters', () => {
     const inputs = loadStewardshipInputs({ dataDir: fixtureDir });
@@ -165,6 +198,33 @@ describe('stewardship coverage census', () => {
     );
   });
 
+  it('ignores only commit provenance when checking JSON and Markdown freshness', () => {
+    const census = buildFixtureCensus();
+    const provenanceOnly = structuredClone(census);
+    provenanceOnly.input.commit = 'squash-merge-commit';
+
+    assertJsonReportCurrent(census, formatStewardshipCensusJson(provenanceOnly));
+    assertMarkdownReportCurrent(census, formatStewardshipCensusMarkdown(provenanceOnly));
+
+    const hashDrift = structuredClone(provenanceOnly);
+    hashDrift.input.files[0].sha256 = '0'.repeat(64);
+    assert.throws(
+      () => assertJsonReportCurrent(census, formatStewardshipCensusJson(hashDrift)),
+      /Committed census JSON is stale/,
+    );
+
+    const countDrift = structuredClone(provenanceOnly);
+    countDrift.records.source.curated.total += 1;
+    assert.throws(
+      () => assertJsonReportCurrent(census, formatStewardshipCensusJson(countDrift)),
+      /Committed census JSON is stale/,
+    );
+    assert.throws(
+      () => assertMarkdownReportCurrent(census, formatStewardshipCensusMarkdown(countDrift)),
+      /Committed census Markdown is stale/,
+    );
+  });
+
   it('gives CI full history for a reproducible input commit stamp', () => {
     const workflow = fs.readFileSync(
       path.join(rootDir, '.github', 'workflows', 'frontend-validation.yml'),
@@ -193,6 +253,10 @@ describe('stewardship coverage census', () => {
     const state = inspectStewardshipInputGitState({ rootDir, files: inputs.files });
     assert.equal(state.shallow, false, 'Census freshness requires complete Git history');
     if (state.dirty) {
+      console.warn(
+        'WARNING: CENSUS FRESHNESS NOT CHECKED: inputs are dirty. ' +
+        'Commit the census inputs and rerun before publication.',
+      );
       t.skip('Commit census inputs before checking the stamped reports');
       return;
     }
@@ -208,13 +272,13 @@ describe('stewardship coverage census', () => {
       census.records.reconciliation.curated.filtered + census.records.reconciliation.social.filtered
     );
 
-    assert.equal(
+    assertJsonReportCurrent(
+      census,
       fs.readFileSync(path.join(rootDir, 'data', 'stewardship-census.json'), 'utf8'),
-      formatStewardshipCensusJson(census)
     );
-    assert.equal(
+    assertMarkdownReportCurrent(
+      census,
       fs.readFileSync(path.join(rootDir, 'data', 'stewardship-census.md'), 'utf8'),
-      formatStewardshipCensusMarkdown(census)
     );
   });
 });

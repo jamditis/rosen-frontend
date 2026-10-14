@@ -13,10 +13,17 @@ rewrites safe:
 
 A crash leaves the original file untouched (only the discarded .tmp is lost),
 and the .bak gives one level of undo for an unwanted run. See issue #145.
+
+The archive-specific read/write functions require Node and the root npm
+dependencies. They use the exporter parser and preserve untouched row bytes,
+including bare LF within CRLF-delimited records; Python csv cannot safely parse
+those files (#870).
 """
 
+import json
 import os
 import shutil
+import subprocess
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -44,3 +51,43 @@ def atomic_csv_write(path, encoding="utf-8"):
         if tmp.exists():
             tmp.unlink()
         raise
+
+
+def _archive_csv_bridge(operation, path, payload=None):
+    """Run the Node CSV bridge without text-mode newline conversion."""
+    bridge = Path(__file__).parent / "lib" / "python-csv-maintenance.js"
+    try:
+        result = subprocess.run(
+            ["node", str(bridge), operation, str(path)],
+            input=None if payload is None else json.dumps(payload).encode("utf-8"),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True,
+        )
+    except FileNotFoundError as error:
+        raise RuntimeError(
+            "Archive CSV maintenance requires Node.js and the root npm dependencies. "
+            "Install Node.js, then run `npm ci` from the repository root."
+        ) from error
+    except subprocess.CalledProcessError as error:
+        detail = error.stderr.decode("utf-8", errors="replace").strip()
+        raise RuntimeError(
+            "Archive CSV maintenance bridge failed. Run `npm ci` from the repository "
+            f"root and retry. Bridge output: {detail or 'no diagnostic'}"
+        ) from error
+    return result.stdout
+
+
+def read_archive_csv(path):
+    """Read columns and records with the same parser as the Node exporter."""
+    return json.loads(_archive_csv_bridge("read", path))
+
+
+def write_archive_csv(path, fieldnames, rows):
+    """Validate raw-row surgery before the existing backup and atomic replace."""
+    path = Path(path)
+    result = _archive_csv_bridge("render", path, [fieldnames, rows])
+    if result == path.read_bytes():
+        return
+    with atomic_csv_write(path) as destination:
+        destination.write(result.decode("utf-8"))

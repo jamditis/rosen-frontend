@@ -28,10 +28,9 @@ a hardcoded ID list and only repointed entities (it never pruned the
 relationship rows, and it could not be called from the Python dedup flow).
 """
 
-import csv
 from pathlib import Path
 
-from csv_safe_write import atomic_csv_write
+from csv_safe_write import read_archive_csv, write_archive_csv
 
 DATA_DIR = Path(__file__).parent
 RECORDS_PATH = DATA_DIR / "archive_records-public.csv"
@@ -40,18 +39,13 @@ ENTITIES_PATH = DATA_DIR / "extracted_entities.csv"
 
 
 def _read_csv(path):
-    """Read a CSV into (fieldnames, list-of-row-dicts)."""
-    with open(path, "r", encoding="utf-8-sig", newline="") as f:
-        reader = csv.DictReader(f)
-        return reader.fieldnames, list(reader)
+    """Read a CSV through the canonical Node parser."""
+    return read_archive_csv(path)
 
 
 def _write_csv(path, fieldnames, rows):
-    """Atomically rewrite a CSV (see data/csv_safe_write.py)."""
-    with atomic_csv_write(path) as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
+    """Write changed rows while retaining every untouched row byte."""
+    write_archive_csv(path, fieldnames, rows)
 
 
 def prune_orphan_references(records_path=RECORDS_PATH,

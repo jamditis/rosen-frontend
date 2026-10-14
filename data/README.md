@@ -72,6 +72,11 @@ npm run export-data  # or: node data/export-archive-data.js
 
 The script reads the four source CSVs (plus `authored-excerpts.csv`), processes and links the records, and writes the JSON files listed above. It prints progress as it goes, including a row count for each CSV it reads.
 
+The legacy Python record-removal commands use the same Node CSV parser so they
+can preserve embedded newlines and untouched row bytes. Run `npm ci` from the
+repository root before `data/dedup_records.py`,
+`data/prune_orphan_references.py`, or `data/fixes/remove-record-00607.py`.
+
 ### Search-by-meaning vectors
 
 After published records change, rebuild both vector pairs from the repository root:
