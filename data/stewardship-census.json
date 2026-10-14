@@ -4,7 +4,7 @@
     "compatibility": "additive changes within version 1; semantic changes require a new major version"
   },
   "input": {
-    "commit": "092b4ff6e6532499cb3dcafb76b6b40368009f4c",
+    "commit": "f61f705459960abbe90b93e63f4101d24b59b8b1",
     "dirty": false,
     "schema_version": "stewardship-census/1.0.0",
     "files": [
@@ -22,23 +22,23 @@
       },
       {
         "path": "data/extracted_relationships.csv",
-        "sha256": "7d25319a1b78c23ce6bcb94534953b2d20dc27c6ee71e1c4292da755440cd8d6"
+        "sha256": "7d95a6deb4808037e5e1ae58ef77d59145a7f75b41c96714900d6827eced76df"
       },
       {
         "path": "data/archive-data.json",
-        "sha256": "60b8dff31e794346de03a7eb6942f93d1306e58f17f8dfb817d702d8a372955b"
+        "sha256": "f427f5149aaa57549f6d5dd1aabd2d3bff033a8a5cc0fdb5bc0e955f0f5768c2"
       },
       {
         "path": "data/archive-core.json",
-        "sha256": "5f8c407ae517f0b326b0ceacf3df219e8bcb519188d1b7f16230ead8c90acc53"
+        "sha256": "bd1951ed86a0d1b69a2f45c12a13be44ebbcd1f4e92d4a4d7b68034824db43fd"
       },
       {
         "path": "data/archive-details.json",
-        "sha256": "bbd20225d0a1af0fdfccd1907e52a601964d5ed742a73c3e072f0dedc0917314"
+        "sha256": "3b81821a5d92a4f7d63437ce144c9543849b4b27bfd4dd56dcabc72f38a9b041"
       },
       {
         "path": "data/archive-entities.json",
-        "sha256": "a1955682a42bf1ff63bae73f94cdf61ac44c313d7d524b9b3bb605755eb5552d"
+        "sha256": "55834950a1747950706fc336f0a63390da7dcf1cfeb22ea83392d8e5e56bdfaa"
       },
       {
         "path": "data/authored-excerpts.csv",
@@ -4508,8 +4508,8 @@
       },
       "related_ids": {
         "total": 26865,
-        "present": 884,
-        "missing": 25981
+        "present": 881,
+        "missing": 25984
       },
       "raw_text": {
         "total": 26865,
@@ -4535,7 +4535,7 @@
       "runtime_total": 7303
     },
     "relationships": {
-      "total": 10990,
+      "total": 10986,
       "by_type": {
         "Affiliated With": 3157,
         "Cites": 163,
@@ -4546,7 +4546,7 @@
         "Expands On": 187,
         "Founded By": 124,
         "Inspired By": 59,
-        "Mentions": 1597,
+        "Mentions": 1593,
         "Occurred At": 247,
         "Originated By": 729,
         "Owned By": 38,
@@ -4573,10 +4573,10 @@
         "0.97": 6,
         "0.98": 12,
         "0.99": 39,
-        "1.0": 1740
+        "1.0": 1736
       },
       "by_confidence": {
-        "high": 10210,
+        "high": 10206,
         "medium": 780
       }
     },
@@ -4600,34 +4600,34 @@
       "social": {
         "source": {
           "rows": 29969,
-          "rows_with_relationship_assertions": 15,
-          "relationship_assertions": 16,
-          "rows_with_entity_links": 15,
-          "distinct_record_entity_links": 31
+          "rows_with_relationship_assertions": 12,
+          "relationship_assertions": 12,
+          "rows_with_entity_links": 12,
+          "distinct_record_entity_links": 24
         },
         "published": {
           "source_backed_rows": 25825,
-          "rows_with_relationship_assertions": 15,
-          "relationship_assertions": 16,
-          "rows_with_entity_links": 15,
-          "distinct_record_entity_links": 31
+          "rows_with_relationship_assertions": 12,
+          "relationship_assertions": 12,
+          "rows_with_entity_links": 12,
+          "distinct_record_entity_links": 24
         }
       },
       "social_by_platform": {
         "Bluesky": {
           "source": {
             "rows": 3339,
-            "rows_with_relationship_assertions": 13,
-            "relationship_assertions": 14,
-            "rows_with_entity_links": 13,
-            "distinct_record_entity_links": 27
+            "rows_with_relationship_assertions": 10,
+            "relationship_assertions": 10,
+            "rows_with_entity_links": 10,
+            "distinct_record_entity_links": 20
           },
           "published": {
             "source_backed_rows": 2837,
-            "rows_with_relationship_assertions": 13,
-            "relationship_assertions": 14,
-            "rows_with_entity_links": 13,
-            "distinct_record_entity_links": 27
+            "rows_with_relationship_assertions": 10,
+            "relationship_assertions": 10,
+            "rows_with_entity_links": 10,
+            "distinct_record_entity_links": 20
           }
         },
         "Mastodon": {
@@ -30311,8 +30311,8 @@
       {
         "metric": "relationships",
         "baseline": 12556,
-        "current": 10990,
-        "delta": -1566
+        "current": 10986,
+        "delta": -1570
       }
     ],
     "explanation": [
