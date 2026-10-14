@@ -117,6 +117,27 @@ describe('preservation manifest schema (#701)', () => {
     rejectsManifest(creationLinkOnLegacy, 'creationEventId', 'schemaVersion 1.1.0');
   });
 
+  it('keeps valid schema 1.0 shapes valid when relabeled as schema 1.1', () => {
+    for (const name of exampleNames) {
+      const relabeled = example(name);
+      relabeled.schemaVersion = '1.1.0';
+      assert.equal(validatePreservationManifest(relabeled), relabeled, name);
+    }
+
+    const evidence = JSON.parse(fs.readFileSync(
+      path.join(root, 'features', 'winer-method', 'retrieval-evidence.json'),
+      'utf8',
+    ));
+    const inlineMapping = convertWinerEvidence(evidence);
+    inlineMapping.schemaVersion = '1.1.0';
+    assert.equal(validatePreservationManifest(inlineMapping), inlineMapping);
+    assert.ok(inlineMapping.events.every(event => (
+      event.normalizationEvidence.fieldMapping !== undefined
+      && event.normalizationEvidence.fieldMappingId === undefined
+    )));
+    assert.equal(inlineMapping.fieldMappings, undefined);
+  });
+
   it('resolves schema 1.1 field mappings and rejects missing registry references', () => {
     const manifest = useSchema11(example('successful-capture'));
     manifest.fieldMappings = [{
@@ -204,15 +225,59 @@ describe('preservation manifest schema (#701)', () => {
       delete linkedCapture.retrieval[field];
     }
     rejectsManifest(notRequested, 'not-requested', 'capture provenance');
+
+    const correctedCapture = useSchema11(example('bot-wall'));
+    const staleCapture = correctedCapture.events[0];
+    const correction = clone(staleCapture);
+    correction.eventId = 'urn:rosen-preservation:event:corrected-not-requested';
+    correction.occurredAt = '2026-08-02T11:01:00.000Z';
+    correction.supersedesEventId = staleCapture.eventId;
+    correction.review = {
+      state: 'review-required',
+      notes: 'Correction: no network request occurred.',
+    };
+    correction.retrieval = {
+      requestedUrl: staleCapture.retrieval.requestedUrl,
+      httpStatus: null,
+      httpOutcome: 'not-requested',
+      mediaType: null,
+      bytesReceived: 0,
+      client: staleCapture.retrieval.client,
+      semanticOutcome: 'uncertain',
+    };
+    const laterReview = {
+      eventId: 'urn:rosen-preservation:event:review-after-correction',
+      eventType: 'review-decision',
+      objectId: staleCapture.objectId,
+      taskVersion: 'preservation-review@1.0.0',
+      inputHash: 'e'.repeat(64),
+      actor: {
+        actorType: 'human',
+        actorId: 'fixture-reviewer',
+      },
+      occurredAt: '2026-08-02T11:02:00.000Z',
+      review: {
+        state: 'review-required',
+        notes: 'Review must cite current capture provenance.',
+      },
+      captureEventId: staleCapture.eventId,
+    };
+    correctedCapture.events.push(correction, laterReview);
+    rejectsManifest(
+      correctedCapture,
+      'captureEventId',
+      'current capture-attempt',
+      'superseded',
+    );
   });
 
-  it('binds a schema 1.1 artifact creation back-reference to its current creation event', () => {
+  it('validates an optional schema 1.1 artifact creation back-reference when supplied', () => {
     const manifest = useSchema11(example('successful-capture'));
     assert.equal(validatePreservationManifest(manifest), manifest);
 
     const missingLink = clone(manifest);
     delete missingLink.artifacts[0].creationEventId;
-    rejectsManifest(missingLink, 'creationEventId', 'current artifact-created');
+    assert.equal(validatePreservationManifest(missingLink), missingLink);
 
     const wrongType = clone(manifest);
     wrongType.artifacts[0].creationEventId = wrongType.artifacts[0].captureEventId;

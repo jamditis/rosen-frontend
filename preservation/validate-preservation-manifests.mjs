@@ -339,12 +339,10 @@ function validateReferences(manifest) {
           );
         }
       } else {
-        if (evidence.fieldMapping !== undefined) {
-          throw new PreservationValidationError(
-            `${event.eventId}: schemaVersion 1.1.0 normalizationEvidence must use fieldMappingId`,
-          );
-        }
-        if (!fieldMappings.has(evidence.fieldMappingId)) {
+        if (
+          evidence.fieldMappingId !== undefined
+          && !fieldMappings.has(evidence.fieldMappingId)
+        ) {
           throw new PreservationValidationError(
             `${event.eventId}: fieldMappingId ${evidence.fieldMappingId} references a missing field mapping`,
           );
@@ -372,6 +370,11 @@ function validateReferences(manifest) {
       if (captureEvent.eventType !== 'capture-attempt' || captureEvent.objectId !== event.objectId) {
         throw new PreservationValidationError(
           `${event.eventId}: captureEventId must identify a capture-attempt for the same object`,
+        );
+      }
+      if (supersededEvents.has(event.captureEventId)) {
+        throw new PreservationValidationError(
+          `${event.eventId}: captureEventId must identify a current capture-attempt; the referenced event is superseded`,
         );
       }
       if (captureEvent.retrieval.httpOutcome === 'not-requested') {
@@ -570,15 +573,6 @@ function validateReferences(manifest) {
           `${artifact.artifactId}: creationEventId must identify a current artifact-created event`,
         );
       }
-    }
-    if (
-      manifest.schemaVersion === '1.1.0'
-      && currentArtifactCreationEvents.length === 1
-      && creationEvent?.eventId !== currentArtifactCreationEvents[0].eventId
-    ) {
-      throw new PreservationValidationError(
-        `${artifact.artifactId}: creationEventId must identify its current artifact-created event`,
-      );
     }
     const provenanceEvents = [
       ...currentArtifactCreationEvents,

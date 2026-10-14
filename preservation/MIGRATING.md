@@ -25,6 +25,14 @@ shared field mappings, explicit generated-artifact creation links, later-event
 links to earlier captures, and raw-source digests. The validator keeps the 1.0
 shape strict: a 1.0 producer must not emit 1.1-only fields.
 
+Version 1.1 is a true superset of 1.0: changing only `schemaVersion` on a valid
+1.0 manifest keeps it valid. Inline `normalizationEvidence.fieldMapping`
+remains valid. A producer may instead add a top-level registry and reference it
+with `fieldMappingId`. An artifact may add `creationEventId`; when it omits the
+link, its single current `artifact-created` event remains the inferred creation
+provenance. Supplied registry references and creation links are fully
+validated.
+
 ## Compatible and incompatible changes
 
 | Change | Treatment |
@@ -83,13 +91,18 @@ fact append-only.
 
 ## Social baseline v1.1 import
 
-`import-social-baseline.mjs` is not a migration of an existing preservation
-artifact; it is the first packaging of the pre-schema `data/social_posts.csv`
-rows into schema v1. Every object, event, and artifact ID derives from the
-row's own stable archive record ID (`BSKY-*`, `TWTR-*`, `MAST-*`) and SHA-256
-digests of its deterministic representations, never from a local path or run
-order, so re-running the importer against an unchanged CSV reproduces the same
-IDs.
+`import-social-baseline.mjs` is not a migration tool. It derives a new schema
+v1.1 package from the current `data/social_posts.csv` rows. Every object, event,
+and artifact ID derives from the row's own stable archive record ID (`BSKY-*`,
+`TWTR-*`, `MAST-*`) and SHA-256 digests of its deterministic representations,
+never from a local path or run order, so re-running the importer against an
+unchanged CSV reproduces the same IDs. Its generated metadata envelope and
+`artifact-created` assertion are new preservation content and therefore have
+new content-addressed IDs. The importer does not claim to migrate or overwrite
+any earlier retained manifest. Keep earlier output as history; converting it
+would require a new schema major version, a new schema `$id`, a deterministic
+migration tool, the source manifest hash, retained prior object, event, and
+artifact IDs, and `supersedesManifestId` linkage.
 
 Run the check:
 

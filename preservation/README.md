@@ -109,7 +109,7 @@ filesystem layout.
 | `artifacts` | Required | Captured or generated artifacts and their storage copies. May be empty. |
 | `supersedesManifestId` | Optional | Prior manifest when a versioned migration creates a new representation. |
 | `description` | Optional | Human-readable scope note. |
-| `fieldMappings` | Optional in 1.1 | Shared named field mappings referenced by normalization evidence. Schema 1.0 keeps mappings inline. |
+| `fieldMappings` | Optional in 1.1 | Shared named field mappings referenced by normalization evidence. Inline `fieldMapping` remains valid for 1.1 producers that do not use the registry. |
 
 ### Object fields
 
@@ -147,8 +147,9 @@ removed or rewritten.
 Schema 1.1 events may use `captureEventId` to link later validation or
 enrichment evidence to an earlier real `capture-attempt` for the same object.
 The link does not imply a new capture. It must resolve to an earlier event in
-the append-only manifest, cannot point to a `not-requested` event, and cannot
-claim validation or enrichment before the linked capture occurred.
+the append-only manifest, cannot point to an event already superseded when the
+link is appended or to a `not-requested` event, and cannot claim validation or
+enrichment before the linked capture occurred.
 
 All ISO timestamps must name a real UTC calendar instant, not merely match the
 timestamp character pattern. Wayback capture timestamps receive the same
@@ -194,15 +195,17 @@ An artifact requires a stable artifact ID, owning object ID, artifact type,
 URI, SHA-256, byte size, and `storageCopies` array. HTTP-response artifacts also
 require their originating capture-event ID. Generated metadata, checksum, and
 other non-response artifacts may omit that ID, but they must have one current
-`artifact-created` event. Schema 1.1 artifacts point to that event with
+`artifact-created` event. Schema 1.1 artifacts may point to that event with
 `creationEventId`; this gives generated artifacts an explicit back-reference
-without fabricating a capture. An artifact cannot have multiple current creation
-events, even when its capture also names it. A superseded capture no longer
-introduces an artifact. The retained artifact must point to a current correcting
-capture that declares it or have a current `artifact-created` event. The storage
-array may be empty when evidence proves a response digest but does not name a
-retained copy. Each named storage copy requires its own stable ID, URI, storage
-class, access state, and creation time.
+without fabricating a capture. A valid 1.0-style artifact may omit the link
+when its single current creation event is unambiguous. When supplied, the link
+must resolve to that current event. An artifact cannot have multiple current
+creation events, even when its capture also names it. A superseded capture no
+longer introduces an artifact. The retained artifact must point to a current
+correcting capture that declares it or have a current `artifact-created` event.
+The storage array may be empty when evidence proves a response digest but does
+not name a retained copy. Each named storage copy requires its own stable ID,
+URI, storage class, access state, and creation time.
 
 The validator ensures object, event, artifact, fixity, and storage-copy
 references resolve and remain within one object. When a capture attempt names
@@ -306,6 +309,13 @@ The importer records three separate digests:
 
 The artifact points back to its event with `creationEventId`. It has no
 `captureEventId`, because no network capture occurred.
+
+This importer derives a new package from the current CSV. Its generated
+metadata envelope and corrected `artifact-created` assertion have their own
+content-addressed artifact, event, and manifest IDs. It does not migrate or
+overwrite a previously retained manifest. Keep any prior retained output as
+history; converting that history would require the major-version migration
+procedure in `MIGRATING.md`.
 
 | Row state | Event | `httpOutcome` | `review.state` | Carries `normalizationEvidence`? |
 |---|---|---|---|---|
