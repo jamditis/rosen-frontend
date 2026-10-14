@@ -45,7 +45,11 @@ process.stdout.write(JSON.stringify(query));
     )
     query = json.loads(result.stdout)
     with sqlite3.connect(":memory:") as database:
-        database.setlimit(sqlite3.SQLITE_LIMIT_LIKE_PATTERN_LENGTH, 50)
+        # Python 3.10 has no setlimit API. It still executes the real query and
+        # checks exact actor selection; 3.11+ also enforces D1's pattern limit.
+        set_limit = getattr(database, "setlimit", None)
+        if set_limit is not None:
+            set_limit(sqlite3.SQLITE_LIMIT_LIKE_PATTERN_LENGTH, 50)
         migrations = ROOT / "workers/source-discovery/migrations"
         for migration in sorted(migrations.glob("*.sql")):
             database.executescript(migration.read_text())
