@@ -51,9 +51,15 @@ To use custom rate limits, set the environment variables before running your app
 export GEMINI_API_RATE_LIMIT_CALLS=30
 export GEMINI_API_RATE_LIMIT_PERIOD=60
 
-# Run your application
-python src/workflow.py
+# Run your application from backend/
+poetry run python src/rosen_scraper/workflow.py
 ```
+
+This command assumes repository-root `csv/urls_to_scrape.csv` and
+`csv/archive_records-public.csv` were already exported from the current Google
+Sheets tabs or copied from the tracked `data/` snapshots for a checkout-only
+test. The workflow writes local files under `csv/output/`; it does not sync
+them back to Sheets.
 
 Or add them to your `.env` file:
 
@@ -77,10 +83,10 @@ Comprehensive tests are available in `tests/test_rate_limiting.py`:
 
 ```bash
 # Run rate limiting tests
-pytest tests/test_rate_limiting.py -v
+poetry run pytest tests/test_rate_limiting.py -v
 
 # Run all tests
-pytest tests/ -v
+poetry run pytest tests/ -v
 ```
 
 ## Architecture

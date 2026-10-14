@@ -370,15 +370,21 @@ Located in `backend/`. Python pipeline for scraping, AI analysis, and content ar
 ```bash
 cd backend
 poetry install
-playwright install
+poetry run playwright install
 ```
 
 ### Configuration
 ```bash
-cp backend/.env.example backend/.env
-# Edit .env with SPREADSHEET_NAME, GEMINI_API_KEY
-# Place Google Cloud credentials in backend/google_credentials.json
+cp .env.example .env
+# Edit .env with GEMINI_API_KEY.
+# SPREADSHEET_NAME and Google credentials apply only to separate Sheet-backed tools.
 ```
+
+Before the main workflow runs, export the current `urls_to_scrape` Google Sheet
+tab to repository-root `csv/urls_to_scrape.csv` and the current `final` tab to
+`csv/archive_records-public.csv`. For a checkout-only test, copy the matching
+tracked files from `data/` instead. The workflow writes dated files under
+`csv/output/`; reconcile approved output back to Google Sheets separately.
 
 ### Key commands
 ```bash

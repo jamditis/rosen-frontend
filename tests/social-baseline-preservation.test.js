@@ -99,7 +99,7 @@ function convertOne(row) {
 }
 
 describe('social baseline preservation (#717)', () => {
-  it('packages a verified row into a not-reviewed capture-attempt with a full-row observation set', () => {
+  it('packages a verified row into a not-reviewed generated artifact with full normalization evidence', () => {
     const { manifest } = convertOne(verifiedRow);
     assert.equal(validatePreservationManifest(manifest), manifest);
 
@@ -112,26 +112,31 @@ describe('social baseline preservation (#717)', () => {
     assert.equal(object.canonicalSourceUrl, verifiedRow.url);
     assert.equal(object.sourceRecordId, 'BSKY-90001');
 
-    assert.equal(event.eventType, 'capture-attempt');
-    // Never 'accepted': no capture was attempted, so nothing has been
-    // reviewed and accepted, regardless of the CSV's own verified column.
+    assert.equal(manifest.schemaVersion, '1.1.0');
+    assert.equal(event.eventType, 'artifact-created');
+    // Never 'accepted': no capture or review was performed, regardless of
+    // the CSV's own verified column.
     assert.equal(event.review.state, 'not-reviewed');
-    assert.equal(event.retrieval.httpOutcome, 'not-requested');
-    assert.equal(event.retrieval.semanticOutcome, 'uncertain');
-    assert.equal(event.retrieval.requestedUrl, verifiedRow.url);
+    assert.equal(event.retrieval, undefined);
     assert.equal(event.artifactId, artifact.artifactId);
+    assert.equal(event.normalizationEvidence.sourceLocator, 'data/social_posts.csv#id=BSKY-90001');
     assert.equal(event.normalizationEvidence.observations.preservedText, verifiedRow.raw_text);
     assert.equal(event.normalizationEvidence.observations.preservedTextSource, 'raw_text');
     assert.equal(event.normalizationEvidence.observations.respondsTo, verifiedRow.responds_to);
     assert.equal(event.normalizationEvidence.observations.verified, verifiedRow.verified);
     assert.equal(event.normalizationEvidence.runtimeNetworkAccess, false);
+    assert.equal(event.normalizationEvidence.fieldMappingId, 'social-posts-csv-v1');
+    assert.equal(event.normalizationEvidence.fieldMapping, undefined);
+    assert.equal(manifest.fieldMappings.length, 1);
+    assert.equal(manifest.fieldMappings[0].fieldMappingId, 'social-posts-csv-v1');
 
     // The CSV's own verified column is honestly preserved as an observation,
     // not folded into the event's review state (see above).
     assert.equal(event.normalizationEvidence.observations.verified, 'TRUE');
 
     assert.equal(artifact.artifactType, 'metadata');
-    assert.equal(artifact.captureEventId, event.eventId);
+    assert.equal(artifact.captureEventId, undefined);
+    assert.equal(artifact.creationEventId, event.eventId);
     assert.equal(artifact.uri, `urn:sha256:${artifact.sha256}`);
     assert.deepEqual(artifact.storageCopies, []);
   });
@@ -196,10 +201,13 @@ describe('social baseline preservation (#717)', () => {
     assert.equal(event.review.state, 'review-required');
     assert.match(event.review.notes, /Source URL cleanup/);
     assert.equal(event.retrieval, undefined, 'artifact-created events cannot carry a retrieval payload');
-    assert.equal(event.normalizationEvidence, undefined, 'artifact-created events cannot carry normalizationEvidence');
+    assert.equal(event.normalizationEvidence.observations.preservedText, missingUrlRow.raw_text);
+    assert.equal(event.normalizationEvidence.observations.author, missingUrlRow.author);
+    assert.equal(event.normalizationEvidence.observations.respondsTo, '');
+    assert.equal(event.normalizationEvidence.rawSourceSha256, event.inputHash);
   });
 
-  it('preserves an image-only post with no text as a normal capture, not a missing state', () => {
+  it('preserves an image-only post with no text as a generated artifact, not a missing state', () => {
     const { manifest, stats } = convertOne(imageOnlyRow);
     assert.equal(validatePreservationManifest(manifest), manifest);
     assert.equal(stats.missingUrlCount, 0);
@@ -207,7 +215,7 @@ describe('social baseline preservation (#717)', () => {
     const [object] = manifest.objects;
     const [event] = manifest.events;
     assert.equal(object.canonicalSourceUrl, imageOnlyRow.url);
-    assert.equal(event.eventType, 'capture-attempt');
+    assert.equal(event.eventType, 'artifact-created');
     assert.equal(event.normalizationEvidence.observations.preservedText, '');
     assert.equal(event.normalizationEvidence.observations.preservedTextSource, 'none');
   });
@@ -220,6 +228,39 @@ describe('social baseline preservation (#717)', () => {
     assert.equal(new Set(manifest.objects.map(o => o.objectId)).size, fixtureRows.length);
     assert.equal(new Set(manifest.events.map(e => e.eventId)).size, fixtureRows.length);
     assert.equal(new Set(manifest.artifacts.map(a => a.artifactId)).size, fixtureRows.length);
+    assert.equal(manifest.fieldMappings.length, 1);
+    assert.ok(manifest.events.every(event => (
+      event.normalizationEvidence.fieldMappingId === manifest.fieldMappings[0].fieldMappingId
+      && event.normalizationEvidence.fieldMapping === undefined
+    )));
+  });
+
+  it('pins independent canonical parsed-row, normalized-object, and artifact digests', () => {
+    const { manifest } = convertOne(verifiedRow);
+    assert.equal(validatePreservationManifest(manifest), manifest);
+    const [event] = manifest.events;
+    const [artifact] = manifest.artifacts;
+
+    assert.equal(event.inputHash, '8d3af5acd8218673f876fd5a117fc51032e6f9248518c64e019c32e4517717fb');
+    assert.equal(event.normalizationEvidence.rawSourceSha256, '8d3af5acd8218673f876fd5a117fc51032e6f9248518c64e019c32e4517717fb');
+    assert.equal(event.normalizationEvidence.normalizedObjectSha256, 'eec8ca43c4bf1a2cd63f692964478935509ebef1189df7f75f39968c064bb2bb');
+    assert.equal(artifact.sha256, 'c0064ce7643fc31012e843494b8896882188892f6a6564e74a212e70bb8aea16');
+    assert.equal(artifact.byteSize, 1697);
+    assert.equal(new Set([
+      event.normalizationEvidence.rawSourceSha256,
+      event.normalizationEvidence.normalizedObjectSha256,
+      artifact.sha256,
+    ]).size, 3);
+
+    const changed = convertOne({ ...verifiedRow, title: 'A normalized title change' }).manifest;
+    assert.equal(
+      changed.events[0].normalizationEvidence.normalizedObjectSha256,
+      '6975f25049c3613e55fb384829a343257d5b56b45feab8a456fc64dd7c14f99d',
+    );
+    assert.notEqual(
+      changed.events[0].normalizationEvidence.normalizedObjectSha256,
+      event.normalizationEvidence.normalizedObjectSha256,
+    );
   });
 
   it('round-trips through the CSV reader the same as converting rows directly', () => {
@@ -344,14 +385,15 @@ describe('social baseline preservation (#717)', () => {
   });
 
   describe('checksum pin (drift detection)', () => {
-    it('builds one checksum per row, matching the row digest used in the manifest', () => {
+    it('builds one checksum per row, matching the canonical parsed-row digest in the manifest', () => {
       const { manifest } = convertSocialBaselineRows(fixtureRows, { importedAt });
       const pin = buildChecksumPin(fixtureRows, { generatedAt: importedAt });
       assert.equal(pin.rowCount, fixtureRows.length);
       assert.equal(Object.keys(pin.checksums).length, fixtureRows.length);
-      for (const artifact of manifest.artifacts) {
-        const object = manifest.objects.find(o => o.objectId === artifact.objectId);
-        assert.equal(pin.checksums[object.sourceRecordId], artifact.sha256);
+      for (const event of manifest.events) {
+        const object = manifest.objects.find(o => o.objectId === event.objectId);
+        assert.equal(pin.checksums[object.sourceRecordId], event.inputHash);
+        assert.equal(pin.checksums[object.sourceRecordId], event.normalizationEvidence.rawSourceSha256);
       }
     });
 

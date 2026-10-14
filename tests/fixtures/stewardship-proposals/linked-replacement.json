@@ -1,0 +1,86 @@
+{
+  "proposals": [
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "proposalId": "urn:rosen-stewardship:proposal:replacement-original-1",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00005",
+      "objectClass": "archive-record",
+      "target": { "kind": "field", "key": "summary" },
+      "currentValue": "Original summary",
+      "proposedValue": "First proposed summary",
+      "relevantInputHash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "evidenceRefs": ["urn:rosen:evidence:record-00005-source-v1"],
+      "ruleVersion": "summary-rule@1.0.0",
+      "generationVersion": "generator@1.0.0",
+      "reason": "Propose a summary from the first source snapshot.",
+      "confidence": 0.8,
+      "severity": "medium",
+      "riskClass": "semantic"
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "proposalId": "urn:rosen-stewardship:proposal:replacement-successor-1",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00005",
+      "objectClass": "archive-record",
+      "target": { "kind": "field", "key": "summary" },
+      "currentValue": "Original summary",
+      "proposedValue": "Second proposed summary",
+      "relevantInputHash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "evidenceRefs": ["urn:rosen:evidence:record-00005-source-v2"],
+      "ruleVersion": "summary-rule@2.0.0",
+      "generationVersion": "generator@2.0.0",
+      "reason": "Use the changed source and current rule.",
+      "confidence": 0.95,
+      "severity": "medium",
+      "riskClass": "semantic",
+      "supersedesProposalId": "urn:rosen-stewardship:proposal:replacement-original-1"
+    }
+  ],
+  "decisions": [
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "eventId": "urn:rosen-stewardship:decision-event:reject-replacement-original-1",
+      "proposalId": "urn:rosen-stewardship:proposal:replacement-original-1",
+      "operation": "reject",
+      "expectedRevision": 0,
+      "actor": { "actorType": "human", "actorId": "curator:joe-amditis" },
+      "occurredAt": "2026-10-14T14:07:00.000Z",
+      "reason": "The first source snapshot is incomplete."
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "eventId": "urn:rosen-stewardship:decision-event:supersede-replacement-original-1",
+      "proposalId": "urn:rosen-stewardship:proposal:replacement-original-1",
+      "operation": "supersede",
+      "expectedRevision": 1,
+      "actor": { "actorType": "human", "actorId": "curator:joe-amditis" },
+      "occurredAt": "2026-10-14T14:08:00.000Z",
+      "reason": "A new source snapshot and rule version justify a successor.",
+      "successorProposalId": "urn:rosen-stewardship:proposal:replacement-successor-1"
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "eventId": "urn:rosen-stewardship:decision-event:approve-replacement-successor-1",
+      "proposalId": "urn:rosen-stewardship:proposal:replacement-successor-1",
+      "operation": "approve",
+      "expectedRevision": 0,
+      "actor": { "actorType": "human", "actorId": "curator:joe-amditis" },
+      "occurredAt": "2026-10-14T14:09:00.000Z",
+      "reason": "The new evidence supports the successor."
+    }
+  ],
+  "expected": {
+    "acceptedProposalIds": [
+      "urn:rosen-stewardship:proposal:replacement-successor-1"
+    ],
+    "supersededProposalIds": [
+      "urn:rosen-stewardship:proposal:replacement-original-1"
+    ],
+    "retainedOriginalOperations": ["reject", "supersede"]
+  }
+}

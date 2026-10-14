@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pressthink.org/j/rosen-archive/schemas/stewardship-proposal-v1.json",
+  "title": "Rosen archive stewardship proposal",
+  "description": "An immutable proposal to change one stable archive object field or assertion.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "vocabularyVersion",
+    "proposalId",
+    "objectId",
+    "objectClass",
+    "target",
+    "currentValue",
+    "proposedValue",
+    "relevantInputHash",
+    "evidenceRefs",
+    "ruleVersion",
+    "generationVersion",
+    "reason",
+    "confidence",
+    "severity",
+    "riskClass"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "vocabularyVersion": { "const": "1.0.0" },
+    "proposalId": { "$ref": "#/$defs/proposalId" },
+    "objectId": { "$ref": "#/$defs/objectId" },
+    "objectClass": { "$ref": "#/$defs/objectClass" },
+    "target": { "$ref": "#/$defs/target" },
+    "currentValue": true,
+    "proposedValue": true,
+    "relevantInputHash": { "$ref": "#/$defs/sha256" },
+    "evidenceRefs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonemptyString" }
+    },
+    "ruleVersion": { "$ref": "#/$defs/version" },
+    "generationVersion": { "$ref": "#/$defs/version" },
+    "reason": { "$ref": "#/$defs/nonemptyString" },
+    "confidence": {
+      "oneOf": [
+        { "type": "number", "minimum": 0, "maximum": 1 },
+        { "type": "null" }
+      ]
+    },
+    "severity": {
+      "enum": ["info", "low", "medium", "high", "critical"]
+    },
+    "riskClass": {
+      "enum": ["deterministic", "semantic", "restricted"]
+    },
+    "duplicateOfProposalId": { "$ref": "#/$defs/proposalId" },
+    "supersedesProposalId": { "$ref": "#/$defs/proposalId" }
+  },
+  "allOf": [
+    {
+      "not": {
+        "required": ["duplicateOfProposalId", "supersedesProposalId"]
+      }
+    },
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "objectClass": { "const": "archive-record" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:archive-record:" }
+          }
+        },
+        {
+          "properties": {
+            "objectClass": { "const": "social-post" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:social-post:" }
+          }
+        },
+        {
+          "properties": {
+            "objectClass": { "const": "entity" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:entity:" }
+          }
+        },
+        {
+          "properties": {
+            "objectClass": { "const": "relationship" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:relationship:" }
+          }
+        },
+        {
+          "properties": {
+            "objectClass": { "const": "dataset" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:dataset:" }
+          }
+        },
+        {
+          "properties": {
+            "objectClass": { "const": "source-file" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:source-file:" }
+          }
+        },
+        {
+          "properties": {
+            "objectClass": { "const": "generated-artifact" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:generated-artifact:" }
+          }
+        },
+        {
+          "properties": {
+            "objectClass": { "const": "feature-record" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:feature-record:" }
+          }
+        }
+      ]
+    }
+  ],
+  "$defs": {
+    "nonemptyString": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+:-]*$"
+    },
+    "proposalId": {
+      "type": "string",
+      "pattern": "^urn:rosen-stewardship:proposal:[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "objectId": {
+      "type": "string",
+      "pattern": "^urn:rosen:object:(?:archive-record|social-post|entity|relationship|dataset|source-file|generated-artifact|feature-record):[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "objectClass": {
+      "enum": [
+        "archive-record",
+        "social-post",
+        "entity",
+        "relationship",
+        "dataset",
+        "source-file",
+        "generated-artifact",
+        "feature-record"
+      ]
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "key"],
+      "properties": {
+        "kind": { "enum": ["field", "assertion"] },
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/|+-]*$"
+        }
+      }
+    }
+  }
+}

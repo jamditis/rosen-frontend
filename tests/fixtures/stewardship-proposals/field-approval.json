@@ -1,0 +1,56 @@
+{
+  "proposals": [
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "proposalId": "urn:rosen-stewardship:proposal:field-title-1",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00001",
+      "objectClass": "archive-record",
+      "target": {
+        "kind": "field",
+        "key": "title"
+      },
+      "currentValue": "Old title",
+      "proposedValue": "Corrected title",
+      "relevantInputHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "evidenceRefs": [
+        "urn:rosen:evidence:record-00001-source"
+      ],
+      "ruleVersion": "title-normalization@1.0.0",
+      "generationVersion": "deterministic-generator@1.0.0",
+      "reason": "Remove a known title transcription error.",
+      "confidence": 1,
+      "severity": "medium",
+      "riskClass": "deterministic"
+    }
+  ],
+  "decisions": [
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "eventId": "urn:rosen-stewardship:decision-event:approve-field-title-1",
+      "proposalId": "urn:rosen-stewardship:proposal:field-title-1",
+      "operation": "approve",
+      "expectedRevision": 0,
+      "actor": {
+        "actorType": "human",
+        "actorId": "curator:joe-amditis"
+      },
+      "occurredAt": "2026-10-14T14:00:00.000Z",
+      "reason": "The cited source confirms the corrected title.",
+      "notes": "Reviewed against the source scan."
+    }
+  ],
+  "currentInputHashes": {
+    "matching": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "changed": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "expected": {
+    "acceptedProposalIds": [
+      "urn:rosen-stewardship:proposal:field-title-1"
+    ],
+    "proposedValueHash": "d605fa12c0005658e009b3506b1e3225c74c977c19ac8e5e1acb11824db3b193",
+    "proposalHash": "e9b8721f3174f1bcc052ff1e44ad152642328702b8653172f4f264959469bc25",
+    "rejectionFingerprint": "05bd2b87cacdb5fbd280e044a91c87123e827ba5674ee1bad4ae44716aad5070"
+  }
+}
