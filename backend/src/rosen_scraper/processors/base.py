@@ -29,7 +29,7 @@ from bs4 import BeautifulSoup
 # yyyy-mm-dd, e.g. the date prefix of an ISO timestamp (2014-08-20T21:24:05Z) or
 # a date embedded in a filename. Compiled once; the processors built this pattern
 # inline on every call.
-_ISO_DATE_RE = re.compile(r'(\d{4})-(\d{2})-(\d{2})')
+_ISO_DATE_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
 
 
 def us_date_from_iso(value: Any, *, anchored: bool = True) -> Optional[str]:
@@ -55,8 +55,8 @@ def iso_to_ymd(created_at: str) -> Optional[str]:
     leading slice rather than raising.
     """
     try:
-        dt = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-        return dt.strftime('%Y-%m-%d')
+        dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+        return dt.strftime("%Y-%m-%d")
     except Exception:
         return created_at[:10] if len(created_at) >= 10 else None
 
@@ -70,7 +70,7 @@ def truncate_on_word_boundary(text: str, length: int) -> str:
     in each caller.
     """
     if len(text) > length:
-        return text[:length].rsplit(' ', 1)[0] + '...'
+        return text[:length].rsplit(" ", 1)[0] + "..."
     return text
 
 
@@ -83,20 +83,20 @@ def clean_html(html_content: str) -> str:
     which deliberately skips the decompose and unescape steps here (#490).
     """
     if not html_content:
-        return ''
+        return ""
 
-    soup = BeautifulSoup(html_content, 'html.parser')
+    soup = BeautifulSoup(html_content, "html.parser")
 
     # Remove script and style elements
-    for element in soup(['script', 'style']):
+    for element in soup(["script", "style"]):
         element.decompose()
 
     # Get text with newlines preserved for block elements
-    text = soup.get_text(separator='\n')
+    text = soup.get_text(separator="\n")
 
     # Clean up whitespace
-    lines = [line.strip() for line in text.split('\n')]
-    text = '\n'.join(line for line in lines if line)
+    lines = [line.strip() for line in text.split("\n")]
+    text = "\n".join(line for line in lines if line)
 
     # Decode HTML entities
     text = html.unescape(text)
@@ -138,5 +138,4 @@ class Processor(Protocol):
     #490 envelope discussion before unifying them.
     """
 
-    def process(self, url: str) -> Dict[str, Any]:
-        ...
+    def process(self, url: str) -> Dict[str, Any]: ...

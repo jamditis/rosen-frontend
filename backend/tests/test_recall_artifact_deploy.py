@@ -217,8 +217,14 @@ def test_social_pair_uses_the_same_atomic_publish_path(tmp_path, monkeypatch):
     )
 
     assert result == {"ok": True, "files_pushed": 2, "error": None}
-    assert remote.files[f"{root}/data/archive-social-embeddings.bin"] == b"new-social-binary"
-    assert remote.files[f"{root}/data/archive-social-embeddings.json"] == b'{"binarySha256":"new-social"}'
+    assert (
+        remote.files[f"{root}/data/archive-social-embeddings.bin"]
+        == b"new-social-binary"
+    )
+    assert (
+        remote.files[f"{root}/data/archive-social-embeddings.json"]
+        == b'{"binarySha256":"new-social"}'
+    )
     assert remote.closed is True
 
 

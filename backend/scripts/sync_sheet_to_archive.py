@@ -228,8 +228,9 @@ def load_csv(csv_path: pathlib.Path) -> Tuple[List[str], List[Dict[str, Any]]]:
     return fieldnames, rows
 
 
-def write_csv_atomic(csv_path: pathlib.Path, fieldnames: List[str],
-                     rows: List[Dict[str, Any]]) -> None:
+def write_csv_atomic(
+    csv_path: pathlib.Path, fieldnames: List[str], rows: List[Dict[str, Any]]
+) -> None:
     """Write rows to a sibling tmp then ``os.replace`` -- atomic for readers.
 
     Every cell is formula-injection-sanitized on the way out, not just the cells
@@ -262,8 +263,9 @@ def write_csv_atomic(csv_path: pathlib.Path, fieldnames: List[str],
 def _run(cmd: List[str], cwd: pathlib.Path) -> Tuple[bool, str]:
     """Run a subprocess, capturing output. Returns (ok, combined_output)."""
     try:
-        proc = subprocess.run(cmd, cwd=str(cwd), check=True,
-                              capture_output=True, text=True)
+        proc = subprocess.run(
+            cmd, cwd=str(cwd), check=True, capture_output=True, text=True
+        )
         return True, (proc.stdout or "")
     except subprocess.CalledProcessError as exc:
         combined = (exc.stderr or "") + (exc.stdout or "")
@@ -298,7 +300,9 @@ def _branch_name() -> str:
     return f"sync/master-sheet-{suffix}"
 
 
-def open_sync_pr(csv_path: pathlib.Path, stats: Dict[str, Any]) -> Tuple[Optional[str], str]:
+def open_sync_pr(
+    csv_path: pathlib.Path, stats: Dict[str, Any]
+) -> Tuple[Optional[str], str]:
     """Commit data and census to a fresh branch, push it, and open a PR.
 
     A direct push to main is deliberately avoided -- a human reviews the
@@ -315,7 +319,8 @@ def open_sync_pr(csv_path: pathlib.Path, stats: Dict[str, Any]) -> Tuple[Optiona
     paths = _changed_paths(csv_path)
     rows_changed = stats["rows_changed"]
     field_lines = "\n".join(
-        f"- `{f}`: {n}" for f, n in sorted(stats["writes_by_field"].items()))
+        f"- `{f}`: {n}" for f, n in sorted(stats["writes_by_field"].items())
+    )
     title = f"data: sync {rows_changed} enriched record(s) from master sheet"
     body = (
         f"Automated sync from the master Google Sheet by the batch maintenance "
@@ -336,36 +341,112 @@ def open_sync_pr(csv_path: pathlib.Path, stats: Dict[str, Any]) -> Tuple[Optiona
         f"Design: `docs/plans/2026-05-29-batch-maintenance-runner-design.md`"
     )
     try:
-        subprocess.run(["git", "config", "user.name",
-                        os.environ.get("GIT_BOT_NAME", "rosen-archive-bot")],
-                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
-        subprocess.run(["git", "config", "user.email",
-                        os.environ.get("GIT_BOT_EMAIL",
-                                       "rosen-archive-bot@users.noreply.github.com")],
-                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
-        subprocess.run(["git", "checkout", "-b", branch],
-                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
-        subprocess.run(["git", "add"] + paths,
-                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
-        subprocess.run(["git", "commit", "-m", title],
-                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
-        subprocess.run(["npm", "run", "census:stewardship"],
-                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
-        subprocess.run(["node", "--test", "tests/stewardship-census.test.js"],
-                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
-        subprocess.run(["git", "add", *_CENSUS_REPORT_PATHS],
-                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
-        subprocess.run(["git", "commit", "-m", "data: refresh stewardship census"],
-                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
-        subprocess.run(["git", "push", "origin", branch],
-                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
-        subprocess.run(["gh", "pr", "create", "--base", "main", "--head", branch,
-                        "--title", title, "--body", body],
-                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
+        subprocess.run(
+            [
+                "git",
+                "config",
+                "user.name",
+                os.environ.get("GIT_BOT_NAME", "rosen-archive-bot"),
+            ],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            [
+                "git",
+                "config",
+                "user.email",
+                os.environ.get(
+                    "GIT_BOT_EMAIL", "rosen-archive-bot@users.noreply.github.com"
+                ),
+            ],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            ["git", "checkout", "-b", branch],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            ["git", "add"] + paths,
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            ["git", "commit", "-m", title],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            ["npm", "run", "census:stewardship"],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            ["node", "--test", "tests/stewardship-census.test.js"],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            ["git", "add", *_CENSUS_REPORT_PATHS],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            ["git", "commit", "-m", "data: refresh stewardship census"],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            ["git", "push", "origin", branch],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            [
+                "gh",
+                "pr",
+                "create",
+                "--base",
+                "main",
+                "--head",
+                branch,
+                "--title",
+                title,
+                "--body",
+                body,
+            ],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
         return branch, f"opened PR from {branch}"
     except subprocess.CalledProcessError as exc:
         diagnostics = "\n".join(
-            part.strip() for part in (exc.stderr or "", exc.stdout or "")
+            part.strip()
+            for part in (exc.stderr or "", exc.stdout or "")
             if part.strip()
         )
         return None, f"commit/PR pipeline failed: {diagnostics or exc}"
@@ -377,29 +458,40 @@ def open_sync_pr(csv_path: pathlib.Path, stats: Dict[str, Any]) -> Tuple[Optiona
 def _print_stats(stats: Dict[str, Any], dry_run: bool) -> None:
     verb = "would change" if dry_run else "changed"
     print("=" * 70)
-    print(f"[sync] matched {stats['matched']} record(s) by id; "
-          f"{verb} {stats['rows_changed']}")
+    print(
+        f"[sync] matched {stats['matched']} record(s) by id; "
+        f"{verb} {stats['rows_changed']}"
+    )
     if stats["writes_by_field"]:
         for field, n in sorted(stats["writes_by_field"].items()):
             print(f"  {field}: {n}")
     else:
         print("  (no field changes)")
     if stats["limit_reached"]:
-        print(f"  [limit] stopped at {stats['rows_changed']} changes; "
-              "more records have pending sheet enrichment -- raise --limit to continue")
+        print(
+            f"  [limit] stopped at {stats['rows_changed']} changes; "
+            "more records have pending sheet enrichment -- raise --limit to continue"
+        )
     print("=" * 70)
 
 
-def run(sheet_tab: Optional[str] = None, limit: int = 0,
-        dry_run: bool = False, csv_path: Optional[pathlib.Path] = None) -> Dict[str, Any]:
+def run(
+    sheet_tab: Optional[str] = None,
+    limit: int = 0,
+    dry_run: bool = False,
+    csv_path: Optional[pathlib.Path] = None,
+) -> Dict[str, Any]:
     """Read the sheet, merge into the CSV, and (unless dry-run) open a PR.
 
     Returns ``{status, rows_changed, exit_code, error}``. ``status`` is one of
     ``pr_opened | dry_run | nothing_to_sync | error``.
     """
     csv_path = pathlib.Path(csv_path or CSV_FILE)
-    sheet_tab = (sheet_tab if sheet_tab is not None else
-                 os.getenv("ROSEN_MASTER_SHEET_TAB") or DEFAULT_SHEET_TAB)
+    sheet_tab = (
+        sheet_tab
+        if sheet_tab is not None
+        else os.getenv("ROSEN_MASTER_SHEET_TAB") or DEFAULT_SHEET_TAB
+    )
 
     # --- Read the master sheet. ---
     try:
@@ -424,14 +516,22 @@ def run(sheet_tab: Optional[str] = None, limit: int = 0,
 
     if dry_run:
         print("[sync] DRY RUN -- CSV not written, nothing deployed")
-        return {"status": "dry_run", "rows_changed": stats["rows_changed"],
-                "exit_code": 0, "error": ""}
+        return {
+            "status": "dry_run",
+            "rows_changed": stats["rows_changed"],
+            "exit_code": 0,
+            "error": "",
+        }
 
     if stats["rows_changed"] == 0:
         # Sheet and CSV already agree. A deterministic no-op is a valid success.
         print("[sync] nothing to sync; CSV already matches the sheet")
-        return {"status": "nothing_to_sync", "rows_changed": 0,
-                "exit_code": 0, "error": ""}
+        return {
+            "status": "nothing_to_sync",
+            "rows_changed": 0,
+            "exit_code": 0,
+            "error": "",
+        }
 
     # --- Write CSV + regenerate + test, then open a PR. ---
     write_csv_atomic(csv_path, fieldnames, rows)
@@ -439,23 +539,41 @@ def run(sheet_tab: Optional[str] = None, limit: int = 0,
 
     ok, out = regen_json()
     if not ok:
-        return {"status": "error", "rows_changed": stats["rows_changed"],
-                "exit_code": 1, "error": f"JSON regen failed: {out}"}
+        return {
+            "status": "error",
+            "rows_changed": stats["rows_changed"],
+            "exit_code": 1,
+            "error": f"JSON regen failed: {out}",
+        }
 
     ok, out = run_node_tests()
     if not ok:
-        return {"status": "error", "rows_changed": stats["rows_changed"],
-                "exit_code": 1, "error": f"Tests failed; PR not opened. {out}"}
+        return {
+            "status": "error",
+            "rows_changed": stats["rows_changed"],
+            "exit_code": 1,
+            "error": f"Tests failed; PR not opened. {out}",
+        }
 
     branch, msg = open_sync_pr(csv_path, stats)
     if branch is None:
-        return {"status": "error", "rows_changed": stats["rows_changed"],
-                "exit_code": 1, "error": f"Could not open PR: {msg}"}
+        return {
+            "status": "error",
+            "rows_changed": stats["rows_changed"],
+            "exit_code": 1,
+            "error": f"Could not open PR: {msg}",
+        }
 
-    print(f"[sync] {msg}; review and merge, then run the Pillar 3c deploy to "
-          "go live")
-    return {"status": "pr_opened", "rows_changed": stats["rows_changed"],
-            "branch": branch, "exit_code": 0, "error": ""}
+    print(
+        f"[sync] {msg}; review and merge, then run the Pillar 3c deploy to " "go live"
+    )
+    return {
+        "status": "pr_opened",
+        "rows_changed": stats["rows_changed"],
+        "branch": branch,
+        "exit_code": 0,
+        "error": "",
+    }
 
 
 # ---------- CLI -------------------------------------------------------------
@@ -464,16 +582,26 @@ def run(sheet_tab: Optional[str] = None, limit: int = 0,
 def _parse_args(argv):
     p = argparse.ArgumentParser(
         description="Merge enriched master-sheet columns into the archive CSV "
-                    "and deploy.")
-    p.add_argument(
-        "--sheet-tab", dest="sheet_tab", default=None,
-        help=("Sheet tab to read (default: ROSEN_MASTER_SHEET_TAB or "
-              f"{DEFAULT_SHEET_TAB})"),
+        "and deploy."
     )
-    p.add_argument("--limit", type=int, default=0,
-                   help="Cap records changed this run (0 = no cap)")
-    p.add_argument("--dry-run", dest="dry_run", action="store_true",
-                   help="Rehearse only: log the diff, write/deploy nothing")
+    p.add_argument(
+        "--sheet-tab",
+        dest="sheet_tab",
+        default=None,
+        help=(
+            "Sheet tab to read (default: ROSEN_MASTER_SHEET_TAB or "
+            f"{DEFAULT_SHEET_TAB})"
+        ),
+    )
+    p.add_argument(
+        "--limit", type=int, default=0, help="Cap records changed this run (0 = no cap)"
+    )
+    p.add_argument(
+        "--dry-run",
+        dest="dry_run",
+        action="store_true",
+        help="Rehearse only: log the diff, write/deploy nothing",
+    )
     return p.parse_args(argv)
 
 
@@ -482,8 +610,9 @@ def main(argv=None) -> int:
     result = run(sheet_tab=args.sheet_tab, limit=args.limit, dry_run=args.dry_run)
     if result["error"]:
         logger.error(result["error"])
-    logger.info(f"Result: status={result['status']} "
-                f"rows_changed={result['rows_changed']}")
+    logger.info(
+        f"Result: status={result['status']} " f"rows_changed={result['rows_changed']}"
+    )
     sys.stdout.flush()
     return int(result.get("exit_code", 1))
 

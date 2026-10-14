@@ -36,9 +36,7 @@ class ProgressReceiptError(ValueError):
 
 
 def _canonical_json(value: Any) -> str:
-    return json.dumps(
-        value, ensure_ascii=False, separators=(",", ":"), sort_keys=True
-    )
+    return json.dumps(value, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
 
 
 def _sha256_text(value: str) -> str:
@@ -55,8 +53,7 @@ def normalize_key_concepts(value: str) -> str:
 def _object_identity(record_id: str) -> tuple[str, str]:
     prefix = record_id.split("-", 1)[0]
     object_type = (
-        "social-post" if prefix in {"BSKY", "MAST", "TWTR"}
-        else "archive-record"
+        "social-post" if prefix in {"BSKY", "MAST", "TWTR"} else "archive-record"
     )
     return object_type, f"urn:rosen:object:{object_type}:{record_id}"
 
@@ -110,18 +107,26 @@ def key_concept_task(
         rule_version=rule_version,
         model_version=model_version,
     )
-    input_hash = _sha256_text(_canonical_json({
-        **context,
-        "currentConcepts": current_concepts,
-    }))
+    input_hash = _sha256_text(
+        _canonical_json(
+            {
+                **context,
+                "currentConcepts": current_concepts,
+            }
+        )
+    )
     object_type, object_id = _object_identity(record_id)
-    task_key = "urn:rosen-stewardship:task:" + _sha256_text(_canonical_json({
-        "inputHash": input_hash,
-        "objectId": object_id,
-        "objectType": object_type,
-        "taskType": KEY_CONCEPT_TASK_TYPE,
-        "taskVersion": KEY_CONCEPT_TASK_VERSION,
-    }))
+    task_key = "urn:rosen-stewardship:task:" + _sha256_text(
+        _canonical_json(
+            {
+                "inputHash": input_hash,
+                "objectId": object_id,
+                "objectType": object_type,
+                "taskType": KEY_CONCEPT_TASK_TYPE,
+                "taskVersion": KEY_CONCEPT_TASK_VERSION,
+            }
+        )
+    )
     return KeyConceptTask(
         record_id=record_id,
         input_hash=input_hash,
@@ -135,18 +140,20 @@ def key_concept_task(
 def encode_receipt(task: KeyConceptTask, expected_concepts: str) -> str:
     """Record task identity plus the concept state expected after its write."""
 
-    return _canonical_json({
-        "schemaVersion": RECEIPT_SCHEMA_VERSION,
-        "taskKey": task.task_key,
-        "taskVersion": KEY_CONCEPT_TASK_VERSION,
-        "ruleVersion": task.rule_version,
-        "modelVersion": task.model_version,
-        "inputHash": task.input_hash,
-        "contextHash": task.context_hash,
-        "expectedConceptsHash": _sha256_text(
-            normalize_key_concepts(expected_concepts)
-        ),
-    })
+    return _canonical_json(
+        {
+            "schemaVersion": RECEIPT_SCHEMA_VERSION,
+            "taskKey": task.task_key,
+            "taskVersion": KEY_CONCEPT_TASK_VERSION,
+            "ruleVersion": task.rule_version,
+            "modelVersion": task.model_version,
+            "inputHash": task.input_hash,
+            "contextHash": task.context_hash,
+            "expectedConceptsHash": _sha256_text(
+                normalize_key_concepts(expected_concepts)
+            ),
+        }
+    )
 
 
 def receipt_matches(
@@ -220,13 +227,15 @@ def receipt_matches(
     )
     object_type, object_id = _object_identity(record_id)
     expected_task_key = "urn:rosen-stewardship:task:" + _sha256_text(
-        _canonical_json({
-            "inputHash": receipt["inputHash"],
-            "objectId": object_id,
-            "objectType": object_type,
-            "taskType": KEY_CONCEPT_TASK_TYPE,
-            "taskVersion": receipt["taskVersion"],
-        })
+        _canonical_json(
+            {
+                "inputHash": receipt["inputHash"],
+                "objectId": object_id,
+                "objectType": object_type,
+                "taskType": KEY_CONCEPT_TASK_TYPE,
+                "taskVersion": receipt["taskVersion"],
+            }
+        )
     )
     if receipt["taskKey"] != expected_task_key:
         return False
@@ -235,8 +244,7 @@ def receipt_matches(
         receipt["ruleVersion"] == rule_version
         and receipt["modelVersion"] == model_version
         and receipt["contextHash"] == current_task.context_hash
-        and receipt["expectedConceptsHash"] == _sha256_text(
-            normalize_key_concepts(current_concepts)
-        )
+        and receipt["expectedConceptsHash"]
+        == _sha256_text(normalize_key_concepts(current_concepts))
         and _sha256_text(_canonical_json(stored_context)) == receipt["contextHash"]
     )

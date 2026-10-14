@@ -30,7 +30,8 @@ class ExtractionDB:
     def _init_schema(self):
         """Create database tables if they don't exist."""
         with self._get_connection() as conn:
-            conn.executescript("""
+            conn.executescript(
+                """
                 -- Track which records have been processed
                 CREATE TABLE IF NOT EXISTS processed_records (
                     record_id TEXT PRIMARY KEY,
@@ -95,7 +96,8 @@ class ExtractionDB:
                 CREATE INDEX IF NOT EXISTS idx_entities_name ON entities(normalized_name);
                 CREATE INDEX IF NOT EXISTS idx_relationships_source ON relationships(source_entity_id);
                 CREATE INDEX IF NOT EXISTS idx_relationships_target ON relationships(target_entity_id);
-            """)
+            """
+            )
 
     @contextmanager
     def _get_connection(self):
@@ -118,8 +120,8 @@ class ExtractionDB:
         record_id: str,
         entity_count: int = 0,
         relationship_count: int = 0,
-        status: str = 'completed',
-        error_msg: Optional[str] = None
+        status: str = "completed",
+        error_msg: Optional[str] = None,
     ):
         """
         Mark a record as processed.
@@ -132,18 +134,21 @@ class ExtractionDB:
             error_msg: Error message if status is 'failed'
         """
         with self._get_connection() as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO processed_records
                 (record_id, status, processed_at, entity_count, relationship_count, error_msg)
                 VALUES (?, ?, ?, ?, ?, ?)
-            """, (
-                record_id,
-                status,
-                datetime.now().isoformat(),
-                entity_count,
-                relationship_count,
-                error_msg
-            ))
+            """,
+                (
+                    record_id,
+                    status,
+                    datetime.now().isoformat(),
+                    entity_count,
+                    relationship_count,
+                    error_msg,
+                ),
+            )
 
     def get_processed_ids(self) -> Set[str]:
         """
@@ -154,13 +159,13 @@ class ExtractionDB:
         """
         with self._get_connection() as conn:
             cursor = conn.execute("SELECT record_id FROM processed_records")
-            return {row['record_id'] for row in cursor.fetchall()}
+            return {row["record_id"] for row in cursor.fetchall()}
 
     def get_processed_count(self) -> int:
         """Get count of processed records."""
         with self._get_connection() as conn:
             cursor = conn.execute("SELECT COUNT(*) as cnt FROM processed_records")
-            return cursor.fetchone()['cnt']
+            return cursor.fetchone()["cnt"]
 
     def get_failed_records(self) -> List[Dict]:
         """Get all records that failed processing."""
@@ -179,27 +184,30 @@ class ExtractionDB:
         Shared by save_entity and save_entities so the column list, defaults,
         and per-row created_at timestamp live in one place.
         """
-        conn.execute("""
+        conn.execute(
+            """
             INSERT OR REPLACE INTO entities
             (entity_id, entity_type, entity_name, normalized_name,
              role_or_description, affiliation, prominence_score,
              first_mention_record_id, total_mentions, related_entities,
              notes, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            entity.get('entity_id'),
-            entity.get('entity_type'),
-            entity.get('entity_name'),
-            entity.get('normalized_name'),
-            entity.get('role_or_description', ''),
-            entity.get('affiliation', ''),
-            entity.get('prominence_score', 0),
-            entity.get('first_mention_record_id', ''),
-            entity.get('total_mentions', 1),
-            entity.get('related_entities', ''),
-            entity.get('notes', ''),
-            datetime.now().isoformat()
-        ))
+        """,
+            (
+                entity.get("entity_id"),
+                entity.get("entity_type"),
+                entity.get("entity_name"),
+                entity.get("normalized_name"),
+                entity.get("role_or_description", ""),
+                entity.get("affiliation", ""),
+                entity.get("prominence_score", 0),
+                entity.get("first_mention_record_id", ""),
+                entity.get("total_mentions", 1),
+                entity.get("related_entities", ""),
+                entity.get("notes", ""),
+                datetime.now().isoformat(),
+            ),
+        )
 
     def save_entity(self, entity: Dict[str, Any]):
         """
@@ -227,7 +235,7 @@ class ExtractionDB:
         """Get count of entities in database."""
         with self._get_connection() as conn:
             cursor = conn.execute("SELECT COUNT(*) as cnt FROM entities")
-            return cursor.fetchone()['cnt']
+            return cursor.fetchone()["cnt"]
 
     # ========== Relationship Storage ==========
 
@@ -238,25 +246,28 @@ class ExtractionDB:
         Shared by save_relationship and save_relationships. Relationships have
         no unique constraint, so a repeated relationship_id appends a row.
         """
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO relationships
             (relationship_id, source_entity_id, target_entity_id,
              relationship_type, description, evidence, source_record_id,
              strength, temporal_context, notes, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            relationship.get('relationship_id'),
-            relationship.get('source_entity_id'),
-            relationship.get('target_entity_id'),
-            relationship.get('relationship_type'),
-            relationship.get('description', ''),
-            relationship.get('evidence', ''),
-            relationship.get('source_record_id', ''),
-            relationship.get('strength', ''),
-            relationship.get('temporal_context', ''),
-            relationship.get('notes', ''),
-            datetime.now().isoformat()
-        ))
+        """,
+            (
+                relationship.get("relationship_id"),
+                relationship.get("source_entity_id"),
+                relationship.get("target_entity_id"),
+                relationship.get("relationship_type"),
+                relationship.get("description", ""),
+                relationship.get("evidence", ""),
+                relationship.get("source_record_id", ""),
+                relationship.get("strength", ""),
+                relationship.get("temporal_context", ""),
+                relationship.get("notes", ""),
+                datetime.now().isoformat(),
+            ),
+        )
 
     def save_relationship(self, relationship: Dict[str, Any]):
         """
@@ -284,11 +295,11 @@ class ExtractionDB:
         """Get count of relationships in database."""
         with self._get_connection() as conn:
             cursor = conn.execute("SELECT COUNT(*) as cnt FROM relationships")
-            return cursor.fetchone()['cnt']
+            return cursor.fetchone()["cnt"]
 
     # ========== Session Progress ==========
 
-    def start_session(self, total_records: int, notes: str = '') -> int:
+    def start_session(self, total_records: int, notes: str = "") -> int:
         """
         Start a new extraction session.
 
@@ -300,11 +311,14 @@ class ExtractionDB:
             Session ID
         """
         with self._get_connection() as conn:
-            cursor = conn.execute("""
+            cursor = conn.execute(
+                """
                 INSERT INTO session_progress
                 (session_start, total_records, status, notes)
                 VALUES (?, ?, 'running', ?)
-            """, (datetime.now().isoformat(), total_records, notes))
+            """,
+                (datetime.now().isoformat(), total_records, notes),
+            )
             return cursor.lastrowid
 
     def update_session_progress(
@@ -313,48 +327,63 @@ class ExtractionDB:
         processed_count: int,
         entity_count: int,
         relationship_count: int,
-        last_record_id: str
+        last_record_id: str,
     ):
         """Update progress for a running session."""
         with self._get_connection() as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 UPDATE session_progress
                 SET processed_count = ?, entity_count = ?,
                     relationship_count = ?, last_record_id = ?
                 WHERE id = ?
-            """, (processed_count, entity_count, relationship_count,
-                  last_record_id, session_id))
+            """,
+                (
+                    processed_count,
+                    entity_count,
+                    relationship_count,
+                    last_record_id,
+                    session_id,
+                ),
+            )
 
-    def end_session(self, session_id: int, status: str = 'completed'):
+    def end_session(self, session_id: int, status: str = "completed"):
         """Mark a session as completed."""
         with self._get_connection() as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 UPDATE session_progress
                 SET session_end = ?, status = ?
                 WHERE id = ?
-            """, (datetime.now().isoformat(), status, session_id))
+            """,
+                (datetime.now().isoformat(), status, session_id),
+            )
 
     def get_last_session(self) -> Optional[Dict]:
         """Get the most recent session."""
         with self._get_connection() as conn:
-            cursor = conn.execute("""
+            cursor = conn.execute(
+                """
                 SELECT * FROM session_progress
                 ORDER BY id DESC LIMIT 1
-            """)
+            """
+            )
             row = cursor.fetchone()
             return dict(row) if row else None
 
     def get_session_stats(self) -> Dict:
         """Get aggregate stats across all sessions."""
         with self._get_connection() as conn:
-            cursor = conn.execute("""
+            cursor = conn.execute(
+                """
                 SELECT
                     COUNT(*) as total_sessions,
                     SUM(processed_count) as total_processed,
                     SUM(entity_count) as total_entities,
                     SUM(relationship_count) as total_relationships
                 FROM session_progress
-            """)
+            """
+            )
             row = cursor.fetchone()
             return dict(row) if row else {}
 
@@ -366,51 +395,63 @@ class ExtractionDB:
             stats = {}
 
             # Processed records
-            cursor = conn.execute("""
+            cursor = conn.execute(
+                """
                 SELECT status, COUNT(*) as cnt
                 FROM processed_records
                 GROUP BY status
-            """)
-            stats['processed_by_status'] = {
-                row['status']: row['cnt'] for row in cursor.fetchall()
+            """
+            )
+            stats["processed_by_status"] = {
+                row["status"]: row["cnt"] for row in cursor.fetchall()
             }
 
             # Entity counts by type
-            cursor = conn.execute("""
+            cursor = conn.execute(
+                """
                 SELECT entity_type, COUNT(*) as cnt
                 FROM entities
                 GROUP BY entity_type
-            """)
-            stats['entities_by_type'] = {
-                row['entity_type']: row['cnt'] for row in cursor.fetchall()
+            """
+            )
+            stats["entities_by_type"] = {
+                row["entity_type"]: row["cnt"] for row in cursor.fetchall()
             }
 
             # Relationship counts by type
-            cursor = conn.execute("""
+            cursor = conn.execute(
+                """
                 SELECT relationship_type, COUNT(*) as cnt
                 FROM relationships
                 GROUP BY relationship_type
-            """)
-            stats['relationships_by_type'] = {
-                row['relationship_type']: row['cnt'] for row in cursor.fetchall()
+            """
+            )
+            stats["relationships_by_type"] = {
+                row["relationship_type"]: row["cnt"] for row in cursor.fetchall()
             }
 
             # Totals
-            stats['total_entities'] = sum(stats.get('entities_by_type', {}).values())
-            stats['total_relationships'] = sum(stats.get('relationships_by_type', {}).values())
-            stats['total_processed'] = sum(stats.get('processed_by_status', {}).values())
+            stats["total_entities"] = sum(stats.get("entities_by_type", {}).values())
+            stats["total_relationships"] = sum(
+                stats.get("relationships_by_type", {}).values()
+            )
+            stats["total_processed"] = sum(
+                stats.get("processed_by_status", {}).values()
+            )
 
             return stats
 
     def clear_all(self):
         """Clear all data from the database. Use with caution!"""
         with self._get_connection() as conn:
-            conn.executescript("""
+            conn.executescript(
+                """
                 DELETE FROM processed_records;
                 DELETE FROM entities;
                 DELETE FROM relationships;
                 DELETE FROM session_progress;
-            """)
+            """
+            )
 
     def vacuum(self):
         """Reclaim space after deletions."""

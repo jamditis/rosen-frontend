@@ -5,6 +5,7 @@ Import paths (src/ for rosen_scraper, the backend root for submission_runtime)
 are set via [tool.pytest.ini_options] pythonpath in pyproject.toml, so this
 file no longer needs to mutate sys.path. See issue #156.
 """
+
 import pytest
 
 
@@ -34,12 +35,12 @@ def sample_article_html():
 def sample_article_data():
     """Sample extracted article data."""
     return {
-        'title': 'Test Article Title',
-        'author': 'John Doe',
-        'text': 'This is a sample article paragraph for testing. Another paragraph with more content.',
-        'date': '2024-01-15',
-        'url': 'https://example.com/test-article',
-        'raw_text': 'This is a sample article paragraph for testing. Another paragraph with more content.'
+        "title": "Test Article Title",
+        "author": "John Doe",
+        "text": "This is a sample article paragraph for testing. Another paragraph with more content.",
+        "date": "2024-01-15",
+        "url": "https://example.com/test-article",
+        "raw_text": "This is a sample article paragraph for testing. Another paragraph with more content.",
     }
 
 
@@ -55,32 +56,42 @@ def sample_schema():
     scope='Media Analysis', etc.).
     """
     return {
-        'taxonomy': {
-            'thematic_categories': [
-                {'name': 'Press & Media Criticism',
-                 'description': 'Analysis of press behavior and norms'},
-                {'name': 'Journalism Theory & Practice',
-                 'description': 'Theoretical and practical frameworks for journalism'},
-                {'name': 'Technology & Digital Media',
-                 'description': 'Digital media and platform shifts'},
+        "taxonomy": {
+            "thematic_categories": [
+                {
+                    "name": "Press & Media Criticism",
+                    "description": "Analysis of press behavior and norms",
+                },
+                {
+                    "name": "Journalism Theory & Practice",
+                    "description": "Theoretical and practical frameworks for journalism",
+                },
+                {
+                    "name": "Technology & Digital Media",
+                    "description": "Digital media and platform shifts",
+                },
             ],
-            'key_concepts': [
-                'View from Nowhere',
-                'audience atomization',
-                'objectivity',
-                'transparency',
-                'press think',
+            "key_concepts": [
+                "View from Nowhere",
+                "audience atomization",
+                "objectivity",
+                "transparency",
+                "press think",
             ],
-            'era': [
-                {'name': 'Digital Age',
-                 'description': 'Test fixture era value used by categorizer tests'},
-                {'name': 'Peak Blogging & Citizen Journalism (2005-2009)',
-                 'description': 'Blogging-era taxonomy value present in real schema.json'},
+            "era": [
+                {
+                    "name": "Digital Age",
+                    "description": "Test fixture era value used by categorizer tests",
+                },
+                {
+                    "name": "Peak Blogging & Citizen Journalism (2005-2009)",
+                    "description": "Blogging-era taxonomy value present in real schema.json",
+                },
             ],
-            'scope': [
-                'Media Analysis',
-                'Theoretical',
-                'Commentary/Critique',
+            "scope": [
+                "Media Analysis",
+                "Theoretical",
+                "Commentary/Critique",
             ],
         }
     }
@@ -91,20 +102,20 @@ def sample_entities():
     """Sample entities for testing."""
     return [
         {
-            'name': 'Jay Rosen',
-            'type': 'Person',
-            'description': 'Professor of Journalism at NYU'
+            "name": "Jay Rosen",
+            "type": "Person",
+            "description": "Professor of Journalism at NYU",
         },
         {
-            'name': 'PressThink',
-            'type': 'Publication',
-            'description': 'Blog by Jay Rosen'
+            "name": "PressThink",
+            "type": "Publication",
+            "description": "Blog by Jay Rosen",
         },
         {
-            'name': 'New York University',
-            'type': 'Organization',
-            'description': 'University in New York City'
-        }
+            "name": "New York University",
+            "type": "Organization",
+            "description": "University in New York City",
+        },
     ]
 
 
@@ -125,10 +136,4 @@ def sample_url():
 @pytest.fixture
 def sample_existing_ids():
     """Sample existing IDs for testing ID generation."""
-    return {
-        'PRESSTH-00001',
-        'PRESSTH-00002',
-        'NYT-00001',
-        'NYT-00002',
-        'CJR-00001'
-    }
+    return {"PRESSTH-00001", "PRESSTH-00002", "NYT-00001", "NYT-00002", "CJR-00001"}

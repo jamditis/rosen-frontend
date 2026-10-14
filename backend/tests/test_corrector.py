@@ -612,9 +612,10 @@ def test_run_rejects_malformed_url_before_detection_or_cost(monkeypatch):
     assert cost_tracker.operations == []
     assert stats["processed"] == 1
     assert stats["errors"] == 1
-    assert "Failed - Unsafe URL: URL could not be parsed" in worksheet.batch_calls[
-        0
-    ][0]["values"][0][0]
+    assert (
+        "Failed - Unsafe URL: URL could not be parsed"
+        in worksheet.batch_calls[0][0]["values"][0][0]
+    )
 
 
 def test_cached_content_does_not_require_url_resolution(monkeypatch):
@@ -994,13 +995,13 @@ def test_resume_skips_completed_rows_individually_not_just_the_leading_run():
     # [complete, incomplete, complete] only the middle row is reprocessed and the
     # trailing completed row is still skipped.
     records = make_records(3)
-    records[0]["notes"] = (
-        "[2026-01-01 12:00] Smart Corrector: Complete - Updated: summary"
-    )
+    records[0][
+        "notes"
+    ] = "[2026-01-01 12:00] Smart Corrector: Complete - Updated: summary"
     records[1]["notes"] = "[2026-01-01 12:00] Smart Corrector: Needs reprocessing"
-    records[2]["notes"] = (
-        "[2026-01-01 12:00] Smart Corrector: Complete - Updated: summary"
-    )
+    records[2][
+        "notes"
+    ] = "[2026-01-01 12:00] Smart Corrector: Complete - Updated: summary"
     worksheet = FakeWorksheet(records)
     categorized = []
 
@@ -1610,11 +1611,14 @@ def test_budget_stop_after_recovery_persists_text_only_in_live_mode(dry_run):
             for update in worksheet.batch_calls[0]
         }
         assert updates_by_range["B2"] == "Recovered article"
-        assert "Smart Corrector: Incomplete - Reprocessed via article" in updates_by_range[
-            "C2"
-        ]
+        assert (
+            "Smart Corrector: Incomplete - Reprocessed via article"
+            in updates_by_range["C2"]
+        )
         assert "Budget limit reached before AI analysis" in updates_by_range["C2"]
-        assert not any(cell in updates_by_range for cell in ("D2", "E2", "F2", "G2", "H2"))
+        assert not any(
+            cell in updates_by_range for cell in ("D2", "E2", "F2", "G2", "H2")
+        )
 
 
 def test_budget_stops_before_paid_default_processor_call():

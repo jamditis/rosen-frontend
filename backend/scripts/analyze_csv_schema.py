@@ -19,25 +19,25 @@ def analyze_schema_compliance():
     """Analyze CSV headers against schema.json."""
 
     # Paths
-    data_dir = Path(__file__).parent.parent.parent / 'data'
-    schema_file = Path(__file__).parent.parent / 'schema.json'
-    csv_file = data_dir / 'archive_records-public.csv'
+    data_dir = Path(__file__).parent.parent.parent / "data"
+    schema_file = Path(__file__).parent.parent / "schema.json"
+    csv_file = data_dir / "archive_records-public.csv"
 
     # Load schema (handle UTF-8 BOM)
-    with open(schema_file, 'r', encoding='utf-8-sig') as f:
+    with open(schema_file, "r", encoding="utf-8-sig") as f:
         schema = json.load(f)
 
-    schema_headers = schema['output_headers']
+    schema_headers = schema["output_headers"]
 
     # Load CSV headers
-    with open(csv_file, 'r', encoding='utf-8') as f:
+    with open(csv_file, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         csv_headers = reader.fieldnames
         records = list(reader)
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("CSV SCHEMA VALIDATION")
-    print("="*80)
+    print("=" * 80)
 
     print(f"\nSchema headers: {len(schema_headers)}")
     print(f"CSV headers: {len(csv_headers)}")
@@ -49,13 +49,15 @@ def analyze_schema_compliance():
     # Headers in CSV but not in schema
     unexpected = csv_set - schema_set
     if unexpected:
-        print("\n" + "-"*80)
+        print("\n" + "-" * 80)
         print("⚠️  UNEXPECTED COLUMNS (in CSV but not in schema):")
-        print("-"*80)
+        print("-" * 80)
         for col in unexpected:
             print(f"  - '{col}'")
             # Show sample values
-            sample_values = [r.get(col, '') for r in records if r.get(col, '').strip()][:5]
+            sample_values = [r.get(col, "") for r in records if r.get(col, "").strip()][
+                :5
+            ]
             if sample_values:
                 print(f"    Sample values: {sample_values}")
         print("\n💡 Action: Either add to schema.json or remove from CSV")
@@ -65,9 +67,9 @@ def analyze_schema_compliance():
     # Headers in schema but not in CSV
     missing = schema_set - csv_set
     if missing:
-        print("\n" + "-"*80)
+        print("\n" + "-" * 80)
         print("⚠️  MISSING COLUMNS (in schema but not in CSV):")
-        print("-"*80)
+        print("-" * 80)
         for col in missing:
             print(f"  - '{col}'")
         print("\n💡 Action: Add columns to CSV or remove from schema.json")
@@ -75,9 +77,9 @@ def analyze_schema_compliance():
         print("\n✅ No missing columns")
 
     # Check ordering
-    print("\n" + "-"*80)
+    print("\n" + "-" * 80)
     print("COLUMN ORDERING:")
-    print("-"*80)
+    print("-" * 80)
 
     # Find columns in both
     common_headers = [h for h in schema_headers if h in csv_set]
@@ -92,16 +94,20 @@ def analyze_schema_compliance():
         print(f"  CSV:    {list(csv_headers)[:10]}")
 
     # Analyze controlled vocabulary fields
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("CONTROLLED VOCABULARY FIELDS")
-    print("="*80)
+    print("=" * 80)
 
     # content_type / format
-    print("\n" + "-"*80)
+    print("\n" + "-" * 80)
     print("content_type:")
-    print("-"*80)
-    content_types = Counter(r.get('content_type', '').strip() for r in records if r.get('content_type', '').strip())
-    schema_formats = set(schema['taxonomy']['content_format'])
+    print("-" * 80)
+    content_types = Counter(
+        r.get("content_type", "").strip()
+        for r in records
+        if r.get("content_type", "").strip()
+    )
+    schema_formats = set(schema["taxonomy"]["content_format"])
 
     print(f"\nSchema defines {len(schema_formats)} content_format values:")
     for fmt in sorted(schema_formats):
@@ -121,11 +127,13 @@ def analyze_schema_compliance():
             print(f"  - '{ct}' ({content_types[ct]} records)")
 
     # scope
-    print("\n" + "-"*80)
+    print("\n" + "-" * 80)
     print("scope:")
-    print("-"*80)
-    scopes = Counter(r.get('scope', '').strip() for r in records if r.get('scope', '').strip())
-    schema_scopes = set(schema['taxonomy']['scope'])
+    print("-" * 80)
+    scopes = Counter(
+        r.get("scope", "").strip() for r in records if r.get("scope", "").strip()
+    )
+    schema_scopes = set(schema["taxonomy"]["scope"])
 
     print(f"\nSchema defines {len(schema_scopes)} scope values:")
     for s in sorted(schema_scopes):
@@ -145,22 +153,30 @@ def analyze_schema_compliance():
             print(f"  - '{sc}' ({scopes[sc]} records)")
 
     # platform
-    print("\n" + "-"*80)
+    print("\n" + "-" * 80)
     print("platform:")
-    print("-"*80)
-    platforms = Counter(r.get('platform', '').strip() for r in records if r.get('platform', '').strip())
+    print("-" * 80)
+    platforms = Counter(
+        r.get("platform", "").strip() for r in records if r.get("platform", "").strip()
+    )
 
     print(f"\nCSV has {len(platforms)} unique platform values:")
     for platform, count in platforms.most_common():
         print(f"  - '{platform}': {count}")
 
-    print("\n💡 Consider: Should 'platform' have a controlled vocabulary in schema.json?")
+    print(
+        "\n💡 Consider: Should 'platform' have a controlled vocabulary in schema.json?"
+    )
 
     # publisher
-    print("\n" + "-"*80)
+    print("\n" + "-" * 80)
     print("publisher:")
-    print("-"*80)
-    publishers = Counter(r.get('publisher', '').strip() for r in records if r.get('publisher', '').strip())
+    print("-" * 80)
+    publishers = Counter(
+        r.get("publisher", "").strip()
+        for r in records
+        if r.get("publisher", "").strip()
+    )
 
     print(f"\nCSV has {len(publishers)} unique publisher values:")
     for pub, count in publishers.most_common(20):
@@ -169,10 +185,14 @@ def analyze_schema_compliance():
         print(f"  ... and {len(publishers) - 20} more")
 
     # original_publication
-    print("\n" + "-"*80)
+    print("\n" + "-" * 80)
     print("original_publication:")
-    print("-"*80)
-    orig_pubs = Counter(r.get('original_publication', '').strip() for r in records if r.get('original_publication', '').strip())
+    print("-" * 80)
+    orig_pubs = Counter(
+        r.get("original_publication", "").strip()
+        for r in records
+        if r.get("original_publication", "").strip()
+    )
 
     print(f"\nCSV has {len(orig_pubs)} unique original_publication values:")
     for op, count in orig_pubs.most_common(20):
@@ -181,96 +201,103 @@ def analyze_schema_compliance():
         print(f"  ... and {len(orig_pubs) - 20} more")
 
     # Generate recommendations
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("RECOMMENDATIONS")
-    print("="*80)
+    print("=" * 80)
 
     recommendations = []
 
     if unexpected:
-        recommendations.append({
-            'priority': 'HIGH',
-            'issue': f"{len(unexpected)} unexpected columns in CSV",
-            'action': 'Review and either add to schema or remove from CSV',
-            'columns': list(unexpected)
-        })
+        recommendations.append(
+            {
+                "priority": "HIGH",
+                "issue": f"{len(unexpected)} unexpected columns in CSV",
+                "action": "Review and either add to schema or remove from CSV",
+                "columns": list(unexpected),
+            }
+        )
 
     if missing:
-        recommendations.append({
-            'priority': 'MEDIUM',
-            'issue': f"{len(missing)} missing columns from CSV",
-            'action': 'Add columns to CSV or remove from schema',
-            'columns': list(missing)
-        })
+        recommendations.append(
+            {
+                "priority": "MEDIUM",
+                "issue": f"{len(missing)} missing columns from CSV",
+                "action": "Add columns to CSV or remove from schema",
+                "columns": list(missing),
+            }
+        )
 
     if unexpected_types:
-        recommendations.append({
-            'priority': 'HIGH',
-            'issue': f"{len(unexpected_types)} content_type values not in schema",
-            'action': 'Add to schema.json content_format list or fix typos in CSV',
-            'values': list(unexpected_types)
-        })
+        recommendations.append(
+            {
+                "priority": "HIGH",
+                "issue": f"{len(unexpected_types)} content_type values not in schema",
+                "action": "Add to schema.json content_format list or fix typos in CSV",
+                "values": list(unexpected_types),
+            }
+        )
 
     if unexpected_scopes:
-        recommendations.append({
-            'priority': 'HIGH',
-            'issue': f"{len(unexpected_scopes)} scope values not in schema",
-            'action': 'Add to schema.json scope list or fix typos in CSV',
-            'values': list(unexpected_scopes)
-        })
+        recommendations.append(
+            {
+                "priority": "HIGH",
+                "issue": f"{len(unexpected_scopes)} scope values not in schema",
+                "action": "Add to schema.json scope list or fix typos in CSV",
+                "values": list(unexpected_scopes),
+            }
+        )
 
     if len(platforms) > 10:
-        recommendations.append({
-            'priority': 'LOW',
-            'issue': f"{len(platforms)} unique platform values (no schema control)",
-            'action': 'Consider adding controlled vocabulary for platform field',
-            'suggestion': 'Add taxonomy.platform list to schema.json'
-        })
+        recommendations.append(
+            {
+                "priority": "LOW",
+                "issue": f"{len(platforms)} unique platform values (no schema control)",
+                "action": "Consider adding controlled vocabulary for platform field",
+                "suggestion": "Add taxonomy.platform list to schema.json",
+            }
+        )
 
     if recommendations:
         for i, rec in enumerate(recommendations, 1):
             print(f"\n{i}. [{rec['priority']}] {rec['issue']}")
             print(f"   Action: {rec['action']}")
-            if 'columns' in rec:
+            if "columns" in rec:
                 print(f"   Columns: {rec['columns']}")
-            if 'values' in rec:
+            if "values" in rec:
                 print(f"   Values: {rec['values']}")
-            if 'suggestion' in rec:
+            if "suggestion" in rec:
                 print(f"   Suggestion: {rec['suggestion']}")
     else:
         print("\n✅ No schema compliance issues found!")
 
     # Save report
-    report_file = Path(__file__).parent.parent / 'csv_schema_validation_report.json'
+    report_file = Path(__file__).parent.parent / "csv_schema_validation_report.json"
     report = {
-        'schema_headers': schema_headers,
-        'csv_headers': list(csv_headers),
-        'unexpected_columns': list(unexpected),
-        'missing_columns': list(missing),
-        'controlled_vocab_issues': {
-            'content_type': {
-                'schema': list(schema_formats),
-                'csv_unique': list(csv_types),
-                'unexpected': list(unexpected_types)
+        "schema_headers": schema_headers,
+        "csv_headers": list(csv_headers),
+        "unexpected_columns": list(unexpected),
+        "missing_columns": list(missing),
+        "controlled_vocab_issues": {
+            "content_type": {
+                "schema": list(schema_formats),
+                "csv_unique": list(csv_types),
+                "unexpected": list(unexpected_types),
             },
-            'scope': {
-                'schema': list(schema_scopes),
-                'csv_unique': list(csv_scopes),
-                'unexpected': list(unexpected_scopes)
+            "scope": {
+                "schema": list(schema_scopes),
+                "csv_unique": list(csv_scopes),
+                "unexpected": list(unexpected_scopes),
             },
-            'platform': {
-                'csv_unique': list(platforms.keys()),
-                'schema': None
-            }
+            "platform": {"csv_unique": list(platforms.keys()), "schema": None},
         },
-        'recommendations': recommendations
+        "recommendations": recommendations,
     }
 
-    with open(report_file, 'w', encoding='utf-8') as f:
+    with open(report_file, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, ensure_ascii=False)
 
     print(f"\n\n📄 Full report saved to: {report_file}")
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print()
 
 

@@ -35,11 +35,11 @@ def extract_from_post(post: Dict) -> Dict:
     Returns:
         Dict with entities and relationships lists
     """
-    record_id = post['id']
-    text_content = post.get('raw_text', '')
-    record_title = post.get('title', 'Untitled Post')
-    record_author = post.get('author', 'Unknown')
-    record_publication = post.get('platform', 'Unknown')
+    record_id = post["id"]
+    text_content = post.get("raw_text", "")
+    record_title = post.get("title", "Untitled Post")
+    record_author = post.get("author", "Unknown")
+    record_publication = post.get("platform", "Unknown")
 
     try:
         result = entity_extractor.extract_entities_and_relationships(
@@ -47,24 +47,26 @@ def extract_from_post(post: Dict) -> Dict:
             record_id=record_id,
             record_title=record_title,
             record_author=record_author,
-            record_publication=record_publication
+            record_publication=record_publication,
         )
 
         if result:
             return {
-                'success': True,
-                'entities': result.get('entities', []),
-                'relationships': result.get('relationships', [])
+                "success": True,
+                "entities": result.get("entities", []),
+                "relationships": result.get("relationships", []),
             }
         else:
-            return {'success': False, 'entities': [], 'relationships': []}
+            return {"success": False, "entities": [], "relationships": []}
 
     except Exception as e:
         print(f"  Error extracting from {record_id}: {e}")
-        return {'success': False, 'entities': [], 'relationships': [], 'error': str(e)}
+        return {"success": False, "entities": [], "relationships": [], "error": str(e)}
 
 
-def save_results_to_csv(entities: List[Dict], relationships: List[Dict], output_dir: Path):
+def save_results_to_csv(
+    entities: List[Dict], relationships: List[Dict], output_dir: Path
+):
     """Save extraction results to CSV files."""
 
     # Save entities
@@ -76,8 +78,8 @@ def save_results_to_csv(entities: List[Dict], relationships: List[Dict], output_
             fieldnames.update(entity.keys())
         fieldnames = sorted(list(fieldnames))
 
-        with open(entities_csv, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
+        with open(entities_csv, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
             writer.writerows(entities)
 
@@ -92,8 +94,8 @@ def save_results_to_csv(entities: List[Dict], relationships: List[Dict], output_
             fieldnames.update(rel.keys())
         fieldnames = sorted(list(fieldnames))
 
-        with open(relationships_csv, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
+        with open(relationships_csv, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
             writer.writerows(relationships)
 
@@ -103,8 +105,11 @@ def save_results_to_csv(entities: List[Dict], relationships: List[Dict], output_
 def main():
     """Main execution."""
     import argparse
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('--yes', '-y', action='store_true', help='Auto-confirm without prompting')
+    parser.add_argument(
+        "--yes", "-y", action="store_true", help="Auto-confirm without prompting"
+    )
     args = parser.parse_args()
 
     print("=" * 60)
@@ -143,13 +148,15 @@ def main():
     print(f"Number of batches: {NUM_BATCHES}")
     print(f"Rate limit: {RATE_LIMIT_DELAY}s between calls")
     print(f"Estimated cost: ${len(posts_to_process) * 0.005:.2f}")
-    print(f"Estimated time: ~{len(posts_to_process) * RATE_LIMIT_DELAY / 60:.1f} minutes")
+    print(
+        f"Estimated time: ~{len(posts_to_process) * RATE_LIMIT_DELAY / 60:.1f} minutes"
+    )
     print()
 
     # Confirm
     if not args.yes:
         response = input("Continue with extraction? (yes/no): ").strip().lower()
-        if response != 'yes':
+        if response != "yes":
             print("Extraction cancelled.")
             return 0
     else:
@@ -171,18 +178,23 @@ def main():
         batch_num = (i - 1) // BATCH_SIZE + 1
         post_in_batch = (i - 1) % BATCH_SIZE + 1
 
-        print(f"[Batch {batch_num}/{NUM_BATCHES}] Processing {post_in_batch}/{BATCH_SIZE}: {post['id']}...", end=' ')
+        print(
+            f"[Batch {batch_num}/{NUM_BATCHES}] Processing {post_in_batch}/{BATCH_SIZE}: {post['id']}...",
+            end=" ",
+        )
 
         # Extract
         result = extract_from_post(post)
 
-        if result['success']:
-            all_entities.extend(result['entities'])
-            all_relationships.extend(result['relationships'])
-            print(f"✓ ({len(result['entities'])} entities, {len(result['relationships'])} rels)")
+        if result["success"]:
+            all_entities.extend(result["entities"])
+            all_relationships.extend(result["relationships"])
+            print(
+                f"✓ ({len(result['entities'])} entities, {len(result['relationships'])} rels)"
+            )
         else:
-            error_msg = result.get('error', 'Unknown error')
-            errors.append({'post_id': post['id'], 'error': error_msg})
+            error_msg = result.get("error", "Unknown error")
+            errors.append({"post_id": post["id"], "error": error_msg})
             print(f"✗ Error: {error_msg}")
 
         # Rate limiting (except for last post)
@@ -192,7 +204,9 @@ def main():
         # Batch summary
         if i % BATCH_SIZE == 0:
             print()
-            print(f"  Batch {batch_num} complete! Total so far: {len(all_entities)} entities, {len(all_relationships)} relationships")
+            print(
+                f"  Batch {batch_num} complete! Total so far: {len(all_entities)} entities, {len(all_relationships)} relationships"
+            )
             print()
 
     # Final summary
@@ -215,16 +229,16 @@ def main():
 
     # Save summary
     summary = {
-        'timestamp': datetime.now().isoformat(),
-        'duration_seconds': duration,
-        'posts_processed': len(posts_to_process),
-        'entities_extracted': len(all_entities),
-        'relationships_extracted': len(all_relationships),
-        'errors': errors
+        "timestamp": datetime.now().isoformat(),
+        "duration_seconds": duration,
+        "posts_processed": len(posts_to_process),
+        "entities_extracted": len(all_entities),
+        "relationships_extracted": len(all_relationships),
+        "errors": errors,
     }
 
     summary_json = output_dir / "extraction_summary.json"
-    with open(summary_json, 'w', encoding='utf-8') as f:
+    with open(summary_json, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
 
     print(f"✓ Saved summary: {summary_json.name}")

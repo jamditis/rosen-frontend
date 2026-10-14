@@ -138,7 +138,9 @@ def process_csv(csv_path, write_mode=False, verbose=False):
     tags_removed_total = 0
     removed_per_concept = Counter()
     kept_per_concept = Counter()
-    sample_removals = defaultdict(list)  # concept -> [(id, text_snippet, removed_concepts)]
+    sample_removals = defaultdict(
+        list
+    )  # concept -> [(id, text_snippet, removed_concepts)]
 
     modified_rows = []
 
@@ -173,9 +175,7 @@ def process_csv(csv_path, write_mode=False, verbose=False):
             for concept in removed:
                 if len(sample_removals[concept]) < 3:
                     snippet = row.get("raw_text", "")[:100]
-                    sample_removals[concept].append(
-                        (row.get("id", "?"), snippet)
-                    )
+                    sample_removals[concept].append((row.get("id", "?"), snippet))
         else:
             modified_rows.append(row)
 

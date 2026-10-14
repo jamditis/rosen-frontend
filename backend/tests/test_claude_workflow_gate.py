@@ -60,9 +60,11 @@ def test_every_trigger_branch_couples_mention_and_association(wf):
     # internal body-or-title `||`; the fragment before the first marker is dropped.
     gate = wf["jobs"]["claude"]["if"]
     branches = gate.split("github.event_name ==")[1:]
-    assert len(branches) == 4, (
-        f"expected 4 individually gated trigger branches, found {len(branches)}")
+    assert (
+        len(branches) == 4
+    ), f"expected 4 individually gated trigger branches, found {len(branches)}"
     for clause in branches:
         assert "@claude" in clause, f"branch missing @claude mention check: {clause!r}"
-        assert "author_association" in clause, (
-            f"branch missing author_association trust guard: {clause!r}")
+        assert (
+            "author_association" in clause
+        ), f"branch missing author_association trust guard: {clause!r}"

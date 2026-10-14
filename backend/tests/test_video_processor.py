@@ -99,9 +99,9 @@ class TestVideoProcessor:
 
         outtmpl = mock_yt_dlp.call_args.args[0]["outtmpl"]
         assert outtmpl != "temp_transcript"
-        assert os.path.isabs(outtmpl), (
-            "temp path must be absolute (a temp dir), not CWD-relative"
-        )
+        assert os.path.isabs(
+            outtmpl
+        ), "temp path must be absolute (a temp dir), not CWD-relative"
 
     @patch("rosen_scraper.processors.video_processor.yt_dlp.YoutubeDL")
     def test_process_video_temp_path_unique_per_call(self, mock_yt_dlp, sample_schema):

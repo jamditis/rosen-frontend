@@ -53,9 +53,9 @@ def test_known_entities_resolves_to_curated_file(name):
     """Each script exposes a KNOWN_ENTITIES_FILE that points at the one curated file."""
     module = _load(name)
     resolved = pathlib.Path(module.KNOWN_ENTITIES_FILE).resolve()
-    assert resolved == _CANONICAL.resolve(), (
-        f"{name} resolves known_entities.json to {resolved}, not {_CANONICAL}"
-    )
+    assert (
+        resolved == _CANONICAL.resolve()
+    ), f"{name} resolves known_entities.json to {resolved}, not {_CANONICAL}"
     assert resolved.exists(), f"{name}: known_entities.json not found at {resolved}"
 
 
@@ -103,9 +103,9 @@ def test_credentials_path_anchored_to_backend(name, monkeypatch):
 
     assert "filename" in captured, f"{name}: gspread.service_account was never called"
     resolved = pathlib.Path(captured["filename"]).resolve()
-    assert resolved.parent == _BACKEND.resolve(), (
-        f"{name}: credentials resolve under {resolved.parent}, not backend/ ({_BACKEND})"
-    )
+    assert (
+        resolved.parent == _BACKEND.resolve()
+    ), f"{name}: credentials resolve under {resolved.parent}, not backend/ ({_BACKEND})"
     assert resolved.name == "google_credentials.json"
 
 
@@ -131,9 +131,9 @@ def test_schema_builder_does_not_clobber_curated_file_by_default():
         ):
             schema_builder.main()  # no --write-canonical
         after = hashlib.sha256(_CANONICAL.read_bytes()).hexdigest()
-        assert after == before, (
-            "default run must not modify the curated known_entities.json"
-        )
+        assert (
+            after == before
+        ), "default run must not modify the curated known_entities.json"
         assert discovered.exists(), "default run must write the discovered staging file"
     finally:
         discovered.unlink(missing_ok=True)

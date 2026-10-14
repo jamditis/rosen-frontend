@@ -44,8 +44,14 @@ def _is_public_address(ip_str):
     # Reject loopback, private (RFC1918 / ULA), link-local (which includes the
     # 169.254.0.0/16 cloud-metadata range), multicast, reserved, and the
     # unspecified address.
-    if (ip.is_private or ip.is_loopback or ip.is_link_local
-            or ip.is_multicast or ip.is_reserved or ip.is_unspecified):
+    if (
+        ip.is_private
+        or ip.is_loopback
+        or ip.is_link_local
+        or ip.is_multicast
+        or ip.is_reserved
+        or ip.is_unspecified
+    ):
         return False
     return True
 
@@ -94,9 +100,7 @@ def resolve_and_validate(url):
         return False, "URL could not be parsed", []
 
     if parsed.scheme.lower() not in ALLOWED_SCHEMES:
-        return (False,
-                f"scheme '{parsed.scheme}' is not allowed (use http/https)",
-                [])
+        return (False, f"scheme '{parsed.scheme}' is not allowed (use http/https)", [])
 
     if not host:
         return False, "URL has no host", []
@@ -127,9 +131,7 @@ def resolve_and_validate(url):
 
     for addr in addresses:
         if not _is_public_address(addr):
-            return (False,
-                    f"host {host} resolves to a non-public address ({addr})",
-                    [])
+            return (False, f"host {host} resolves to a non-public address ({addr})", [])
 
     return True, "ok", sorted(addresses)
 
@@ -181,23 +183,35 @@ def pinned_resolution(host, ips):
             if addr.version == 6:
                 if family not in (0, socket.AF_INET6):
                     continue
-                results.append((socket.AF_INET6, socket.SOCK_STREAM,
-                                socket.IPPROTO_TCP, "",
-                                (ip, normalized_port, 0, 0)))
+                results.append(
+                    (
+                        socket.AF_INET6,
+                        socket.SOCK_STREAM,
+                        socket.IPPROTO_TCP,
+                        "",
+                        (ip, normalized_port, 0, 0),
+                    )
+                )
             else:
                 if family not in (0, socket.AF_INET):
                     continue
-                results.append((socket.AF_INET, socket.SOCK_STREAM,
-                                socket.IPPROTO_TCP, "",
-                                (ip, normalized_port)))
+                results.append(
+                    (
+                        socket.AF_INET,
+                        socket.SOCK_STREAM,
+                        socket.IPPROTO_TCP,
+                        "",
+                        (ip, normalized_port),
+                    )
+                )
         if not results:
             # This is the pinned host but no validated address matches the
             # requested family. Fail closed: falling back to the live resolver
             # here would re-resolve this very host and reopen the DNS-rebinding
             # window the pin exists to close.
             raise socket.gaierror(
-                socket.EAI_NONAME,
-                "no pinned address for host in the requested family")
+                socket.EAI_NONAME, "no pinned address for host in the requested family"
+            )
         return results
 
     socket.getaddrinfo = _patched

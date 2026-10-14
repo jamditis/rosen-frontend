@@ -4,6 +4,7 @@ Tests for the rosen_scraper.logger module.
 These tests target the current ArchiveLogger API (see issue #181 for the
 realignment from a pre-refactor logger shape that no longer exists).
 """
+
 from rosen_scraper.logger import (
     ArchiveLogger,
     PoisonPillType,
@@ -18,16 +19,18 @@ class TestPoisonPillTypeEnum:
     def test_has_expected_members(self):
         # Pin the public members so adding/removing one is an intentional change.
         expected = {
-            'CONTENT_TOO_SHORT',
-            'PAYWALL_DETECTED',
-            'JAVASCRIPT_HEAVY',
-            'DEAD_LINK',
-            'ANTI_BOT',
-            'MALFORMED_CONTENT',
-            'API_FAILURE',
+            "CONTENT_TOO_SHORT",
+            "PAYWALL_DETECTED",
+            "JAVASCRIPT_HEAVY",
+            "DEAD_LINK",
+            "ANTI_BOT",
+            "MALFORMED_CONTENT",
+            "API_FAILURE",
         }
         actual = {m.name for m in PoisonPillType}
-        assert actual == expected, f"PoisonPillType members drifted: {actual ^ expected}"
+        assert (
+            actual == expected
+        ), f"PoisonPillType members drifted: {actual ^ expected}"
 
 
 class TestInitLogger:
@@ -38,10 +41,12 @@ class TestInitLogger:
         logger = init_logger(log_dir=str(tmp_path / "logs"))
         assert isinstance(logger, ArchiveLogger)
 
-    def test_underlying_stdlib_logger_is_named_archive_pipeline(self, tmp_path, monkeypatch):
+    def test_underlying_stdlib_logger_is_named_archive_pipeline(
+        self, tmp_path, monkeypatch
+    ):
         monkeypatch.chdir(tmp_path)
         logger = init_logger(log_dir=str(tmp_path / "logs"))
-        assert logger.logger.name == 'archive_pipeline'
+        assert logger.logger.name == "archive_pipeline"
 
     def test_underlying_stdlib_logger_has_handlers(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)

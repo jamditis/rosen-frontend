@@ -35,16 +35,24 @@ def _load_credentials():
         if source.kind == "inline_json":
             info = json.loads(source.value)
             return service_account.Credentials.from_service_account_info(
-                info, scopes=_SHEETS_SCOPE)
+                info, scopes=_SHEETS_SCOPE
+            )
         return service_account.Credentials.from_service_account_file(
-            source.value, scopes=_SHEETS_SCOPE)
+            source.value, scopes=_SHEETS_SCOPE
+        )
     except (json.JSONDecodeError, FileNotFoundError, ValueError) as exc:
         logger.error(f"Failed to load SA credentials: {exc}")
         return None
 
 
-def update_row(sheet_id: str, sheet_tab: str, row: int, status: str,
-               record_id: str = "", error: str = "") -> Dict[str, Any]:
+def update_row(
+    sheet_id: str,
+    sheet_tab: str,
+    row: int,
+    status: str,
+    record_id: str = "",
+    error: str = "",
+) -> Dict[str, Any]:
     """Write status, record_id, and error to a single row of the queue sheet."""
     if not sheet_id or not row:
         return {"ok": False, "skipped": True, "error": "missing sheet_id or row"}
@@ -58,8 +66,11 @@ def update_row(sheet_id: str, sheet_tab: str, row: int, status: str,
         from googleapiclient.discovery import build
         from googleapiclient.errors import HttpError
     except ImportError:
-        return {"ok": False, "skipped": False,
-                "error": "google-api-python-client not installed"}
+        return {
+            "ok": False,
+            "skipped": False,
+            "error": "google-api-python-client not installed",
+        }
 
     tab = quote_tab(sheet_tab)
     body = {
@@ -72,10 +83,10 @@ def update_row(sheet_id: str, sheet_tab: str, row: int, status: str,
     }
 
     try:
-        service = build("sheets", "v4", credentials=creds,
-                        cache_discovery=False)
+        service = build("sheets", "v4", credentials=creds, cache_discovery=False)
         service.spreadsheets().values().batchUpdate(
-            spreadsheetId=sheet_id, body=body).execute()
+            spreadsheetId=sheet_id, body=body
+        ).execute()
         logger.info(f"Sheet writeback ok: {sheet_id} row={row} status={status}")
         return {"ok": True, "skipped": False, "error": None}
     except HttpError as exc:

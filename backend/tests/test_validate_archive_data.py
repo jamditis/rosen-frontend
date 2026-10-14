@@ -4,7 +4,9 @@ from pathlib import Path
 import importlib.util
 
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "validate_archive_data.py"
+SCRIPT_PATH = (
+    Path(__file__).resolve().parents[1] / "scripts" / "validate_archive_data.py"
+)
 SPEC = importlib.util.spec_from_file_location("validate_archive_data", SCRIPT_PATH)
 assert SPEC and SPEC.loader
 validate_archive_data = importlib.util.module_from_spec(SPEC)

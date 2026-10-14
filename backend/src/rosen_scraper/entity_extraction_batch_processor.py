@@ -52,7 +52,9 @@ class EntityExtractionProcessor:
             spreadsheet_name: Name of the Google Sheet (from env if not provided)
             test_mode: If True, process only first 5 records
         """
-        self.spreadsheet_name = spreadsheet_name or os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List")
+        self.spreadsheet_name = spreadsheet_name or os.environ.get(
+            "SPREADSHEET_NAME", "Rosen Archive URL List"
+        )
         self.test_mode = test_mode
         self.schema = entity_extractor.load_entity_schema()
 
@@ -73,7 +75,7 @@ class EntityExtractionProcessor:
         """Load progress from JSON file."""
         if PROGRESS_FILE.exists():
             try:
-                with open(PROGRESS_FILE, 'r', encoding='utf-8') as f:
+                with open(PROGRESS_FILE, "r", encoding="utf-8") as f:
                     return json.load(f)
             except Exception as e:
                 print(f"[PROGRESS] Warning: Could not load progress file: {e}")
@@ -89,16 +91,18 @@ class EntityExtractionProcessor:
             "relationships_extracted": 0,
             "errors": 0,
             "last_run": None,
-            "processed_record_ids": []
+            "processed_record_ids": [],
         }
 
     def _save_progress(self):
         """Save progress to JSON file."""
         try:
             PROGRESS_FILE.parent.mkdir(parents=True, exist_ok=True)
-            with open(PROGRESS_FILE, 'w', encoding='utf-8') as f:
+            with open(PROGRESS_FILE, "w", encoding="utf-8") as f:
                 json.dump(self.progress, f, indent=2)
-            print(f"[PROGRESS] Progress saved: {self.progress['total_processed']} records processed")
+            print(
+                f"[PROGRESS] Progress saved: {self.progress['total_processed']} records processed"
+            )
         except Exception as e:
             print(f"[PROGRESS] Warning: Could not save progress: {e}")
 
@@ -116,7 +120,9 @@ class EntityExtractionProcessor:
             # Open or create worksheets
             self.test_runs_sheet = self.spreadsheet.worksheet("test_runs")
             self.entities_sheet = self._get_or_create_sheet("extracted_entities")
-            self.relationships_sheet = self._get_or_create_sheet("extracted_relationships")
+            self.relationships_sheet = self._get_or_create_sheet(
+                "extracted_relationships"
+            )
 
             # Load existing entities into registry for deduplication
             self._load_entity_registry()
@@ -132,10 +138,14 @@ class EntityExtractionProcessor:
             # Safe error printing
             error_msg = str(e)
             try:
-                print(f"[SHEETS] ERROR: Failed to connect to Google Sheets: {error_msg}")
+                print(
+                    f"[SHEETS] ERROR: Failed to connect to Google Sheets: {error_msg}"
+                )
             except UnicodeEncodeError:
-                error_msg_safe = error_msg.encode('ascii', 'ignore').decode('ascii')
-                print(f"[SHEETS] ERROR: Failed to connect to Google Sheets: {error_msg_safe}")
+                error_msg_safe = error_msg.encode("ascii", "ignore").decode("ascii")
+                print(
+                    f"[SHEETS] ERROR: Failed to connect to Google Sheets: {error_msg_safe}"
+                )
             return False
 
     def _get_or_create_sheet(self, sheet_name: str):
@@ -146,22 +156,45 @@ class EntityExtractionProcessor:
             print(f"[SHEETS] Creating new sheet: {sheet_name}")
 
             if sheet_name == "extracted_entities":
-                headers = self.schema.get("output_format", {}).get("entities_sheet_columns", [
-                    "entity_id", "entity_type", "entity_name", "normalized_name",
-                    "role_or_description", "affiliation", "prominence_score",
-                    "first_mention_record_id", "total_mentions", "related_entities", "notes"
-                ])
+                headers = self.schema.get("output_format", {}).get(
+                    "entities_sheet_columns",
+                    [
+                        "entity_id",
+                        "entity_type",
+                        "entity_name",
+                        "normalized_name",
+                        "role_or_description",
+                        "affiliation",
+                        "prominence_score",
+                        "first_mention_record_id",
+                        "total_mentions",
+                        "related_entities",
+                        "notes",
+                    ],
+                )
             elif sheet_name == "extracted_relationships":
-                headers = self.schema.get("output_format", {}).get("relationships_sheet_columns", [
-                    "relationship_id", "source_record_id", "source_entity_id", "source_entity_name",
-                    "relationship_type", "target_entity_id", "target_entity_name",
-                    "context_snippet", "confidence_score", "extracted_date"
-                ])
+                headers = self.schema.get("output_format", {}).get(
+                    "relationships_sheet_columns",
+                    [
+                        "relationship_id",
+                        "source_record_id",
+                        "source_entity_id",
+                        "source_entity_name",
+                        "relationship_type",
+                        "target_entity_id",
+                        "target_entity_name",
+                        "context_snippet",
+                        "confidence_score",
+                        "extracted_date",
+                    ],
+                )
             else:
                 headers = []
 
             # Create new sheet
-            worksheet = self.spreadsheet.add_worksheet(title=sheet_name, rows=1000, cols=len(headers))
+            worksheet = self.spreadsheet.add_worksheet(
+                title=sheet_name, rows=1000, cols=len(headers)
+            )
 
             # Add headers
             if headers:
@@ -242,7 +275,9 @@ class EntityExtractionProcessor:
             records = []
             processed_ids = set(self.progress["processed_record_ids"])
 
-            for row_idx in range(start_row, min(start_row + batch_size, len(all_values))):
+            for row_idx in range(
+                start_row, min(start_row + batch_size, len(all_values))
+            ):
                 row = all_values[row_idx]
 
                 # Get record ID and raw text
@@ -255,23 +290,31 @@ class EntityExtractionProcessor:
 
                 # Skip if text is too short (likely not meaningful)
                 if len(raw_text.strip()) < 100:
-                    print(f"[FETCH] Skipping {record_id}: text too short ({len(raw_text)} chars)")
+                    print(
+                        f"[FETCH] Skipping {record_id}: text too short ({len(raw_text)} chars)"
+                    )
                     continue
 
-                records.append({
-                    "record_id": record_id,
-                    "raw_text": raw_text,
-                    "row_number": row_idx + 1  # 1-indexed for sheets
-                })
+                records.append(
+                    {
+                        "record_id": record_id,
+                        "raw_text": raw_text,
+                        "row_number": row_idx + 1,  # 1-indexed for sheets
+                    }
+                )
 
-            print(f"[FETCH] Fetched {len(records)} records to process (starting from row {start_row})")
+            print(
+                f"[FETCH] Fetched {len(records)} records to process (starting from row {start_row})"
+            )
             return records
 
         except Exception as e:
             print(f"[FETCH] ERROR: Failed to fetch records: {e}")
             return []
 
-    def process_record(self, record: Dict, existing_entity_ids: Set[str]) -> Optional[Dict]:
+    def process_record(
+        self, record: Dict, existing_entity_ids: Set[str]
+    ) -> Optional[Dict]:
         """
         Process a single record through entity extraction.
 
@@ -289,9 +332,7 @@ class EntityExtractionProcessor:
 
         # Extract entities and relationships
         result = entity_extractor.extract_entities_and_relationships(
-            text_content=raw_text,
-            record_id=record_id,
-            schema=self.schema
+            text_content=raw_text, record_id=record_id, schema=self.schema
         )
 
         if not result:
@@ -299,37 +340,38 @@ class EntityExtractionProcessor:
             return None
 
         # Use entity registry to reassign IDs and prevent duplicates
-        updated_entities, id_mapping, existing_count, new_count = self.entity_registry.reassign_entity_ids(
-            result["entities"]
+        updated_entities, id_mapping, existing_count, new_count = (
+            self.entity_registry.reassign_entity_ids(result["entities"])
         )
 
         # Update relationships with canonical entity IDs
         updated_relationships = self.entity_registry.update_relationship_ids(
-            result["relationships"],
-            id_mapping
+            result["relationships"], id_mapping
         )
 
-        print(f"[REGISTRY] Entity deduplication: {existing_count} existing, {new_count} new")
+        print(
+            f"[REGISTRY] Entity deduplication: {existing_count} existing, {new_count} new"
+        )
 
         # Format for sheets
         entity_lookup = {e["entity_id"]: e["entity_name"] for e in updated_entities}
 
         # Only create rows for NEW entities (not already in sheet)
-        new_entities_only = [e for e in updated_entities if e["entity_id"] not in existing_entity_ids]
+        new_entities_only = [
+            e for e in updated_entities if e["entity_id"] not in existing_entity_ids
+        ]
 
         entity_rows = entity_extractor.format_entities_for_sheet(
-            new_entities_only,
-            record_id,
-            existing_entity_ids
+            new_entities_only, record_id, existing_entity_ids
         )
 
         relationship_rows = entity_extractor.format_relationships_for_sheet(
-            updated_relationships,
-            record_id,
-            entity_lookup
+            updated_relationships, record_id, entity_lookup
         )
 
-        print(f"[PROCESS] Entities: {len(updated_entities)} total, {len(new_entities_only)} new rows to write")
+        print(
+            f"[PROCESS] Entities: {len(updated_entities)} total, {len(new_entities_only)} new rows to write"
+        )
         print(f"[PROCESS] Relationships: {len(updated_relationships)} to write")
 
         return {
@@ -338,7 +380,7 @@ class EntityExtractionProcessor:
             "relationship_rows": relationship_rows,
             "entities_count": len(entity_rows),
             "relationships_count": len(relationship_rows),
-            "total_entities": len(updated_entities)
+            "total_entities": len(updated_entities),
         }
 
     def write_results_to_sheets(self, results: List[Dict]):
@@ -365,7 +407,7 @@ class EntityExtractionProcessor:
             try:
                 print(f"[WRITE] Writing {len(all_entity_rows)} entity rows...")
                 for i in range(0, len(all_entity_rows), 100):
-                    batch = all_entity_rows[i:i+100]
+                    batch = all_entity_rows[i : i + 100]
                     self.entities_sheet.append_rows(batch)
                     time.sleep(2)  # Rate limit
                 print(f"[WRITE] Successfully wrote {len(all_entity_rows)} entities")
@@ -375,12 +417,16 @@ class EntityExtractionProcessor:
         # Write relationships in batches
         if all_relationship_rows:
             try:
-                print(f"[WRITE] Writing {len(all_relationship_rows)} relationship rows...")
+                print(
+                    f"[WRITE] Writing {len(all_relationship_rows)} relationship rows..."
+                )
                 for i in range(0, len(all_relationship_rows), 100):
-                    batch = all_relationship_rows[i:i+100]
+                    batch = all_relationship_rows[i : i + 100]
                     self.relationships_sheet.append_rows(batch)
                     time.sleep(2)  # Rate limit
-                print(f"[WRITE] Successfully wrote {len(all_relationship_rows)} relationships")
+                print(
+                    f"[WRITE] Successfully wrote {len(all_relationship_rows)} relationships"
+                )
             except Exception as e:
                 print(f"[WRITE] ERROR: Failed to write relationships: {e}")
 
@@ -392,19 +438,19 @@ class EntityExtractionProcessor:
             batch_size: Number of records to process per batch
             limit: Maximum total records to process (None = all)
         """
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("ENTITY EXTRACTION BATCH PROCESSOR")
-        print("="*80)
+        print("=" * 80)
         # Handle emoji in spreadsheet name for Windows console
         try:
             print(f"Spreadsheet: {self.spreadsheet_name}")
         except UnicodeEncodeError:
-            safe_name = self.spreadsheet_name.encode('ascii', 'ignore').decode('ascii')
+            safe_name = self.spreadsheet_name.encode("ascii", "ignore").decode("ascii")
             print(f"Spreadsheet: {safe_name}")
         print(f"Batch size: {batch_size}")
         print(f"Test mode: {self.test_mode}")
         print(f"Starting from row: {self.progress['last_processed_row'] + 1}")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         # Connect to Google Sheets
         if not self.connect_to_sheets():
@@ -445,9 +491,13 @@ class EntityExtractionProcessor:
                         # Update tracking
                         self.progress["total_processed"] += 1
                         self.progress["entities_extracted"] += result["entities_count"]
-                        self.progress["relationships_extracted"] += result["relationships_count"]
+                        self.progress["relationships_extracted"] += result[
+                            "relationships_count"
+                        ]
                         self.progress["last_processed_row"] = record["row_number"]
-                        self.progress["processed_record_ids"].append(record["record_id"])
+                        self.progress["processed_record_ids"].append(
+                            record["record_id"]
+                        )
 
                         # Update existing entity IDs
                         for row in result["entity_rows"]:
@@ -464,7 +514,9 @@ class EntityExtractionProcessor:
 
                     # Rate limiting
                     if idx < len(records) - 1:  # Don't delay after last record
-                        print(f"[RATE] Waiting {RATE_LIMIT_DELAY}s before next extraction...")
+                        print(
+                            f"[RATE] Waiting {RATE_LIMIT_DELAY}s before next extraction..."
+                        )
                         time.sleep(RATE_LIMIT_DELAY)
 
                 except Exception as e:
@@ -485,23 +537,25 @@ class EntityExtractionProcessor:
                 break
 
             # Delay between batches
-            print(f"\n[BATCH] Batch complete. Waiting {BATCH_DELAY}s before next batch...")
+            print(
+                f"\n[BATCH] Batch complete. Waiting {BATCH_DELAY}s before next batch..."
+            )
             time.sleep(BATCH_DELAY)
 
         # Final summary
         session_end = datetime.now()
         duration = (session_end - session_start).total_seconds() / 60
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("PROCESSING COMPLETE")
-        print("="*80)
+        print("=" * 80)
         print(f"Duration: {duration:.1f} minutes")
         print(f"Records processed: {self.progress['total_processed']}")
         print(f"Entities extracted: {self.progress['entities_extracted']}")
         print(f"Relationships extracted: {self.progress['relationships_extracted']}")
         print(f"Errors: {self.progress['errors']}")
         print(f"Last processed row: {self.progress['last_processed_row']}")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
 
 def main():
@@ -513,29 +567,27 @@ def main():
         "--batch-size",
         type=int,
         default=DEFAULT_BATCH_SIZE,
-        help=f"Number of records to process per batch (default: {DEFAULT_BATCH_SIZE})"
+        help=f"Number of records to process per batch (default: {DEFAULT_BATCH_SIZE})",
     )
     parser.add_argument(
         "--limit",
         type=int,
         default=None,
-        help="Maximum number of records to process (default: all)"
+        help="Maximum number of records to process (default: all)",
     )
     parser.add_argument(
-        "--test",
-        action="store_true",
-        help="Test mode: process only first 5 records"
+        "--test", action="store_true", help="Test mode: process only first 5 records"
     )
     parser.add_argument(
         "--reset-progress",
         action="store_true",
-        help="Reset progress and start from beginning"
+        help="Reset progress and start from beginning",
     )
     parser.add_argument(
         "--spreadsheet",
         type=str,
         default=None,
-        help="Google Sheet name (default: from environment)"
+        help="Google Sheet name (default: from environment)",
     )
 
     args = parser.parse_args()
@@ -548,8 +600,7 @@ def main():
 
     # Initialize processor
     processor = EntityExtractionProcessor(
-        spreadsheet_name=args.spreadsheet,
-        test_mode=args.test
+        spreadsheet_name=args.spreadsheet, test_mode=args.test
     )
 
     # Run extraction

@@ -18,15 +18,16 @@ load_dotenv()
 
 from rosen_scraper import scraper
 
+
 def test_url_context():
     """Test the URL Context functionality with a sample URL."""
-    
+
     # Test with a well-known, accessible article
     test_url = "https://www.bbc.com/news/technology"
-    
+
     print(f"Testing URL Context with: {test_url}")
     print("-" * 50)
-    
+
     # Test URL Context directly
     print("\n1. Testing URL Context directly:")
     url_context_result = scraper.fetch_with_url_context(test_url)
@@ -34,11 +35,13 @@ def test_url_context():
         print("✓ URL Context successful")
         print(f"  - Title: {url_context_result.get('title', 'N/A')}")
         print(f"  - Author: {url_context_result.get('author', 'N/A')}")
-        print(f"  - Publication: {url_context_result.get('original_publication', 'N/A')}")
+        print(
+            f"  - Publication: {url_context_result.get('original_publication', 'N/A')}"
+        )
         print(f"  - Text length: {len(url_context_result.get('text', ''))}")
     else:
         print("✗ URL Context failed")
-    
+
     # Test enhanced scraper
     print("\n2. Testing enhanced scraper:")
     content, is_structured = scraper.fetch_article_content_enhanced(test_url)
@@ -50,7 +53,7 @@ def test_url_context():
             print(f"  - HTML content length: {len(content)}")
     else:
         print("✗ Enhanced scraper failed")
-    
+
     # Test traditional scraper as fallback
     print("\n3. Testing traditional scraper:")
     html_content = scraper.fetch_article_content(test_url)
@@ -60,11 +63,12 @@ def test_url_context():
     else:
         print("✗ Traditional scraper failed")
 
+
 if __name__ == "__main__":
     # Check if API key is configured
     if not os.environ.get("GEMINI_API_KEY"):
         print("WARNING: GEMINI_API_KEY not found in environment variables")
         print("URL Context will be skipped, but traditional scraping should still work")
         print()
-    
+
     test_url_context()

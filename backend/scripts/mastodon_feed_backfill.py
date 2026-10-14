@@ -64,14 +64,43 @@ PAGE_LIMIT = 40  # Mastodon API max
 
 # Schema fields exactly mirror social_posts.csv header order
 SCHEMA_FIELDS = [
-    "id", "title", "url", "author", "publication_date", "original_publication",
-    "publisher", "platform", "content_type", "format", "word_count",
-    "length_in_seconds", "excerpt", "summary", "thematic_categories",
-    "key_concepts", "series", "era", "scope", "tags", "likes", "reposts",
-    "replies", "related_to", "responds_to", "influence", "copyright",
-    "license", "permissions", "date_processed", "gdrive_pdf_link",
-    "gdrive_raw_file_link", "gdrive_transcript_link", "pull_quote",
-    "raw_text", "verified", "notes",
+    "id",
+    "title",
+    "url",
+    "author",
+    "publication_date",
+    "original_publication",
+    "publisher",
+    "platform",
+    "content_type",
+    "format",
+    "word_count",
+    "length_in_seconds",
+    "excerpt",
+    "summary",
+    "thematic_categories",
+    "key_concepts",
+    "series",
+    "era",
+    "scope",
+    "tags",
+    "likes",
+    "reposts",
+    "replies",
+    "related_to",
+    "responds_to",
+    "influence",
+    "copyright",
+    "license",
+    "permissions",
+    "date_processed",
+    "gdrive_pdf_link",
+    "gdrive_raw_file_link",
+    "gdrive_transcript_link",
+    "pull_quote",
+    "raw_text",
+    "verified",
+    "notes",
 ]
 
 # Constants matching the planned Mastodon rows
@@ -120,27 +149,30 @@ def fetch_page(max_id: str | None, retries: int = 3) -> list[dict]:
     for attempt in range(retries):
         try:
             r = requests.get(
-                STATUSES_ENDPOINT, params=params,
+                STATUSES_ENDPOINT,
+                params=params,
                 headers={"User-Agent": "RosenArchive-Backfill/1.0"},
                 timeout=30,
             )
             if r.status_code == 429 or 500 <= r.status_code < 600:
                 # Honour Retry-After when present, otherwise back off 30s.
                 wait = int(r.headers.get("Retry-After") or 30)
-                print(f"  HTTP {r.status_code}; sleeping {wait}s "
-                      f"(attempt {attempt + 1}/{retries})")
+                print(
+                    f"  HTTP {r.status_code}; sleeping {wait}s "
+                    f"(attempt {attempt + 1}/{retries})"
+                )
                 time.sleep(wait)
                 continue
             r.raise_for_status()
             return r.json()
         except requests.RequestException as exc:
             last_exc = exc
-            print(f"  Request failed: {exc}; sleeping 30s "
-                  f"(attempt {attempt + 1}/{retries})")
+            print(
+                f"  Request failed: {exc}; sleeping 30s "
+                f"(attempt {attempt + 1}/{retries})"
+            )
             time.sleep(30)
-    raise RuntimeError(
-        f"Mastodon API exhausted retries (max_id={max_id}): {last_exc}"
-    )
+    raise RuntimeError(f"Mastodon API exhausted retries (max_id={max_id}): {last_exc}")
 
 
 def load_existing_urls(csv_path: Path) -> tuple[set[str], int]:
@@ -193,13 +225,14 @@ def status_to_row(status: dict, next_id: int, today: str) -> dict | None:
     except (ValueError, TypeError):
         pub_date = created_at
 
-    in_reply_to_id = (status.get("in_reply_to_id") or "").strip() \
-        if status.get("in_reply_to_id") else ""
+    in_reply_to_id = (
+        (status.get("in_reply_to_id") or "").strip()
+        if status.get("in_reply_to_id")
+        else ""
+    )
     # Mirror the Bluesky script's at://-style parent pointer for cross-platform
     # readability of the responds_to field.
-    responds_to = (
-        f"at://mastodon.social/{in_reply_to_id}" if in_reply_to_id else ""
-    )
+    responds_to = f"at://mastodon.social/{in_reply_to_id}" if in_reply_to_id else ""
 
     word_count = len(text.split()) if text else 0
     title = derive_title(text)
@@ -260,12 +293,20 @@ def status_to_row(status: dict, next_id: int, today: str) -> dict | None:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--sample", type=int, default=None,
-                    help="Stop after fetching this many new posts")
-    ap.add_argument("--all", action="store_true",
-                    help="Walk the entire status history until exhausted")
-    ap.add_argument("--dry-run", action="store_true",
-                    help="Print summary, don't write CSV")
+    ap.add_argument(
+        "--sample",
+        type=int,
+        default=None,
+        help="Stop after fetching this many new posts",
+    )
+    ap.add_argument(
+        "--all",
+        action="store_true",
+        help="Walk the entire status history until exhausted",
+    )
+    ap.add_argument(
+        "--dry-run", action="store_true", help="Print summary, don't write CSV"
+    )
     args = ap.parse_args()
 
     if not args.sample and not args.all:
@@ -314,8 +355,7 @@ def main():
             # check — covers any API quirk that surfaces a third-party status
             # outside the reblog wrapper.
             account = status.get("account") or {}
-            if (account.get("acct") != ACTOR_ACCT or
-                    str(account.get("id")) != ACTOR_ID):
+            if account.get("acct") != ACTOR_ACCT or str(account.get("id")) != ACTOR_ID:
                 skipped_wrong_author += 1
                 continue
 
@@ -354,16 +394,18 @@ def main():
             # One more empty fetch will confirm exhaustion, but exiting here
             # saves a request — mirrors the Bluesky script's "no cursor"
             # short-circuit.
-            print(f"Page {pages} returned {len(page)} < {PAGE_LIMIT} — "
-                  f"feed exhausted")
+            print(
+                f"Page {pages} returned {len(page)} < {PAGE_LIMIT} — " f"feed exhausted"
+            )
             break
         max_id_cursor = last_status_id
         time.sleep(0.25)  # gentle on the API
 
     print(f"\nFetched {seen:,} statuses across {pages} pages")
     print(f"Skipped {skipped_reblog:,} reblogs (third-party posts)")
-    print(f"Skipped {skipped_wrong_author:,} wrong-author entries "
-          f"(defense-in-depth)")
+    print(
+        f"Skipped {skipped_wrong_author:,} wrong-author entries " f"(defense-in-depth)"
+    )
     print(f"Skipped {skipped_existing:,} already-in-archive")
     print(f"Skipped {skipped_dupe_in_run:,} dupes within this run")
     print(f"New rows to append: {len(new_rows):,}")
@@ -374,8 +416,10 @@ def main():
     if args.dry_run:
         print("\nDry-run: first 3 new rows:")
         for r in new_rows[:3]:
-            print(f"  {r['id']} | {r['publication_date']} | "
-                  f"{r['title'][:50]!r} | {r['url']}")
+            print(
+                f"  {r['id']} | {r['publication_date']} | "
+                f"{r['title'][:50]!r} | {r['url']}"
+            )
         return
 
     # Append new rows to social_posts.csv via atomic-write.
@@ -406,17 +450,17 @@ def main():
         )
 
     with atomic_csv_write(SOCIAL_POSTS_CSV) as out:
-        writer = csv.DictWriter(out, fieldnames=fieldnames,
-                                quoting=csv.QUOTE_MINIMAL)
+        writer = csv.DictWriter(out, fieldnames=fieldnames, quoting=csv.QUOTE_MINIMAL)
         writer.writeheader()
         writer.writerows(existing_rows)
         writer.writerows(new_rows)
 
-    print(f"\nAppended {len(new_rows):,} rows. "
-          f"Backup at {SOCIAL_POSTS_CSV}.bak")
+    print(f"\nAppended {len(new_rows):,} rows. " f"Backup at {SOCIAL_POSTS_CSV}.bak")
     print(f"New id range: {new_rows[0]['id']} .. {new_rows[-1]['id']}")
-    print(f"Date range: {new_rows[-1]['publication_date']} .. "
-          f"{new_rows[0]['publication_date']}")
+    print(
+        f"Date range: {new_rows[-1]['publication_date']} .. "
+        f"{new_rows[0]['publication_date']}"
+    )
 
 
 if __name__ == "__main__":

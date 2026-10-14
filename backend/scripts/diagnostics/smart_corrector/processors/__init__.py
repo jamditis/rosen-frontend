@@ -10,8 +10,8 @@ from .youtube_processor import YouTubeEnhancedProcessor
 from .twitter_processor import TwitterProcessor
 
 __all__ = [
-    'SoundCloudProcessor',
-    'CSpanProcessor',
-    'YouTubeEnhancedProcessor',
-    'TwitterProcessor'
+    "SoundCloudProcessor",
+    "CSpanProcessor",
+    "YouTubeEnhancedProcessor",
+    "TwitterProcessor",
 ]

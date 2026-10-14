@@ -26,10 +26,14 @@ class _Model:
 
     def generate_content(self, prompt):
         self.prompts.append(prompt)
-        return _Response(json.dumps({
-            "concepts": self.concepts,
-            "recommendations": self.recommendations,
-        }))
+        return _Response(
+            json.dumps(
+                {
+                    "concepts": self.concepts,
+                    "recommendations": self.recommendations,
+                }
+            )
+        )
 
 
 def _column_number(cell: str) -> int:
@@ -41,8 +45,15 @@ def _column_number(cell: str) -> int:
 
 
 class _Worksheet:
-    def __init__(self, values, *, col_count=None, fail_batch=False,
-                 fail_growth=False, raise_after_batch=False):
+    def __init__(
+        self,
+        values,
+        *,
+        col_count=None,
+        fail_batch=False,
+        fail_growth=False,
+        raise_after_batch=False,
+    ):
         self.values = copy.deepcopy(values)
         self.col_count = col_count or max(map(len, values), default=0)
         self.fail_batch = fail_batch
@@ -112,21 +123,28 @@ def _no_sleep(monkeypatch):
     monkeypatch.setattr(kc.time, "sleep", lambda seconds: None)
 
 
-def _run(worksheet, model, *, schema=None, limit=1, dry_run=False,
-         force_reprocess=False):
+def _run(
+    worksheet, model, *, schema=None, limit=1, dry_run=False, force_reprocess=False
+):
     return kc.process_rows(
-        _Spreadsheet(worksheet), model=model, schema=schema or _schema(),
-        limit=limit, dry_run=dry_run, force_reprocess=force_reprocess,
+        _Spreadsheet(worksheet),
+        model=model,
+        schema=schema or _schema(),
+        limit=limit,
+        dry_run=dry_run,
+        force_reprocess=force_reprocess,
         durable_progress=True,
     )
 
 
 def test_small_live_runs_resume_by_receipt_after_process_restart():
-    worksheet = _Worksheet([
-        _header(receipt=False),
-        _row("RECORD-00001", "a")[:-1],
-        _row("RECORD-00002", "b")[:-1],
-    ])
+    worksheet = _Worksheet(
+        [
+            _header(receipt=False),
+            _row("RECORD-00001", "a")[:-1],
+            _row("RECORD-00002", "b")[:-1],
+        ]
+    )
 
     first_model = _Model()
     first = _run(worksheet, first_model)
@@ -142,7 +160,9 @@ def test_small_live_runs_resume_by_receipt_after_process_restart():
     assert worksheet.add_cols_calls == [1]
     assert len(worksheet.batch_updates) == 1
     assert {update["range"] for update in worksheet.batch_updates[0]} == {
-        "C2", "F1", "F2",
+        "C2",
+        "F1",
+        "F2",
     }
 
     restarted_model = _Model()
@@ -178,10 +198,12 @@ def test_default_limit_processes_one_batch_and_zero_is_unlimited():
 
 
 def test_negative_limit_fails_before_model_or_sheet_write():
-    worksheet = _Worksheet([
-        _header(receipt=False),
-        _row("RECORD-00001", "a")[:-1],
-    ])
+    worksheet = _Worksheet(
+        [
+            _header(receipt=False),
+            _row("RECORD-00001", "a")[:-1],
+        ]
+    )
     model = _Model()
 
     with pytest.raises(ValueError, match="limit must be zero or greater"):
@@ -193,10 +215,12 @@ def test_negative_limit_fails_before_model_or_sheet_write():
 
 
 def test_dry_run_does_not_create_header_or_receipt():
-    worksheet = _Worksheet([
-        _header(receipt=False),
-        _row("RECORD-00001", "a")[:-1],
-    ])
+    worksheet = _Worksheet(
+        [
+            _header(receipt=False),
+            _row("RECORD-00001", "a")[:-1],
+        ]
+    )
 
     preview = _run(worksheet, _Model(), dry_run=True)
     assert preview["processed"] == 1
@@ -211,10 +235,13 @@ def test_dry_run_does_not_create_header_or_receipt():
 
 
 def test_fresh_receipt_column_preserves_unlabeled_data_and_grows_full_grid():
-    worksheet = _Worksheet([
-        _header(receipt=False),
-        _row("RECORD-00001", "a")[:-1] + ["curator-private"],
-    ], col_count=6)
+    worksheet = _Worksheet(
+        [
+            _header(receipt=False),
+            _row("RECORD-00001", "a")[:-1] + ["curator-private"],
+        ],
+        col_count=6,
+    )
 
     _run(worksheet, _Model())
 
@@ -223,15 +250,21 @@ def test_fresh_receipt_column_preserves_unlabeled_data_and_grows_full_grid():
     assert worksheet.values[1][5] == "curator-private"
     assert worksheet.values[0][6] == progress.TASK_RECEIPT_COLUMN
     assert {update["range"] for update in worksheet.batch_updates[0]} == {
-        "C2", "G1", "G2",
+        "C2",
+        "G1",
+        "G2",
     }
 
 
 def test_grid_growth_failure_stops_before_model_call():
-    worksheet = _Worksheet([
-        _header(receipt=False),
-        _row("RECORD-00001", "a")[:-1],
-    ], col_count=5, fail_growth=True)
+    worksheet = _Worksheet(
+        [
+            _header(receipt=False),
+            _row("RECORD-00001", "a")[:-1],
+        ],
+        col_count=5,
+        fail_growth=True,
+    )
     model = _Model()
 
     with pytest.raises(kc.SheetWriteError, match="grid.*grid growth failed"):
@@ -243,12 +276,14 @@ def test_grid_growth_failure_stops_before_model_call():
 
 
 def test_empty_spacer_rows_are_ignored_but_nonempty_rows_require_ids():
-    worksheet = _Worksheet([
-        _header(receipt=False),
-        _row("RECORD-00001", "a")[:-1],
-        ["", "", "", "", ""],
-        _row("RECORD-00002", "b")[:-1],
-    ])
+    worksheet = _Worksheet(
+        [
+            _header(receipt=False),
+            _row("RECORD-00001", "a")[:-1],
+            ["", "", "", "", ""],
+            _row("RECORD-00002", "b")[:-1],
+        ]
+    )
     model = _Model()
 
     summary = _run(worksheet, model, limit=2)
@@ -256,10 +291,12 @@ def test_empty_spacer_rows_are_ignored_but_nonempty_rows_require_ids():
     assert summary["processed"] == 2
     assert len(model.prompts) == 2
 
-    missing_id = _Worksheet([
-        _header(receipt=False),
-        ["", "nonempty source", "", "", ""],
-    ])
+    missing_id = _Worksheet(
+        [
+            _header(receipt=False),
+            ["", "nonempty source", "", "", ""],
+        ]
+    )
     missing_id_model = _Model()
     with pytest.raises(ValueError, match="row 2.*missing stable id"):
         _run(missing_id, missing_id_model)
@@ -267,14 +304,16 @@ def test_empty_spacer_rows_are_ignored_but_nonempty_rows_require_ids():
 
 
 def test_dedup_rewrite_stays_complete_but_curator_edit_invalidates_receipt():
-    worksheet = _Worksheet([
-        _header(),
-        _row(
-            "RECORD-00001",
-            "a",
-            concepts="Mindcasting; False balance, Mindcasting",
-        ),
-    ])
+    worksheet = _Worksheet(
+        [
+            _header(),
+            _row(
+                "RECORD-00001",
+                "a",
+                concepts="Mindcasting; False balance, Mindcasting",
+            ),
+        ]
+    )
     first_model = _Model(recommendations="N/A")
     _run(worksheet, first_model)
 
@@ -302,13 +341,13 @@ def test_dedup_rewrite_stays_complete_but_curator_edit_invalidates_receipt():
 def test_taxonomy_rule_model_and_force_changes_invalidate_receipt(monkeypatch):
     for change in ("taxonomy", "rule", "model", "force"):
         monkeypatch.setattr(kc, "KEY_CONCEPT_RULE_VERSION", "1.0.0")
-        monkeypatch.setattr(
-            kc, "KEY_CONCEPT_MODEL_VERSION", "gemini-2.0-flash-lite"
+        monkeypatch.setattr(kc, "KEY_CONCEPT_MODEL_VERSION", "gemini-2.0-flash-lite")
+        worksheet = _Worksheet(
+            [
+                _header(),
+                _row("RECORD-00001", "a"),
+            ]
         )
-        worksheet = _Worksheet([
-            _header(),
-            _row("RECORD-00001", "a"),
-        ])
         _run(worksheet, _Model())
         model = _Model(recommendations="N/A")
         if change == "taxonomy":
@@ -330,10 +369,12 @@ def test_taxonomy_rule_model_and_force_changes_invalidate_receipt(monkeypatch):
 
 
 def test_changed_source_text_invalidates_receipt():
-    worksheet = _Worksheet([
-        _header(),
-        _row("RECORD-00001", "a"),
-    ])
+    worksheet = _Worksheet(
+        [
+            _header(),
+            _row("RECORD-00001", "a"),
+        ]
+    )
     _run(worksheet, _Model())
     worksheet.values[1][1] = "changed source " * 20
 
@@ -344,10 +385,13 @@ def test_changed_source_text_invalidates_receipt():
 
 
 def test_atomic_batch_failure_writes_neither_output_nor_receipt():
-    worksheet = _Worksheet([
-        _header(receipt=False),
-        _row("RECORD-00001", "a")[:-1],
-    ], fail_batch=True)
+    worksheet = _Worksheet(
+        [
+            _header(receipt=False),
+            _row("RECORD-00001", "a")[:-1],
+        ],
+        fail_batch=True,
+    )
     model = _Model()
 
     with pytest.raises(kc.SheetWriteError, match="atomic sheet write failed"):
@@ -359,10 +403,13 @@ def test_atomic_batch_failure_writes_neither_output_nor_receipt():
 
 
 def test_restart_skips_receipt_when_atomic_write_landed_before_response_error():
-    worksheet = _Worksheet([
-        _header(receipt=False),
-        _row("RECORD-00001", "a")[:-1],
-    ], raise_after_batch=True)
+    worksheet = _Worksheet(
+        [
+            _header(receipt=False),
+            _row("RECORD-00001", "a")[:-1],
+        ],
+        raise_after_batch=True,
+    )
     first_model = _Model()
 
     with pytest.raises(kc.SheetWriteError, match="response lost after atomic apply"):
@@ -381,11 +428,13 @@ def test_restart_skips_receipt_when_atomic_write_landed_before_response_error():
 
 
 def test_empty_model_result_is_recorded_as_a_durable_no_concepts_result():
-    worksheet = _Worksheet([
-        _header(),
-        _row("RECORD-00001", "a"),
-        _row("RECORD-00002", "b"),
-    ])
+    worksheet = _Worksheet(
+        [
+            _header(),
+            _row("RECORD-00001", "a"),
+            _row("RECORD-00002", "b"),
+        ]
+    )
 
     first = _run(worksheet, _Model(concepts=[]))
     assert first["gemini_calls"] == 1
@@ -401,39 +450,47 @@ def test_empty_model_result_is_recorded_as_a_durable_no_concepts_result():
 
 
 def test_malformed_receipt_and_duplicate_ids_fail_before_model_call():
-    malformed = _Worksheet([
-        _header(),
-        _row("RECORD-00001", "a", receipt="not json"),
-    ])
+    malformed = _Worksheet(
+        [
+            _header(),
+            _row("RECORD-00001", "a", receipt="not json"),
+        ]
+    )
     malformed_model = _Model()
     with pytest.raises(ValueError, match="row 2.*malformed"):
         _run(malformed, malformed_model)
     assert malformed_model.prompts == []
 
-    invalid_hash_receipt = json.dumps({
-        "schemaVersion": progress.RECEIPT_SCHEMA_VERSION,
-        "taskKey": "urn:rosen-stewardship:task:" + "0" * 64,
-        "taskVersion": progress.KEY_CONCEPT_TASK_VERSION,
-        "ruleVersion": progress.KEY_CONCEPT_RULE_VERSION,
-        "modelVersion": progress.KEY_CONCEPT_MODEL_VERSION,
-        "inputHash": "invalid",
-        "contextHash": "0" * 64,
-        "expectedConceptsHash": "0" * 64,
-    })
-    invalid_hash = _Worksheet([
-        _header(),
-        _row("RECORD-00001", "a", receipt=invalid_hash_receipt),
-    ])
+    invalid_hash_receipt = json.dumps(
+        {
+            "schemaVersion": progress.RECEIPT_SCHEMA_VERSION,
+            "taskKey": "urn:rosen-stewardship:task:" + "0" * 64,
+            "taskVersion": progress.KEY_CONCEPT_TASK_VERSION,
+            "ruleVersion": progress.KEY_CONCEPT_RULE_VERSION,
+            "modelVersion": progress.KEY_CONCEPT_MODEL_VERSION,
+            "inputHash": "invalid",
+            "contextHash": "0" * 64,
+            "expectedConceptsHash": "0" * 64,
+        }
+    )
+    invalid_hash = _Worksheet(
+        [
+            _header(),
+            _row("RECORD-00001", "a", receipt=invalid_hash_receipt),
+        ]
+    )
     invalid_hash_model = _Model()
     with pytest.raises(ValueError, match="row 2.*inputHash"):
         _run(invalid_hash, invalid_hash_model)
     assert invalid_hash_model.prompts == []
 
-    duplicates = _Worksheet([
-        _header(),
-        _row("RECORD-00001", "a"),
-        _row("RECORD-00001", "b"),
-    ])
+    duplicates = _Worksheet(
+        [
+            _header(),
+            _row("RECORD-00001", "a"),
+            _row("RECORD-00001", "b"),
+        ]
+    )
     duplicate_model = _Model()
     with pytest.raises(ValueError, match="row 3.*duplicate.*RECORD-00001"):
         _run(duplicates, duplicate_model)
@@ -441,10 +498,12 @@ def test_malformed_receipt_and_duplicate_ids_fail_before_model_call():
 
 
 def test_receipt_copied_to_another_id_is_stale_without_blocking_original():
-    worksheet = _Worksheet([
-        _header(),
-        _row("RECORD-00001", "a"),
-    ])
+    worksheet = _Worksheet(
+        [
+            _header(),
+            _row("RECORD-00001", "a"),
+        ]
+    )
     _run(worksheet, _Model())
     original_receipt = worksheet.values[1][-1]
     worksheet.values.append(
@@ -461,25 +520,39 @@ def test_receipt_copied_to_another_id_is_stale_without_blocking_original():
 
 
 def test_manual_cursor_mode_remains_available(monkeypatch):
-    worksheet = _Worksheet([
-        _header(receipt=False),
-        _row("RECORD-00001", "a")[:-1],
-    ])
+    worksheet = _Worksheet(
+        [
+            _header(receipt=False),
+            _row("RECORD-00001", "a")[:-1],
+        ]
+    )
     updates = []
 
     def update(values=None, range_name=None):
         updates.append((range_name, values))
 
     worksheet.update = update
-    monkeypatch.setattr(kc, "load_progress", lambda: {
-        "sheet_name": "archive_records", "last_processed_row": 1,
-        "total_processed": 0, "total_updated": 0, "last_run": None,
-    })
+    monkeypatch.setattr(
+        kc,
+        "load_progress",
+        lambda: {
+            "sheet_name": "archive_records",
+            "last_processed_row": 1,
+            "total_processed": 0,
+            "total_updated": 0,
+            "last_run": None,
+        },
+    )
     monkeypatch.setattr(kc, "save_progress", lambda progress: None)
 
     summary = kc.process_rows(
-        _Spreadsheet(worksheet), model=_Model(), schema=_schema(),
-        start_row=2, limit=1, resume=True, dry_run=False,
+        _Spreadsheet(worksheet),
+        model=_Model(),
+        schema=_schema(),
+        start_row=2,
+        limit=1,
+        resume=True,
+        dry_run=False,
         durable_progress=False,
     )
 
@@ -488,29 +561,52 @@ def test_manual_cursor_mode_remains_available(monkeypatch):
     assert worksheet.batch_updates == []
 
 
-@pytest.mark.parametrize((
-    "record_id", "raw_text", "current_concepts", "taxonomy", "force",
-    "expected_input_hash", "expected_task_key",
-), [
+@pytest.mark.parametrize(
     (
-        "RECORD-00001", "source text", "Mindcasting",
-        ["Mindcasting", "False balance"], False,
-        "502b56d028e67cf952171dc098201e27b004e5d858854621fa2e6848549fc4ed",
-        "9ad57290e1fe09a601058a3d9149c2f955b49b1de55d8637af68c9fd121e1675",
+        "record_id",
+        "raw_text",
+        "current_concepts",
+        "taxonomy",
+        "force",
+        "expected_input_hash",
+        "expected_task_key",
     ),
-    (
-        "BSKY-90001", "“Press” \U0001f5de\ufe0f \U00010400", "Mindcasting \U0001f9e0",
-        ["Mindcasting", "視点 \U0001f4f0"], True,
-        "fcc2822b130bcdae008e025fd149228f45991b4cbaa145a812cc04b5b592ea95",
-        "1e9a88b958de7a71b9c881443aecf1d686281df0821c4856360da867ba8bfe5b",
-    ),
-])
+    [
+        (
+            "RECORD-00001",
+            "source text",
+            "Mindcasting",
+            ["Mindcasting", "False balance"],
+            False,
+            "502b56d028e67cf952171dc098201e27b004e5d858854621fa2e6848549fc4ed",
+            "9ad57290e1fe09a601058a3d9149c2f955b49b1de55d8637af68c9fd121e1675",
+        ),
+        (
+            "BSKY-90001",
+            "“Press” \U0001f5de\ufe0f \U00010400",
+            "Mindcasting \U0001f9e0",
+            ["Mindcasting", "視点 \U0001f4f0"],
+            True,
+            "fcc2822b130bcdae008e025fd149228f45991b4cbaa145a812cc04b5b592ea95",
+            "1e9a88b958de7a71b9c881443aecf1d686281df0821c4856360da867ba8bfe5b",
+        ),
+    ],
+)
 def test_task_key_matches_independent_canonical_fixtures(
-    record_id, raw_text, current_concepts, taxonomy, force,
-    expected_input_hash, expected_task_key,
+    record_id,
+    raw_text,
+    current_concepts,
+    taxonomy,
+    force,
+    expected_input_hash,
+    expected_task_key,
 ):
     task = progress.key_concept_task(
-        record_id, raw_text, current_concepts, taxonomy, force,
+        record_id,
+        raw_text,
+        current_concepts,
+        taxonomy,
+        force,
     )
 
     assert task.input_hash == expected_input_hash

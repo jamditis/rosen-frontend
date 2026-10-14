@@ -24,6 +24,7 @@ _BACKEND = pathlib.Path(__file__).resolve().parents[1]
 if str(_BACKEND) not in sys.path:
     sys.path.insert(0, str(_BACKEND))
 
+
 def _load_module():
     path = _BACKEND / "scripts" / "sync_sheet_to_archive.py"
     spec = importlib.util.spec_from_file_location("sync_sheet_to_archive", path)
@@ -65,15 +66,34 @@ def test_sheet_rows_by_id_empty():
 
 # ---------- merge_enrichment ------------------------------------------------
 
-FIELDS = ["id", "key_concepts", "thematic_categories", "raw_text",
-          "publication_date", "notes"]
+FIELDS = [
+    "id",
+    "key_concepts",
+    "thematic_categories",
+    "raw_text",
+    "publication_date",
+    "notes",
+]
 
 
 def test_enrichment_fills_and_overwrites_but_never_blanks():
-    rows = [{"id": "R1", "key_concepts": "", "thematic_categories": "old cat",
-             "raw_text": "", "publication_date": "", "notes": "keep"}]
-    sheet = {"R1": {"key_concepts": "Mindcasting", "thematic_categories": "new cat",
-                    "raw_text": ""}}
+    rows = [
+        {
+            "id": "R1",
+            "key_concepts": "",
+            "thematic_categories": "old cat",
+            "raw_text": "",
+            "publication_date": "",
+            "notes": "keep",
+        }
+    ]
+    sheet = {
+        "R1": {
+            "key_concepts": "Mindcasting",
+            "thematic_categories": "new cat",
+            "raw_text": "",
+        }
+    }
     merged, stats = sync.merge_enrichment(rows, sheet, FIELDS)
     # Filled empty enrichment cell, and the sheet's value won over the old one.
     assert merged[0]["key_concepts"] == "Mindcasting"
@@ -85,8 +105,16 @@ def test_enrichment_fills_and_overwrites_but_never_blanks():
 
 
 def test_empty_sheet_value_does_not_blank_csv():
-    rows = [{"id": "R1", "key_concepts": "Existing", "thematic_categories": "",
-             "raw_text": "", "publication_date": "", "notes": ""}]
+    rows = [
+        {
+            "id": "R1",
+            "key_concepts": "Existing",
+            "thematic_categories": "",
+            "raw_text": "",
+            "publication_date": "",
+            "notes": "",
+        }
+    ]
     sheet = {"R1": {"key_concepts": "", "thematic_categories": ""}}
     merged, stats = sync.merge_enrichment(rows, sheet, FIELDS)
     assert merged[0]["key_concepts"] == "Existing"  # not blanked
@@ -95,14 +123,25 @@ def test_empty_sheet_value_does_not_blank_csv():
 
 def test_raw_text_filled_only_when_empty_and_never_shortened():
     rows = [
-        {"id": "R1", "key_concepts": "", "thematic_categories": "",
-         "raw_text": "A long existing body that must survive", "publication_date": "",
-         "notes": ""},
-        {"id": "R2", "key_concepts": "", "thematic_categories": "",
-         "raw_text": "", "publication_date": "", "notes": ""},
+        {
+            "id": "R1",
+            "key_concepts": "",
+            "thematic_categories": "",
+            "raw_text": "A long existing body that must survive",
+            "publication_date": "",
+            "notes": "",
+        },
+        {
+            "id": "R2",
+            "key_concepts": "",
+            "thematic_categories": "",
+            "raw_text": "",
+            "publication_date": "",
+            "notes": "",
+        },
     ]
     sheet = {
-        "R1": {"raw_text": "short"},          # shorter -> must NOT overwrite
+        "R1": {"raw_text": "short"},  # shorter -> must NOT overwrite
         "R2": {"raw_text": "filled in body"},  # empty CSV -> fill is allowed
     }
     merged, stats = sync.merge_enrichment(rows, sheet, FIELDS)
@@ -112,16 +151,33 @@ def test_raw_text_filled_only_when_empty_and_never_shortened():
 
 
 def test_rows_not_in_sheet_are_untouched():
-    rows = [{"id": "R9", "key_concepts": "", "thematic_categories": "",
-             "raw_text": "", "publication_date": "", "notes": ""}]
+    rows = [
+        {
+            "id": "R9",
+            "key_concepts": "",
+            "thematic_categories": "",
+            "raw_text": "",
+            "publication_date": "",
+            "notes": "",
+        }
+    ]
     merged, stats = sync.merge_enrichment(rows, {}, FIELDS)
     assert stats["matched"] == 0
     assert stats["rows_changed"] == 0
 
 
 def test_limit_caps_rows_changed():
-    rows = [{"id": f"R{i}", "key_concepts": "", "thematic_categories": "",
-             "raw_text": "", "publication_date": "", "notes": ""} for i in range(5)]
+    rows = [
+        {
+            "id": f"R{i}",
+            "key_concepts": "",
+            "thematic_categories": "",
+            "raw_text": "",
+            "publication_date": "",
+            "notes": "",
+        }
+        for i in range(5)
+    ]
     sheet = {f"R{i}": {"key_concepts": "Mindcasting"} for i in range(5)}
     merged, stats = sync.merge_enrichment(rows, sheet, FIELDS, limit=2)
     assert stats["rows_changed"] == 2
@@ -129,33 +185,66 @@ def test_limit_caps_rows_changed():
     assert stats["matched"] == 5
     # Only the first two rows got the value; the rest stayed empty.
     assert [r["key_concepts"] for r in merged] == [
-        "Mindcasting", "Mindcasting", "", "", ""]
+        "Mindcasting",
+        "Mindcasting",
+        "",
+        "",
+        "",
+    ]
 
 
 def test_merge_enrichment_sanitizes_formula_injection_in_enrichment():
     # Enrichment values are sheet-editor controlled; a leading formula trigger
     # must be neutralized before it lands in the committed archive CSV.
-    rows = [{"id": "R1", "key_concepts": "", "thematic_categories": "",
-             "raw_text": "", "publication_date": "", "notes": ""}]
-    sheet = {"R1": {"key_concepts": '=HYPERLINK("http://evil.example","x")',
-                    "thematic_categories": "@SUM(1+1)"}}
+    rows = [
+        {
+            "id": "R1",
+            "key_concepts": "",
+            "thematic_categories": "",
+            "raw_text": "",
+            "publication_date": "",
+            "notes": "",
+        }
+    ]
+    sheet = {
+        "R1": {
+            "key_concepts": '=HYPERLINK("http://evil.example","x")',
+            "thematic_categories": "@SUM(1+1)",
+        }
+    }
     merged, _ = sync.merge_enrichment(rows, sheet, FIELDS)
-    assert merged[0]["key_concepts"] == "'=HYPERLINK(\"http://evil.example\",\"x\")"
+    assert merged[0]["key_concepts"] == '\'=HYPERLINK("http://evil.example","x")'
     assert merged[0]["thematic_categories"] == "'@SUM(1+1)"
 
 
 def test_merge_enrichment_sanitizes_formula_injection_in_fill_only():
     # Fill-only columns (raw_text) are sheet-sourced too and must be neutralized.
-    rows = [{"id": "R1", "key_concepts": "", "thematic_categories": "",
-             "raw_text": "", "publication_date": "", "notes": ""}]
+    rows = [
+        {
+            "id": "R1",
+            "key_concepts": "",
+            "thematic_categories": "",
+            "raw_text": "",
+            "publication_date": "",
+            "notes": "",
+        }
+    ]
     sheet = {"R1": {"raw_text": "=2+5+cmd|'/c calc'!A0"}}
     merged, _ = sync.merge_enrichment(rows, sheet, FIELDS)
     assert merged[0]["raw_text"] == "'=2+5+cmd|'/c calc'!A0"
 
 
 def test_merge_enrichment_does_not_over_escape_safe_values():
-    rows = [{"id": "R1", "key_concepts": "", "thematic_categories": "",
-             "raw_text": "", "publication_date": "", "notes": ""}]
+    rows = [
+        {
+            "id": "R1",
+            "key_concepts": "",
+            "thematic_categories": "",
+            "raw_text": "",
+            "publication_date": "",
+            "notes": "",
+        }
+    ]
     sheet = {"R1": {"key_concepts": "View from Nowhere"}}
     merged, _ = sync.merge_enrichment(rows, sheet, FIELDS)
     assert merged[0]["key_concepts"] == "View from Nowhere"
@@ -293,16 +382,22 @@ def test_run_accepts_configured_master_tab(tmp_path, monkeypatch):
 
 def test_open_sync_pr_commits_census_after_input_data(tmp_path, monkeypatch):
     csv_path = _seed_csv(tmp_path)
-    run_mock = MagicMock(return_value=subprocess.CompletedProcess(
-        args=[], returncode=0, stdout="", stderr=""))
+    run_mock = MagicMock(
+        return_value=subprocess.CompletedProcess(
+            args=[], returncode=0, stdout="", stderr=""
+        )
+    )
     monkeypatch.setattr(sync.subprocess, "run", run_mock)
     monkeypatch.setenv("GITHUB_RUN_ID", "12345")
 
-    branch, _ = sync.open_sync_pr(csv_path, {
-        "rows_changed": 1,
-        "matched": 1,
-        "writes_by_field": {"key_concepts": 1},
-    })
+    branch, _ = sync.open_sync_pr(
+        csv_path,
+        {
+            "rows_changed": 1,
+            "matched": 1,
+            "writes_by_field": {"key_concepts": 1},
+        },
+    )
 
     assert branch == "sync/master-sheet-12345"
     commands = [call.args[0] for call in run_mock.call_args_list]
@@ -311,40 +406,45 @@ def test_open_sync_pr_commits_census_after_input_data(tmp_path, monkeypatch):
     assert ["npm", "run", "census:stewardship"] in commands
     assert ["node", "--test", "tests/stewardship-census.test.js"] in commands
     assert [
-        "git", "add",
+        "git",
+        "add",
         "data/stewardship-census.json",
         "data/stewardship-census.md",
     ] in commands
-    create_pr = next(cmd for cmd in commands
-                     if cmd[:3] == ["gh", "pr", "create"])
+    create_pr = next(cmd for cmd in commands if cmd[:3] == ["gh", "pr", "create"])
     body = create_pr[create_pr.index("--body") + 1]
     assert "Create a merge commit" in body
     assert "Do not squash or rebase" in body
-    push_index = next(index for index, cmd in enumerate(commands)
-                      if cmd[:2] == ["git", "push"])
-    second_commit_index = max(index for index, cmd in enumerate(commands)
-                              if cmd[:2] == ["git", "commit"])
+    push_index = next(
+        index for index, cmd in enumerate(commands) if cmd[:2] == ["git", "push"]
+    )
+    second_commit_index = max(
+        index for index, cmd in enumerate(commands) if cmd[:2] == ["git", "commit"]
+    )
     assert push_index > second_commit_index
 
 
-def test_open_sync_pr_blocks_publication_when_census_check_fails(
-        tmp_path, monkeypatch):
+def test_open_sync_pr_blocks_publication_when_census_check_fails(tmp_path, monkeypatch):
     csv_path = _seed_csv(tmp_path)
 
     def fake_run(cmd, *args, **kwargs):
         if cmd == ["node", "--test", "tests/stewardship-census.test.js"]:
             raise subprocess.CalledProcessError(
-                1, cmd, output="stale stewardship census", stderr="")
+                1, cmd, output="stale stewardship census", stderr=""
+            )
         return subprocess.CompletedProcess(cmd, 0, "", "")
 
     run_mock = MagicMock(side_effect=fake_run)
     monkeypatch.setattr(sync.subprocess, "run", run_mock)
 
-    branch, message = sync.open_sync_pr(csv_path, {
-        "rows_changed": 1,
-        "matched": 1,
-        "writes_by_field": {"key_concepts": 1},
-    })
+    branch, message = sync.open_sync_pr(
+        csv_path,
+        {
+            "rows_changed": 1,
+            "matched": 1,
+            "writes_by_field": {"key_concepts": 1},
+        },
+    )
 
     assert branch is None
     assert "stale stewardship census" in message
@@ -361,8 +461,9 @@ def test_dry_run_writes_nothing_and_opens_no_pr(tmp_path, monkeypatch):
         ["id", "key_concepts", "raw_text"],
         ["R1", "Mindcasting", "should not overwrite"],
     ]
-    monkeypatch.setattr(sync, "open_spreadsheet",
-                        lambda *a, **k: _FakeSheet(sheet_values))
+    monkeypatch.setattr(
+        sync, "open_spreadsheet", lambda *a, **k: _FakeSheet(sheet_values)
+    )
 
     # Fail loudly if dry-run ever reaches the deploy tail.
     def _boom(*a, **k):
@@ -375,9 +476,9 @@ def test_dry_run_writes_nothing_and_opens_no_pr(tmp_path, monkeypatch):
     result = sync.run(dry_run=True, csv_path=csv_path)
 
     assert result["status"] == "dry_run"
-    assert result["rows_changed"] == 1            # it would change R1
+    assert result["rows_changed"] == 1  # it would change R1
     assert result["exit_code"] == 0
-    assert csv_path.read_bytes() == before        # but wrote nothing
+    assert csv_path.read_bytes() == before  # but wrote nothing
 
 
 def test_nothing_to_sync_when_sheet_matches(tmp_path, monkeypatch):
@@ -387,11 +488,14 @@ def test_nothing_to_sync_when_sheet_matches(tmp_path, monkeypatch):
         ["id", "key_concepts", "raw_text"],
         ["R1", "", "x"],
     ]
-    monkeypatch.setattr(sync, "open_spreadsheet",
-                        lambda *a, **k: _FakeSheet(sheet_values))
-    monkeypatch.setattr(sync, "open_sync_pr",
-                        lambda *a, **k: (_ for _ in ()).throw(
-                            AssertionError("should not open a PR")))
+    monkeypatch.setattr(
+        sync, "open_spreadsheet", lambda *a, **k: _FakeSheet(sheet_values)
+    )
+    monkeypatch.setattr(
+        sync,
+        "open_sync_pr",
+        lambda *a, **k: (_ for _ in ()).throw(AssertionError("should not open a PR")),
+    )
 
     result = sync.run(dry_run=False, csv_path=csv_path)
     assert result["status"] == "nothing_to_sync"

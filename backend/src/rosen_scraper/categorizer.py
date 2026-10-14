@@ -20,7 +20,7 @@ UNIFORM_RESPONSE_SIGNATURE = {
     "key_concepts": [],
     "era": "Platform Transition & Future Models (2021-Present)",
     "scope": "Media Analysis",
-    "tags": ["journalism", "media"]
+    "tags": ["journalism", "media"],
 }
 
 
@@ -58,7 +58,11 @@ def _extract_taxonomy_names(taxonomy_items: Any) -> List[str]:
         # Check if first item is a dict (new format) or string (old format)
         if isinstance(taxonomy_items[0], dict):
             # New format with name/description objects
-            return [item.get("name", "") for item in taxonomy_items if isinstance(item, dict) and item.get("name")]
+            return [
+                item.get("name", "")
+                for item in taxonomy_items
+                if isinstance(item, dict) and item.get("name")
+            ]
         else:
             # Old format with simple strings
             return [str(item).strip() for item in taxonomy_items if str(item).strip()]
@@ -90,7 +94,9 @@ def _format_categories_for_prompt(taxonomy_items: Any) -> str:
             return "\n" + "\n".join(formatted) if formatted else "[]"
         else:
             # Old format - just list the names
-            return str([str(item).strip() for item in taxonomy_items if str(item).strip()])
+            return str(
+                [str(item).strip() for item in taxonomy_items if str(item).strip()]
+            )
 
     return "[]"
 
@@ -118,7 +124,8 @@ def _matches_uniform_signature(ai_data: Dict[str, Any]) -> bool:
 
     signature_tags = [tag.lower() for tag in UNIFORM_RESPONSE_SIGNATURE["tags"]]
     return (
-        [item.strip() for item in thematic] == UNIFORM_RESPONSE_SIGNATURE["thematic_categories"]
+        [item.strip() for item in thematic]
+        == UNIFORM_RESPONSE_SIGNATURE["thematic_categories"]
         and not key_concepts
         and era == UNIFORM_RESPONSE_SIGNATURE["era"]
         and scope.lower() == UNIFORM_RESPONSE_SIGNATURE["scope"].lower()
@@ -126,20 +133,32 @@ def _matches_uniform_signature(ai_data: Dict[str, Any]) -> bool:
     )
 
 
-def _validate_ai_payload(ai_data: Dict[str, Any], schema: Dict[str, Any], raw_payload: str) -> Optional[Dict[str, Any]]:
+def _validate_ai_payload(
+    ai_data: Dict[str, Any], schema: Dict[str, Any], raw_payload: str
+) -> Optional[Dict[str, Any]]:
     """
     Ensure Gemini output adheres to taxonomy expectations and reject suspicious results.
 
     Returns the sanitized payload or None if the response must be discarded.
     """
     taxonomy = schema.get("taxonomy", {})
-    allowed_categories = set(_extract_taxonomy_names(taxonomy.get("thematic_categories", [])))
+    allowed_categories = set(
+        _extract_taxonomy_names(taxonomy.get("thematic_categories", []))
+    )
     allowed_concepts = set(taxonomy.get("key_concepts", []))
     allowed_eras = set(_extract_taxonomy_names(taxonomy.get("era", [])))
     allowed_scopes = set(taxonomy.get("scope", []))
 
-    ai_data["thematic_categories"] = [item for item in _to_list(ai_data.get("thematic_categories")) if item in allowed_categories]
-    ai_data["key_concepts"] = [item for item in _to_list(ai_data.get("key_concepts")) if item in allowed_concepts]
+    ai_data["thematic_categories"] = [
+        item
+        for item in _to_list(ai_data.get("thematic_categories"))
+        if item in allowed_categories
+    ]
+    ai_data["key_concepts"] = [
+        item
+        for item in _to_list(ai_data.get("key_concepts"))
+        if item in allowed_concepts
+    ]
     ai_data["tags"] = _to_list(ai_data.get("tags"))
 
     # Normalize scalar fields
@@ -171,7 +190,9 @@ def _validate_ai_payload(ai_data: Dict[str, Any], schema: Dict[str, Any], raw_pa
         critical_issues.append("uniform_response_signature_detected")
 
     if critical_issues:
-        print(f"  [AI] WARNING: Gemini response failed validation: {', '.join(critical_issues)}")
+        print(
+            f"  [AI] WARNING: Gemini response failed validation: {', '.join(critical_issues)}"
+        )
         _dump_ai_debug(raw_payload, "validation_failure")
         return None
 
@@ -195,7 +216,10 @@ def _call_gemini_for_classification(model, prompt):
     response = model.generate_content(prompt)
     return response
 
-def summarize_and_classify(text_content: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+
+def summarize_and_classify(
+    text_content: str, schema: Dict[str, Any]
+) -> Optional[Dict[str, Any]]:
     """
     Uses the Gemini API to extract metadata, generate a summary, and classify an article.
 
@@ -225,7 +249,7 @@ def summarize_and_classify(text_content: str, schema: Dict[str, Any]) -> Optiona
     genai.configure(api_key=api_key)
     # Initialize the specific Gemini model to be used for content generation.
     # gemini-2.0-flash was retired by Google; 2.5-flash is the current default.
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    model = genai.GenerativeModel("gemini-2.5-flash")
 
     # Extract the taxonomy from the provided schema to guide the AI's classification.
     taxonomy = schema.get("taxonomy", {})
@@ -299,11 +323,11 @@ def summarize_and_classify(text_content: str, schema: Dict[str, Any]) -> Optiona
         # Send the request to the Gemini API and await the response.
         print("  [AI] Sending request to Gemini API for analysis...")
         response = _call_gemini_for_classification(model, prompt)
-        
+
         # Clean up the response text to ensure it's valid JSON.
         # This strips any markdown code fence around the JSON body.
         cleaned_response = strip_gemini_fence(response.text)
-        
+
         # Parse the cleaned JSON string into a Python dictionary.
         ai_data = json.loads(cleaned_response)
         ai_data = _validate_ai_payload(ai_data, schema, cleaned_response)
@@ -318,8 +342,8 @@ def summarize_and_classify(text_content: str, schema: Dict[str, Any]) -> Optiona
         # Handle potential errors during the API call or JSON parsing.
         print(f"  [AI] ERROR: An error occurred during Gemini API call: {e}")
         # Log the raw response to aid in debugging.
-        raw_response = response.text if 'response' in locals() else 'No response'
+        raw_response = response.text if "response" in locals() else "No response"
         print(f"  [AI] Raw response was: {raw_response}")
-        if raw_response and raw_response != 'No response':
+        if raw_response and raw_response != "No response":
             _dump_ai_debug(raw_response, "api_exception")
         return None

@@ -219,7 +219,10 @@ class TestDispatcherSocial:
             "raw_text": "tweet body",
             "author": "Jay Rosen",
         }
-        mock_ai.return_value = {"summary": "a summary", "categories": ["Press Criticism"]}
+        mock_ai.return_value = {
+            "summary": "a summary",
+            "categories": ["Press Criticism"],
+        }
 
         result = dispatcher.dispatch_url(url, sample_schema)
 

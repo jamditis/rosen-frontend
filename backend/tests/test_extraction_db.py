@@ -9,6 +9,7 @@ duplicated INSERT statement is extracted into a shared per-row helper:
   - both apply the same .get() column defaults and set created_at.
 The single and bulk variants must stay byte-equivalent after the extraction.
 """
+
 import pytest
 
 from rosen_scraper.extraction_db import ExtractionDB

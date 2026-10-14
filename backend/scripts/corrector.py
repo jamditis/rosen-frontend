@@ -56,6 +56,8 @@ def pinned_resolution(host: str | None, ips: list[str]):
     from rosen_scraper.url_safety import pinned_resolution as pin
 
     return pin(host, ips)
+
+
 # Only the consolidated corrector writes a "Complete -" status, and it writes that
 # note in the SAME batch_update as the AI-field values (see run_corrector), so a
 # "Complete -" note is proof the AI fields landed. The retired drivers wrote
@@ -234,9 +236,7 @@ def run_corrector(
         # Partial and fallback handoffs deliberately preserve metadata or an
         # alternate URL in raw_text. Those values are not finished content, even
         # if a permissive validator accepts them on the next run.
-        if _notes_require_reprocessing(
-            str(record.get("notes", "")), existing_raw_text
-        ):
+        if _notes_require_reprocessing(str(record.get("notes", "")), existing_raw_text):
             is_valid = False
             quality_score = 0.0
 
@@ -445,9 +445,7 @@ def run_corrector(
                             ),
                         )
                     )
-                    if _write_row(
-                        worksheet, row_number, row_updates, dry_run=dry_run
-                    ):
+                    if _write_row(worksheet, row_number, row_updates, dry_run=dry_run):
                         stats["processed"] += 1
                     else:
                         stats["write_errors"] += 1

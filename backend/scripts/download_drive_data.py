@@ -22,7 +22,9 @@ OUTPUT_DIR = Path(__file__).parent.parent.parent / "data" / "drive_downloads"
 
 def get_credentials():
     """Load credentials from gcloud application default credentials."""
-    creds_path = Path.home() / ".config" / "gcloud" / "application_default_credentials.json"
+    creds_path = (
+        Path.home() / ".config" / "gcloud" / "application_default_credentials.json"
+    )
 
     if not creds_path.exists():
         raise FileNotFoundError(f"Credentials not found at {creds_path}")
@@ -49,17 +51,21 @@ def list_files_in_folder(service, folder_id):
     page_token = None
 
     while True:
-        response = service.files().list(
-            q=f"'{folder_id}' in parents and trashed=false",
-            spaces='drive',
-            fields='nextPageToken, files(id, name, mimeType, size, modifiedTime)',
-            pageToken=page_token,
-            supportsAllDrives=True,
-            includeItemsFromAllDrives=True
-        ).execute()
+        response = (
+            service.files()
+            .list(
+                q=f"'{folder_id}' in parents and trashed=false",
+                spaces="drive",
+                fields="nextPageToken, files(id, name, mimeType, size, modifiedTime)",
+                pageToken=page_token,
+                supportsAllDrives=True,
+                includeItemsFromAllDrives=True,
+            )
+            .execute()
+        )
 
-        results.extend(response.get('files', []))
-        page_token = response.get('nextPageToken')
+        results.extend(response.get("files", []))
+        page_token = response.get("nextPageToken")
 
         if not page_token:
             break
@@ -110,7 +116,7 @@ def main():
         return 1
 
     # Build Drive service
-    service = build('drive', 'v3', credentials=creds)
+    service = build("drive", "v3", credentials=creds)
 
     # List files in folder
     print()
@@ -127,8 +133,10 @@ def main():
     print("-" * 60)
 
     for f in files:
-        size = int(f.get('size', 0)) if f.get('size') else 0
-        size_str = f"{size/1024:.1f} KB" if size < 1024*1024 else f"{size/1024/1024:.1f} MB"
+        size = int(f.get("size", 0)) if f.get("size") else 0
+        size_str = (
+            f"{size/1024:.1f} KB" if size < 1024 * 1024 else f"{size/1024/1024:.1f} MB"
+        )
         print(f"  {f['name']:<40} {size_str:>10}  {f['mimeType']}")
 
     # Download CSV and JSON files
@@ -138,11 +146,11 @@ def main():
 
     downloaded = []
     for f in files:
-        name = f['name']
-        if name.endswith('.csv') or name.endswith('.json'):
+        name = f["name"]
+        if name.endswith(".csv") or name.endswith(".json"):
             print(f"\nDownloading: {name}")
             try:
-                path = download_file(service, f['id'], name, OUTPUT_DIR)
+                path = download_file(service, f["id"], name, OUTPUT_DIR)
                 downloaded.append(path)
             except Exception as e:
                 print(f"  ✗ Failed: {e}")

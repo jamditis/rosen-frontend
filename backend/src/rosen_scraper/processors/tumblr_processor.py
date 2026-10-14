@@ -31,7 +31,7 @@ class TumblrProcessor:
     """Process Tumblr archive exports."""
 
     # Supported post types
-    POST_TYPES = ['text', 'quote', 'link', 'photo', 'video', 'audio', 'answer', 'chat']
+    POST_TYPES = ["text", "quote", "link", "photo", "video", "audio", "answer", "chat"]
 
     def __init__(self, export_dir: str):
         """
@@ -41,8 +41,8 @@ class TumblrProcessor:
             export_dir: Path to Tumblr export directory
         """
         self.export_dir = Path(export_dir)
-        self.posts_dir = self.export_dir / 'posts'
-        self.media_dir = self.export_dir / 'media'
+        self.posts_dir = self.export_dir / "posts"
+        self.media_dir = self.export_dir / "media"
         self.processed_count = 0
         self.error_count = 0
 
@@ -54,38 +54,40 @@ class TumblrProcessor:
             Dict with validation results
         """
         results = {
-            'valid': False,
-            'export_dir_exists': self.export_dir.exists(),
-            'posts_found': 0,
-            'media_found': 0,
-            'json_metadata': None,
-            'errors': []
+            "valid": False,
+            "export_dir_exists": self.export_dir.exists(),
+            "posts_found": 0,
+            "media_found": 0,
+            "json_metadata": None,
+            "errors": [],
         }
 
-        if not results['export_dir_exists']:
-            results['errors'].append(f'Export directory not found: {self.export_dir}')
+        if not results["export_dir_exists"]:
+            results["errors"].append(f"Export directory not found: {self.export_dir}")
             return results
 
         # Check for posts directory or JSON file
         if self.posts_dir.exists():
-            html_files = list(self.posts_dir.glob('*.html'))
-            results['posts_found'] = len(html_files)
+            html_files = list(self.posts_dir.glob("*.html"))
+            results["posts_found"] = len(html_files)
 
         # Check for JSON metadata
-        json_files = list(self.export_dir.glob('*.json'))
+        json_files = list(self.export_dir.glob("*.json"))
         if json_files:
-            results['json_metadata'] = str(json_files[0])
+            results["json_metadata"] = str(json_files[0])
 
         # Check for media
         if self.media_dir.exists():
-            media_files = list(self.media_dir.glob('*'))
-            results['media_found'] = len(media_files)
+            media_files = list(self.media_dir.glob("*"))
+            results["media_found"] = len(media_files)
 
         # Validate we have something to process
-        if results['posts_found'] > 0 or results['json_metadata']:
-            results['valid'] = True
+        if results["posts_found"] > 0 or results["json_metadata"]:
+            results["valid"] = True
         else:
-            results['errors'].append('No posts found (no HTML files in posts/ or JSON metadata)')
+            results["errors"].append(
+                "No posts found (no HTML files in posts/ or JSON metadata)"
+            )
 
         return results
 
@@ -103,7 +105,7 @@ class TumblrProcessor:
 
         # Validate first
         validation = self.validate_export()
-        if not validation['valid']:
+        if not validation["valid"]:
             print(f"[TUMBLR] Export validation failed: {validation['errors']}")
             return []
 
@@ -111,13 +113,13 @@ class TumblrProcessor:
         current_id = start_id
 
         # Strategy 1: Process from JSON metadata (preferred)
-        json_path = validation.get('json_metadata')
+        json_path = validation.get("json_metadata")
         if json_path:
             print(f"[TUMBLR] Processing from JSON metadata: {json_path}")
             records = self._process_json_export(json_path, current_id)
 
         # Strategy 2: Process HTML files directly
-        elif validation['posts_found'] > 0:
+        elif validation["posts_found"] > 0:
             print(f"[TUMBLR] Processing {validation['posts_found']} HTML files")
             records = self._process_html_posts(current_id)
 
@@ -139,7 +141,7 @@ class TumblrProcessor:
         current_id = start_id
 
         try:
-            with open(json_path, 'r', encoding='utf-8') as f:
+            with open(json_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
         except Exception as e:
             print(f"[TUMBLR] Error reading JSON: {e}")
@@ -151,9 +153,9 @@ class TumblrProcessor:
             posts = data
         elif isinstance(data, dict):
             # Common structures: data['posts'], data['tumblr'], etc.
-            posts = data.get('posts', data.get('tumblr', []))
+            posts = data.get("posts", data.get("tumblr", []))
             if isinstance(posts, dict):
-                posts = posts.get('posts', [])
+                posts = posts.get("posts", [])
 
         print(f"[TUMBLR] Found {len(posts)} posts in JSON")
 
@@ -183,11 +185,11 @@ class TumblrProcessor:
         records = []
         current_id = start_id
 
-        html_files = sorted(self.posts_dir.glob('*.html'))
+        html_files = sorted(self.posts_dir.glob("*.html"))
 
         for html_file in html_files:
             try:
-                with open(html_file, 'r', encoding='utf-8') as f:
+                with open(html_file, "r", encoding="utf-8") as f:
                     content = f.read()
 
                 record = self._process_html_post(content, html_file.name, current_id)
@@ -212,172 +214,193 @@ class TumblrProcessor:
         Returns:
             Processed record dict or None
         """
-        post_type = post.get('type', 'text')
+        post_type = post.get("type", "text")
 
         # Generate archive ID
         archive_id = f"TUMBLR-{post_id:05d}"
 
         # Extract common fields
         record = {
-            'id': archive_id,
-            'url': post.get('post_url', post.get('permalink', '')),
-            'title': self._extract_title(post),
-            'author': 'Jay Rosen',
-            'publication_date': self._parse_date(post.get('date', post.get('timestamp', ''))),
-            'original_publication': 'Tumblr',
-            'publisher': 'jayrosen_nyu.tumblr.com',
-            'platform': 'tumblr',
-            'content_type': self._map_content_type(post_type),
-            'format': 'text',
-            'raw_text': '',
-            'excerpt': '',
-            'summary': '',
-            'tags': ', '.join(post.get('tags', [])),
-            'responds_to': self._extract_reblog_source(post),
-            'notes': f"Tumblr {post_type} post"
+            "id": archive_id,
+            "url": post.get("post_url", post.get("permalink", "")),
+            "title": self._extract_title(post),
+            "author": "Jay Rosen",
+            "publication_date": self._parse_date(
+                post.get("date", post.get("timestamp", ""))
+            ),
+            "original_publication": "Tumblr",
+            "publisher": "jayrosen_nyu.tumblr.com",
+            "platform": "tumblr",
+            "content_type": self._map_content_type(post_type),
+            "format": "text",
+            "raw_text": "",
+            "excerpt": "",
+            "summary": "",
+            "tags": ", ".join(post.get("tags", [])),
+            "responds_to": self._extract_reblog_source(post),
+            "notes": f"Tumblr {post_type} post",
         }
 
         # Process by post type
-        if post_type == 'text':
+        if post_type == "text":
             record = self._process_text_post(post, record)
-        elif post_type == 'quote':
+        elif post_type == "quote":
             record = self._process_quote_post(post, record)
-        elif post_type == 'link':
+        elif post_type == "link":
             record = self._process_link_post(post, record)
-        elif post_type == 'photo':
+        elif post_type == "photo":
             record = self._process_photo_post(post, record)
-        elif post_type == 'video':
+        elif post_type == "video":
             record = self._process_video_post(post, record)
-        elif post_type == 'audio':
+        elif post_type == "audio":
             record = self._process_audio_post(post, record)
-        elif post_type == 'answer':
+        elif post_type == "answer":
             record = self._process_answer_post(post, record)
-        elif post_type == 'chat':
+        elif post_type == "chat":
             record = self._process_chat_post(post, record)
         else:
             # Unknown type - extract what we can
-            record['raw_text'] = self._extract_text_content(post)
+            record["raw_text"] = self._extract_text_content(post)
 
         # Skip empty posts
-        if not record.get('raw_text') and not record.get('title'):
+        if not record.get("raw_text") and not record.get("title"):
             return None
 
         # Generate excerpt if not set
-        if not record.get('excerpt') and record.get('raw_text'):
-            record['excerpt'] = self._generate_excerpt(record['raw_text'])
+        if not record.get("excerpt") and record.get("raw_text"):
+            record["excerpt"] = self._generate_excerpt(record["raw_text"])
 
         return record
 
     def _process_text_post(self, post: Dict, record: Dict) -> Dict:
         """Process a text post."""
-        body = post.get('body', '')
-        record['raw_text'] = self._clean_html(body)
+        body = post.get("body", "")
+        record["raw_text"] = self._clean_html(body)
 
         # Title might be in body as first heading
-        if not record['title']:
-            record['title'] = self._extract_title_from_body(body)
+        if not record["title"]:
+            record["title"] = self._extract_title_from_body(body)
 
         return record
 
     def _process_quote_post(self, post: Dict, record: Dict) -> Dict:
         """Process a quote post."""
-        quote_text = post.get('text', '')
-        source = post.get('source', '')
+        quote_text = post.get("text", "")
+        source = post.get("source", "")
 
-        record['content_type'] = 'Quote'
-        record['raw_text'] = f'"{self._clean_html(quote_text)}"\n\n— {self._clean_html(source)}'
-        record['pull_quote'] = self._clean_html(quote_text)
-        record['title'] = f"Quote: {self._truncate(quote_text, 50)}"
+        record["content_type"] = "Quote"
+        record["raw_text"] = (
+            f'"{self._clean_html(quote_text)}"\n\n— {self._clean_html(source)}'
+        )
+        record["pull_quote"] = self._clean_html(quote_text)
+        record["title"] = f"Quote: {self._truncate(quote_text, 50)}"
 
         return record
 
     def _process_link_post(self, post: Dict, record: Dict) -> Dict:
         """Process a link post."""
-        link_url = post.get('url', '')
-        link_title = post.get('title', '')
-        description = post.get('description', '')
+        link_url = post.get("url", "")
+        link_title = post.get("title", "")
+        description = post.get("description", "")
 
-        record['content_type'] = 'Link'
-        record['title'] = link_title or f"Link: {link_url}"
-        record['raw_text'] = f"{link_title}\n\n{link_url}\n\n{self._clean_html(description)}"
-        record['related_to'] = link_url
+        record["content_type"] = "Link"
+        record["title"] = link_title or f"Link: {link_url}"
+        record["raw_text"] = (
+            f"{link_title}\n\n{link_url}\n\n{self._clean_html(description)}"
+        )
+        record["related_to"] = link_url
 
         return record
 
     def _process_photo_post(self, post: Dict, record: Dict) -> Dict:
         """Process a photo post."""
-        caption = post.get('caption', '')
-        photos = post.get('photos', [])
+        caption = post.get("caption", "")
+        photos = post.get("photos", [])
 
-        record['content_type'] = 'Photo'
-        record['format'] = 'image'
-        record['raw_text'] = self._clean_html(caption)
-        record['title'] = self._extract_title_from_body(caption) or f"Photo post ({len(photos)} images)"
-        record['notes'] = f"Photo post with {len(photos)} images - needs image description"
+        record["content_type"] = "Photo"
+        record["format"] = "image"
+        record["raw_text"] = self._clean_html(caption)
+        record["title"] = (
+            self._extract_title_from_body(caption)
+            or f"Photo post ({len(photos)} images)"
+        )
+        record["notes"] = (
+            f"Photo post with {len(photos)} images - needs image description"
+        )
 
         # Extract photo URLs for reference
         if photos:
-            photo_urls = [p.get('original_size', {}).get('url', '') for p in photos if p.get('original_size')]
+            photo_urls = [
+                p.get("original_size", {}).get("url", "")
+                for p in photos
+                if p.get("original_size")
+            ]
             if photo_urls:
-                record['notes'] += f"\nMedia URLs: {', '.join(photo_urls[:3])}"
+                record["notes"] += f"\nMedia URLs: {', '.join(photo_urls[:3])}"
 
         return record
 
     def _process_video_post(self, post: Dict, record: Dict) -> Dict:
         """Process a video post."""
-        caption = post.get('caption', '')
-        video_url = post.get('video_url', '')
+        caption = post.get("caption", "")
+        video_url = post.get("video_url", "")
 
-        record['content_type'] = 'Video'
-        record['format'] = 'video'
-        record['raw_text'] = self._clean_html(caption)
-        record['title'] = self._extract_title_from_body(caption) or "Video post"
-        record['notes'] = f"Video post - needs transcription. Video URL: {video_url}"
+        record["content_type"] = "Video"
+        record["format"] = "video"
+        record["raw_text"] = self._clean_html(caption)
+        record["title"] = self._extract_title_from_body(caption) or "Video post"
+        record["notes"] = f"Video post - needs transcription. Video URL: {video_url}"
 
         return record
 
     def _process_audio_post(self, post: Dict, record: Dict) -> Dict:
         """Process an audio post."""
-        caption = post.get('caption', '')
-        audio_url = post.get('audio_url', '')
+        caption = post.get("caption", "")
+        audio_url = post.get("audio_url", "")
 
-        record['content_type'] = 'Audio'
-        record['format'] = 'audio'
-        record['raw_text'] = self._clean_html(caption)
-        record['title'] = self._extract_title_from_body(caption) or "Audio post"
-        record['notes'] = f"Audio post - needs transcription. Audio URL: {audio_url}"
+        record["content_type"] = "Audio"
+        record["format"] = "audio"
+        record["raw_text"] = self._clean_html(caption)
+        record["title"] = self._extract_title_from_body(caption) or "Audio post"
+        record["notes"] = f"Audio post - needs transcription. Audio URL: {audio_url}"
 
         return record
 
     def _process_answer_post(self, post: Dict, record: Dict) -> Dict:
         """Process an answer (ask) post."""
-        question = post.get('question', '')
-        answer = post.get('answer', '')
-        asking_name = post.get('asking_name', 'Anonymous')
+        question = post.get("question", "")
+        answer = post.get("answer", "")
+        asking_name = post.get("asking_name", "Anonymous")
 
-        record['content_type'] = 'Q&A'
-        record['raw_text'] = f"Q ({asking_name}): {question}\n\nA: {self._clean_html(answer)}"
-        record['title'] = f"Q&A: {self._truncate(question, 50)}"
+        record["content_type"] = "Q&A"
+        record["raw_text"] = (
+            f"Q ({asking_name}): {question}\n\nA: {self._clean_html(answer)}"
+        )
+        record["title"] = f"Q&A: {self._truncate(question, 50)}"
 
         return record
 
     def _process_chat_post(self, post: Dict, record: Dict) -> Dict:
         """Process a chat post."""
-        dialogue = post.get('dialogue', [])
+        dialogue = post.get("dialogue", [])
 
         chat_text = []
         for line in dialogue:
-            name = line.get('name', '')
-            phrase = line.get('phrase', '')
+            name = line.get("name", "")
+            phrase = line.get("phrase", "")
             chat_text.append(f"{name}: {phrase}")
 
-        record['content_type'] = 'Chat'
-        record['raw_text'] = '\n'.join(chat_text)
-        record['title'] = f"Chat: {self._truncate(chat_text[0] if chat_text else '', 50)}"
+        record["content_type"] = "Chat"
+        record["raw_text"] = "\n".join(chat_text)
+        record["title"] = (
+            f"Chat: {self._truncate(chat_text[0] if chat_text else '', 50)}"
+        )
 
         return record
 
-    def _process_html_post(self, content: str, filename: str, post_id: int) -> Optional[Dict]:
+    def _process_html_post(
+        self, content: str, filename: str, post_id: int
+    ) -> Optional[Dict]:
         """
         Process a single HTML post file.
 
@@ -389,20 +412,20 @@ class TumblrProcessor:
         Returns:
             Processed record dict or None
         """
-        soup = BeautifulSoup(content, 'html.parser')
+        soup = BeautifulSoup(content, "html.parser")
 
         # Extract post body from article tag
-        article = soup.find('article')
+        article = soup.find("article")
         body = article if article else soup.body or soup
 
         # Generate archive ID
         archive_id = f"TUMBLR-{post_id:05d}"
 
         # Extract date from <time datetime="..."> tag first
-        pub_date = ''
-        time_tag = soup.find('time')
+        pub_date = ""
+        time_tag = soup.find("time")
         if time_tag:
-            datetime_attr = time_tag.get('datetime', '')
+            datetime_attr = time_tag.get("datetime", "")
             if datetime_attr:
                 # Parse ISO format: 2014-08-20T21:24:05Z
                 iso_date = base.us_date_from_iso(datetime_attr, anchored=True)
@@ -416,113 +439,115 @@ class TumblrProcessor:
                 pub_date = file_date
 
         # Extract title from h2 tag (common in tumblr-utils exports)
-        title = ''
-        h2_tag = soup.find('h2')
+        title = ""
+        h2_tag = soup.find("h2")
         if h2_tag:
             title = h2_tag.get_text().strip()
         if not title:
             title = self._extract_html_title(soup)
 
         # Extract URL from tmblr.co link or article id
-        url = ''
-        tmblr_link = soup.find('a', href=re.compile(r'tmblr\.co'))
+        url = ""
+        tmblr_link = soup.find("a", href=re.compile(r"tmblr\.co"))
         if tmblr_link:
-            url = tmblr_link.get('href', '')
+            url = tmblr_link.get("href", "")
         if not url and article:
-            post_tumblr_id = article.get('id', '').replace('p-', '')
+            post_tumblr_id = article.get("id", "").replace("p-", "")
             if post_tumblr_id:
                 url = f"https://studio20nyu.tumblr.com/post/{post_tumblr_id}"
 
         # Determine blog from export directory
-        blog_name = 'studio20nyu'  # Default for this export
-        if 'jayrosen' in str(self.export_dir).lower():
-            blog_name = 'jayrosen_nyu'
+        blog_name = "studio20nyu"  # Default for this export
+        if "jayrosen" in str(self.export_dir).lower():
+            blog_name = "jayrosen_nyu"
 
         record = {
-            'id': archive_id,
-            'url': url,
-            'title': title or f"Post {post_id}",
-            'author': 'Jay Rosen / Studio 20',
-            'publication_date': pub_date,
-            'original_publication': 'Tumblr',
-            'publisher': f'{blog_name}.tumblr.com',
-            'platform': 'tumblr',
-            'content_type': 'Article',
-            'format': 'text',
-            'raw_text': self._clean_html(str(body)),
-            'notes': f"Studio 20 Tumblr post. Source file: {filename}"
+            "id": archive_id,
+            "url": url,
+            "title": title or f"Post {post_id}",
+            "author": "Jay Rosen / Studio 20",
+            "publication_date": pub_date,
+            "original_publication": "Tumblr",
+            "publisher": f"{blog_name}.tumblr.com",
+            "platform": "tumblr",
+            "content_type": "Article",
+            "format": "text",
+            "raw_text": self._clean_html(str(body)),
+            "notes": f"Studio 20 Tumblr post. Source file: {filename}",
         }
 
         # Extract URL from meta tags or links (fallback)
-        if not record['url']:
-            canonical = soup.find('link', rel='canonical')
+        if not record["url"]:
+            canonical = soup.find("link", rel="canonical")
             if canonical:
-                record['url'] = canonical.get('href', '')
+                record["url"] = canonical.get("href", "")
 
         # Extract tags
-        tags_meta = soup.find('meta', {'name': 'keywords'})
+        tags_meta = soup.find("meta", {"name": "keywords"})
         if tags_meta:
-            record['tags'] = tags_meta.get('content', '')
+            record["tags"] = tags_meta.get("content", "")
 
         # Generate excerpt
-        record['excerpt'] = self._generate_excerpt(record['raw_text'])
+        record["excerpt"] = self._generate_excerpt(record["raw_text"])
 
-        return record if record['raw_text'] else None
+        return record if record["raw_text"] else None
 
     # === Utility Methods ===
 
     def _extract_title(self, post: Dict) -> str:
         """Extract title from post, generating one if needed."""
         # Some post types have explicit titles
-        title = post.get('title', '')
+        title = post.get("title", "")
         if title:
             return self._clean_html(title)
 
         # Generate from slug or first line
-        slug = post.get('slug', '')
+        slug = post.get("slug", "")
         if slug:
-            return slug.replace('-', ' ').title()
+            return slug.replace("-", " ").title()
 
-        return ''
+        return ""
 
     def _extract_title_from_body(self, body: str) -> str:
         """Extract title from HTML body (first heading or strong text)."""
-        soup = BeautifulSoup(body, 'html.parser')
+        soup = BeautifulSoup(body, "html.parser")
 
         # Try headings first
-        for tag in ['h1', 'h2', 'h3', 'strong', 'b']:
+        for tag in ["h1", "h2", "h3", "strong", "b"]:
             element = soup.find(tag)
             if element:
                 text = element.get_text().strip()
                 if len(text) > 5 and len(text) < 200:
                     return text
 
-        return ''
+        return ""
 
     def _extract_html_title(self, soup: BeautifulSoup) -> str:
         """Extract title from HTML document."""
-        title_tag = soup.find('title')
+        title_tag = soup.find("title")
         if title_tag:
             title = title_tag.get_text().strip()
             # Remove common suffixes
-            title = re.sub(r'\s*[-|]\s*(Tumblr|jayrosen_nyu).*$', '', title, flags=re.I)
+            title = re.sub(r"\s*[-|]\s*(Tumblr|jayrosen_nyu).*$", "", title, flags=re.I)
             return title
-        return ''
+        return ""
 
     def _extract_text_content(self, post: Dict) -> str:
         """Extract text from any available field."""
-        for field in ['body', 'text', 'caption', 'description', 'answer']:
+        for field in ["body", "text", "caption", "description", "answer"]:
             if field in post and post[field]:
                 return self._clean_html(post[field])
-        return ''
+        return ""
 
     def _extract_reblog_source(self, post: Dict) -> str:
         """Extract reblog source if this is a reblog."""
-        reblog = post.get('reblogged_from_name', '') or post.get('source_title', '')
+        reblog = post.get("reblogged_from_name", "") or post.get("source_title", "")
         if reblog:
-            reblog_url = post.get('reblogged_from_url', '') or post.get('source_url', '')
+            reblog_url = post.get("reblogged_from_url", "") or post.get(
+                "source_url", ""
+            )
             return f"{reblog}: {reblog_url}" if reblog_url else reblog
-        return ''
+        return ""
 
     def _parse_date(self, date_str: str) -> str:
         """
@@ -534,12 +559,12 @@ class TumblrProcessor:
         - Human readable: March 24, 2015
         """
         if not date_str:
-            return ''
+            return ""
 
         # Handle Unix timestamp
         if isinstance(date_str, (int, float)):
             dt = datetime.fromtimestamp(date_str)
-            return dt.strftime('%m/%d/%Y')
+            return dt.strftime("%m/%d/%Y")
 
         # Handle ISO format
         iso_date = base.us_date_from_iso(date_str, anchored=True)
@@ -550,7 +575,7 @@ class TumblrProcessor:
         try:
             timestamp = int(date_str)
             dt = datetime.fromtimestamp(timestamp)
-            return dt.strftime('%m/%d/%Y')
+            return dt.strftime("%m/%d/%Y")
         except (ValueError, TypeError):
             pass
 
@@ -560,16 +585,16 @@ class TumblrProcessor:
     def _map_content_type(self, tumblr_type: str) -> str:
         """Map Tumblr post type to archive content type."""
         mapping = {
-            'text': 'Article',
-            'quote': 'Quote',
-            'link': 'Link',
-            'photo': 'Photo',
-            'video': 'Video',
-            'audio': 'Audio',
-            'answer': 'Q&A',
-            'chat': 'Chat'
+            "text": "Article",
+            "quote": "Quote",
+            "link": "Link",
+            "photo": "Photo",
+            "video": "Video",
+            "audio": "Audio",
+            "answer": "Q&A",
+            "chat": "Chat",
         }
-        return mapping.get(tumblr_type, 'Article')
+        return mapping.get(tumblr_type, "Article")
 
     def _clean_html(self, html_content: str) -> str:
         """Strip HTML tags and clean text."""
@@ -578,10 +603,10 @@ class TumblrProcessor:
     def _generate_excerpt(self, text: str, length: int = 300) -> str:
         """Generate excerpt from text."""
         if not text:
-            return ''
+            return ""
 
         # Get first paragraph or sentence
-        paragraphs = text.split('\n\n')
+        paragraphs = text.split("\n\n")
         excerpt = paragraphs[0] if paragraphs else text
 
         return base.truncate_on_word_boundary(excerpt, length)
@@ -602,11 +627,13 @@ def main():
     """
     import argparse
 
-    parser = argparse.ArgumentParser(description='Process Tumblr archive export')
-    parser.add_argument('export_dir', help='Path to Tumblr export directory')
-    parser.add_argument('--output', '-o', help='Output JSON file path')
-    parser.add_argument('--start-id', type=int, default=1, help='Starting ID number')
-    parser.add_argument('--validate-only', action='store_true', help='Only validate export structure')
+    parser = argparse.ArgumentParser(description="Process Tumblr archive export")
+    parser.add_argument("export_dir", help="Path to Tumblr export directory")
+    parser.add_argument("--output", "-o", help="Output JSON file path")
+    parser.add_argument("--start-id", type=int, default=1, help="Starting ID number")
+    parser.add_argument(
+        "--validate-only", action="store_true", help="Only validate export structure"
+    )
 
     args = parser.parse_args()
 
@@ -620,7 +647,7 @@ def main():
     records = processor.process_export(start_id=args.start_id)
 
     if args.output:
-        with open(args.output, 'w', encoding='utf-8') as f:
+        with open(args.output, "w", encoding="utf-8") as f:
             json.dump(records, f, indent=2, ensure_ascii=False)
         print(f"[TUMBLR] Wrote {len(records)} records to {args.output}")
     else:
@@ -633,7 +660,7 @@ def main():
         if records:
             print("\n  Sample record:")
             sample = records[0]
-            for key in ['id', 'title', 'publication_date', 'content_type', 'url']:
+            for key in ["id", "title", "publication_date", "content_type", "url"]:
                 print(f"    {key}: {sample.get(key, '')}")
 
 

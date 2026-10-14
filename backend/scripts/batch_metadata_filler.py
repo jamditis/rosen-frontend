@@ -267,9 +267,7 @@ def format_record_for_classification(
         "params": {
             "model": model,
             "max_tokens": max_tokens,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
+            "messages": [{"role": "user", "content": prompt}],
         },
     }
 
@@ -354,6 +352,7 @@ class BatchMetadataFiller:
         if self._client is None:
             try:
                 from anthropic import Anthropic
+
                 self._client = Anthropic()
             except ImportError:
                 print("[FILL] ERROR: anthropic package not installed.")
@@ -372,7 +371,8 @@ class BatchMetadataFiller:
 
         total = len(records)
         non_social = [
-            r for r in records
+            r
+            for r in records
             if r.get("content_type", "").strip() not in SOCIAL_CONTENT_TYPES
         ]
 
@@ -602,7 +602,8 @@ class BatchMetadataFiller:
             # Check all non-social records that have both fields filled
             field = None
             pool = [
-                r for r in records
+                r
+                for r in records
                 if r.get("content_type", "").strip() not in SOCIAL_CONTENT_TYPES
                 and r.get("thematic_categories", "").strip()
                 and r.get("key_concepts", "").strip()
@@ -723,7 +724,9 @@ def main():
         batch_id = filler.submit_fill_batch(args.fill)
         if batch_id:
             print(f"\n[FILL] Batch submitted: {batch_id}")
-            print(f"[FILL] Check status: python {__file__} --apply --batch-id {batch_id}")
+            print(
+                f"[FILL] Check status: python {__file__} --apply --batch-id {batch_id}"
+            )
 
     elif args.apply:
         if not args.batch_id:

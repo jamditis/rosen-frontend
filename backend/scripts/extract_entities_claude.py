@@ -72,14 +72,28 @@ TYPE_SPECIFIC_ROLE_FIELDS = _batch.TYPE_SPECIFIC_ROLE_FIELDS
 
 # CSV headers (exact, in order) — must match the existing files byte-for-byte.
 ENTITIES_HEADER = [
-    "entity_id", "entity_type", "entity_name", "normalized_name",
-    "role_or_description", "affiliation", "prominence_score",
-    "first_mention_record_id", "total_mentions", "related_entities", "notes",
+    "entity_id",
+    "entity_type",
+    "entity_name",
+    "normalized_name",
+    "role_or_description",
+    "affiliation",
+    "prominence_score",
+    "first_mention_record_id",
+    "total_mentions",
+    "related_entities",
+    "notes",
 ]
 RELATIONSHIPS_HEADER = [
-    "relationship_id", "source_record_id", "source_entity_id",
-    "source_entity_name", "relationship_type", "target_entity_id",
-    "target_entity_name", "context_snippet", "confidence_score",
+    "relationship_id",
+    "source_record_id",
+    "source_entity_id",
+    "source_entity_name",
+    "relationship_type",
+    "target_entity_id",
+    "target_entity_name",
+    "context_snippet",
+    "confidence_score",
     "extracted_date",
 ]
 
@@ -150,9 +164,7 @@ def alloc_entity_id(prefix: str, next_seq: Dict[str, int]) -> str:
     return f"{prefix}{n:04d}"
 
 
-def next_rel_seq_for_record(
-    record_id: str, relationships: Iterable[Dict]
-) -> int:
+def next_rel_seq_for_record(record_id: str, relationships: Iterable[Dict]) -> int:
     """Return the next REL sequence number for a given record_id.
 
     Existing ids look like RECORD-00002_REL_001. If a record already has rels
@@ -248,9 +260,7 @@ def invoke_claude_p(
     )
     if proc.returncode != 0:
         stderr = proc.stderr.decode("utf-8", errors="replace")
-        raise RuntimeError(
-            f"claude -p exited {proc.returncode}: {stderr[:500]}"
-        )
+        raise RuntimeError(f"claude -p exited {proc.returncode}: {stderr[:500]}")
     return proc.stdout.decode("utf-8", errors="replace")
 
 
@@ -259,9 +269,7 @@ def invoke_claude_p(
 # ---------------------------------------------------------------------------
 
 
-def load_record(
-    record_id: str, records_csv: Path
-) -> Optional[Dict]:
+def load_record(record_id: str, records_csv: Path) -> Optional[Dict]:
     with records_csv.open("r", encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f):
             if row.get("id") == record_id:
@@ -269,9 +277,7 @@ def load_record(
     return None
 
 
-def append_csv_rows(
-    path: Path, header: List[str], rows: List[Dict]
-) -> None:
+def append_csv_rows(path: Path, header: List[str], rows: List[Dict]) -> None:
     """Append rows to an existing CSV that already has the header.
 
     Uses csv.DictWriter for proper quoting/escaping.
@@ -408,7 +414,7 @@ def process_record(
         if not src_canonical or not tgt_canonical:
             continue
 
-        snippet = (raw_rel.get("context_snippet") or raw_rel.get("evidence") or "")
+        snippet = raw_rel.get("context_snippet") or raw_rel.get("evidence") or ""
         snippet = snippet[:200] if snippet else ""
 
         confidence = raw_rel.get("confidence_score", "")
@@ -455,8 +461,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     next_seq = next_entity_ids_by_prefix(existing_entities)
     today = date.today().isoformat()
 
-    print(f"[init] {len(existing_entities)} existing entities, "
-          f"{len(existing_relationships)} existing rels", flush=True)
+    print(
+        f"[init] {len(existing_entities)} existing entities, "
+        f"{len(existing_relationships)} existing rels",
+        flush=True,
+    )
     print(f"[init] next-id seeds: {next_seq}", flush=True)
 
     all_new_entities: List[Dict] = []
@@ -465,8 +474,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     for record_id in args.record_ids:
         record = load_record(record_id, records_csv)
         if not record:
-            print(f"[{record_id}] NOT FOUND in {records_csv.name}; skipping",
-                  flush=True)
+            print(
+                f"[{record_id}] NOT FOUND in {records_csv.name}; skipping", flush=True
+            )
             continue
         if not (record.get("raw_text") or "").strip():
             print(f"[{record_id}] empty raw_text; skipping", flush=True)
@@ -480,14 +490,18 @@ def main(argv: Optional[List[str]] = None) -> int:
             max_input_chars=args.max_input_chars,
             today=today,
         )
-        print(f"[{record_id}] +{len(new_ents)} entities, +{len(new_rels)} rels",
-              flush=True)
+        print(
+            f"[{record_id}] +{len(new_ents)} entities, +{len(new_rels)} rels",
+            flush=True,
+        )
         all_new_entities.extend(new_ents)
         all_new_rels.extend(new_rels)
 
     if args.dry_run:
-        print(f"[dry-run] would append {len(all_new_entities)} entities, "
-              f"{len(all_new_rels)} relationships")
+        print(
+            f"[dry-run] would append {len(all_new_entities)} entities, "
+            f"{len(all_new_rels)} relationships"
+        )
         return 0
 
     if all_new_entities:
@@ -495,8 +509,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     if all_new_rels:
         append_csv_rows(relationships_csv, RELATIONSHIPS_HEADER, all_new_rels)
 
-    print(f"[done] appended {len(all_new_entities)} entities and "
-          f"{len(all_new_rels)} relationships", flush=True)
+    print(
+        f"[done] appended {len(all_new_entities)} entities and "
+        f"{len(all_new_rels)} relationships",
+        flush=True,
+    )
 
     type_counts = Counter(e["entity_type"] for e in all_new_entities)
     rel_counts = Counter(r["relationship_type"] for r in all_new_rels)

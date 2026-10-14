@@ -88,12 +88,14 @@ def test_configuration_preflight_runs_before_app_token(wf):
     steps = wf["jobs"]["maintenance"]["steps"]
     names = [step.get("name") for step in steps]
     assert names.index("Check required configuration") < names.index(
-        "Mint GitHub App installation token")
+        "Mint GitHub App installation token"
+    )
 
     preflight = _step(wf, "Check required configuration")
     assert preflight["env"]["SPREADSHEET_NAME"] == "${{ secrets.SPREADSHEET_NAME }}"
     assert preflight["env"]["ROSEN_SHEETS_SA_KEY_JSON"] == (
-        "${{ secrets.ROSEN_SHEETS_SA_KEY_JSON }}")
+        "${{ secrets.ROSEN_SHEETS_SA_KEY_JSON }}"
+    )
     assert "ROSEN_GH_APP_ID" in preflight["env"]
     assert "ROSEN_GH_APP_PRIVATE_KEY" in preflight["env"]
 
@@ -114,7 +116,8 @@ def test_workflow_passes_configurable_master_tab(wf):
 def test_key_concepts_uses_durable_sheet_receipts(wf):
     run = _run_step(wf)["run"]
     command = next(
-        line.strip() for line in run.splitlines()
+        line.strip()
+        for line in run.splitlines()
         if "rosen_scraper.key_concepts_updater" in line
     )
     assert "--durable-progress" in command
@@ -125,10 +128,12 @@ def test_referenced_scripts_exist(wf):
     run = step["run"]
     # The module form and the two script paths the case-statement dispatches to.
     assert "rosen_scraper.key_concepts_updater" in run
-    assert (_REPO_ROOT / "backend" / "src" / "rosen_scraper"
-            / "key_concepts_updater.py").exists()
+    assert (
+        _REPO_ROOT / "backend" / "src" / "rosen_scraper" / "key_concepts_updater.py"
+    ).exists()
     assert "scripts/diagnostics/data_deduper.py" in run
-    assert (_REPO_ROOT / "backend" / "scripts" / "diagnostics"
-            / "data_deduper.py").exists()
+    assert (
+        _REPO_ROOT / "backend" / "scripts" / "diagnostics" / "data_deduper.py"
+    ).exists()
     assert "scripts/sync_sheet_to_archive.py" in run
     assert (_REPO_ROOT / "backend" / "scripts" / "sync_sheet_to_archive.py").exists()

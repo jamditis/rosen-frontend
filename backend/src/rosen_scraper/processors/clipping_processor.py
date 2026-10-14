@@ -28,12 +28,13 @@ from rosen_scraper.processors import base
 @dataclass
 class ClippingMetadata:
     """Extracted metadata from a newspaper clipping."""
-    publication: str = ''
-    date: str = ''
-    author: str = ''
-    headline: str = ''
-    page: str = ''
-    section: str = ''
+
+    publication: str = ""
+    date: str = ""
+    author: str = ""
+    headline: str = ""
+    page: str = ""
+    section: str = ""
     confidence: float = 0.0
 
 
@@ -42,42 +43,42 @@ class ClippingProcessor:
 
     # Known publications with their ID prefixes
     PUBLICATION_PREFIXES = {
-        'new york times': 'NYT',
-        'nytimes': 'NYT',
-        'ny times': 'NYT',
-        'wall street journal': 'WSJ',
-        'wsj': 'WSJ',
-        'washington post': 'WP',
-        'wapo': 'WP',
-        'los angeles times': 'LAT',
-        'la times': 'LAT',
-        'chicago tribune': 'CT',
-        'boston globe': 'BG',
-        'guardian': 'GRD',
-        'the guardian': 'GRD',
-        'columbia journalism review': 'CJR',
-        'american journalism review': 'AJR',
-        'editor & publisher': 'EP',
-        'nieman reports': 'NR',
-        'poynter': 'PYN',
+        "new york times": "NYT",
+        "nytimes": "NYT",
+        "ny times": "NYT",
+        "wall street journal": "WSJ",
+        "wsj": "WSJ",
+        "washington post": "WP",
+        "wapo": "WP",
+        "los angeles times": "LAT",
+        "la times": "LAT",
+        "chicago tribune": "CT",
+        "boston globe": "BG",
+        "guardian": "GRD",
+        "the guardian": "GRD",
+        "columbia journalism review": "CJR",
+        "american journalism review": "AJR",
+        "editor & publisher": "EP",
+        "nieman reports": "NR",
+        "poynter": "PYN",
     }
 
     # Common OCR artifacts to fix
     OCR_FIXES = [
         # Character substitutions
-        (r'\bl\s*l\b', 'll'),  # Spaced ll
-        (r'\brn\b', 'm'),  # rn → m (common OCR error)
-        (r'\bvv\b', 'w'),  # vv → w
-        (r'0(?=[a-zA-Z])', 'O'),  # Leading 0 before letters
-        (r'(?<=[a-zA-Z])1\b', 'l'),  # Trailing 1 after letters
+        (r"\bl\s*l\b", "ll"),  # Spaced ll
+        (r"\brn\b", "m"),  # rn → m (common OCR error)
+        (r"\bvv\b", "w"),  # vv → w
+        (r"0(?=[a-zA-Z])", "O"),  # Leading 0 before letters
+        (r"(?<=[a-zA-Z])1\b", "l"),  # Trailing 1 after letters
         # Spacing issues
-        (r'(\w)-\s*\n\s*(\w)', r'\1\2'),  # Hyphenated line breaks
-        (r'\s+', ' '),  # Multiple spaces
-        (r'\n{3,}', '\n\n'),  # Multiple newlines
+        (r"(\w)-\s*\n\s*(\w)", r"\1\2"),  # Hyphenated line breaks
+        (r"\s+", " "),  # Multiple spaces
+        (r"\n{3,}", "\n\n"),  # Multiple newlines
         # Common words
-        (r'\bth\s+e\b', 'the'),
-        (r'\bw\s*h\s*i\s*c\s*h\b', 'which'),
-        (r'\bj\s*o\s*u\s*r\s*n\s*a\s*l\s*i\s*s\s*m\b', 'journalism'),
+        (r"\bth\s+e\b", "the"),
+        (r"\bw\s*h\s*i\s*c\s*h\b", "which"),
+        (r"\bj\s*o\s*u\s*r\s*n\s*a\s*l\s*i\s*s\s*m\b", "journalism"),
     ]
 
     def __init__(self, clippings_dir: Optional[str] = None):
@@ -109,8 +110,8 @@ class ClippingProcessor:
         records = []
 
         # Find all text and JSON files
-        files = list(self.clippings_dir.glob('*.txt'))
-        files.extend(self.clippings_dir.glob('*.json'))
+        files = list(self.clippings_dir.glob("*.txt"))
+        files.extend(self.clippings_dir.glob("*.json"))
 
         print(f"[CLIPPING] Found {len(files)} files to process")
 
@@ -124,10 +125,12 @@ class ClippingProcessor:
                 print(f"[CLIPPING] Error processing {file_path.name}: {e}")
                 self.error_count += 1
 
-        print(f"[CLIPPING] Processed {self.processed_count} clippings ({self.error_count} errors)")
+        print(
+            f"[CLIPPING] Processed {self.processed_count} clippings ({self.error_count} errors)"
+        )
 
         if output_file:
-            with open(output_file, 'w', encoding='utf-8') as f:
+            with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(records, f, indent=2, ensure_ascii=False)
             print(f"[CLIPPING] Wrote {len(records)} records to {output_file}")
 
@@ -145,12 +148,12 @@ class ClippingProcessor:
         """
         file_path = Path(file_path)
 
-        if file_path.suffix == '.json':
+        if file_path.suffix == ".json":
             return self._process_json_file(file_path)
         else:
             return self._process_text_file(file_path)
 
-    def process_text(self, raw_text: str, filename: str = '') -> Dict:
+    def process_text(self, raw_text: str, filename: str = "") -> Dict:
         """
         Process raw OCR text into a clipping record.
 
@@ -172,32 +175,32 @@ class ClippingProcessor:
 
         # Build the record
         record = {
-            'id': archive_id,
-            'url': '',  # Clippings typically don't have URLs
-            'title': metadata.headline or self._extract_title_from_text(cleaned_text),
-            'author': metadata.author or 'Jay Rosen',
-            'publication_date': metadata.date,
-            'original_publication': metadata.publication or 'Unknown Publication',
-            'publisher': metadata.publication or 'Unknown',
-            'platform': 'newspaper',
-            'content_type': 'Article',
-            'format': 'text',
-            'raw_text': cleaned_text,
-            'excerpt': self._generate_excerpt(cleaned_text),
-            'summary': '',  # To be filled by AI
-            'thematic_categories': '',  # To be filled by AI
-            'key_concepts': '',  # To be filled by AI
-            'tags': '',
-            'notes': f"OCR'd newspaper clipping. Source file: {filename}. Metadata confidence: {metadata.confidence:.0%}",
-            'verified': 'false',
-            'date_processed': datetime.now().strftime('%m/%d/%Y'),
+            "id": archive_id,
+            "url": "",  # Clippings typically don't have URLs
+            "title": metadata.headline or self._extract_title_from_text(cleaned_text),
+            "author": metadata.author or "Jay Rosen",
+            "publication_date": metadata.date,
+            "original_publication": metadata.publication or "Unknown Publication",
+            "publisher": metadata.publication or "Unknown",
+            "platform": "newspaper",
+            "content_type": "Article",
+            "format": "text",
+            "raw_text": cleaned_text,
+            "excerpt": self._generate_excerpt(cleaned_text),
+            "summary": "",  # To be filled by AI
+            "thematic_categories": "",  # To be filled by AI
+            "key_concepts": "",  # To be filled by AI
+            "tags": "",
+            "notes": f"OCR'd newspaper clipping. Source file: {filename}. Metadata confidence: {metadata.confidence:.0%}",
+            "verified": "false",
+            "date_processed": datetime.now().strftime("%m/%d/%Y"),
         }
 
         # Add page/section if available
         if metadata.page:
-            record['notes'] += f". Page: {metadata.page}"
+            record["notes"] += f". Page: {metadata.page}"
         if metadata.section:
-            record['notes'] += f". Section: {metadata.section}"
+            record["notes"] += f". Section: {metadata.section}"
 
         return record
 
@@ -212,7 +215,7 @@ class ClippingProcessor:
             Cleaned text
         """
         if not text:
-            return ''
+            return ""
 
         cleaned = text
 
@@ -222,21 +225,23 @@ class ClippingProcessor:
 
         # Fix smart quotes and special characters
         cleaned = cleaned.replace('"', '"').replace('"', '"')
-        cleaned = cleaned.replace(''', "'").replace(''', "'")
-        cleaned = cleaned.replace('—', '--').replace('–', '-')
+        cleaned = cleaned.replace(""", "'").replace(""", "'")
+        cleaned = cleaned.replace("—", "--").replace("–", "-")
 
         # Remove page markers and headers
-        cleaned = re.sub(r'^.*?(?:Page|PAGE)\s*\d+.*?$', '', cleaned, flags=re.MULTILINE)
+        cleaned = re.sub(
+            r"^.*?(?:Page|PAGE)\s*\d+.*?$", "", cleaned, flags=re.MULTILINE
+        )
 
         # Normalize paragraph breaks
-        cleaned = re.sub(r'\n\s*\n\s*\n+', '\n\n', cleaned)
+        cleaned = re.sub(r"\n\s*\n\s*\n+", "\n\n", cleaned)
 
         # Strip excessive whitespace
         cleaned = cleaned.strip()
 
         return cleaned
 
-    def extract_metadata(self, text: str, filename: str = '') -> ClippingMetadata:
+    def extract_metadata(self, text: str, filename: str = "") -> ClippingMetadata:
         """
         Extract metadata from clipping text and filename.
 
@@ -267,7 +272,7 @@ class ClippingProcessor:
                     break
 
         # Extract from text
-        lines = text.split('\n')
+        lines = text.split("\n")
         header_lines = lines[:20]  # Check first 20 lines for metadata
 
         for line in header_lines:
@@ -299,7 +304,7 @@ class ClippingProcessor:
 
             # Look for page number
             if not metadata.page:
-                page_match = re.search(r'(?:Page|PAGE|p\.?)\s*(\d+)', line)
+                page_match = re.search(r"(?:Page|PAGE|p\.?)\s*(\d+)", line)
                 if page_match:
                     metadata.page = page_match.group(1)
                     confidence_factors.append(0.1)
@@ -318,15 +323,25 @@ class ClippingProcessor:
         """Extract date from text, return MM/DD/YYYY format."""
         # Pattern 1: March 15, 1998
         month_match = re.search(
-            r'(January|February|March|April|May|June|July|August|September|October|November|December)\s+'
-            r'(\d{1,2}),?\s+(\d{4})',
-            text, re.IGNORECASE
+            r"(January|February|March|April|May|June|July|August|September|October|November|December)\s+"
+            r"(\d{1,2}),?\s+(\d{4})",
+            text,
+            re.IGNORECASE,
         )
         if month_match:
             month_names = {
-                'january': '01', 'february': '02', 'march': '03', 'april': '04',
-                'may': '05', 'june': '06', 'july': '07', 'august': '08',
-                'september': '09', 'october': '10', 'november': '11', 'december': '12'
+                "january": "01",
+                "february": "02",
+                "march": "03",
+                "april": "04",
+                "may": "05",
+                "june": "06",
+                "july": "07",
+                "august": "08",
+                "september": "09",
+                "october": "10",
+                "november": "11",
+                "december": "12",
             }
             month = month_names[month_match.group(1).lower()]
             day = month_match.group(2).zfill(2)
@@ -334,7 +349,7 @@ class ClippingProcessor:
             return f"{month}/{day}/{year}"
 
         # Pattern 2: 03/15/1998 or 15/03/1998
-        date_match = re.search(r'(\d{1,2})/(\d{1,2})/(\d{4})', text)
+        date_match = re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})", text)
         if date_match:
             # Assume MM/DD/YYYY for US newspapers
             return f"{date_match.group(1).zfill(2)}/{date_match.group(2).zfill(2)}/{date_match.group(3)}"
@@ -344,15 +359,15 @@ class ClippingProcessor:
         if iso_date:
             return iso_date
 
-        return ''
+        return ""
 
     def _extract_author(self, text: str) -> str:
         """Extract author from byline text."""
         # Common byline patterns
         patterns = [
-            r'^By\s+(.+?)(?:\s*[,|]|$)',
-            r'^BY\s+(.+?)(?:\s*[,|]|$)',
-            r'(?:Written by|Author:)\s*(.+?)(?:\s*[,|]|$)',
+            r"^By\s+(.+?)(?:\s*[,|]|$)",
+            r"^BY\s+(.+?)(?:\s*[,|]|$)",
+            r"(?:Written by|Author:)\s*(.+?)(?:\s*[,|]|$)",
         ]
 
         for pattern in patterns:
@@ -360,15 +375,20 @@ class ClippingProcessor:
             if match:
                 author = match.group(1).strip()
                 # Clean up common suffixes
-                author = re.sub(r'\s*(?:Staff Writer|Special to|Correspondent).*$', '', author, flags=re.I)
+                author = re.sub(
+                    r"\s*(?:Staff Writer|Special to|Correspondent).*$",
+                    "",
+                    author,
+                    flags=re.I,
+                )
                 if len(author) > 3 and len(author) < 50:
                     return author
 
-        return ''
+        return ""
 
     def _extract_headline(self, text: str) -> str:
         """Extract headline from clipping text."""
-        lines = text.split('\n')
+        lines = text.split("\n")
 
         # Skip metadata lines, find first substantive headline
         for i, line in enumerate(lines[:15]):
@@ -377,62 +397,62 @@ class ClippingProcessor:
                 continue
 
             # Skip common metadata patterns
-            if re.match(r'^(By|BY|Page|PAGE|Section|\d{1,2}/\d{1,2})', line):
+            if re.match(r"^(By|BY|Page|PAGE|Section|\d{1,2}/\d{1,2})", line):
                 continue
             if any(pub in line.lower() for pub in self.PUBLICATION_PREFIXES.keys()):
                 continue
 
             # Headline candidates: relatively short, no periods at end, possibly uppercase
             if len(line) > 10 and len(line) < 200:
-                if not line.endswith('.'):
+                if not line.endswith("."):
                     return line
                 # Allow sentence-style headlines
                 if i < 5:  # Early in document
-                    return line.rstrip('.')
+                    return line.rstrip(".")
 
-        return ''
+        return ""
 
     def _extract_title_from_text(self, text: str) -> str:
         """Generate a title from the text content."""
         # Get first meaningful sentence
-        sentences = re.split(r'[.!?]\s+', text[:500])
+        sentences = re.split(r"[.!?]\s+", text[:500])
         for sentence in sentences:
             sentence = sentence.strip()
             if len(sentence) > 20 and len(sentence) < 200:
-                return sentence[:100] + ('...' if len(sentence) > 100 else '')
+                return sentence[:100] + ("..." if len(sentence) > 100 else "")
 
         # Fallback: first N characters
-        return text[:50].strip() + '...' if len(text) > 50 else text
+        return text[:50].strip() + "..." if len(text) > 50 else text
 
     def _normalize_publication(self, name: str) -> str:
         """Normalize publication name to canonical form."""
         normalizations = {
-            'nytimes': 'The New York Times',
-            'ny times': 'The New York Times',
-            'new york times': 'The New York Times',
-            'wsj': 'The Wall Street Journal',
-            'wall street journal': 'The Wall Street Journal',
-            'wapo': 'The Washington Post',
-            'washington post': 'The Washington Post',
-            'lat': 'Los Angeles Times',
-            'la times': 'Los Angeles Times',
-            'los angeles times': 'Los Angeles Times',
-            'chicago tribune': 'Chicago Tribune',
-            'boston globe': 'The Boston Globe',
-            'guardian': 'The Guardian',
-            'the guardian': 'The Guardian',
-            'columbia journalism review': 'Columbia Journalism Review',
-            'american journalism review': 'American Journalism Review',
-            'editor & publisher': 'Editor & Publisher',
-            'nieman reports': 'Nieman Reports',
-            'poynter': 'Poynter',
+            "nytimes": "The New York Times",
+            "ny times": "The New York Times",
+            "new york times": "The New York Times",
+            "wsj": "The Wall Street Journal",
+            "wall street journal": "The Wall Street Journal",
+            "wapo": "The Washington Post",
+            "washington post": "The Washington Post",
+            "lat": "Los Angeles Times",
+            "la times": "Los Angeles Times",
+            "los angeles times": "Los Angeles Times",
+            "chicago tribune": "Chicago Tribune",
+            "boston globe": "The Boston Globe",
+            "guardian": "The Guardian",
+            "the guardian": "The Guardian",
+            "columbia journalism review": "Columbia Journalism Review",
+            "american journalism review": "American Journalism Review",
+            "editor & publisher": "Editor & Publisher",
+            "nieman reports": "Nieman Reports",
+            "poynter": "Poynter",
         }
         return normalizations.get(name.lower(), name.title())
 
     def _generate_id(self, publication: str) -> str:
         """Generate archive ID for a clipping."""
         # Determine prefix
-        prefix = 'CLIP'
+        prefix = "CLIP"
         for pub_name, pub_prefix in self.PUBLICATION_PREFIXES.items():
             if pub_name in publication.lower():
                 prefix = pub_prefix
@@ -448,48 +468,48 @@ class ClippingProcessor:
     def _generate_excerpt(self, text: str, length: int = 300) -> str:
         """Generate excerpt from text."""
         if not text:
-            return ''
+            return ""
 
         # Skip headline (first line), get content
-        lines = text.split('\n')
+        lines = text.split("\n")
         content_start = 1 if len(lines) > 1 else 0
-        content = '\n'.join(lines[content_start:])
+        content = "\n".join(lines[content_start:])
 
         # Get first paragraph
-        paragraphs = content.split('\n\n')
+        paragraphs = content.split("\n\n")
         excerpt = paragraphs[0] if paragraphs else content
 
         return base.truncate_on_word_boundary(excerpt, length).strip()
 
     def _process_text_file(self, file_path: Path) -> Optional[Dict]:
         """Process a text file containing OCR output."""
-        with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
+        with open(file_path, "r", encoding="utf-8", errors="replace") as f:
             raw_text = f.read()
 
         return self.process_text(raw_text, file_path.name)
 
     def _process_json_file(self, file_path: Path) -> Optional[Dict]:
         """Process a JSON file with pre-extracted metadata."""
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         # If it's already in our format, just clean and validate
-        if 'raw_text' in data:
-            data['raw_text'] = self.clean_ocr_text(data['raw_text'])
-            if not data.get('id'):
-                data['id'] = self._generate_id(data.get('original_publication', ''))
+        if "raw_text" in data:
+            data["raw_text"] = self.clean_ocr_text(data["raw_text"])
+            if not data.get("id"):
+                data["id"] = self._generate_id(data.get("original_publication", ""))
             return data
 
         # Otherwise, treat raw_text or text field as OCR output
-        raw_text = data.get('raw_text', data.get('text', data.get('content', '')))
+        raw_text = data.get("raw_text", data.get("text", data.get("content", "")))
         return self.process_text(raw_text, file_path.name)
 
     def get_stats(self) -> Dict:
         """Get processing statistics."""
         return {
-            'processed': self.processed_count,
-            'errors': self.error_count,
-            'publications': dict(self.publication_counters)
+            "processed": self.processed_count,
+            "errors": self.error_count,
+            "publications": dict(self.publication_counters),
         }
 
 
@@ -504,11 +524,13 @@ def main():
     """
     import argparse
 
-    parser = argparse.ArgumentParser(description='Process newspaper clippings')
-    parser.add_argument('directory', nargs='?', help='Directory containing clipping files')
-    parser.add_argument('--file', '-f', help='Process a single file')
-    parser.add_argument('--output', '-o', help='Output JSON file path')
-    parser.add_argument('--text', help='Process raw text directly')
+    parser = argparse.ArgumentParser(description="Process newspaper clippings")
+    parser.add_argument(
+        "directory", nargs="?", help="Directory containing clipping files"
+    )
+    parser.add_argument("--file", "-f", help="Process a single file")
+    parser.add_argument("--output", "-o", help="Output JSON file path")
+    parser.add_argument("--text", help="Process raw text directly")
 
     args = parser.parse_args()
 

@@ -5,6 +5,7 @@ the path to a created .pdf and the file exists. This held before the basic-
 fallback removal (the enhanced formatter was already the code path taken) and
 must hold after.
 """
+
 import os
 
 from rosen_scraper import pdf_generator

@@ -267,7 +267,9 @@ def test_batch_skips_malformed_third_party_records(tmp_path, kind):
     assert csv_path.read_bytes().startswith(original)
     assert [row["id"] for row in _read_rows(csv_path)] == ["BSKY-03435", "BSKY-03436"]
     assert result.report["counts"] == {"captured": 1, "admitted": 1, "context_only": 0}
-    assert [source["uri"] for source in result.report["observed_sources"]] == [jay["post"]["uri"]]
+    assert [source["uri"] for source in result.report["observed_sources"]] == [
+        jay["post"]["uri"]
+    ]
     assert datetime.datetime.fromisoformat(result.report["newest_source_time"]) == (
         datetime.datetime(2026, 10, 15, 12, 0, tzinfo=datetime.timezone.utc)
     )

@@ -20,8 +20,9 @@ load_dotenv()
 # known_entities.json; --write-canonical opts into overwriting it (after
 # backing the current file up to known_entities.json.bak).
 BACKEND_DIR = Path(__file__).resolve().parents[2]
-KNOWN_ENTITIES_FILE = BACKEND_DIR / 'known_entities.json'
-DISCOVERED_FILE = BACKEND_DIR / 'known_entities.discovered.json'
+KNOWN_ENTITIES_FILE = BACKEND_DIR / "known_entities.json"
+DISCOVERED_FILE = BACKEND_DIR / "known_entities.discovered.json"
+
 
 def main(write_canonical=False):
     """Rebuild the known-entities schema from the sheet.
@@ -32,7 +33,9 @@ def main(write_canonical=False):
     """
     # --- 1. Connect to Google Sheets ---
     try:
-        credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+        credentials_filename = os.environ.get(
+            "GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json"
+        )
         credentials_path = BACKEND_DIR / credentials_filename
         gc = gspread.service_account(filename=str(credentials_path))
         sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
@@ -46,7 +49,7 @@ def main(write_canonical=False):
     if len(all_values) < 2:
         print("No data to process.")
         return
-    
+
     header = all_values[0]
     data = all_values[1:301]
 
@@ -56,43 +59,48 @@ def main(write_canonical=False):
 
     for row in data:
         row_data = dict(zip(header, row))
-        
-        url = row_data.get('url')
+
+        url = row_data.get("url")
         if not url:
             continue
 
         domain = urlparse(url).netloc
-        publisher = row_data.get('publisher')
-        platform = row_data.get('platform')
+        publisher = row_data.get("publisher")
+        platform = row_data.get("platform")
 
-        if publisher and publisher != 'Not Found':
+        if publisher and publisher != "Not Found":
             if publisher not in publications:
-                publications[publisher] = {'aliases': []}
-            if domain not in publications[publisher]['aliases']:
-                publications[publisher]['aliases'].append(domain)
+                publications[publisher] = {"aliases": []}
+            if domain not in publications[publisher]["aliases"]:
+                publications[publisher]["aliases"].append(domain)
 
-        if platform and platform != 'Not Found':
+        if platform and platform != "Not Found":
             if platform not in platforms:
-                platforms[platform] = {'aliases': []}
-            if domain not in platforms[platform]['aliases']:
-                platforms[platform]['aliases'].append(domain)
+                platforms[platform] = {"aliases": []}
+            if domain not in platforms[platform]["aliases"]:
+                platforms[platform]["aliases"].append(domain)
 
     # --- 4. Create and Write Schema ---
     known_entities = {
-        'publications': [{'correct_name': k, 'aliases': v['aliases']} for k, v in publications.items()],
-        'platforms': [{'correct_name': k, 'aliases': v['aliases']} for k, v in platforms.items()]
+        "publications": [
+            {"correct_name": k, "aliases": v["aliases"]}
+            for k, v in publications.items()
+        ],
+        "platforms": [
+            {"correct_name": k, "aliases": v["aliases"]} for k, v in platforms.items()
+        ],
     }
 
     if write_canonical:
         # Back up the curated file before overwriting, so a bad rebuild is recoverable.
         if KNOWN_ENTITIES_FILE.exists():
-            backup = KNOWN_ENTITIES_FILE.with_name(KNOWN_ENTITIES_FILE.name + '.bak')
+            backup = KNOWN_ENTITIES_FILE.with_name(KNOWN_ENTITIES_FILE.name + ".bak")
             shutil.copy2(KNOWN_ENTITIES_FILE, backup)
         target = KNOWN_ENTITIES_FILE
     else:
         target = DISCOVERED_FILE
 
-    with open(target, 'w', encoding='utf-8') as f:
+    with open(target, "w", encoding="utf-8") as f:
         json.dump(known_entities, f, indent=2)
 
     print(f"Successfully built the schema and wrote it to {target.name}.")
@@ -101,6 +109,7 @@ def main(write_canonical=False):
             "This is a staging file. Review it, then re-run with --write-canonical "
             "to update the curated known_entities.json (a .bak backup is kept)."
         )
+
 
 if __name__ == "__main__":
     import argparse
@@ -112,7 +121,7 @@ if __name__ == "__main__":
         "--write-canonical",
         action="store_true",
         help="Overwrite the curated known_entities.json (a .bak backup is kept). "
-             "The default writes to known_entities.discovered.json for review.",
+        "The default writes to known_entities.discovered.json for review.",
     )
     args = parser.parse_args()
     main(write_canonical=args.write_canonical)

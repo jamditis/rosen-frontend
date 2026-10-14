@@ -31,16 +31,30 @@ ENTITIES_CSV = DATA_DIR / "extracted_entities.csv"
 RELATIONSHIPS_CSV = DATA_DIR / "extracted_relationships.csv"
 
 ENTITY_FIELDS = [
-    "entity_id", "entity_type", "entity_name", "normalized_name",
-    "role_or_description", "affiliation", "prominence_score",
-    "first_mention_record_id", "total_mentions", "related_entities", "notes"
+    "entity_id",
+    "entity_type",
+    "entity_name",
+    "normalized_name",
+    "role_or_description",
+    "affiliation",
+    "prominence_score",
+    "first_mention_record_id",
+    "total_mentions",
+    "related_entities",
+    "notes",
 ]
 
 REL_FIELDS = [
-    "relationship_id", "source_record_id", "source_entity_id",
-    "source_entity_name", "relationship_type", "target_entity_id",
-    "target_entity_name", "context_snippet", "confidence_score",
-    "extracted_date"
+    "relationship_id",
+    "source_record_id",
+    "source_entity_id",
+    "source_entity_name",
+    "relationship_type",
+    "target_entity_id",
+    "target_entity_name",
+    "context_snippet",
+    "confidence_score",
+    "extracted_date",
 ]
 
 
@@ -52,7 +66,11 @@ def normalize_name(name: str) -> str:
     # Remove leading "the "
     s = re.sub(r"^the\s+", "", s)
     # Remove trailing parentheticals like (concept), (book), (organization)
-    s = re.sub(r"\s*\((?:concept|book|organization|person|work|event|movement|journal|magazine|newspaper|blog|website|term|idea|theory|phrase|slogan|principle|model|framework|approach|method|practice|project|program|initiative|campaign|film|tv show|podcast|documentary|report|article|essay|column|speech|lecture|talk|paper|study|survey|poll|award|prize|index|platform|app|tool|service|network|group|coalition|alliance|consortium|institute|center|foundation|association|society|committee|board|council|agency|department|bureau|office|division|branch|unit|team|section|desk)s?\)\s*$", "", s)
+    s = re.sub(
+        r"\s*\((?:concept|book|organization|person|work|event|movement|journal|magazine|newspaper|blog|website|term|idea|theory|phrase|slogan|principle|model|framework|approach|method|practice|project|program|initiative|campaign|film|tv show|podcast|documentary|report|article|essay|column|speech|lecture|talk|paper|study|survey|poll|award|prize|index|platform|app|tool|service|network|group|coalition|alliance|consortium|institute|center|foundation|association|society|committee|board|council|agency|department|bureau|office|division|branch|unit|team|section|desk)s?\)\s*$",
+        "",
+        s,
+    )
     # Collapse multiple spaces
     s = re.sub(r"\s+", " ", s)
     return s.strip()
@@ -72,7 +90,7 @@ def is_junk_entity(entity: dict) -> tuple[bool, str]:
         return True, "parsing artifact (short with trailing quote)"
 
     # Names that are just punctuation or whitespace
-    if not re.sub(r'[^\w]', '', name):
+    if not re.sub(r"[^\w]", "", name):
         return True, "empty/punctuation-only name"
 
     # Overly long names (full sentences, not real entity names)
@@ -217,7 +235,9 @@ def deduplicate(dry_run: bool = False):
         print("  Top 10 duplicate groups:")
         for (norm, etype), group in dup_groups[:10]:
             ids = [e["entity_id"] for e in group]
-            print(f"    \"{norm}\" ({etype}): {len(group)} entities -> {ids[0]} [IDs: {', '.join(ids)}]")
+            print(
+                f"    \"{norm}\" ({etype}): {len(group)} entities -> {ids[0]} [IDs: {', '.join(ids)}]"
+            )
         print()
 
     # ── Step 4: Cross-type merge ──────────────────────────────
@@ -231,8 +251,12 @@ def deduplicate(dry_run: bool = False):
 
     # Type priority: Concept > Person > Organization > Work > Event > Location
     TYPE_PRIORITY = {
-        "Concept": 0, "Person": 1, "Organization": 2,
-        "Work": 3, "Event": 4, "Location": 5
+        "Concept": 0,
+        "Person": 1,
+        "Organization": 2,
+        "Work": 3,
+        "Event": 4,
+        "Location": 5,
     }
 
     for norm_name, group in name_groups.items():
@@ -323,7 +347,7 @@ def deduplicate(dry_run: bool = False):
             rel["source_record_id"],
             rel["source_entity_id"],
             rel["target_entity_id"],
-            rel["relationship_type"]
+            rel["relationship_type"],
         )
         if key in seen_rels:
             dup_rel_count += 1
@@ -358,16 +382,22 @@ def deduplicate(dry_run: bool = False):
     print(f"  Updated totalMentions for {mentions_updated} entities")
 
     # Show top entities by mention count
-    by_mentions = sorted(final_entities, key=lambda e: int(e["total_mentions"] or 1), reverse=True)
+    by_mentions = sorted(
+        final_entities, key=lambda e: int(e["total_mentions"] or 1), reverse=True
+    )
     print()
     print("  Top 20 entities by cross-record mentions:")
     for e in by_mentions[:20]:
         mentions = int(e["total_mentions"])
-        print(f"    {e['entity_name']} ({e['entity_type']}): {mentions} records -{e['entity_id']}")
+        print(
+            f"    {e['entity_name']} ({e['entity_type']}): {mentions} records -{e['entity_id']}"
+        )
     print()
 
     # Count entities with >1 mention (cross-record connections)
-    multi_mention = sum(1 for e in final_entities if int(e.get("total_mentions", 1)) > 1)
+    multi_mention = sum(
+        1 for e in final_entities if int(e.get("total_mentions", 1)) > 1
+    )
     single_mention = len(final_entities) - multi_mention
     print(f"  Entities appearing in >1 record: {multi_mention}")
     print(f"  Entities appearing in 1 record: {single_mention}")
@@ -419,14 +449,20 @@ def deduplicate(dry_run: bool = False):
     print("=" * 60)
     print("Summary")
     print("=" * 60)
-    print(f"  Entities:  {len(entities)} -> {len(final_entities)} ({len(entities) - len(final_entities)} removed)")
+    print(
+        f"  Entities:  {len(entities)} -> {len(final_entities)} ({len(entities) - len(final_entities)} removed)"
+    )
     print(f"    Junk removed:      {len(junk_ids)}")
     print(f"    Same-type merges:  {merge_count}")
     print(f"    Cross-type merges: {cross_merge_count}")
-    print(f"  Relationships: {len(relationships)} -> {len(deduped_rels)} ({len(relationships) - len(deduped_rels)} removed)")
+    print(
+        f"  Relationships: {len(relationships)} -> {len(deduped_rels)} ({len(relationships) - len(deduped_rels)} removed)"
+    )
     print(f"    Junk refs removed: {removed_junk_refs}")
     print(f"    Duplicates removed: {dup_rel_count}")
-    print(f"  Cross-record entities: {multi_mention} ({multi_mention / len(final_entities) * 100:.1f}%)")
+    print(
+        f"  Cross-record entities: {multi_mention} ({multi_mention / len(final_entities) * 100:.1f}%)"
+    )
     print()
 
 

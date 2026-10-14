@@ -34,32 +34,34 @@ _BACKEND = pathlib.Path(__file__).resolve().parents[1]
 # Every artifact a data-only deploy must ship. Keep in step with the three tuples
 # below and with the exporter (data/export-archive-data.js). archive-data.json is
 # the full combined fallback; the rest are the split / lazily-fetched payloads.
-EXPECTED_ARTIFACTS = frozenset({
-    "archive-data.json",
-    "archive-core.json",
-    "archive-details.json",
-    "archive-entities.json",
-    "archive-analytics.json",
-    "search-index.json",
-    "social-search-index.json",
-    "relationship-adjacency-0.json",
-    "relationship-adjacency-1.json",
-    "relationship-adjacency-2.json",
-    "relationship-adjacency-3.json",
-    "relationship-adjacency-4.json",
-    "relationship-adjacency-5.json",
-    "relationship-adjacency-6.json",
-    "relationship-adjacency-7.json",
-    "relationship-adjacency-8.json",
-    "relationship-adjacency-9.json",
-    "relationship-adjacency-a.json",
-    "relationship-adjacency-b.json",
-    "relationship-adjacency-c.json",
-    "relationship-adjacency-d.json",
-    "relationship-adjacency-e.json",
-    "relationship-adjacency-f.json",
-    "relationship-adjacency-manifest.json",
-})
+EXPECTED_ARTIFACTS = frozenset(
+    {
+        "archive-data.json",
+        "archive-core.json",
+        "archive-details.json",
+        "archive-entities.json",
+        "archive-analytics.json",
+        "search-index.json",
+        "social-search-index.json",
+        "relationship-adjacency-0.json",
+        "relationship-adjacency-1.json",
+        "relationship-adjacency-2.json",
+        "relationship-adjacency-3.json",
+        "relationship-adjacency-4.json",
+        "relationship-adjacency-5.json",
+        "relationship-adjacency-6.json",
+        "relationship-adjacency-7.json",
+        "relationship-adjacency-8.json",
+        "relationship-adjacency-9.json",
+        "relationship-adjacency-a.json",
+        "relationship-adjacency-b.json",
+        "relationship-adjacency-c.json",
+        "relationship-adjacency-d.json",
+        "relationship-adjacency-e.json",
+        "relationship-adjacency-f.json",
+        "relationship-adjacency-manifest.json",
+    }
+)
 
 _CANONICAL_PUBLISH_LISTS = (
     ("submission_runtime/artifacts.py", "DATA_DEPLOY_JSON_FILES"),
@@ -108,7 +110,7 @@ def _extract_tuple(rel_path: str, name: str) -> list:
         elif text[j] == ")":
             depth -= 1
             if depth == 0:
-                body = text[open_idx + 1:j]
+                body = text[open_idx + 1 : j]
                 return re.findall(r"""['"]([^'"]+)['"]""", body)
     raise AssertionError(f"{rel_path}: unbalanced parens for `{name}`")
 
@@ -143,10 +145,12 @@ def test_parsers_find_nonempty_lists():
 def test_python_publish_paths_alias_the_runtime_artifact_list():
     for rel, name in _PYTHON_ALIAS_LISTS:
         source = _strip_comments((_BACKEND / rel).read_text(encoding="utf-8"))
-        assert "DATA_DEPLOY_JSON_FILES" in source, (
-            f"{rel} should import DATA_DEPLOY_JSON_FILES from submission_runtime.artifacts"
-        )
-        assert re.search(rf"{re.escape(name)}\s*=\s*DATA_DEPLOY_JSON_FILES\b", source), (
+        assert (
+            "DATA_DEPLOY_JSON_FILES" in source
+        ), f"{rel} should import DATA_DEPLOY_JSON_FILES from submission_runtime.artifacts"
+        assert re.search(
+            rf"{re.escape(name)}\s*=\s*DATA_DEPLOY_JSON_FILES\b", source
+        ), (
             f"{rel}:{name} should alias DATA_DEPLOY_JSON_FILES instead of "
             "declaring another artifact tuple"
         )

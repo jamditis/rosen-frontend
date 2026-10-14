@@ -64,8 +64,8 @@ def staging_dir(tmp_path):
 
 
 _LIVE_INDEX = (
-    '<!doctype html><html><head>'
-    '<title>Live archive</title>'
+    "<!doctype html><html><head>"
+    "<title>Live archive</title>"
     '<meta name="description" content="Live description" />'
     '<link rel="canonical" href="https://pressthink.org/j/rosen-archive/" />'
     '<meta property="og:title" content="Live archive" />'
@@ -238,9 +238,9 @@ class TestSuccessfulPush:
         # The destination of every upload ends in .tmp — atomic write hinge.
         for call in mock_sftp.put.call_args_list:
             args = call.args
-            assert args[1].endswith(".tmp"), (
-                f"upload must land in .tmp first; got {args[1]!r}"
-            )
+            assert args[1].endswith(
+                ".tmp"
+            ), f"upload must land in .tmp first; got {args[1]!r}"
 
     def test_falls_back_to_plain_rename_without_posix(self, staging_dir, monkeypatch):
         """An SFTP server without posix_rename should not break the push."""
@@ -262,19 +262,26 @@ class TestRecordShellPush:
     """Data-only deploys keep the affected record shell in the same transaction."""
 
     def test_uploads_record_shell_after_json_using_live_template(
-            self, staging_dir, monkeypatch):
+        self, staging_dir, monkeypatch
+    ):
         _set_env(monkeypatch)
-        (staging_dir / 'archive-data.json').write_text(json.dumps({
-            'records': [{
-                'id': 'RECORD-00001',
-                'title': 'Fresh title',
-                'summary': 'Fresh summary',
-                'type': 'article',
-            }],
-        }))
+        (staging_dir / "archive-data.json").write_text(
+            json.dumps(
+                {
+                    "records": [
+                        {
+                            "id": "RECORD-00001",
+                            "title": "Fresh title",
+                            "summary": "Fresh summary",
+                            "type": "article",
+                        }
+                    ],
+                }
+            )
+        )
         captured = {}
 
-        with patch('paramiko.SSHClient') as mock_client_cls:
+        with patch("paramiko.SSHClient") as mock_client_cls:
             mock_client = MagicMock()
             mock_sftp = MagicMock()
             remote_file = MagicMock()
@@ -282,36 +289,42 @@ class TestRecordShellPush:
             mock_sftp.open.return_value.__enter__.return_value = remote_file
 
             def _capture(local, remote):
-                if remote.endswith('/r/RECORD-00001.html.tmp'):
-                    captured['shell'] = pathlib.Path(local).read_text()
+                if remote.endswith("/r/RECORD-00001.html.tmp"):
+                    captured["shell"] = pathlib.Path(local).read_text()
 
             mock_sftp.put.side_effect = _capture
             mock_client.open_sftp.return_value = mock_sftp
             mock_client_cls.return_value = mock_client
 
             result = sftp_push.push_to_production(
-                staging_dir, record_ids=('RECORD-00001',))
+                staging_dir, record_ids=("RECORD-00001",)
+            )
 
-        assert result['ok'] is True
+        assert result["ok"] is True
         destinations = [call.args[1] for call in mock_sftp.put.call_args_list]
-        assert destinations[-1].endswith('/rosen-archive/r/RECORD-00001.html.tmp')
-        assert all('/data/' in path for path in destinations[:-1])
-        assert 'Fresh title' in captured['shell']
-        assert './frontend/index.js?v=live' in captured['shell']
-        assert mock_sftp.open.call_args.args[0].endswith('/rosen-archive/index.html')
+        assert destinations[-1].endswith("/rosen-archive/r/RECORD-00001.html.tmp")
+        assert all("/data/" in path for path in destinations[:-1])
+        assert "Fresh title" in captured["shell"]
+        assert "./frontend/index.js?v=live" in captured["shell"]
+        assert mock_sftp.open.call_args.args[0].endswith("/rosen-archive/index.html")
 
-    def test_social_record_removes_obsolete_shell(self, staging_dir,
-                                                   monkeypatch):
+    def test_social_record_removes_obsolete_shell(self, staging_dir, monkeypatch):
         _set_env(monkeypatch)
-        (staging_dir / 'archive-data.json').write_text(json.dumps({
-            'records': [{
-                'id': 'BSKY-00001',
-                'title': 'Social post',
-                'type': 'social',
-            }],
-        }))
+        (staging_dir / "archive-data.json").write_text(
+            json.dumps(
+                {
+                    "records": [
+                        {
+                            "id": "BSKY-00001",
+                            "title": "Social post",
+                            "type": "social",
+                        }
+                    ],
+                }
+            )
+        )
 
-        with patch('paramiko.SSHClient') as mock_client_cls:
+        with patch("paramiko.SSHClient") as mock_client_cls:
             mock_client = MagicMock()
             mock_sftp = MagicMock()
             remote_file = MagicMock()
@@ -321,24 +334,33 @@ class TestRecordShellPush:
             mock_client_cls.return_value = mock_client
 
             result = sftp_push.push_to_production(
-                staging_dir, record_ids=('BSKY-00001',))
+                staging_dir, record_ids=("BSKY-00001",)
+            )
 
-        assert result['ok'] is True
+        assert result["ok"] is True
         mock_sftp.remove.assert_called_once_with(
-            '/home/rosen/public_html/j/rosen-archive/r/BSKY-00001.html')
+            "/home/rosen/public_html/j/rosen-archive/r/BSKY-00001.html"
+        )
 
     def test_missing_requested_record_fails_without_deleting_shell(
-            self, staging_dir, monkeypatch):
+        self, staging_dir, monkeypatch
+    ):
         _set_env(monkeypatch)
-        (staging_dir / 'archive-data.json').write_text(json.dumps({
-            'records': [{
-                'id': 'RECORD-00002',
-                'title': 'Different record',
-                'type': 'article',
-            }],
-        }))
+        (staging_dir / "archive-data.json").write_text(
+            json.dumps(
+                {
+                    "records": [
+                        {
+                            "id": "RECORD-00002",
+                            "title": "Different record",
+                            "type": "article",
+                        }
+                    ],
+                }
+            )
+        )
 
-        with patch('paramiko.SSHClient') as mock_client_cls:
+        with patch("paramiko.SSHClient") as mock_client_cls:
             mock_client = MagicMock()
             mock_sftp = MagicMock()
             remote_file = MagicMock()
@@ -348,77 +370,93 @@ class TestRecordShellPush:
             mock_client_cls.return_value = mock_client
 
             result = sftp_push.push_to_production(
-                staging_dir, record_ids=('RECORD-00001',))
+                staging_dir, record_ids=("RECORD-00001",)
+            )
 
-        assert result['ok'] is False
-        assert 'RECORD-00001' in result['error']
+        assert result["ok"] is False
+        assert "RECORD-00001" in result["error"]
         mock_sftp.put.assert_not_called()
         mock_sftp.remove.assert_not_called()
 
     def test_rejects_record_shell_push_outside_data_directory(
-            self, staging_dir, monkeypatch):
-        _set_env(monkeypatch, ROSEN_SFTP_REMOTE_PATH='/srv/archive-json')
+        self, staging_dir, monkeypatch
+    ):
+        _set_env(monkeypatch, ROSEN_SFTP_REMOTE_PATH="/srv/archive-json")
 
-        result = sftp_push.push_to_production(
-            staging_dir, record_ids=('RECORD-00001',))
+        result = sftp_push.push_to_production(staging_dir, record_ids=("RECORD-00001",))
 
-        assert result['ok'] is False
-        assert 'data directory' in result['error']
+        assert result["ok"] is False
+        assert "data directory" in result["error"]
 
     def test_template_failure_returns_error_before_any_upload(
-            self, staging_dir, monkeypatch):
+        self, staging_dir, monkeypatch
+    ):
         _set_env(monkeypatch)
-        (staging_dir / 'archive-data.json').write_text(json.dumps({
-            'records': [{
-                'id': 'RECORD-00001',
-                'title': 'Fresh title',
-                'type': 'article',
-            }],
-        }))
+        (staging_dir / "archive-data.json").write_text(
+            json.dumps(
+                {
+                    "records": [
+                        {
+                            "id": "RECORD-00001",
+                            "title": "Fresh title",
+                            "type": "article",
+                        }
+                    ],
+                }
+            )
+        )
 
-        with patch('paramiko.SSHClient') as mock_client_cls:
+        with patch("paramiko.SSHClient") as mock_client_cls:
             mock_client = MagicMock()
             mock_sftp = MagicMock()
             remote_file = MagicMock()
-            remote_file.read.return_value = '<html>template drifted</html>'
+            remote_file.read.return_value = "<html>template drifted</html>"
             mock_sftp.open.return_value.__enter__.return_value = remote_file
             mock_client.open_sftp.return_value = mock_sftp
             mock_client_cls.return_value = mock_client
 
             result = sftp_push.push_to_production(
-                staging_dir, record_ids=('RECORD-00001',))
+                staging_dir, record_ids=("RECORD-00001",)
+            )
 
-        assert result['ok'] is False
-        assert 'record shell' in result['error'].lower()
+        assert result["ok"] is False
+        assert "record shell" in result["error"].lower()
         mock_sftp.put.assert_not_called()
 
     def test_obsolete_shell_permission_error_fails_the_push(
-            self, staging_dir, monkeypatch):
+        self, staging_dir, monkeypatch
+    ):
         _set_env(monkeypatch)
-        (staging_dir / 'archive-data.json').write_text(json.dumps({
-            'records': [{
-                'id': 'BSKY-00001',
-                'title': 'Social post',
-                'type': 'social',
-            }],
-        }))
+        (staging_dir / "archive-data.json").write_text(
+            json.dumps(
+                {
+                    "records": [
+                        {
+                            "id": "BSKY-00001",
+                            "title": "Social post",
+                            "type": "social",
+                        }
+                    ],
+                }
+            )
+        )
 
-        with patch('paramiko.SSHClient') as mock_client_cls:
+        with patch("paramiko.SSHClient") as mock_client_cls:
             mock_client = MagicMock()
             mock_sftp = MagicMock()
             remote_file = MagicMock()
             remote_file.read.return_value = _LIVE_INDEX
             mock_sftp.open.return_value.__enter__.return_value = remote_file
-            mock_sftp.remove.side_effect = PermissionError(
-                13, 'permission denied')
+            mock_sftp.remove.side_effect = PermissionError(13, "permission denied")
             mock_client.open_sftp.return_value = mock_sftp
             mock_client_cls.return_value = mock_client
 
             result = sftp_push.push_to_production(
-                staging_dir, record_ids=('BSKY-00001',))
+                staging_dir, record_ids=("BSKY-00001",)
+            )
 
-        assert result['ok'] is False
-        assert 'permission denied' in result['error']
+        assert result["ok"] is False
+        assert "permission denied" in result["error"]
 
 
 class TestAuthMode:

@@ -20,18 +20,18 @@ from collections import defaultdict
 
 def load_thread_mappings(json_path: Path) -> Dict[str, Dict]:
     """Load thread mapping JSON."""
-    with open(json_path, 'r', encoding='utf-8') as f:
+    with open(json_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def load_social_posts(csv_path: Path) -> Dict[str, Dict]:
     """Load social posts CSV indexed by ID."""
     posts = {}
-    with open(csv_path, 'r', encoding='utf-8') as f:
+    with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            if row.get('platform') == 'Bluesky':
-                posts[row['id']] = row
+            if row.get("platform") == "Bluesky":
+                posts[row["id"]] = row
     return posts
 
 
@@ -54,14 +54,16 @@ def get_thread_posts(thread_map: Dict, root_id: str) -> List[Dict]:
             return
 
         info = thread_map[post_id]
-        posts.append({
-            'id': post_id,
-            'depth': info['depth'],
-            'parent_id': info.get('parent_id'),
-            'children': info.get('children', [])
-        })
+        posts.append(
+            {
+                "id": post_id,
+                "depth": info["depth"],
+                "parent_id": info.get("parent_id"),
+                "children": info.get("children", []),
+            }
+        )
 
-        for child_id in info.get('children', []):
+        for child_id in info.get("children", []):
             add_post_and_children(child_id)
 
     add_post_and_children(root_id)
@@ -74,7 +76,7 @@ def create_thread_record(
     thread_posts: List[Dict],
     social_posts: Dict,
     rank: int,
-    max_depth: int
+    max_depth: int,
 ) -> Dict:
     """
     Create an archive record for a thread.
@@ -93,18 +95,18 @@ def create_thread_record(
     # Build thread content for summary
     thread_content_parts = []
     for post_info in thread_posts[:10]:  # First 10 posts
-        post = social_posts.get(post_info['id'])
+        post = social_posts.get(post_info["id"])
         if post:
-            content = post.get('content', '').strip()
+            content = post.get("content", "").strip()
             if content:
                 thread_content_parts.append(content)
 
-    full_thread_text = '\n\n'.join(thread_content_parts)
+    full_thread_text = "\n\n".join(thread_content_parts)
 
     # Extract first post as title
-    title = root_post.get('content', '')[:100]
-    if len(root_post.get('content', '')) > 100:
-        title += '...'
+    title = root_post.get("content", "")[:100]
+    if len(root_post.get("content", "")) > 100:
+        title += "..."
 
     # Create summary
     summary = f"A {len(thread_posts)}-post Bluesky thread by Jay Rosen. "
@@ -114,56 +116,58 @@ def create_thread_record(
 
     # Build structured thread data for modal display
     thread_data = {
-        'thread_id': root_id,
-        'total_posts': len(thread_posts),
-        'max_depth': max_depth,
-        'posts': []
+        "thread_id": root_id,
+        "total_posts": len(thread_posts),
+        "max_depth": max_depth,
+        "posts": [],
     }
 
     for i, post_info in enumerate(thread_posts):
-        post = social_posts.get(post_info['id'])
+        post = social_posts.get(post_info["id"])
         if post:
-            thread_data['posts'].append({
-                'number': i + 1,
-                'id': post['id'],
-                'content': post.get('content', ''),
-                'date': post.get('publication_date', ''),
-                'url': post.get('url', ''),
-                'depth': post_info['depth'],
-                'parent_id': post_info.get('parent_id')
-            })
+            thread_data["posts"].append(
+                {
+                    "number": i + 1,
+                    "id": post["id"],
+                    "content": post.get("content", ""),
+                    "date": post.get("publication_date", ""),
+                    "url": post.get("url", ""),
+                    "depth": post_info["depth"],
+                    "parent_id": post_info.get("parent_id"),
+                }
+            )
 
     # Calculate word count
     word_count = len(full_thread_text.split())
 
     # Create archive record
     record = {
-        'id': f'THREAD-{str(rank).zfill(5)}',
-        'collection_id': 'PUBLIC',
-        'title': f'[Bluesky Thread] {title}',
-        'author': 'Jay Rosen',
-        'publication': 'Bluesky',
-        'publication_date': root_post.get('publication_date', ''),
-        'url': root_post.get('url', ''),
-        'summary': summary,
-        'content_type': 'Social Media Thread',
-        'scope': 'Thread',
-        'format': 'Social Media',
-        'word_count': str(word_count),
-        'era': root_post.get('era', ''),
-        'categories': 'Social Media',
-        'tags': f'Bluesky,Thread,{len(thread_posts)} posts',
-        'key_concepts': '',
-        'platforms': 'Bluesky',
-        'copyright': '',
-        'verified': 'Yes',
-        'date_added': datetime.now().strftime("%Y-%m-%d"),
-        'date_modified': datetime.now().strftime("%Y-%m-%d"),
-        'date_processed': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        'notes': f'Major Bluesky thread (rank #{rank}). Contains {len(thread_posts)} posts with max depth {max_depth}.',
-        'raw_text': full_thread_text,
-        'quote': thread_content_parts[0][:300] if thread_content_parts else '',
-        'thread_data': json.dumps(thread_data)  # Structured data for modal
+        "id": f"THREAD-{str(rank).zfill(5)}",
+        "collection_id": "PUBLIC",
+        "title": f"[Bluesky Thread] {title}",
+        "author": "Jay Rosen",
+        "publication": "Bluesky",
+        "publication_date": root_post.get("publication_date", ""),
+        "url": root_post.get("url", ""),
+        "summary": summary,
+        "content_type": "Social Media Thread",
+        "scope": "Thread",
+        "format": "Social Media",
+        "word_count": str(word_count),
+        "era": root_post.get("era", ""),
+        "categories": "Social Media",
+        "tags": f"Bluesky,Thread,{len(thread_posts)} posts",
+        "key_concepts": "",
+        "platforms": "Bluesky",
+        "copyright": "",
+        "verified": "Yes",
+        "date_added": datetime.now().strftime("%Y-%m-%d"),
+        "date_modified": datetime.now().strftime("%Y-%m-%d"),
+        "date_processed": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "notes": f"Major Bluesky thread (rank #{rank}). Contains {len(thread_posts)} posts with max depth {max_depth}.",
+        "raw_text": full_thread_text,
+        "quote": thread_content_parts[0][:300] if thread_content_parts else "",
+        "thread_data": json.dumps(thread_data),  # Structured data for modal
     }
 
     return record
@@ -201,10 +205,10 @@ def generate_thread_records(output_csv: Path, thread_json: Path):
     thread_max_depth = {}
 
     for info in thread_map.values():
-        root_id = info['thread_root_id']
+        root_id = info["thread_root_id"]
         thread_sizes[root_id] += 1
         current_max = thread_max_depth.get(root_id, 0)
-        thread_max_depth[root_id] = max(current_max, info['depth'])
+        thread_max_depth[root_id] = max(current_max, info["depth"])
 
     top_threads = sorted(thread_sizes.items(), key=lambda x: x[1], reverse=True)[:10]
     print(f"✓ Identified top {len(top_threads)} threads")
@@ -229,21 +233,23 @@ def generate_thread_records(output_csv: Path, thread_json: Path):
         )
 
         records.append(record)
-        thread_details.append({
-            'thread_id': f'THREAD-{str(rank).zfill(5)}',
-            'root_bsky_id': root_id,
-            'size': size,
-            'max_depth': max_depth,
-            'date': root_post.get('publication_date', ''),
-            'url': root_post.get('url', '')
-        })
+        thread_details.append(
+            {
+                "thread_id": f"THREAD-{str(rank).zfill(5)}",
+                "root_bsky_id": root_id,
+                "size": size,
+                "max_depth": max_depth,
+                "date": root_post.get("publication_date", ""),
+                "url": root_post.get("url", ""),
+            }
+        )
 
         print(f"✓ Created THREAD-{str(rank).zfill(5)}: {size} posts, depth {max_depth}")
 
     # Write CSV
     if records:
         fieldnames = list(records[0].keys())
-        with open(output_csv, 'w', newline='', encoding='utf-8') as f:
+        with open(output_csv, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(records)
@@ -252,7 +258,7 @@ def generate_thread_records(output_csv: Path, thread_json: Path):
         print(f"✓ Saved {len(records)} thread records: {output_csv.name}")
 
     # Write thread details JSON
-    with open(thread_json, 'w', encoding='utf-8') as f:
+    with open(thread_json, "w", encoding="utf-8") as f:
         json.dump(thread_details, f, indent=2)
 
     print(f"✓ Saved thread details: {thread_json.name}")
@@ -288,4 +294,5 @@ def main():
 
 if __name__ == "__main__":
     import sys
+
     sys.exit(main())

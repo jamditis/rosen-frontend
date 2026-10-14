@@ -34,7 +34,9 @@ def test_legacy_flask_server_has_no_active_runtime_surface():
         _PROJECT_ROOT / "automation" / "systemd" / "rosen-submission.service",
     ]
 
-    present = [str(path.relative_to(_PROJECT_ROOT)) for path in legacy_paths if path.exists()]
+    present = [
+        str(path.relative_to(_PROJECT_ROOT)) for path in legacy_paths if path.exists()
+    ]
     assert present == [], f"deprecated Flask runtime surfaces remain active: {present}"
 
 

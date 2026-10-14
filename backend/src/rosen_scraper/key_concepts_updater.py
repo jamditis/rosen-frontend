@@ -74,7 +74,9 @@ BATCH_SIZE = 100  # Process 100 rows at a time
 PROGRESS_FILE = "key_concepts_progress.json"
 
 # Rate limiting delays (in seconds)
-DELAY_BETWEEN_UPDATES = 5  # Delay after each Google Sheets update (increased for rate limiting)
+DELAY_BETWEEN_UPDATES = (
+    5  # Delay after each Google Sheets update (increased for rate limiting)
+)
 DELAY_BETWEEN_BATCHES = 10  # Delay between batches of 100
 
 
@@ -85,29 +87,31 @@ class SheetWriteError(RuntimeError):
 def load_progress() -> Dict:
     """Load progress from file"""
     if os.path.exists(PROGRESS_FILE):
-        with open(PROGRESS_FILE, 'r', encoding='utf-8') as f:
+        with open(PROGRESS_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     return {
         "sheet_name": None,
         "last_processed_row": 1,  # Start from row 2 (after header)
         "total_processed": 0,
         "total_updated": 0,
-        "last_run": None
+        "last_run": None,
     }
 
 
 def save_progress(progress: Dict):
     """Save progress to file"""
     progress["last_run"] = datetime.now().isoformat()
-    with open(PROGRESS_FILE, 'w', encoding='utf-8') as f:
+    with open(PROGRESS_FILE, "w", encoding="utf-8") as f:
         json.dump(progress, f, indent=2)
-    print(f"  [*] Progress saved: Last row {progress['last_processed_row']}, Total updated: {progress['total_updated']}")
+    print(
+        f"  [*] Progress saved: Last row {progress['last_processed_row']}, Total updated: {progress['total_updated']}"
+    )
 
 
 def load_schema() -> Dict:
     """Load taxonomy from schema.json"""
     schema_path = "schema.json"
-    with open(schema_path, 'r', encoding='utf-8-sig') as f:
+    with open(schema_path, "r", encoding="utf-8-sig") as f:
         schema = json.load(f)
     return schema
 
@@ -136,8 +140,12 @@ def setup_gemini() -> genai.GenerativeModel:
     return model
 
 
-def analyze_key_concepts(model: genai.GenerativeModel, raw_text: str, key_concepts_list: List[str],
-                         current_concepts: str = "") -> Dict:
+def analyze_key_concepts(
+    model: genai.GenerativeModel,
+    raw_text: str,
+    key_concepts_list: List[str],
+    current_concepts: str = "",
+) -> Dict:
     """
     Use Gemini 2.0 Flash to analyze raw text and identify relevant key concepts.
 
@@ -251,9 +259,9 @@ Return format (JSON object):
         result = json.loads(result_text)
 
         # Validate and normalize returned concepts
-        if 'concepts' in result:
+        if "concepts" in result:
             validated_concepts = []
-            for concept in result['concepts']:
+            for concept in result["concepts"]:
                 # Exact match (preferred)
                 if concept in key_concepts_list:
                     validated_concepts.append(concept)
@@ -263,9 +271,11 @@ Return format (JSON object):
                     for valid_concept in key_concepts_list:
                         if valid_concept.lower() == concept_lower:
                             validated_concepts.append(valid_concept)
-                            print(f"  [WARN] Normalized '{concept}' to '{valid_concept}'")
+                            print(
+                                f"  [WARN] Normalized '{concept}' to '{valid_concept}'"
+                            )
                             break
-            result['concepts'] = validated_concepts
+            result["concepts"] = validated_concepts
         else:
             result = {"concepts": [], "recommendations": ""}
 
@@ -280,10 +290,15 @@ Return format (JSON object):
         raise
 
 
-def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
-                          model: genai.GenerativeModel, schema: Dict,
-                          *, limit: Optional[int], force_reprocess: bool,
-                          dry_run: bool) -> Dict:
+def _process_rows_durable(
+    spreadsheet: gspread.Spreadsheet,
+    model: genai.GenerativeModel,
+    schema: Dict,
+    *,
+    limit: Optional[int],
+    force_reprocess: bool,
+    dry_run: bool,
+) -> Dict:
     """Process source-bound tasks and atomically store each Sheet receipt."""
     if limit is None:
         limit = BATCH_SIZE
@@ -294,15 +309,20 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
     worksheet = spreadsheet.worksheet(sheet_name)
     rows = worksheet.get_all_values()
     writes_by_field = {
-        'key_concepts': 0,
-        'recommendations': 0,
-        'notes': 0,
-        'progress_receipt': 0,
+        "key_concepts": 0,
+        "recommendations": 0,
+        "notes": 0,
+        "progress_receipt": 0,
     }
     if len(rows) < 2:
         print("No data rows found in sheet")
-        return {'processed': 0, 'writes': 0, 'gemini_calls': 0,
-                'dry_run': dry_run, 'by_field': writes_by_field}
+        return {
+            "processed": 0,
+            "writes": 0,
+            "gemini_calls": 0,
+            "dry_run": dry_run,
+            "by_field": writes_by_field,
+        }
 
     headers = [str(name).strip() for name in rows[0]]
     required = ("id", "raw_text", "key_concepts", "notes", "colQ_changes")
@@ -317,8 +337,7 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
     missing_columns = [name for name in required if name not in headers]
     if missing_columns:
         raise ValueError(
-            "Master sheet is missing required column(s): "
-            + ", ".join(missing_columns)
+            "Master sheet is missing required column(s): " + ", ".join(missing_columns)
         )
 
     columns = {name: index for index, name in enumerate(headers)}
@@ -346,7 +365,7 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
         if receipt_header_exists
         else max(populated_width(row) for row in rows)
     )
-    taxonomy = schema['taxonomy']['key_concepts']
+    taxonomy = schema["taxonomy"]["key_concepts"]
 
     seen_ids: set[str] = set()
     for row_number, row in data_rows:
@@ -363,12 +382,11 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
     for row_number, row in data_rows:
         record_id = row[id_index].strip()
         raw_text = row[raw_text_index] if len(row) > raw_text_index else ""
-        concepts = (
-            row[key_concepts_index] if len(row) > key_concepts_index else ""
-        )
+        concepts = row[key_concepts_index] if len(row) > key_concepts_index else ""
         encoded_receipt = (
             row[receipt_index]
-            if receipt_header_exists and len(row) > receipt_index else ""
+            if receipt_header_exists and len(row) > receipt_index
+            else ""
         )
         try:
             complete = receipt_matches(
@@ -417,49 +435,63 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
     def address(row_number: int, column_index: int) -> str:
         return rowcol_to_a1(row_number, column_index + 1)
 
-    def commit(row_number: int, task, expected_concepts: str,
-               pending: list[dict]) -> None:
+    def commit(
+        row_number: int, task, expected_concepts: str, pending: list[dict]
+    ) -> None:
         nonlocal header_planned
         writes = list(pending)
         if not header_planned:
-            writes.insert(0, {
-                'range': address(1, receipt_index),
-                'values': [[TASK_RECEIPT_COLUMN]],
-                'field': 'progress_receipt',
-            })
-        writes.append({
-            'range': address(row_number, receipt_index),
-            'values': [[encode_receipt(task, expected_concepts)]],
-            'field': 'progress_receipt',
-        })
+            writes.insert(
+                0,
+                {
+                    "range": address(1, receipt_index),
+                    "values": [[TASK_RECEIPT_COLUMN]],
+                    "field": "progress_receipt",
+                },
+            )
+        writes.append(
+            {
+                "range": address(row_number, receipt_index),
+                "values": [[encode_receipt(task, expected_concepts)]],
+                "field": "progress_receipt",
+            }
+        )
         if dry_run:
             for write in writes:
-                print(f"  [DRY-RUN] would write {write['field']} -> "
-                      f"{write['range']}: {str(write['values'][0][0])[:60]}")
-                writes_by_field[write['field']] += 1
+                print(
+                    f"  [DRY-RUN] would write {write['field']} -> "
+                    f"{write['range']}: {str(write['values'][0][0])[:60]}"
+                )
+                writes_by_field[write["field"]] += 1
             header_planned = True
             return
         try:
-            worksheet.batch_update([
-                {'range': write['range'], 'values': write['values']}
-                for write in writes
-            ], raw=True)
+            worksheet.batch_update(
+                [
+                    {"range": write["range"], "values": write["values"]}
+                    for write in writes
+                ],
+                raw=True,
+            )
         except Exception as exc:
             raise SheetWriteError(
                 f"Could not atomically write row {row_number} and its "
                 f"progress receipt: {exc}"
             ) from exc
         for write in writes:
-            writes_by_field[write['field']] += 1
+            writes_by_field[write["field"]] += 1
         header_planned = True
 
-    def pending_write(pending: list[dict], row_number: int,
-                      column_index: int, value: str, field: str) -> None:
-        pending.append({
-            'range': address(row_number, column_index),
-            'values': [[value]],
-            'field': field,
-        })
+    def pending_write(
+        pending: list[dict], row_number: int, column_index: int, value: str, field: str
+    ) -> None:
+        pending.append(
+            {
+                "range": address(row_number, column_index),
+                "values": [[value]],
+                "field": field,
+            }
+        )
 
     for row_number, row in selected:
         record_id = row[id_index].strip()
@@ -482,24 +514,22 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
         try:
             if not raw_text or len(raw_text.strip()) < 100:
                 if notes.strip():
-                    print(f"Row {row_number}: [SKIP] No raw text or too short; "
-                          "preserving existing notes")
+                    print(
+                        f"Row {row_number}: [SKIP] No raw text or too short; "
+                        "preserving existing notes"
+                    )
                 else:
                     note = "Skipped: No raw text or content too short (< 100 chars)"
-                    pending_write(
-                        pending, row_number, notes_index, note, 'notes'
-                    )
+                    pending_write(pending, row_number, notes_index, note, "notes")
                 commit(row_number, task, concepts, pending)
                 reviewed += 1
                 time.sleep(DELAY_BETWEEN_UPDATES)
                 continue
 
             model_calls += 1
-            analysis = analyze_key_concepts(
-                model, raw_text, taxonomy, concepts
-            )
+            analysis = analyze_key_concepts(model, raw_text, taxonomy, concepts)
             if concepts and not force_reprocess:
-                recommendation = analysis.get('recommendations', '')
+                recommendation = analysis.get("recommendations", "")
                 if not recommendation or recommendation == "N/A":
                     recommendation = "N/A"
                 pending_write(
@@ -507,30 +537,28 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
                     row_number,
                     changes_index,
                     recommendation,
-                    'recommendations',
+                    "recommendations",
                 )
                 expected_concepts = concepts
                 reviewed += 1
             else:
-                identified = analysis.get('concepts', [])
-                expected_concepts = normalize_key_concepts(
-                    ", ".join(identified)
-                )
+                identified = analysis.get("concepts", [])
+                expected_concepts = normalize_key_concepts(", ".join(identified))
                 pending_write(
                     pending,
                     row_number,
                     key_concepts_index,
                     expected_concepts,
-                    'key_concepts',
+                    "key_concepts",
                 )
-                recommendations = analysis.get('recommendations', '')
+                recommendations = analysis.get("recommendations", "")
                 if recommendations:
                     pending_write(
                         pending,
                         row_number,
                         changes_index,
                         recommendations,
-                        'recommendations',
+                        "recommendations",
                     )
             commit(row_number, task, expected_concepts, pending)
             updates_made += 1
@@ -541,30 +569,37 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
 
     total_writes = sum(writes_by_field.values())
     print("\n" + "=" * 80)
-    print("[*] BATCH COMPLETE" + (
-        " (DRY RUN -- nothing written)" if dry_run else ""
-    ))
+    print("[*] BATCH COMPLETE" + (" (DRY RUN -- nothing written)" if dry_run else ""))
     print("=" * 80)
     print(f"Rows in this batch: {len(selected)}")
     print(f"[OK] Key concepts filled/updated: {updates_made}")
     print(f"[SKIP] Reviewed (had existing concepts): {reviewed}")
     print(f"Gemini calls: {model_calls}")
-    print(f"Cells {'that would be ' if dry_run else ''}written: {total_writes} "
-          f"({writes_by_field})")
+    print(
+        f"Cells {'that would be ' if dry_run else ''}written: {total_writes} "
+        f"({writes_by_field})"
+    )
     print("\n[*] Durable progress: Sheet row receipts")
     return {
-        'processed': len(selected),
-        'writes': total_writes,
-        'gemini_calls': model_calls,
-        'dry_run': dry_run,
-        'by_field': writes_by_field,
+        "processed": len(selected),
+        "writes": total_writes,
+        "gemini_calls": model_calls,
+        "dry_run": dry_run,
+        "by_field": writes_by_field,
     }
 
 
-def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
-                 schema: Dict, start_row: Optional[int] = None, limit: Optional[int] = None,
-                 resume: bool = True, force_reprocess: bool = False,
-                 dry_run: bool = False, durable_progress: bool = False) -> Dict:
+def process_rows(
+    spreadsheet: gspread.Spreadsheet,
+    model: genai.GenerativeModel,
+    schema: Dict,
+    start_row: Optional[int] = None,
+    limit: Optional[int] = None,
+    resume: bool = True,
+    force_reprocess: bool = False,
+    dry_run: bool = False,
+    durable_progress: bool = False,
+) -> Dict:
     """
     Process rows from the configured master sheet and update key concepts.
 
@@ -600,7 +635,7 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
     # would have written -- so the run summary can prove work happened. A live
     # run that calls Gemini but writes zero cells is the "$0.53 wasted, AI ran
     # but nothing was saved" failure the data-pipeline rules guard against.
-    writes_by_field = {'key_concepts': 0, 'recommendations': 0, 'notes': 0}
+    writes_by_field = {"key_concepts": 0, "recommendations": 0, "notes": 0}
     gemini_calls = 0
 
     def _write(range_name: str, value, field: str):
@@ -613,8 +648,10 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
         reporting success when Gemini ran but nothing was saved.
         """
         if dry_run:
-            print(f"  [DRY-RUN] would write {field} -> {range_name}: "
-                  f"{str(value)[:60]}")
+            print(
+                f"  [DRY-RUN] would write {field} -> {range_name}: "
+                f"{str(value)[:60]}"
+            )
             writes_by_field[field] += 1
             return
         try:
@@ -653,27 +690,25 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
 
     if len(all_rows) < 2:
         print("No data rows found in sheet")
-        return {'processed': 0, 'writes': 0, 'gemini_calls': 0,
-                'dry_run': dry_run, 'by_field': writes_by_field}
+        return {
+            "processed": 0,
+            "writes": 0,
+            "gemini_calls": 0,
+            "dry_run": dry_run,
+            "by_field": writes_by_field,
+        }
 
     required_columns = ("raw_text", "key_concepts", "notes", "colQ_changes")
     normalized_headers = [str(name).strip() for name in all_rows[0]]
     duplicate_columns = [
-        name for name in required_columns
-        if normalized_headers.count(name) > 1
+        name for name in required_columns if normalized_headers.count(name) > 1
     ]
     if duplicate_columns:
         duplicates = ", ".join(duplicate_columns)
-        raise ValueError(
-            f"Master sheet has duplicate required column(s): {duplicates}"
-        )
+        raise ValueError(f"Master sheet has duplicate required column(s): {duplicates}")
 
-    column_indices = {
-        name: index for index, name in enumerate(normalized_headers)
-    }
-    missing_columns = [
-        name for name in required_columns if name not in column_indices
-    ]
+    column_indices = {name: index for index, name in enumerate(normalized_headers)}
+    missing_columns = [name for name in required_columns if name not in column_indices]
     if missing_columns:
         missing = ", ".join(missing_columns)
         raise ValueError(f"Master sheet is missing required column(s): {missing}")
@@ -687,13 +722,13 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
         return rowcol_to_a1(row_number, column_index + 1)
 
     # Get key concepts from schema
-    key_concepts_list = schema['taxonomy']['key_concepts']
+    key_concepts_list = schema["taxonomy"]["key_concepts"]
     print(f"\n[*] Available Key Concepts: {len(key_concepts_list)}")
     for concept in key_concepts_list:
         print(f"   - {concept}")
 
     # Determine range
-    data_rows = all_rows[start_row-1:]  # Convert to 0-indexed
+    data_rows = all_rows[start_row - 1 :]  # Convert to 0-indexed
 
     if limit:
         data_rows = data_rows[:limit]
@@ -713,29 +748,31 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
 
         try:
             raw_text = (
-                row_data[raw_text_index]
-                if len(row_data) > raw_text_index else ""
+                row_data[raw_text_index] if len(row_data) > raw_text_index else ""
             )
 
             current_concepts = (
                 row_data[key_concepts_index]
-                if len(row_data) > key_concepts_index else ""
+                if len(row_data) > key_concepts_index
+                else ""
             )
-            current_notes = (
-                row_data[notes_index] if len(row_data) > notes_index else ""
-            )
+            current_notes = row_data[notes_index] if len(row_data) > notes_index else ""
 
             # Record the skip reason only when the curator has not already
             # supplied notes. Existing notes are an audit trail.
             if not raw_text or len(raw_text.strip()) < 100:
                 if current_notes.strip():
-                    print(f"Row {row_number}: [SKIP] No raw text or too short; "
-                          "preserving existing notes")
+                    print(
+                        f"Row {row_number}: [SKIP] No raw text or too short; "
+                        "preserving existing notes"
+                    )
                 else:
-                    print(f"Row {row_number}: [NOTE] No raw text or too short; "
-                          "adding a skip note")
+                    print(
+                        f"Row {row_number}: [NOTE] No raw text or too short; "
+                        "adding a skip note"
+                    )
                     note = "Skipped: No raw text or content too short (< 100 chars)"
-                    _write(_cell_address(row_number, notes_index), note, 'notes')
+                    _write(_cell_address(row_number, notes_index), note, "notes")
                 skipped += 1
                 processed_count += 1
                 time.sleep(DELAY_BETWEEN_UPDATES)
@@ -743,24 +780,34 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
 
             # If row already has key concepts
             if current_concepts and not force_reprocess:
-                print(f"\nRow {row_number}: [REVIEW] Existing concepts: {current_concepts[:50]}...")
+                print(
+                    f"\nRow {row_number}: [REVIEW] Existing concepts: {current_concepts[:50]}..."
+                )
                 print(f"  Raw text length: {len(raw_text)} chars")
 
                 # Analyze and provide recommendations
                 gemini_calls += 1
-                analysis = analyze_key_concepts(model, raw_text, key_concepts_list, current_concepts)
+                analysis = analyze_key_concepts(
+                    model, raw_text, key_concepts_list, current_concepts
+                )
 
-                recommendations = analysis.get('recommendations', '')
+                recommendations = analysis.get("recommendations", "")
 
                 if recommendations and recommendations != "N/A":
                     print(f"  [RECOMMENDATION] {recommendations}")
-                    _write(_cell_address(row_number, changes_index),
-                           recommendations, 'recommendations')
+                    _write(
+                        _cell_address(row_number, changes_index),
+                        recommendations,
+                        "recommendations",
+                    )
                     updates_made += 1
                 else:
                     print("  [OK] N/A - Current assignment looks good")
-                    _write(_cell_address(row_number, changes_index),
-                           "N/A", 'recommendations')
+                    _write(
+                        _cell_address(row_number, changes_index),
+                        "N/A",
+                        "recommendations",
+                    )
                     updates_made += 1
 
                 skipped += 1
@@ -774,24 +821,33 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
 
             # Analyze with Gemini
             gemini_calls += 1
-            analysis = analyze_key_concepts(model, raw_text, key_concepts_list, current_concepts)
-            identified_concepts = analysis.get('concepts', [])
-            recommendations = analysis.get('recommendations', '')
+            analysis = analyze_key_concepts(
+                model, raw_text, key_concepts_list, current_concepts
+            )
+            identified_concepts = analysis.get("concepts", [])
+            recommendations = analysis.get("recommendations", "")
 
             # Format as comma-separated string
-            new_concepts_str = ", ".join(identified_concepts) if identified_concepts else ""
+            new_concepts_str = (
+                ", ".join(identified_concepts) if identified_concepts else ""
+            )
 
-            print(f"  AI-identified concepts: {new_concepts_str if new_concepts_str else '(none)'}")
+            print(
+                f"  AI-identified concepts: {new_concepts_str if new_concepts_str else '(none)'}"
+            )
 
             cell_address = _cell_address(row_number, key_concepts_index)
-            _write(cell_address, new_concepts_str, 'key_concepts')
+            _write(cell_address, new_concepts_str, "key_concepts")
             print(f"  [OK] Updated: {cell_address}")
             updates_made += 1
 
             # If there are recommendations, add them to colQ_changes.
             if recommendations:
-                _write(_cell_address(row_number, changes_index),
-                       recommendations, 'recommendations')
+                _write(
+                    _cell_address(row_number, changes_index),
+                    recommendations,
+                    "recommendations",
+                )
                 print("  [NOTE] Added recommendations to colQ_changes")
 
             processed_count += 1
@@ -809,7 +865,9 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
     # real run would skip the rows this rehearsal only pretended to process.
     if not dry_run:
         progress["last_processed_row"] = start_row + processed_count - 1
-        progress["total_processed"] = progress.get("total_processed", 0) + processed_count
+        progress["total_processed"] = (
+            progress.get("total_processed", 0) + processed_count
+        )
         progress["total_updated"] = progress.get("total_updated", 0) + updates_made
         save_progress(progress)
 
@@ -821,8 +879,10 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
     print(f"[OK] Key concepts filled/updated: {updates_made}")
     print(f"[SKIP] Reviewed (had existing concepts): {skipped}")
     print(f"Gemini calls: {gemini_calls}")
-    print(f"Cells {'that would be ' if dry_run else ''}written: {total_writes} "
-          f"({writes_by_field})")
+    print(
+        f"Cells {'that would be ' if dry_run else ''}written: {total_writes} "
+        f"({writes_by_field})"
+    )
     print("\n[*] Overall Progress:")
     print(f"Total rows processed across all runs: {progress['total_processed']}")
     print(f"Total updates made across all runs: {progress['total_updated']}")
@@ -833,11 +893,11 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
     print("  - Rows with empty concepts: key_concepts filled from analysis")
 
     return {
-        'processed': processed_count,
-        'writes': total_writes,
-        'gemini_calls': gemini_calls,
-        'dry_run': dry_run,
-        'by_field': writes_by_field,
+        "processed": processed_count,
+        "writes": total_writes,
+        "gemini_calls": gemini_calls,
+        "dry_run": dry_run,
+        "by_field": writes_by_field,
     }
 
 
@@ -847,41 +907,41 @@ def main():
         description="Update key concepts in the master archive sheet using Gemini 2.0 Flash analysis"
     )
     parser.add_argument(
-        '--start',
+        "--start",
         type=int,
         default=None,
-        help='Starting row number (default: resume from saved progress)'
+        help="Starting row number (default: resume from saved progress)",
     )
     parser.add_argument(
-        '--limit',
+        "--limit",
         type=int,
         default=None,
-        help=f'Limit number of rows to process (default: {BATCH_SIZE})'
+        help=f"Limit number of rows to process (default: {BATCH_SIZE})",
     )
     parser.add_argument(
-        '--no-resume',
-        action='store_true',
-        help='Do not resume from saved progress (start fresh)'
+        "--no-resume",
+        action="store_true",
+        help="Do not resume from saved progress (start fresh)",
     )
     parser.add_argument(
-        '--force-reprocess',
-        action='store_true',
-        help='Reprocess rows even if they already have key concepts'
+        "--force-reprocess",
+        action="store_true",
+        help="Reprocess rows even if they already have key concepts",
     )
     parser.add_argument(
-        '--reset-progress',
-        action='store_true',
-        help='Reset progress file and start from beginning'
+        "--reset-progress",
+        action="store_true",
+        help="Reset progress file and start from beginning",
     )
     parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help='Rehearse only: log the cells that would be written, write nothing'
+        "--dry-run",
+        action="store_true",
+        help="Rehearse only: log the cells that would be written, write nothing",
     )
     parser.add_argument(
-        '--durable-progress',
-        action='store_true',
-        help='Use stable task receipts stored atomically in the master sheet'
+        "--durable-progress",
+        action="store_true",
+        help="Use stable task receipts stored atomically in the master sheet",
     )
 
     args = parser.parse_args()
@@ -889,8 +949,8 @@ def main():
         args.start is not None or args.no_resume or args.reset_progress
     ):
         parser.error(
-            '--durable-progress cannot be combined with --start, --no-resume, '
-            'or --reset-progress'
+            "--durable-progress cannot be combined with --start, --no-resume, "
+            "or --reset-progress"
         )
 
     print("[*] Key Concepts Updater")
@@ -928,15 +988,25 @@ def main():
     )
 
     print("\n[*] Script complete!")
-    print("[*] To continue processing, run: poetry run python -m rosen_scraper.key_concepts_updater")
-    print("[*] To start over, run: poetry run python -m rosen_scraper.key_concepts_updater --reset-progress")
+    print(
+        "[*] To continue processing, run: poetry run python -m rosen_scraper.key_concepts_updater"
+    )
+    print(
+        "[*] To start over, run: poetry run python -m rosen_scraper.key_concepts_updater --reset-progress"
+    )
 
     # The "$0.53 wasted" guard: a live run that spent Gemini calls but wrote
     # zero cells means the AI ran and nothing was saved. Fail loudly so the
     # Action shows red instead of a green run that quietly changed nothing.
-    if not summary['dry_run'] and summary['gemini_calls'] > 0 and summary['writes'] == 0:
-        print(f"\n[FATAL] Made {summary['gemini_calls']} Gemini call(s) but wrote 0 cells "
-              "-- refusing to report success.")
+    if (
+        not summary["dry_run"]
+        and summary["gemini_calls"] > 0
+        and summary["writes"] == 0
+    ):
+        print(
+            f"\n[FATAL] Made {summary['gemini_calls']} Gemini call(s) but wrote 0 cells "
+            "-- refusing to report success."
+        )
         return 1
     return 0
 

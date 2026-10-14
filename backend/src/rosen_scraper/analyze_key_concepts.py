@@ -22,8 +22,8 @@ load_dotenv()
 
 # Configuration
 SCOPES = [
-    'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/drive'
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
 ]
 CREDENTIALS_FILE = "google_credentials.json"
 SPREADSHEET_NAME = os.getenv("SPREADSHEET_NAME", "Rosen Archive URL List")
@@ -38,10 +38,7 @@ OUTPUT_FILE = "key_concepts_analysis.txt"
 
 def setup_google_sheets() -> gspread.Spreadsheet:
     """Initialize Google Sheets connection"""
-    creds = Credentials.from_service_account_file(
-        CREDENTIALS_FILE,
-        scopes=SCOPES
-    )
+    creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=SCOPES)
     client = gspread.authorize(creds)
     spreadsheet = client.open(SPREADSHEET_NAME)
     return spreadsheet
@@ -53,10 +50,10 @@ def parse_concepts(concepts_str: str) -> List[str]:
         return []
 
     # Handle both comma and pipe separators
-    if '|' in concepts_str:
-        concepts = [c.strip() for c in concepts_str.split('|')]
+    if "|" in concepts_str:
+        concepts = [c.strip() for c in concepts_str.split("|")]
     else:
-        concepts = [c.strip() for c in concepts_str.split(',')]
+        concepts = [c.strip() for c in concepts_str.split(",")]
 
     return [c for c in concepts if c]
 
@@ -86,7 +83,7 @@ def extract_mentioned_concepts(recommendation: str) -> Set[str]:
         "both sides",
         "false balance",
         "objectivity",
-        "neutrality"
+        "neutrality",
     ]
 
     rec_lower = recommendation.lower()
@@ -133,11 +130,17 @@ def analyze_key_concepts(spreadsheet: gspread.Spreadsheet):
                 concept_counts[concept] += 1
 
                 # Store recommendation with this concept if present
-                if recommendations and recommendations != "Looks good" and recommendations != "Looks good.":
-                    concept_recommendations[concept].append({
-                        'row': i,
-                        'recommendation': recommendations[:200]  # First 200 chars
-                    })
+                if (
+                    recommendations
+                    and recommendations != "Looks good"
+                    and recommendations != "Looks good."
+                ):
+                    concept_recommendations[concept].append(
+                        {
+                            "row": i,
+                            "recommendation": recommendations[:200],  # First 200 chars
+                        }
+                    )
 
         if recommendations:
             rows_with_recommendations += 1
@@ -173,7 +176,11 @@ def analyze_key_concepts(spreadsheet: gspread.Spreadsheet):
     report_lines.append("Concept frequency (sorted by count):")
     report_lines.append("-" * 80)
     for concept, count in concept_counts.most_common():
-        percentage = (count / total_concept_instances) * 100 if total_concept_instances > 0 else 0
+        percentage = (
+            (count / total_concept_instances) * 100
+            if total_concept_instances > 0
+            else 0
+        )
         report_lines.append(f"  {count:4d} ({percentage:5.1f}%) - {concept}")
     report_lines.append("")
 
@@ -182,8 +189,12 @@ def analyze_key_concepts(spreadsheet: gspread.Spreadsheet):
     report_lines.append("SECTION 2: CONCEPTS MENTIONED IN RECOMMENDATIONS")
     report_lines.append("=" * 80)
     report_lines.append("")
-    report_lines.append("These concepts appear in AI recommendations, suggesting they may be")
-    report_lines.append("relevant but are not currently in the schema or not being captured:")
+    report_lines.append(
+        "These concepts appear in AI recommendations, suggesting they may be"
+    )
+    report_lines.append(
+        "relevant but are not currently in the schema or not being captured:"
+    )
     report_lines.append("")
 
     for concept, count in suggested_concepts.most_common(20):
@@ -198,14 +209,18 @@ def analyze_key_concepts(spreadsheet: gspread.Spreadsheet):
     report_lines.append("Concepts that frequently have recommendations for changes:")
     report_lines.append("")
 
-    concepts_with_many_recs = [(c, len(recs)) for c, recs in concept_recommendations.items()]
+    concepts_with_many_recs = [
+        (c, len(recs)) for c, recs in concept_recommendations.items()
+    ]
     concepts_with_many_recs.sort(key=lambda x: x[1], reverse=True)
 
     for concept, rec_count in concepts_with_many_recs[:10]:
         report_lines.append(f"\n{concept} - {rec_count} recommendations")
         report_lines.append("-" * 80)
         for rec_info in concept_recommendations[concept][:3]:  # Show first 3 examples
-            report_lines.append(f"  Row {rec_info['row']}: {rec_info['recommendation']}")
+            report_lines.append(
+                f"  Row {rec_info['row']}: {rec_info['recommendation']}"
+            )
     report_lines.append("")
 
     # Section 4: Sample Recommendations for Review
@@ -220,11 +235,13 @@ def analyze_key_concepts(spreadsheet: gspread.Spreadsheet):
         key_concepts = row[COL_KEY_CONCEPTS] if len(row) > COL_KEY_CONCEPTS else ""
 
         if recommendations and recommendations not in ["Looks good", "Looks good.", ""]:
-            sample_recs.append({
-                'row': i,
-                'concepts': key_concepts,
-                'recommendation': recommendations[:300]
-            })
+            sample_recs.append(
+                {
+                    "row": i,
+                    "concepts": key_concepts,
+                    "recommendation": recommendations[:300],
+                }
+            )
 
         if len(sample_recs) >= 20:
             break
@@ -237,7 +254,7 @@ def analyze_key_concepts(spreadsheet: gspread.Spreadsheet):
     # Write report to file
     report_text = "\n".join(report_lines)
 
-    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write(report_text)
 
     print("\n[*] Analysis complete!")

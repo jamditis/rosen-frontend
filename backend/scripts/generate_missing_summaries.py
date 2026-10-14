@@ -29,7 +29,7 @@ class SummaryGenerator:
 
     def load_records(self) -> None:
         """Load all records from CSV."""
-        with open(self.csv_path, 'r', encoding='utf-8') as f:
+        with open(self.csv_path, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             self.records = list(reader)
         print(f"Loaded {len(self.records)} records from {self.csv_path}")
@@ -40,7 +40,7 @@ class SummaryGenerator:
             return []
 
         # Find all hashtags
-        hashtags = re.findall(r'#([A-Za-z0-9_]+)', text)
+        hashtags = re.findall(r"#([A-Za-z0-9_]+)", text)
         return hashtags
 
     def clean_text(self, text: str) -> str:
@@ -49,28 +49,28 @@ class SummaryGenerator:
             return ""
 
         # Remove timestamps like "5/11/2011 12:00:00 AM"
-        text = re.sub(r'\d{1,2}/\d{1,2}/\d{4}\s+\d{1,2}:\d{2}:\d{2}\s+[AP]M', '', text)
+        text = re.sub(r"\d{1,2}/\d{1,2}/\d{4}\s+\d{1,2}:\d{2}:\d{2}\s+[AP]M", "", text)
 
         # Remove special characters like ¶ and ●
-        text = re.sub(r'[¶●]', '', text)
+        text = re.sub(r"[¶●]", "", text)
 
         # Remove "X notes" pattern
-        text = re.sub(r'\d+\s+notes?', '', text)
+        text = re.sub(r"\d+\s+notes?", "", text)
 
         # Remove hashtags (we'll handle them separately)
-        text = re.sub(r'#[A-Za-z0-9_]+', '', text)
+        text = re.sub(r"#[A-Za-z0-9_]+", "", text)
 
         # Clean up whitespace
-        text = ' '.join(text.split())
+        text = " ".join(text.split())
 
         return text.strip()
 
     def generate_summary_from_content(self, record: Dict) -> Optional[str]:
         """Generate a summary based on available record content."""
-        title = record.get('title', '').strip()
-        raw_text = record.get('raw_text', '').strip()
-        platform = record.get('platform', '').strip()
-        publication_date = record.get('publication_date', '').strip()
+        title = record.get("title", "").strip()
+        raw_text = record.get("raw_text", "").strip()
+        platform = record.get("platform", "").strip()
+        publication_date = record.get("publication_date", "").strip()
 
         # Extract hashtags for context
         hashtags = self.extract_hashtags(raw_text)
@@ -82,7 +82,7 @@ class SummaryGenerator:
         summary_parts = []
 
         # Determine post type
-        if 'photo' in title.lower():
+        if "photo" in title.lower():
             post_type = "Photo post"
         elif hashtags or cleaned_text:
             post_type = "Post"
@@ -116,7 +116,7 @@ class SummaryGenerator:
         if publication_date:
             try:
                 # Parse the date and extract year
-                year = publication_date.split('-')[0]
+                year = publication_date.split("-")[0]
                 summary_parts.append(f"Published in {year}.")
             except Exception as e:
                 print(f"  Could not parse publication date '{publication_date}': {e}")
@@ -139,7 +139,7 @@ class SummaryGenerator:
         """Find all records with empty summary fields."""
         missing = []
         for record in self.records:
-            if not record.get('summary', '').strip():
+            if not record.get("summary", "").strip():
                 missing.append(record)
         return missing
 
@@ -151,23 +151,25 @@ class SummaryGenerator:
         print("\nGenerating summaries...\n")
 
         for record in missing:
-            record_id = record.get('id', 'UNKNOWN')
-            title = record.get('title', 'Untitled')
+            record_id = record.get("id", "UNKNOWN")
+            title = record.get("title", "Untitled")
 
             # Generate summary
             summary = self.generate_summary_from_content(record)
 
             if summary:
                 # Update the record
-                record['summary'] = summary
+                record["summary"] = summary
 
                 # Track the update
-                self.updates.append({
-                    'id': record_id,
-                    'title': title,
-                    'old_summary': '',
-                    'new_summary': summary
-                })
+                self.updates.append(
+                    {
+                        "id": record_id,
+                        "title": title,
+                        "old_summary": "",
+                        "new_summary": summary,
+                    }
+                )
 
                 print(f"✓ {record_id}: {title[:50]}")
                 print(f"  Summary: {summary[:100]}...")
@@ -183,13 +185,14 @@ class SummaryGenerator:
             return
 
         # Create backup
-        backup_path = self.csv_path.with_suffix('.csv.backup')
+        backup_path = self.csv_path.with_suffix(".csv.backup")
         import shutil
+
         shutil.copy2(self.csv_path, backup_path)
         print(f"\n✓ Created backup at {backup_path}")
 
         # Write updated records
-        with open(self.csv_path, 'w', encoding='utf-8', newline='') as f:
+        with open(self.csv_path, "w", encoding="utf-8", newline="") as f:
             if self.records:
                 writer = csv.DictWriter(f, fieldnames=self.records[0].keys())
                 writer.writeheader()
@@ -212,36 +215,42 @@ class SummaryGenerator:
             "",
             "UPDATES:",
             "=" * 80,
-            ""
+            "",
         ]
 
         for update in self.updates:
-            report_lines.extend([
-                f"ID: {update['id']}",
-                f"Title: {update['title']}",
-                f"New Summary: {update['new_summary']}",
-                "-" * 80,
-                ""
-            ])
+            report_lines.extend(
+                [
+                    f"ID: {update['id']}",
+                    f"Title: {update['title']}",
+                    f"New Summary: {update['new_summary']}",
+                    "-" * 80,
+                    "",
+                ]
+            )
 
-        report_lines.extend([
-            "=" * 80,
-            "SUMMARY",
-            "=" * 80,
-            f"✓ Successfully generated {len(self.updates)} summaries",
-            "✓ CSV backup created",
-            "✓ CSV updated with new summaries",
-            ""
-        ])
+        report_lines.extend(
+            [
+                "=" * 80,
+                "SUMMARY",
+                "=" * 80,
+                f"✓ Successfully generated {len(self.updates)} summaries",
+                "✓ CSV backup created",
+                "✓ CSV updated with new summaries",
+                "",
+            ]
+        )
 
         return "\n".join(report_lines)
 
     def save_report(self, report: str) -> None:
         """Save the report to a file."""
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        report_path = self.csv_path.parent / f"summary_generation_report_{timestamp}.txt"
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        report_path = (
+            self.csv_path.parent / f"summary_generation_report_{timestamp}.txt"
+        )
 
-        with open(report_path, 'w', encoding='utf-8') as f:
+        with open(report_path, "w", encoding="utf-8") as f:
             f.write(report)
 
         print(f"\n✓ Report saved to {report_path}")
@@ -281,14 +290,14 @@ def main():
         description="Generate summaries for archive records missing them"
     )
     parser.add_argument(
-        '--csv',
-        default='data/archive_records-public.csv',
-        help='Path to the archive CSV file (default: data/archive_records-public.csv)'
+        "--csv",
+        default="data/archive_records-public.csv",
+        help="Path to the archive CSV file (default: data/archive_records-public.csv)",
     )
     parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help='Preview changes without saving (default: False)'
+        "--dry-run",
+        action="store_true",
+        help="Preview changes without saving (default: False)",
     )
 
     args = parser.parse_args()
@@ -308,5 +317,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     exit(main())

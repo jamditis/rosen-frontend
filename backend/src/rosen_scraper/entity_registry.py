@@ -52,8 +52,14 @@ class EntityRegistry:
             id_col = headers.index("entity_id")
             type_col = headers.index("entity_type")
             name_col = headers.index("entity_name")
-            role_col = headers.index("role_or_description") if "role_or_description" in headers else -1
-            affiliation_col = headers.index("affiliation") if "affiliation" in headers else -1
+            role_col = (
+                headers.index("role_or_description")
+                if "role_or_description" in headers
+                else -1
+            )
+            affiliation_col = (
+                headers.index("affiliation") if "affiliation" in headers else -1
+            )
         except ValueError as e:
             print(f"[REGISTRY] ERROR: Required column not found: {e}")
             return
@@ -78,12 +84,18 @@ class EntityRegistry:
 
             # Store full entity data
             self.entities[entity_id] = {
-                'entity_id': entity_id,
-                'entity_type': entity_type,
-                'entity_name': entity_name,
-                'normalized_name': normalized,
-                'role_or_description': row[role_col] if role_col >= 0 and len(row) > role_col else "",
-                'affiliation': row[affiliation_col] if affiliation_col >= 0 and len(row) > affiliation_col else ""
+                "entity_id": entity_id,
+                "entity_type": entity_type,
+                "entity_name": entity_name,
+                "normalized_name": normalized,
+                "role_or_description": (
+                    row[role_col] if role_col >= 0 and len(row) > role_col else ""
+                ),
+                "affiliation": (
+                    row[affiliation_col]
+                    if affiliation_col >= 0 and len(row) > affiliation_col
+                    else ""
+                ),
             }
 
             # Update ID counter
@@ -118,13 +130,13 @@ class EntityRegistry:
 
         loaded_count = 0
 
-        with open(csv_path, 'r', encoding='utf-8-sig') as f:
+        with open(csv_path, "r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
 
             for row in reader:
-                entity_id = row.get('entity_id', '')
-                entity_type = row.get('entity_type', '')
-                entity_name = row.get('entity_name', '')
+                entity_id = row.get("entity_id", "")
+                entity_type = row.get("entity_type", "")
+                entity_name = row.get("entity_name", "")
 
                 if not entity_id or not entity_type or not entity_name:
                     continue
@@ -138,17 +150,17 @@ class EntityRegistry:
 
                 # Store full entity data
                 self.entities[entity_id] = {
-                    'entity_id': entity_id,
-                    'entity_type': entity_type,
-                    'entity_name': entity_name,
-                    'normalized_name': normalized,
-                    'role_or_description': row.get('role_or_description', ''),
-                    'affiliation': row.get('affiliation', ''),
-                    'prominence_score': row.get('prominence_score', ''),
-                    'first_mention_record_id': row.get('first_mention_record_id', ''),
-                    'total_mentions': row.get('total_mentions', '1'),
-                    'related_entities': row.get('related_entities', ''),
-                    'notes': row.get('notes', '')
+                    "entity_id": entity_id,
+                    "entity_type": entity_type,
+                    "entity_name": entity_name,
+                    "normalized_name": normalized,
+                    "role_or_description": row.get("role_or_description", ""),
+                    "affiliation": row.get("affiliation", ""),
+                    "prominence_score": row.get("prominence_score", ""),
+                    "first_mention_record_id": row.get("first_mention_record_id", ""),
+                    "total_mentions": row.get("total_mentions", "1"),
+                    "related_entities": row.get("related_entities", ""),
+                    "notes": row.get("notes", ""),
                 }
 
                 # Update ID counter
@@ -167,7 +179,9 @@ class EntityRegistry:
 
         return loaded_count
 
-    def get_or_create_entity_id(self, entity_name: str, entity_type: str) -> Tuple[str, bool]:
+    def get_or_create_entity_id(
+        self, entity_name: str, entity_type: str
+    ) -> Tuple[str, bool]:
         """
         Get existing entity ID or create a new one.
 
@@ -188,7 +202,7 @@ class EntityRegistry:
             return self.name_to_id[key], False
 
         # Create new entity ID
-        prefix = ENTITY_TYPE_PREFIXES.get(entity_type, 'X')
+        prefix = ENTITY_TYPE_PREFIXES.get(entity_type, "X")
 
         self.id_counters[prefix] += 1
         new_id = f"{prefix}{self.id_counters[prefix]:04d}"
@@ -196,10 +210,10 @@ class EntityRegistry:
         # Register the new entity
         self.name_to_id[key] = new_id
         self.entities[new_id] = {
-            'entity_id': new_id,
-            'entity_type': entity_type,
-            'entity_name': entity_name,
-            'normalized_name': normalized
+            "entity_id": new_id,
+            "entity_type": entity_type,
+            "entity_name": entity_name,
+            "normalized_name": normalized,
         }
 
         return new_id, True
@@ -225,18 +239,20 @@ class EntityRegistry:
         updated_entities = []
 
         for entity in entities:
-            old_id = entity.get('entity_id', '')
-            entity_name = entity.get('entity_name', '')
-            entity_type = entity.get('entity_type', '')
+            old_id = entity.get("entity_id", "")
+            entity_name = entity.get("entity_name", "")
+            entity_type = entity.get("entity_type", "")
 
             if not entity_name or not entity_type:
                 continue
 
             # Get or create canonical ID
-            canonical_id, is_new = self.get_or_create_entity_id(entity_name, entity_type)
+            canonical_id, is_new = self.get_or_create_entity_id(
+                entity_name, entity_type
+            )
 
             # Update entity with canonical ID
-            entity['entity_id'] = canonical_id
+            entity["entity_id"] = canonical_id
             updated_entities.append(entity)
 
             # Track the mapping
@@ -249,7 +265,9 @@ class EntityRegistry:
 
         return updated_entities, id_mapping, existing_count, new_count
 
-    def update_relationship_ids(self, relationships: List[Dict], id_mapping: Dict[str, str]) -> List[Dict]:
+    def update_relationship_ids(
+        self, relationships: List[Dict], id_mapping: Dict[str, str]
+    ) -> List[Dict]:
         """
         Update relationship IDs based on entity ID mapping.
 
@@ -263,8 +281,8 @@ class EntityRegistry:
         updated_relationships = []
 
         for rel in relationships:
-            source_id = rel.get('source_entity_id', '')
-            target_id = rel.get('target_entity_id', '')
+            source_id = rel.get("source_entity_id", "")
+            target_id = rel.get("target_entity_id", "")
 
             # Map to canonical IDs
             mapped_source = id_mapping.get(source_id, source_id)
@@ -274,8 +292,8 @@ class EntityRegistry:
             if not mapped_source or not mapped_target:
                 continue
 
-            rel['source_entity_id'] = mapped_source
-            rel['target_entity_id'] = mapped_target
+            rel["source_entity_id"] = mapped_source
+            rel["target_entity_id"] = mapped_target
 
             updated_relationships.append(rel)
 
@@ -289,7 +307,7 @@ class EntityRegistry:
             type_counts[prefix] += 1
 
         return {
-            'total_entities': len(self.entities),
-            'by_type': dict(type_counts),
-            'id_counters': dict(self.id_counters)
+            "total_entities": len(self.entities),
+            "by_type": dict(type_counts),
+            "id_counters": dict(self.id_counters),
         }

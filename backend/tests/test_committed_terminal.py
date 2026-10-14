@@ -40,11 +40,11 @@ def test_sweeper_treats_committed_as_terminal():
 
     # committed is terminal: not a sweep status, and never "stuck" at any age.
     assert "committed" not in sweep_stuck._THRESHOLDS
-    assert sweep_stuck._is_stuck("committed", 10 ** 9) is False
+    assert sweep_stuck._is_stuck("committed", 10**9) is False
 
     # archived stays a retry status so a genuine push error still gets re-fired.
     assert "archived" in sweep_stuck._THRESHOLDS
-    assert sweep_stuck._is_stuck("archived", 10 ** 9) is True
+    assert sweep_stuck._is_stuck("archived", 10**9) is True
 
 
 def test_skip_path_writes_committed_error_path_keeps_archived():
@@ -77,7 +77,7 @@ def test_sentinel_branches_on_skipped_before_ok():
     """
     src = (_BACKEND / "scripts" / "process_submission.py").read_text(encoding="utf-8")
     first = src.index("push_to_production(")
-    block = src[first:first + 1500]
+    block = src[first : first + 1500]
     skipped_at = block.find("push.get('skipped')")
     ok_at = block.find("push.get('ok')")
     assert skipped_at != -1 and ok_at != -1, "sentinel block branches missing"

@@ -34,31 +34,31 @@ from rosen_scraper.extraction_db import ExtractionDB
 
 # Expected schema for entities
 ENTITY_COLUMNS = [
-    'entity_id',
-    'entity_type',
-    'entity_name',
-    'normalized_name',
-    'role_or_description',
-    'affiliation',
-    'prominence_score',
-    'first_mention_record_id',
-    'total_mentions',
-    'related_entities',
-    'notes'
+    "entity_id",
+    "entity_type",
+    "entity_name",
+    "normalized_name",
+    "role_or_description",
+    "affiliation",
+    "prominence_score",
+    "first_mention_record_id",
+    "total_mentions",
+    "related_entities",
+    "notes",
 ]
 
 # Expected schema for relationships
 RELATIONSHIP_COLUMNS = [
-    'relationship_id',
-    'source_entity_id',
-    'target_entity_id',
-    'relationship_type',
-    'description',
-    'evidence',
-    'source_record_id',
-    'strength',
-    'temporal_context',
-    'notes'
+    "relationship_id",
+    "source_entity_id",
+    "target_entity_id",
+    "relationship_type",
+    "description",
+    "evidence",
+    "source_record_id",
+    "strength",
+    "temporal_context",
+    "notes",
 ]
 
 
@@ -73,11 +73,13 @@ class DataExporter:
             data_dir: Path to the data directory containing source files
         """
         self.data_dir = Path(data_dir)
-        self.db_path = self.data_dir / 'extraction.db'
+        self.db_path = self.data_dir / "extraction.db"
 
         # Source CSV files
-        self.existing_entities_csv = self.data_dir / 'rosen_extracted_entities.csv'
-        self.existing_relationships_csv = self.data_dir / 'rosen_extracted_relationships.csv'
+        self.existing_entities_csv = self.data_dir / "rosen_extracted_entities.csv"
+        self.existing_relationships_csv = (
+            self.data_dir / "rosen_extracted_relationships.csv"
+        )
 
     def load_existing_entities(self) -> List[Dict]:
         """Load entities from existing CSV file."""
@@ -86,7 +88,7 @@ class DataExporter:
             return []
 
         entities = []
-        with open(self.existing_entities_csv, 'r', encoding='utf-8-sig') as f:
+        with open(self.existing_entities_csv, "r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 entities.append(dict(row))
@@ -97,11 +99,13 @@ class DataExporter:
     def load_existing_relationships(self) -> List[Dict]:
         """Load relationships from existing CSV file."""
         if not self.existing_relationships_csv.exists():
-            print(f"[EXPORT] No existing relationships CSV at: {self.existing_relationships_csv}")
+            print(
+                f"[EXPORT] No existing relationships CSV at: {self.existing_relationships_csv}"
+            )
             return []
 
         relationships = []
-        with open(self.existing_relationships_csv, 'r', encoding='utf-8-sig') as f:
+        with open(self.existing_relationships_csv, "r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 relationships.append(dict(row))
@@ -121,19 +125,21 @@ class DataExporter:
         # Convert to standard format
         standardized = []
         for e in entities:
-            standardized.append({
-                'entity_id': e.get('entity_id', ''),
-                'entity_type': e.get('entity_type', ''),
-                'entity_name': e.get('entity_name', ''),
-                'normalized_name': e.get('normalized_name', ''),
-                'role_or_description': e.get('role_or_description', ''),
-                'affiliation': e.get('affiliation', ''),
-                'prominence_score': e.get('prominence_score', ''),
-                'first_mention_record_id': e.get('first_mention_record_id', ''),
-                'total_mentions': e.get('total_mentions', '1'),
-                'related_entities': e.get('related_entities', ''),
-                'notes': e.get('notes', '')
-            })
+            standardized.append(
+                {
+                    "entity_id": e.get("entity_id", ""),
+                    "entity_type": e.get("entity_type", ""),
+                    "entity_name": e.get("entity_name", ""),
+                    "normalized_name": e.get("normalized_name", ""),
+                    "role_or_description": e.get("role_or_description", ""),
+                    "affiliation": e.get("affiliation", ""),
+                    "prominence_score": e.get("prominence_score", ""),
+                    "first_mention_record_id": e.get("first_mention_record_id", ""),
+                    "total_mentions": e.get("total_mentions", "1"),
+                    "related_entities": e.get("related_entities", ""),
+                    "notes": e.get("notes", ""),
+                }
+            )
 
         print(f"[EXPORT] Loaded {len(standardized)} entities from database")
         return standardized
@@ -149,26 +155,26 @@ class DataExporter:
         # Convert to standard format
         standardized = []
         for r in relationships:
-            standardized.append({
-                'relationship_id': r.get('relationship_id', ''),
-                'source_entity_id': r.get('source_entity_id', ''),
-                'target_entity_id': r.get('target_entity_id', ''),
-                'relationship_type': r.get('relationship_type', ''),
-                'description': r.get('description', ''),
-                'evidence': r.get('evidence', ''),
-                'source_record_id': r.get('source_record_id', ''),
-                'strength': r.get('strength', ''),
-                'temporal_context': r.get('temporal_context', ''),
-                'notes': r.get('notes', '')
-            })
+            standardized.append(
+                {
+                    "relationship_id": r.get("relationship_id", ""),
+                    "source_entity_id": r.get("source_entity_id", ""),
+                    "target_entity_id": r.get("target_entity_id", ""),
+                    "relationship_type": r.get("relationship_type", ""),
+                    "description": r.get("description", ""),
+                    "evidence": r.get("evidence", ""),
+                    "source_record_id": r.get("source_record_id", ""),
+                    "strength": r.get("strength", ""),
+                    "temporal_context": r.get("temporal_context", ""),
+                    "notes": r.get("notes", ""),
+                }
+            )
 
         print(f"[EXPORT] Loaded {len(standardized)} relationships from database")
         return standardized
 
     def merge_entities(
-        self,
-        csv_entities: List[Dict],
-        db_entities: List[Dict]
+        self, csv_entities: List[Dict], db_entities: List[Dict]
     ) -> List[Dict]:
         """
         Merge entities from CSV and database, deduplicating by entity_id.
@@ -187,28 +193,28 @@ class DataExporter:
 
         # Add CSV entities first (they take precedence)
         for e in csv_entities:
-            entity_id = e.get('entity_id')
+            entity_id = e.get("entity_id")
             if entity_id:
                 merged[entity_id] = e
 
         # Add database entities (only if not already present)
         new_from_db = 0
         for e in db_entities:
-            entity_id = e.get('entity_id')
+            entity_id = e.get("entity_id")
             if entity_id and entity_id not in merged:
                 merged[entity_id] = e
                 new_from_db += 1
 
-        print(f"[EXPORT] Merged entities: {len(csv_entities)} from CSV + "
-              f"{new_from_db} new from DB = {len(merged)} total")
+        print(
+            f"[EXPORT] Merged entities: {len(csv_entities)} from CSV + "
+            f"{new_from_db} new from DB = {len(merged)} total"
+        )
 
         # Sort by entity_id for consistent output
-        return sorted(merged.values(), key=lambda x: x.get('entity_id', ''))
+        return sorted(merged.values(), key=lambda x: x.get("entity_id", ""))
 
     def merge_relationships(
-        self,
-        csv_relationships: List[Dict],
-        db_relationships: List[Dict]
+        self, csv_relationships: List[Dict], db_relationships: List[Dict]
     ) -> List[Dict]:
         """
         Merge relationships from CSV and database.
@@ -228,9 +234,9 @@ class DataExporter:
 
         def rel_key(r):
             return (
-                r.get('source_entity_id', ''),
-                r.get('target_entity_id', ''),
-                r.get('relationship_type', '')
+                r.get("source_entity_id", ""),
+                r.get("target_entity_id", ""),
+                r.get("relationship_type", ""),
             )
 
         # Add CSV relationships first
@@ -249,8 +255,10 @@ class DataExporter:
                 merged.append(r)
                 new_from_db += 1
 
-        print(f"[EXPORT] Merged relationships: {len(csv_relationships)} from CSV + "
-              f"{new_from_db} new from DB = {len(merged)} total")
+        print(
+            f"[EXPORT] Merged relationships: {len(csv_relationships)} from CSV + "
+            f"{new_from_db} new from DB = {len(merged)} total"
+        )
 
         return merged
 
@@ -262,23 +270,23 @@ class DataExporter:
             Tuple of (is_valid, list_of_issues)
         """
         issues = []
-        valid_types = {'Person', 'Organization', 'Concept', 'Work', 'Event', 'Location'}
-        valid_prefixes = {'P', 'O', 'C', 'W', 'E', 'L', 'X'}
+        valid_types = {"Person", "Organization", "Concept", "Work", "Event", "Location"}
+        valid_prefixes = {"P", "O", "C", "W", "E", "L", "X"}
 
         entity_ids = set()
 
         for i, e in enumerate(entities):
-            entity_id = e.get('entity_id', '')
+            entity_id = e.get("entity_id", "")
 
             # Check required fields
             if not entity_id:
                 issues.append(f"Row {i+1}: Missing entity_id")
                 continue
 
-            if not e.get('entity_type'):
+            if not e.get("entity_type"):
                 issues.append(f"Row {i+1} ({entity_id}): Missing entity_type")
 
-            if not e.get('entity_name'):
+            if not e.get("entity_name"):
                 issues.append(f"Row {i+1} ({entity_id}): Missing entity_name")
 
             # Check ID format
@@ -290,8 +298,10 @@ class DataExporter:
                 issues.append(f"Row {i+1}: Invalid number in entity_id: {entity_id}")
 
             # Check type
-            if e.get('entity_type') not in valid_types:
-                issues.append(f"Row {i+1} ({entity_id}): Invalid entity_type: {e.get('entity_type')}")
+            if e.get("entity_type") not in valid_types:
+                issues.append(
+                    f"Row {i+1} ({entity_id}): Invalid entity_type: {e.get('entity_type')}"
+                )
 
             # Check for duplicates
             if entity_id in entity_ids:
@@ -301,9 +311,7 @@ class DataExporter:
         return len(issues) == 0, issues
 
     def validate_relationships(
-        self,
-        relationships: List[Dict],
-        entity_ids: Set[str]
+        self, relationships: List[Dict], entity_ids: Set[str]
     ) -> Tuple[bool, List[str]]:
         """
         Validate relationship data.
@@ -317,16 +325,28 @@ class DataExporter:
         """
         issues = []
         valid_types = {
-            'Mentions', 'Criticizes', 'Supports', 'Endorses', 'Cites',
-            'Affiliated With', 'Works For', 'Founded', 'Collaborated With',
-            'Influenced', 'Taught', 'Related To', 'Part Of', 'Responds To',
-            'Developed', 'Authored By'
+            "Mentions",
+            "Criticizes",
+            "Supports",
+            "Endorses",
+            "Cites",
+            "Affiliated With",
+            "Works For",
+            "Founded",
+            "Collaborated With",
+            "Influenced",
+            "Taught",
+            "Related To",
+            "Part Of",
+            "Responds To",
+            "Developed",
+            "Authored By",
         }
 
         for i, r in enumerate(relationships):
-            source_id = r.get('source_entity_id', '')
-            target_id = r.get('target_entity_id', '')
-            rel_type = r.get('relationship_type', '')
+            source_id = r.get("source_entity_id", "")
+            target_id = r.get("target_entity_id", "")
+            rel_type = r.get("relationship_type", "")
 
             # Check required fields
             if not source_id:
@@ -352,12 +372,7 @@ class DataExporter:
 
         return len(issues) == 0, issues
 
-    def write_csv(
-        self,
-        data: List[Dict],
-        output_path: Path,
-        columns: List[str]
-    ) -> int:
+    def write_csv(self, data: List[Dict], output_path: Path, columns: List[str]) -> int:
         """
         Write data to CSV file.
 
@@ -371,19 +386,15 @@ class DataExporter:
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_path, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=columns, extrasaction='ignore')
+        with open(output_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=columns, extrasaction="ignore")
             writer.writeheader()
             writer.writerows(data)
 
         print(f"[EXPORT] Wrote {len(data)} rows to: {output_path}")
         return len(data)
 
-    def export(
-        self,
-        output_dir: Path,
-        validate: bool = True
-    ) -> Tuple[int, int]:
+    def export(self, output_dir: Path, validate: bool = True) -> Tuple[int, int]:
         """
         Export merged data to CSV files.
 
@@ -407,7 +418,9 @@ class DataExporter:
 
         # Merge
         merged_entities = self.merge_entities(csv_entities, db_entities)
-        merged_relationships = self.merge_relationships(csv_relationships, db_relationships)
+        merged_relationships = self.merge_relationships(
+            csv_relationships, db_relationships
+        )
 
         # Validate if requested
         if validate:
@@ -421,8 +434,12 @@ class DataExporter:
                 if len(issues_e) > 10:
                     print(f"  ... and {len(issues_e) - 10} more")
 
-            entity_ids = {e.get('entity_id') for e in merged_entities if e.get('entity_id')}
-            valid_r, issues_r = self.validate_relationships(merged_relationships, entity_ids)
+            entity_ids = {
+                e.get("entity_id") for e in merged_entities if e.get("entity_id")
+            }
+            valid_r, issues_r = self.validate_relationships(
+                merged_relationships, entity_ids
+            )
             if not valid_r:
                 print(f"[EXPORT] Relationship validation issues ({len(issues_r)}):")
                 for issue in issues_r[:10]:
@@ -432,13 +449,15 @@ class DataExporter:
 
         # Write output files
         output_dir = Path(output_dir)
-        timestamp = datetime.now().strftime('%Y%m%d')
+        timestamp = datetime.now().strftime("%Y%m%d")
 
-        entities_path = output_dir / f'final_entities_{timestamp}.csv'
-        relationships_path = output_dir / f'final_relationships_{timestamp}.csv'
+        entities_path = output_dir / f"final_entities_{timestamp}.csv"
+        relationships_path = output_dir / f"final_relationships_{timestamp}.csv"
 
         entity_count = self.write_csv(merged_entities, entities_path, ENTITY_COLUMNS)
-        rel_count = self.write_csv(merged_relationships, relationships_path, RELATIONSHIP_COLUMNS)
+        rel_count = self.write_csv(
+            merged_relationships, relationships_path, RELATIONSHIP_COLUMNS
+        )
 
         # Print summary
         print("\n" + "=" * 60)
@@ -470,7 +489,7 @@ class DataExporter:
         if csv_entities:
             type_counts = defaultdict(int)
             for e in csv_entities:
-                type_counts[e.get('entity_type', 'Unknown')] += 1
+                type_counts[e.get("entity_type", "Unknown")] += 1
             print("   By type:")
             for t, c in sorted(type_counts.items()):
                 print(f"      {t}: {c:,}")
@@ -485,9 +504,9 @@ class DataExporter:
             print(f"   Relationships: {db_stats.get('total_relationships', 0):,}")
             print(f"   Processed records: {db_stats.get('total_processed', 0):,}")
 
-            if db_stats.get('entities_by_type'):
+            if db_stats.get("entities_by_type"):
                 print("   By type:")
-                for t, c in sorted(db_stats['entities_by_type'].items()):
+                for t, c in sorted(db_stats["entities_by_type"].items()):
                     print(f"      {t}: {c:,}")
         else:
             print("\n💾 SQLite Database: Not found")
@@ -498,38 +517,36 @@ class DataExporter:
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description='Export merged entity data to CSV files'
+        description="Export merged entity data to CSV files"
     )
 
     parser.add_argument(
-        '--data-dir',
+        "--data-dir",
         type=Path,
-        default=Path(__file__).parent.parent.parent / 'data' / 'social_import',
-        help='Path to data directory'
+        default=Path(__file__).parent.parent.parent / "data" / "social_import",
+        help="Path to data directory",
     )
 
     parser.add_argument(
-        '--output-dir', '-o',
+        "--output-dir",
+        "-o",
         type=Path,
-        help='Output directory (default: data_dir/output/)'
+        help="Output directory (default: data_dir/output/)",
     )
 
     parser.add_argument(
-        '--validate-only',
-        action='store_true',
-        help='Only validate data, do not export'
+        "--validate-only", action="store_true", help="Only validate data, do not export"
     )
 
     parser.add_argument(
-        '--stats', '-s',
-        action='store_true',
-        help='Show statistics about available data'
+        "--stats",
+        "-s",
+        action="store_true",
+        help="Show statistics about available data",
     )
 
     parser.add_argument(
-        '--no-validate',
-        action='store_true',
-        help='Skip validation during export'
+        "--no-validate", action="store_true", help="Skip validation during export"
     )
 
     args = parser.parse_args()
@@ -548,11 +565,15 @@ def main():
         db_relationships = exporter.load_db_relationships()
 
         merged_entities = exporter.merge_entities(csv_entities, db_entities)
-        merged_relationships = exporter.merge_relationships(csv_relationships, db_relationships)
+        merged_relationships = exporter.merge_relationships(
+            csv_relationships, db_relationships
+        )
 
         valid_e, issues_e = exporter.validate_entities(merged_entities)
-        entity_ids = {e.get('entity_id') for e in merged_entities if e.get('entity_id')}
-        valid_r, issues_r = exporter.validate_relationships(merged_relationships, entity_ids)
+        entity_ids = {e.get("entity_id") for e in merged_entities if e.get("entity_id")}
+        valid_r, issues_r = exporter.validate_relationships(
+            merged_relationships, entity_ids
+        )
 
         print("\n" + "=" * 60)
         print("VALIDATION RESULTS")
@@ -570,11 +591,11 @@ def main():
         return 0 if (valid_e and valid_r) else 1
 
     # Export
-    output_dir = args.output_dir or (args.data_dir / 'output')
+    output_dir = args.output_dir or (args.data_dir / "output")
     exporter.export(output_dir, validate=not args.no_validate)
 
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

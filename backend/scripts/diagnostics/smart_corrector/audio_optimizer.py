@@ -21,8 +21,8 @@ class AudioOptimizer:
     """
 
     DEFAULT_SPEED_FACTOR = 2.0  # 2x speed = 50% cost reduction
-    MAX_SPEED_FACTOR = 2.5      # Don't go too fast (accuracy degrades)
-    MIN_SPEED_FACTOR = 1.0      # Minimum is normal speed
+    MAX_SPEED_FACTOR = 2.5  # Don't go too fast (accuracy degrades)
+    MIN_SPEED_FACTOR = 1.0  # Minimum is normal speed
 
     def __init__(self, speed_factor: float = DEFAULT_SPEED_FACTOR):
         """
@@ -31,16 +31,16 @@ class AudioOptimizer:
         Args:
             speed_factor: Speed multiplier (2.0 = 2x speed, 50% cost reduction)
         """
-        self.speed_factor = min(max(speed_factor, self.MIN_SPEED_FACTOR), self.MAX_SPEED_FACTOR)
+        self.speed_factor = min(
+            max(speed_factor, self.MIN_SPEED_FACTOR), self.MAX_SPEED_FACTOR
+        )
         self._check_ffmpeg()
 
     def _check_ffmpeg(self):
         """Check if FFmpeg is available."""
         try:
             result = subprocess.run(
-                ['ffmpeg', '-version'],
-                capture_output=True,
-                timeout=5
+                ["ffmpeg", "-version"], capture_output=True, timeout=5
             )
             if result.returncode != 0:
                 raise Exception("FFmpeg not found or not working")
@@ -50,7 +50,9 @@ class AudioOptimizer:
                 "Please install FFmpeg and add it to your system PATH."
             ) from e
 
-    def speed_up_audio(self, input_file: str, output_file: str, speed_factor: Optional[float] = None) -> str:
+    def speed_up_audio(
+        self, input_file: str, output_file: str, speed_factor: Optional[float] = None
+    ) -> str:
         """
         Speed up audio while preserving pitch quality.
 
@@ -78,20 +80,19 @@ class AudioOptimizer:
 
         # FFmpeg command
         command = [
-            'ffmpeg',
-            '-i', input_file,
-            '-filter:a', filter_complex,
-            '-vn',  # Remove video if present
-            '-y',   # Overwrite output file
-            output_file
+            "ffmpeg",
+            "-i",
+            input_file,
+            "-filter:a",
+            filter_complex,
+            "-vn",  # Remove video if present
+            "-y",  # Overwrite output file
+            output_file,
         ]
 
         try:
             result = subprocess.run(
-                command,
-                capture_output=True,
-                text=True,
-                timeout=300  # 5 minute timeout
+                command, capture_output=True, text=True, timeout=300  # 5 minute timeout
             )
 
             if result.returncode != 0:
@@ -118,7 +119,7 @@ class AudioOptimizer:
         - 3.0x: "atempo=2.0,atempo=1.5" (2.0 * 1.5 = 3.0)
         """
         if speed_factor <= 2.0:
-            return f'atempo={speed_factor}'
+            return f"atempo={speed_factor}"
 
         # Need to chain multiple filters
         filters = []
@@ -126,13 +127,13 @@ class AudioOptimizer:
 
         while remaining_speed > 1.0:
             if remaining_speed > 2.0:
-                filters.append('atempo=2.0')
+                filters.append("atempo=2.0")
                 remaining_speed /= 2.0
             else:
-                filters.append(f'atempo={remaining_speed:.2f}')
+                filters.append(f"atempo={remaining_speed:.2f}")
                 remaining_speed = 1.0
 
-        return ','.join(filters)
+        return ",".join(filters)
 
     def convert_to_wav(self, input_file: str, output_file: str) -> str:
         """
@@ -151,21 +152,22 @@ class AudioOptimizer:
             Path to WAV file
         """
         command = [
-            'ffmpeg',
-            '-i', input_file,
-            '-ac', '1',                    # Mono
-            '-ar', '16000',                # 16kHz sample rate
-            '-acodec', 'pcm_s16le',        # LINEAR16
-            '-y',
-            output_file
+            "ffmpeg",
+            "-i",
+            input_file,
+            "-ac",
+            "1",  # Mono
+            "-ar",
+            "16000",  # 16kHz sample rate
+            "-acodec",
+            "pcm_s16le",  # LINEAR16
+            "-y",
+            output_file,
         ]
 
         try:
             result = subprocess.run(
-                command,
-                capture_output=True,
-                text=True,
-                timeout=300
+                command, capture_output=True, text=True, timeout=300
             )
 
             if result.returncode != 0:
@@ -187,20 +189,18 @@ class AudioOptimizer:
             Duration in seconds
         """
         command = [
-            'ffprobe',
-            '-v', 'error',
-            '-show_entries', 'format=duration',
-            '-of', 'default=noprint_wrappers=1:nokey=1',
-            file_path
+            "ffprobe",
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            file_path,
         ]
 
         try:
-            result = subprocess.run(
-                command,
-                capture_output=True,
-                text=True,
-                timeout=30
-            )
+            result = subprocess.run(command, capture_output=True, text=True, timeout=30)
 
             if result.returncode == 0:
                 duration = float(result.stdout.strip())
@@ -212,7 +212,9 @@ class AudioOptimizer:
         except Exception:
             return 1800.0  # Default fallback
 
-    def calculate_cost_savings(self, original_duration_seconds: float, cost_per_minute: float = 0.024) -> Dict:
+    def calculate_cost_savings(
+        self, original_duration_seconds: float, cost_per_minute: float = 0.024
+    ) -> Dict:
         """
         Calculate cost savings from speed optimization.
 
@@ -232,16 +234,18 @@ class AudioOptimizer:
         savings_percent = (savings / original_cost * 100) if original_cost > 0 else 0
 
         return {
-            'original_duration_minutes': round(original_minutes, 2),
-            'optimized_duration_minutes': round(optimized_minutes, 2),
-            'original_cost': round(original_cost, 4),
-            'optimized_cost': round(optimized_cost, 4),
-            'savings': round(savings, 4),
-            'savings_percent': round(savings_percent, 1),
-            'speed_factor': self.speed_factor
+            "original_duration_minutes": round(original_minutes, 2),
+            "optimized_duration_minutes": round(optimized_minutes, 2),
+            "original_cost": round(original_cost, 4),
+            "optimized_cost": round(optimized_cost, 4),
+            "savings": round(savings, 4),
+            "savings_percent": round(savings_percent, 1),
+            "speed_factor": self.speed_factor,
         }
 
-    def normalize_timestamps(self, timestamps: list, speed_factor: Optional[float] = None) -> list:
+    def normalize_timestamps(
+        self, timestamps: list, speed_factor: Optional[float] = None
+    ) -> list:
         """
         Normalize timestamps from sped-up audio back to original timeline.
 
@@ -261,12 +265,14 @@ class AudioOptimizer:
 
         normalized = []
         for ts in timestamps:
-            normalized.append({
-                'start': ts['start'] * speed_factor,
-                'end': ts['end'] * speed_factor,
-                'word': ts.get('word', ''),
-                'text': ts.get('text', '')
-            })
+            normalized.append(
+                {
+                    "start": ts["start"] * speed_factor,
+                    "end": ts["end"] * speed_factor,
+                    "word": ts.get("word", ""),
+                    "text": ts.get("text", ""),
+                }
+            )
 
         return normalized
 
@@ -289,25 +295,30 @@ class AudioOptimizer:
         speed_factor = self.DEFAULT_SPEED_FACTOR  # Start with 2.0x
 
         # Check audio quality
-        bitrate = audio_metadata.get('bitrate', 128)
+        bitrate = audio_metadata.get("bitrate", 128)
         if bitrate < 64:
             # Low quality audio - use slower speed for better accuracy
             speed_factor = 1.5
             print("  [ADAPTIVE] Low bitrate detected, using 1.5x speed")
 
         # Check speaking rate from description/metadata
-        description = audio_metadata.get('description', '').lower()
-        if any(word in description for word in ['fast-paced', 'rapid', 'quick']):
+        description = audio_metadata.get("description", "").lower()
+        if any(word in description for word in ["fast-paced", "rapid", "quick"]):
             speed_factor = min(speed_factor, 1.5)
             print("  [ADAPTIVE] Fast-paced content, reducing to 1.5x speed")
 
         # Check for multiple speakers
-        if any(word in description for word in ['interview', 'conversation', 'panel', 'discussion']):
+        if any(
+            word in description
+            for word in ["interview", "conversation", "panel", "discussion"]
+        ):
             speed_factor = min(speed_factor, 1.75)
             print("  [ADAPTIVE] Multi-speaker content, using 1.75x speed")
 
         # Check for accent/clarity indicators
-        if any(word in description for word in ['accent', 'non-native', 'second language']):
+        if any(
+            word in description for word in ["accent", "non-native", "second language"]
+        ):
             speed_factor = min(speed_factor, 1.5)
             print("  [ADAPTIVE] Clarity concerns, using 1.5x speed")
 
@@ -317,7 +328,7 @@ class AudioOptimizer:
         self,
         input_file: str,
         speed_factor: Optional[float] = None,
-        output_format: str = 'wav'
+        output_format: str = "wav",
     ) -> Dict:
         """
         Complete audio processing pipeline.
@@ -338,12 +349,12 @@ class AudioOptimizer:
             original_duration = self.get_audio_duration(input_file)
 
             # Speed up audio
-            sped_up_file = os.path.join(temp_dir, 'sped_up.mp3')
+            sped_up_file = os.path.join(temp_dir, "sped_up.mp3")
             self.speed_up_audio(input_file, sped_up_file, speed_factor)
 
             # Convert to final format
-            if output_format == 'wav':
-                final_file = os.path.join(temp_dir, 'final.wav')
+            if output_format == "wav":
+                final_file = os.path.join(temp_dir, "final.wav")
                 self.convert_to_wav(sped_up_file, final_file)
             else:
                 final_file = sped_up_file
@@ -355,9 +366,9 @@ class AudioOptimizer:
             # (In actual use, you'd copy this to your desired location)
 
             return {
-                'processed_file': final_file,
-                'original_duration': original_duration,
-                'optimized_duration': original_duration / speed_factor,
-                'cost_savings': cost_info,
-                'speed_factor': speed_factor
+                "processed_file": final_file,
+                "original_duration": original_duration,
+                "optimized_duration": original_duration / speed_factor,
+                "cost_savings": cost_info,
+                "speed_factor": speed_factor,
             }

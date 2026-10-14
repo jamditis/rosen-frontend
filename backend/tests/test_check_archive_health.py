@@ -403,8 +403,7 @@ def test_oversized_response_is_an_outage_without_reading_past_bound(tmp_path):
 
 def test_systemd_script_cli_loads_without_site_packages():
     service = (
-        REPOSITORY_ROOT
-        / "automation/systemd/rosen-source-discovery-health.service"
+        REPOSITORY_ROOT / "automation/systemd/rosen-source-discovery-health.service"
     ).read_text(encoding="utf-8")
     assert "ExecStart=/usr/bin/python3 -S " in service
 

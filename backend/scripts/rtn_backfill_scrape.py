@@ -54,7 +54,9 @@ def fetch(url: str) -> Optional[str]:
 
 def head_ok(url: str) -> bool:
     try:
-        r = requests.head(url, headers={"User-Agent": UA}, timeout=15, allow_redirects=True)
+        r = requests.head(
+            url, headers={"User-Agent": UA}, timeout=15, allow_redirects=True
+        )
         return 200 <= r.status_code < 400
     except requests.RequestException:
         return False
@@ -80,12 +82,14 @@ def parse_listing(html: str) -> list[dict]:
             continue
         seen.add(href)
         y, mo, d = date_m.groups()
-        out.append({
-            "number": int(m.group(1)),
-            "url": href,
-            "title": title,
-            "date": f"{y}-{mo}-{d}",
-        })
+        out.append(
+            {
+                "number": int(m.group(1)),
+                "url": href,
+                "title": title,
+                "date": f"{y}-{mo}-{d}",
+            }
+        )
     return out
 
 
@@ -136,7 +140,9 @@ def crawl(max_pages: int = 20, sleep: float = 1.0) -> list[dict]:
     return [catalog[n] for n in sorted(catalog)]
 
 
-def enrich(items: list[dict], sleep: float = 1.0, verify_mp3: bool = True) -> list[dict]:
+def enrich(
+    items: list[dict], sleep: float = 1.0, verify_mp3: bool = True
+) -> list[dict]:
     out = []
     for it in items:
         print(f"[episode #{it['number']}] {it['url']}", file=sys.stderr)
@@ -161,8 +167,11 @@ def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--out", required=True, help="Path to output JSON")
     p.add_argument("--max-pages", type=int, default=20)
-    p.add_argument("--sample-only", action="store_true",
-                   help="Skip per-episode enrichment; index only")
+    p.add_argument(
+        "--sample-only",
+        action="store_true",
+        help="Skip per-episode enrichment; index only",
+    )
     p.add_argument("--sleep", type=float, default=1.0)
     args = p.parse_args()
 

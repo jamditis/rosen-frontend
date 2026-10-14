@@ -32,22 +32,22 @@ import nltk
 
 # Download required NLTK data
 try:
-    nltk.data.find('tokenizers/punkt')
+    nltk.data.find("tokenizers/punkt")
 except LookupError:
     print("Downloading NLTK punkt tokenizer...")
-    nltk.download('punkt')
+    nltk.download("punkt")
 
 try:
-    nltk.data.find('tokenizers/punkt_tab')
+    nltk.data.find("tokenizers/punkt_tab")
 except LookupError:
     print("Downloading NLTK punkt_tab tokenizer...")
-    nltk.download('punkt_tab')
+    nltk.download("punkt_tab")
 
 
 class SummaryGenerator:
     """Generate summaries using sumy library."""
 
-    def __init__(self, algorithm: str = 'lsa', sentences: int = 3):
+    def __init__(self, algorithm: str = "lsa", sentences: int = 3):
         """
         Initialize summarizer.
 
@@ -59,11 +59,11 @@ class SummaryGenerator:
         self.tokenizer = Tokenizer("english")
 
         # Choose algorithm
-        if algorithm == 'lsa':
+        if algorithm == "lsa":
             self.summarizer = LsaSummarizer()
-        elif algorithm == 'lexrank':
+        elif algorithm == "lexrank":
             self.summarizer = LexRankSummarizer()
-        elif algorithm == 'textrank':
+        elif algorithm == "textrank":
             self.summarizer = TextRankSummarizer()
         else:
             raise ValueError(f"Unknown algorithm: {algorithm}")
@@ -91,7 +91,7 @@ class SummaryGenerator:
             summary_sentences = self.summarizer(parser.document, self.sentences)
 
             # Convert to string
-            summary = ' '.join([str(sentence) for sentence in summary_sentences])
+            summary = " ".join([str(sentence) for sentence in summary_sentences])
 
             return summary.strip()
 
@@ -101,8 +101,7 @@ class SummaryGenerator:
 
 
 def identify_records_needing_summaries(
-    df: pd.DataFrame,
-    min_length: int = 100
+    df: pd.DataFrame, min_length: int = 100
 ) -> pd.DataFrame:
     """
     Identify records with missing or short summaries.
@@ -115,10 +114,10 @@ def identify_records_needing_summaries(
         DataFrame with records needing summaries
     """
     # Missing summaries
-    missing = df['summary'].isna()
+    missing = df["summary"].isna()
 
     # Short summaries
-    short = df['summary'].notna() & (df['summary'].str.len() < min_length)
+    short = df["summary"].notna() & (df["summary"].str.len() < min_length)
 
     # Combine
     needs_summary = df[missing | short].copy()
@@ -132,8 +131,8 @@ def backfill_summaries(
     dry_run: bool = False,
     min_length: int = 100,
     sentences: int = 3,
-    algorithm: str = 'lsa',
-    limit: Optional[int] = None
+    algorithm: str = "lsa",
+    limit: Optional[int] = None,
 ):
     """
     Backfill summaries for records.
@@ -163,8 +162,10 @@ def backfill_summaries(
 
     print(f"Records needing summaries: {len(needs_summary)}")
     print(f"  - Missing summary: {needs_summary['summary'].isna().sum()}")
-    print(f"  - Short summary (<{min_length} chars): "
-          f"{needs_summary['summary'].notna().sum()}\n")
+    print(
+        f"  - Short summary (<{min_length} chars): "
+        f"{needs_summary['summary'].notna().sum()}\n"
+    )
 
     if len(needs_summary) == 0:
         print("✓ All records have adequate summaries!")
@@ -186,10 +187,12 @@ def backfill_summaries(
     skipped_count = 0
 
     for idx, row in needs_summary.iterrows():
-        record_id = row['id']
-        title = row['title'][:50] + "..." if len(row['title']) > 50 else row['title']
+        record_id = row["id"]
+        title = row["title"][:50] + "..." if len(row["title"]) > 50 else row["title"]
 
-        print(f"\n[{updated_count + skipped_count + 1}/{len(needs_summary)}] {record_id}")
+        print(
+            f"\n[{updated_count + skipped_count + 1}/{len(needs_summary)}] {record_id}"
+        )
         print(f"  Title: {title}")
 
         # Get text content
@@ -197,14 +200,14 @@ def backfill_summaries(
         text = None
 
         # Try raw_text field first
-        if pd.notna(row.get('raw_text')):
-            text = row['raw_text']
-            text_source = 'raw_text'
+        if pd.notna(row.get("raw_text")):
+            text = row["raw_text"]
+            text_source = "raw_text"
 
         # Try excerpt if no raw_text
-        elif pd.notna(row.get('excerpt')):
-            text = row['excerpt']
-            text_source = 'excerpt'
+        elif pd.notna(row.get("excerpt")):
+            text = row["excerpt"]
+            text_source = "excerpt"
 
         if not text:
             print("  ⚠️  No text available - skipping")
@@ -221,7 +224,7 @@ def backfill_summaries(
             print(f"    Preview: {summary[:100]}...")
 
             # Update dataframe
-            df.at[idx, 'summary'] = summary
+            df.at[idx, "summary"] = summary
             updated_count += 1
         else:
             print("  ⚠️  Failed to generate summary")
@@ -239,7 +242,9 @@ def backfill_summaries(
     # Save results
     if not dry_run and updated_count > 0:
         output_path = output_path or csv_path
-        backup_path = csv_path.replace('.csv', f'_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv')
+        backup_path = csv_path.replace(
+            ".csv", f'_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+        )
 
         print(f"Creating backup: {backup_path}")
         df_original = pd.read_csv(csv_path)
@@ -262,41 +267,34 @@ def main():
         description="Backfill missing summaries using sumy library"
     )
     parser.add_argument(
-        '--csv',
-        default='/home/user/rosen-frontend/data/archive_records-public.csv',
-        help='Path to archive CSV'
+        "--csv",
+        default="/home/user/rosen-frontend/data/archive_records-public.csv",
+        help="Path to archive CSV",
+    )
+    parser.add_argument("--output", help="Output path (defaults to input path)")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Preview changes without writing"
     )
     parser.add_argument(
-        '--output',
-        help='Output path (defaults to input path)'
-    )
-    parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help='Preview changes without writing'
-    )
-    parser.add_argument(
-        '--min-length',
+        "--min-length",
         type=int,
         default=100,
-        help='Minimum summary length in characters (default: 100)'
+        help="Minimum summary length in characters (default: 100)",
     )
     parser.add_argument(
-        '--sentences',
+        "--sentences",
         type=int,
         default=3,
-        help='Number of sentences in summary (default: 3)'
+        help="Number of sentences in summary (default: 3)",
     )
     parser.add_argument(
-        '--algorithm',
-        choices=['lsa', 'lexrank', 'textrank'],
-        default='lsa',
-        help='Summarization algorithm (default: lsa)'
+        "--algorithm",
+        choices=["lsa", "lexrank", "textrank"],
+        default="lsa",
+        help="Summarization algorithm (default: lsa)",
     )
     parser.add_argument(
-        '--limit',
-        type=int,
-        help='Process only first N records (for testing)'
+        "--limit", type=int, help="Process only first N records (for testing)"
     )
 
     args = parser.parse_args()
@@ -308,7 +306,7 @@ def main():
         min_length=args.min_length,
         sentences=args.sentences,
         algorithm=args.algorithm,
-        limit=args.limit
+        limit=args.limit,
     )
 
 

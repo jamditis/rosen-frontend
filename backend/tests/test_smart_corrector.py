@@ -9,22 +9,22 @@ from pathlib import Path
 
 # Add project root to path
 ROOT_DIR = Path(__file__).resolve().parent.parent  # Go to backend root
-sys.path.insert(0, str(ROOT_DIR / 'scripts'))
-sys.path.insert(0, str(ROOT_DIR / 'scripts' / 'diagnostics'))
+sys.path.insert(0, str(ROOT_DIR / "scripts"))
+sys.path.insert(0, str(ROOT_DIR / "scripts" / "diagnostics"))
 
 from diagnostics.smart_corrector import (
     ContentDetector,
     QualityValidator,
     AudioOptimizer,
-    CostTracker
+    CostTracker,
 )
 
 
 def test_content_detector():
     """Test content type detection."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Testing Content Detector")
-    print("="*60)
+    print("=" * 60)
 
     detector = ContentDetector()
 
@@ -47,34 +47,44 @@ def test_content_detector():
 
 def test_quality_validator():
     """Test quality validation."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Testing Quality Validator")
-    print("="*60)
+    print("=" * 60)
 
     validator = QualityValidator()
 
     test_cases = [
-        ("Good article text with multiple paragraphs and sentences. " * 20, "article", True),
+        (
+            "Good article text with multiple paragraphs and sentences. " * 20,
+            "article",
+            True,
+        ),
         ("<script>alert('bad')</script>Short text", "article", False),
         ("404 not found error page", "article", False),
-        ("Speaker 1: This is a transcript. Speaker 2: Yes, it is. " * 10, "audio", True),
+        (
+            "Speaker 1: This is a transcript. Speaker 2: Yes, it is. " * 10,
+            "audio",
+            True,
+        ),
         ("Short", "article", False),
     ]
 
     for text, content_type, should_be_valid in test_cases:
-        is_valid, score, issues = validator.validate(text, '', content_type)
+        is_valid, score, issues = validator.validate(text, "", content_type)
         status = "[OK]" if is_valid == should_be_valid else "[FAIL]"
         quality_label = validator.get_quality_label(score)
-        print(f"{status} Score: {score:.2f} ({quality_label:10s}) Issues: {len(issues):2d} Valid: {is_valid}")
+        print(
+            f"{status} Score: {score:.2f} ({quality_label:10s}) Issues: {len(issues):2d} Valid: {is_valid}"
+        )
 
     print("[OK] Quality Validator Test Complete\n")
 
 
 def test_audio_optimizer():
     """Test audio optimizer (without actual FFmpeg processing)."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Testing Audio Optimizer")
-    print("="*60)
+    print("=" * 60)
 
     try:
         optimizer = AudioOptimizer(speed_factor=2.0)
@@ -86,7 +96,9 @@ def test_audio_optimizer():
         print(f"  Optimized duration: {savings['optimized_duration_minutes']} minutes")
         print(f"  Original cost:      ${savings['original_cost']:.2f}")
         print(f"  Optimized cost:     ${savings['optimized_cost']:.2f}")
-        print(f"  Savings:            ${savings['savings']:.2f} ({savings['savings_percent']:.1f}%)")
+        print(
+            f"  Savings:            ${savings['savings']:.2f} ({savings['savings_percent']:.1f}%)"
+        )
 
         # Test atempo chain building
         chain_1_5x = optimizer._build_atempo_chain(1.5)
@@ -106,17 +118,17 @@ def test_audio_optimizer():
 
 def test_cost_tracker():
     """Test cost tracking."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Testing Cost Tracker")
-    print("="*60)
+    print("=" * 60)
 
     tracker = CostTracker(max_budget=10.00, speed_optimization=True)
 
     # Test cost estimation
-    article_cost = tracker.estimate_cost('article')
-    audio_cost = tracker.estimate_cost('audio', duration=30)
-    video_cost = tracker.estimate_cost('video', duration=20)
-    social_cost = tracker.estimate_cost('social')
+    article_cost = tracker.estimate_cost("article")
+    audio_cost = tracker.estimate_cost("audio", duration=30)
+    video_cost = tracker.estimate_cost("video", duration=20)
+    social_cost = tracker.estimate_cost("social")
 
     print("Estimated costs:")
     print(f"  Article:      ${article_cost:.4f}")
@@ -125,8 +137,8 @@ def test_cost_tracker():
     print(f"  Social:       ${social_cost:.4f}")
 
     # Test cost recording
-    tracker.record_cost('gemini_flash', 0.05, 'Test operation 1')
-    tracker.record_cost('speech_to_text', 0.36, 'Test transcription')
+    tracker.record_cost("gemini_flash", 0.05, "Test operation 1")
+    tracker.record_cost("speech_to_text", 0.36, "Test transcription")
 
     summary = tracker.get_summary()
     print("\nTracking Summary:")
@@ -139,18 +151,18 @@ def test_cost_tracker():
 
 def main():
     """Run all tests."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("SMART DATA CORRECTOR - MODULE TESTS")
-    print("="*60)
+    print("=" * 60)
 
     test_content_detector()
     test_quality_validator()
     test_audio_optimizer()
     test_cost_tracker()
 
-    print("="*60)
+    print("=" * 60)
     print("ALL TESTS COMPLETE")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
 
 if __name__ == "__main__":

@@ -29,10 +29,12 @@ def test_inline_json_wins(monkeypatch):
         seen["scopes"] = scopes
         return "CREDS_FROM_INFO"
 
-    monkeypatch.setattr(sheets_client.Credentials,
-                        "from_service_account_info", fake_from_info)
-    monkeypatch.setenv("ROSEN_SHEETS_SA_KEY_JSON",
-                       json.dumps({"client_email": "bot@x.iam"}))
+    monkeypatch.setattr(
+        sheets_client.Credentials, "from_service_account_info", fake_from_info
+    )
+    monkeypatch.setenv(
+        "ROSEN_SHEETS_SA_KEY_JSON", json.dumps({"client_email": "bot@x.iam"})
+    )
     # A path is also set, but the inline JSON must take precedence.
     monkeypatch.setenv("ROSEN_SHEETS_SA_KEY", "/should/not/be/used.json")
 
@@ -51,8 +53,9 @@ def test_file_path_env_used_when_no_inline(monkeypatch):
         seen["path"] = path
         return "CREDS_FROM_FILE"
 
-    monkeypatch.setattr(sheets_client.Credentials,
-                        "from_service_account_file", fake_from_file)
+    monkeypatch.setattr(
+        sheets_client.Credentials, "from_service_account_file", fake_from_file
+    )
     monkeypatch.setenv("ROSEN_SHEETS_SA_KEY", "/keys/sa.json")
 
     creds = sheets_client.load_credentials(fallback_file="ignored.json")
@@ -68,8 +71,9 @@ def test_falls_back_to_local_file(monkeypatch):
         seen["path"] = path
         return "CREDS_FROM_FALLBACK"
 
-    monkeypatch.setattr(sheets_client.Credentials,
-                        "from_service_account_file", fake_from_file)
+    monkeypatch.setattr(
+        sheets_client.Credentials, "from_service_account_file", fake_from_file
+    )
 
     creds = sheets_client.load_credentials(fallback_file="google_credentials.json")
 
@@ -84,8 +88,11 @@ def test_bad_inline_json_raises(monkeypatch):
 
 
 def test_get_gspread_client_authorizes(monkeypatch):
-    monkeypatch.setattr(sheets_client, "load_credentials",
-                        lambda fallback_file=sheets_client.DEFAULT_FALLBACK_FILE: "CREDS")
+    monkeypatch.setattr(
+        sheets_client,
+        "load_credentials",
+        lambda fallback_file=sheets_client.DEFAULT_FALLBACK_FILE: "CREDS",
+    )
     captured = {}
 
     def fake_authorize(creds):
@@ -105,8 +112,11 @@ def test_open_spreadsheet_uses_env_name(monkeypatch):
         def open(self, name):
             return f"SHEET::{name}"
 
-    monkeypatch.setattr(sheets_client, "get_gspread_client",
-                        lambda fallback_file=sheets_client.DEFAULT_FALLBACK_FILE: _Client())
+    monkeypatch.setattr(
+        sheets_client,
+        "get_gspread_client",
+        lambda fallback_file=sheets_client.DEFAULT_FALLBACK_FILE: _Client(),
+    )
     monkeypatch.setenv("SPREADSHEET_NAME", "My Master Sheet")
 
     assert sheets_client.open_spreadsheet() == "SHEET::My Master Sheet"

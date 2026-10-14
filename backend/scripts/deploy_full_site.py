@@ -58,9 +58,9 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s %(levelname)s %(message)s',
+    format="%(asctime)s %(levelname)s %(message)s",
 )
-logger = logging.getLogger('deploy_full_site')
+logger = logging.getLogger("deploy_full_site")
 
 _BACKEND = Path(__file__).resolve().parents[1]
 if str(_BACKEND) not in sys.path:
@@ -79,55 +79,53 @@ from submission_runtime import remote_transfer  # noqa: E402
 # backend/tests/test_deploy_full_site.py::TestDeploymentMdAlignment.
 
 _DEPLOY_FILES: Tuple[str, ...] = (
-    'index.html',
-    'sw.js',  # root-scope bridge; imports frontend/sw.js
-    'favicon.ico',
-    'favicon.svg',  # SVG favicon referenced by index.html, the FAQ, and dataviz
-    'og-image.png',  # social card referenced by the OG/Twitter meta tags
-    'shared-styles.css',
-    'version.json',
-    'metadata.json',
-    '.htaccess',
-    'ADDING-RECORDS.md',
+    "index.html",
+    "sw.js",  # root-scope bridge; imports frontend/sw.js
+    "favicon.ico",
+    "favicon.svg",  # SVG favicon referenced by index.html, the FAQ, and dataviz
+    "og-image.png",  # social card referenced by the OG/Twitter meta tags
+    "shared-styles.css",
+    "version.json",
+    "metadata.json",
+    ".htaccess",
+    "ADDING-RECORDS.md",
     # Shared Tailwind build for the standalone data visualization tool. It sits
     # at tools/active/, one level above the deployed tool dir, so the dir walk
     # below never reaches it; dataviz loads it as ../tailwind.css.
-    'tools/active/tailwind.css',
+    "tools/active/tailwind.css",
 )
 
 _DEPLOY_DIRS: Tuple[str, ...] = (
-    'r',  # generated metadata shells for ?record= deep links
-    'frontend',
-    'dissertation',
-    'faq',
-    'dissertation-launch',
-    'features/shared',
-    'features/winer-method',
-    'features/participate',
-    'tools/active/dataviz',
-    'data/feeds',
+    "r",  # generated metadata shells for ?record= deep links
+    "frontend",
+    "dissertation",
+    "faq",
+    "dissertation-launch",
+    "features/shared",
+    "features/winer-method",
+    "features/participate",
+    "tools/active/dataviz",
+    "data/feeds",
 )
 
 # Prune retired pages after all current files upload so a transfer failure
 # cannot remove working pages before the replacement site is in place. Missing
 # directories are treated as already pruned.
 _REMOTE_PRUNE_DIRS: Tuple[str, ...] = (
-    'dissertation/comparison',
-    'dissertation/concepts',
-    'dissertation/context',
-    'dissertation/excerpts',
-    'dissertation/glossary',
-    'dissertation/timeline',
-    'features/status-report',
+    "dissertation/comparison",
+    "dissertation/concepts",
+    "dissertation/context",
+    "dissertation/excerpts",
+    "dissertation/glossary",
+    "dissertation/timeline",
+    "features/status-report",
 )
 
 # The hardened data explorer source remains in the repository as an internal
 # prototype, but any old manually uploaded copy must not remain a hidden public
 # endpoint. Keep this distinct from retired routes so dry-run output records the
 # product decision rather than implying that the source itself was deleted.
-_REMOTE_INTERNAL_PRUNE_DIRS: Tuple[str, ...] = (
-    'tools/active/dataexplorer',
-)
+_REMOTE_INTERNAL_PRUNE_DIRS: Tuple[str, ...] = ("tools/active/dataexplorer",)
 _REMOTE_PRUNE_TARGETS: Tuple[str, ...] = (
     *_REMOTE_PRUNE_DIRS,
     *_REMOTE_INTERNAL_PRUNE_DIRS,
@@ -136,9 +134,7 @@ _REMOTE_PRUNE_TARGETS: Tuple[str, ...] = (
 # Exact retired files need separate reconciliation because the surrounding
 # frontend directory remains public. Remove them only after replacement uploads
 # succeed, using the same archive-root scope validation as every upload.
-_REMOTE_PRUNE_FILES: Tuple[str, ...] = (
-    'frontend/components/RiverOfNews.js',
-)
+_REMOTE_PRUNE_FILES: Tuple[str, ...] = ("frontend/components/RiverOfNews.js",)
 
 # features/making-of is intentionally omitted. That page is a draft pending
 # curator sign-off, and its handoff chapter carries approval-gated disclosures,
@@ -148,53 +144,53 @@ _REMOTE_PRUNE_FILES: Tuple[str, ...] = (
 # social card, not a browsable page) via _EXCLUDE_NAMES.
 
 _DEPLOY_DATA_FILES: Tuple[str, ...] = (
-    'data/archive-core.json',
-    'data/archive-data.json',
-    'data/archive-details.json',
-    'data/archive-entities.json',
-    'data/archive-analytics.json',
-    'data/search-index.json',  # prebuilt MiniSearch full-text index, loaded lazily on first search, issue 276
-    'data/social-search-index.json',  # social-body MiniSearch index, loaded lazily on first search, issue 669
+    "data/archive-core.json",
+    "data/archive-data.json",
+    "data/archive-details.json",
+    "data/archive-entities.json",
+    "data/archive-analytics.json",
+    "data/search-index.json",  # prebuilt MiniSearch full-text index, loaded lazily on first search, issue 276
+    "data/social-search-index.json",  # social-body MiniSearch index, loaded lazily on first search, issue 669
     # Similar-in-theme artifact pair. Upload the binary first and its hash-bound
     # sidecar second so the live index never advertises bytes that are not present.
-    'data/archive-embeddings.bin',
-    'data/archive-embeddings.json',
+    "data/archive-embeddings.bin",
+    "data/archive-embeddings.json",
     # Meaning-search vectors for social posts. Keep each binary immediately
     # before its hash-bound sidecar.
-    'data/archive-social-embeddings.bin',
-    'data/archive-social-embeddings.json',
+    "data/archive-social-embeddings.bin",
+    "data/archive-social-embeddings.json",
     # Fixed public-safe relationship shards. Upload the manifest last so it
     # never points a reader at a shard that has not uploaded yet. Issue 807.
-    'data/relationship-adjacency-0.json',
-    'data/relationship-adjacency-1.json',
-    'data/relationship-adjacency-2.json',
-    'data/relationship-adjacency-3.json',
-    'data/relationship-adjacency-4.json',
-    'data/relationship-adjacency-5.json',
-    'data/relationship-adjacency-6.json',
-    'data/relationship-adjacency-7.json',
-    'data/relationship-adjacency-8.json',
-    'data/relationship-adjacency-9.json',
-    'data/relationship-adjacency-a.json',
-    'data/relationship-adjacency-b.json',
-    'data/relationship-adjacency-c.json',
-    'data/relationship-adjacency-d.json',
-    'data/relationship-adjacency-e.json',
-    'data/relationship-adjacency-f.json',
-    'data/relationship-adjacency-manifest.json',
-    'data/wiki-seed.json',
-    'data/schema.json',  # data dictionary; linked from the open-data download UI
-    'data/SCHEMA.md',  # human-readable data guide; linked from participation/open-data UI
-    'data/eras.js',  # canonical era taxonomy imported by the frontend
+    "data/relationship-adjacency-0.json",
+    "data/relationship-adjacency-1.json",
+    "data/relationship-adjacency-2.json",
+    "data/relationship-adjacency-3.json",
+    "data/relationship-adjacency-4.json",
+    "data/relationship-adjacency-5.json",
+    "data/relationship-adjacency-6.json",
+    "data/relationship-adjacency-7.json",
+    "data/relationship-adjacency-8.json",
+    "data/relationship-adjacency-9.json",
+    "data/relationship-adjacency-a.json",
+    "data/relationship-adjacency-b.json",
+    "data/relationship-adjacency-c.json",
+    "data/relationship-adjacency-d.json",
+    "data/relationship-adjacency-e.json",
+    "data/relationship-adjacency-f.json",
+    "data/relationship-adjacency-manifest.json",
+    "data/wiki-seed.json",
+    "data/schema.json",  # data dictionary; linked from the open-data download UI
+    "data/SCHEMA.md",  # human-readable data guide; linked from participation/open-data UI
+    "data/eras.js",  # canonical era taxonomy imported by the frontend
 )
 
 _RECALL_ARTIFACT_PAIR: Tuple[str, str] = (
-    'data/archive-embeddings.bin',
-    'data/archive-embeddings.json',
+    "data/archive-embeddings.bin",
+    "data/archive-embeddings.json",
 )
 _SOCIAL_RECALL_ARTIFACT_PAIR: Tuple[str, str] = (
-    'data/archive-social-embeddings.bin',
-    'data/archive-social-embeddings.json',
+    "data/archive-social-embeddings.bin",
+    "data/archive-social-embeddings.json",
 )
 _RECALL_ARTIFACT_PAIRS: Tuple[Tuple[str, str], ...] = (
     _RECALL_ARTIFACT_PAIR,
@@ -202,8 +198,8 @@ _RECALL_ARTIFACT_PAIRS: Tuple[Tuple[str, str], ...] = (
 )
 
 # Walking _DEPLOY_DIRS, prune these.
-_EXCLUDE_NAMES: frozenset = frozenset({'__pycache__', '.DS_Store', '.gitkeep'})
-_EXCLUDE_SUFFIXES: Tuple[str, ...] = ('.pyc', '.test.js', '.spec.js', '.csv')
+_EXCLUDE_NAMES: frozenset = frozenset({"__pycache__", ".DS_Store", ".gitkeep"})
+_EXCLUDE_SUFFIXES: Tuple[str, ...] = (".pyc", ".test.js", ".spec.js", ".csv")
 
 # Entry-point files that must upload AFTER everything else they reference.
 # Atomic per-file rename protects each file individually, but cross-file
@@ -231,10 +227,16 @@ _EXCLUDE_SUFFIXES: Tuple[str, ...] = ('.pyc', '.test.js', '.spec.js', '.csv')
 #     so it flips LAST as the least-harmful stale state: a client racing the
 #     final rename pins the old version.json (a missed update nudge) rather than
 #     any asset the worker would cache.
-_ENTRY_POINTS: Tuple[str, ...] = ('index.html', 'frontend/sw.js', 'sw.js', 'version.json')
+_ENTRY_POINTS: Tuple[str, ...] = (
+    "index.html",
+    "frontend/sw.js",
+    "sw.js",
+    "version.json",
+)
 
 
 # ---------- Config ----------------------------------------------------------
+
 
 def _read_env() -> Optional[Dict[str, Any]]:
     """Return transfer config from env, or None when required vars are missing.
@@ -243,43 +245,44 @@ def _read_env() -> Optional[Dict[str, Any]]:
     ROSEN_SFTP_SITE_PATH (the full-site root) instead of the data-only
     ROSEN_SFTP_REMOTE_PATH.
     """
-    host = os.environ.get('ROSEN_SFTP_HOST', '').strip()
-    user = os.environ.get('ROSEN_SFTP_USER', '').strip()
-    site_path = os.environ.get('ROSEN_SFTP_SITE_PATH', '').strip()
-    transaction_path = os.environ.get(
-        'ROSEN_SFTP_TRANSACTION_PATH', '').strip()
-    password = os.environ.get('ROSEN_SFTP_PASSWORD', '')
-    key_path = os.environ.get('ROSEN_SFTP_KEY_PATH', '').strip()
+    host = os.environ.get("ROSEN_SFTP_HOST", "").strip()
+    user = os.environ.get("ROSEN_SFTP_USER", "").strip()
+    site_path = os.environ.get("ROSEN_SFTP_SITE_PATH", "").strip()
+    transaction_path = os.environ.get("ROSEN_SFTP_TRANSACTION_PATH", "").strip()
+    password = os.environ.get("ROSEN_SFTP_PASSWORD", "")
+    key_path = os.environ.get("ROSEN_SFTP_KEY_PATH", "").strip()
     protocol = remote_transfer.normalize_protocol(
-        os.environ.get('ROSEN_TRANSFER_PROTOCOL', 'sftp'))
+        os.environ.get("ROSEN_TRANSFER_PROTOCOL", "sftp")
+    )
 
-    has_auth = bool(password) if protocol == 'ftps' else bool(password or key_path)
+    has_auth = bool(password) if protocol == "ftps" else bool(password or key_path)
     if not (host and user and site_path and has_auth):
         return None
 
     try:
-        default_port = '21' if protocol == 'ftps' else '22'
-        port = int(os.environ.get('ROSEN_SFTP_PORT') or default_port)
+        default_port = "21" if protocol == "ftps" else "22"
+        port = int(os.environ.get("ROSEN_SFTP_PORT") or default_port)
     except (TypeError, ValueError) as exc:
         raise ValueError("ROSEN_SFTP_PORT must be an integer") from exc
 
     return {
-        'protocol': protocol,
-        'host': host,
-        'port': port,
-        'user': user,
-        'site_path': site_path.rstrip('/'),
-        'transaction_path': transaction_path.rstrip('/') or None,
-        'password': password or None,
-        'key_path': key_path or None,
-        'key_passphrase': os.environ.get('ROSEN_SFTP_KEY_PASSPHRASE') or None,
-        'known_hosts': os.environ.get(
-            'ROSEN_SFTP_KNOWN_HOSTS',
-            str(Path.home() / '.ssh' / 'known_hosts')),
+        "protocol": protocol,
+        "host": host,
+        "port": port,
+        "user": user,
+        "site_path": site_path.rstrip("/"),
+        "transaction_path": transaction_path.rstrip("/") or None,
+        "password": password or None,
+        "key_path": key_path or None,
+        "key_passphrase": os.environ.get("ROSEN_SFTP_KEY_PASSPHRASE") or None,
+        "known_hosts": os.environ.get(
+            "ROSEN_SFTP_KNOWN_HOSTS", str(Path.home() / ".ssh" / "known_hosts")
+        ),
     }
 
 
 # ---------- File collection -------------------------------------------------
+
 
 def _is_excluded(path: Path) -> bool:
     if path.name in _EXCLUDE_NAMES:
@@ -333,22 +336,24 @@ def collect_local_files(
     # This covers dissertation/, faq/, tools/, and features/ uniformly as their
     # versioned surfaces evolve. Generated r/*.html shells keep their dedicated
     # ordering below because they depend on the global frontend and archive data.
-    standalone_entry_points = tuple(sorted(
-        path.relative_to(repo_root).as_posix()
-        for relpath in dirs
-        if relpath.rstrip('/') != 'r'
-        and not (repo_root / relpath).is_symlink()
-        for path in (repo_root / relpath).rglob('index.html')
-        if _deployable_file(path)
-    ))
-    record_entry_points = tuple(sorted(
-        path.relative_to(repo_root).as_posix()
-        for relpath in dirs
-        if relpath.rstrip('/') == 'r'
-        and not (repo_root / relpath).is_symlink()
-        for path in (repo_root / relpath).glob('*.html')
-        if _deployable_file(path) and RECORD_SHELL_RE.fullmatch(path.name)
-    ))
+    standalone_entry_points = tuple(
+        sorted(
+            path.relative_to(repo_root).as_posix()
+            for relpath in dirs
+            if relpath.rstrip("/") != "r" and not (repo_root / relpath).is_symlink()
+            for path in (repo_root / relpath).rglob("index.html")
+            if _deployable_file(path)
+        )
+    )
+    record_entry_points = tuple(
+        sorted(
+            path.relative_to(repo_root).as_posix()
+            for relpath in dirs
+            if relpath.rstrip("/") == "r" and not (repo_root / relpath).is_symlink()
+            for path in (repo_root / relpath).glob("*.html")
+            if _deployable_file(path) and RECORD_SHELL_RE.fullmatch(path.name)
+        )
+    )
     entry_set = (
         set(declared_entry_points)
         | set(standalone_entry_points)
@@ -375,7 +380,7 @@ def collect_local_files(
     # that import them flip live. Other data files stay after the directory walk
     # so this only changes ordering for runtime module dependencies.
     for relpath in data_files:
-        if not relpath.endswith('.js'):
+        if not relpath.endswith(".js"):
             continue
         p = repo_root / relpath
         if _deployable_file(p):
@@ -385,7 +390,7 @@ def collect_local_files(
         d = repo_root / relpath
         if d.is_symlink() or not d.is_dir():
             continue
-        for sub in sorted(d.rglob('*')):
+        for sub in sorted(d.rglob("*")):
             if _deployable_file(sub) and not _is_excluded(sub):
                 # Also prune anything under an excluded-dir name anywhere
                 # in the path (e.g. frontend/foo/__pycache__/bar.pyc).
@@ -429,13 +434,14 @@ def collect_local_files(
 
 # ---------- Remote upload ---------------------------------------------------
 
+
 def _ensure_remote_dir(sftp, remote_dir: str, cache: Set[str]) -> None:
     """Remote `mkdir -p`. Walks remote_dir segment by segment, creating
     missing dirs. Caches successful dirs so the next 50 files in the
     same dir don't re-stat it 50 times."""
-    if remote_dir in cache or remote_dir in ('', '/'):
+    if remote_dir in cache or remote_dir in ("", "/"):
         return
-    parent = remote_dir.rsplit('/', 1)[0]
+    parent = remote_dir.rsplit("/", 1)[0]
     if parent and parent != remote_dir:
         _ensure_remote_dir(sftp, parent, cache)
     try:
@@ -466,7 +472,7 @@ def _remove_remote_tree(sftp, remote_dir: str) -> bool:
         raise
 
     for entry in entries:
-        child = f'{remote_dir}/{entry.filename}'
+        child = f"{remote_dir}/{entry.filename}"
         if stat.S_ISDIR(entry.st_mode):
             _remove_remote_tree(sftp, child)
         else:
@@ -517,7 +523,7 @@ def _prune_remote_record_shells(
             continue
         if entry.filename in expected_names:
             continue
-        sftp.remove(f'{remote_dir}/{entry.filename}')
+        sftp.remove(f"{remote_dir}/{entry.filename}")
         removed += 1
     return removed
 
@@ -527,7 +533,7 @@ def _remote_exists(remote, path: str) -> bool:
         remote.stat(path)
         return True
     except IOError as exc:
-        if getattr(exc, 'errno', None) == errno.ENOENT:
+        if getattr(exc, "errno", None) == errno.ENOENT:
             return False
         raise
 
@@ -538,14 +544,14 @@ def _remove_remote_if_exists(remote, path: str) -> None:
     try:
         remote.remove(path)
     except IOError as exc:
-        if getattr(exc, 'errno', None) != errno.ENOENT:
+        if getattr(exc, "errno", None) != errno.ENOENT:
             raise
 
 
 def _copy_remote_file(remote, source: str, target: str) -> None:
     """Copy one remote file without moving its live source path."""
     with tempfile.NamedTemporaryFile() as local_copy:
-        with remote.open(source, 'rb') as remote_source:
+        with remote.open(source, "rb") as remote_source:
             shutil.copyfileobj(remote_source, local_copy)
         local_copy.flush()
         remote.put(local_copy.name, target)
@@ -553,16 +559,16 @@ def _copy_remote_file(remote, source: str, target: str) -> None:
 
 def _local_file_digest(path: Path) -> str:
     digest = hashlib.sha256()
-    with path.open('rb') as source:
-        for chunk in iter(lambda: source.read(64 * 1024), b''):
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(64 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
 
 
 def _remote_file_digest(remote, path: str) -> str:
     digest = hashlib.sha256()
-    with remote.open(path, 'rb') as source:
-        for chunk in iter(lambda: source.read(64 * 1024), b''):
+    with remote.open(path, "rb") as source:
+        for chunk in iter(lambda: source.read(64 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
 
@@ -573,17 +579,12 @@ def _remote_sidecar_binds_digest(
     binary_digest: str,
 ) -> bool:
     try:
-        with remote.open(sidecar_path, 'rb') as source:
+        with remote.open(sidecar_path, "rb") as source:
             sidecar = json.load(source)
     except (json.JSONDecodeError, UnicodeDecodeError):
         return False
-    expected_digest = (
-        sidecar.get('binarySha256') if isinstance(sidecar, dict) else None
-    )
-    return (
-        isinstance(expected_digest, str)
-        and expected_digest.lower() == binary_digest
-    )
+    expected_digest = sidecar.get("binarySha256") if isinstance(sidecar, dict) else None
+    return isinstance(expected_digest, str) and expected_digest.lower() == binary_digest
 
 
 def _replace_remote_file(remote, source: str, target: str) -> None:
@@ -609,62 +610,67 @@ def _publish_recall_artifact_pair(
     artifact_pair: Tuple[str, str] = _RECALL_ARTIFACT_PAIR,
 ) -> None:
     """Publish the hash-bound binary and sidecar as one rollback-safe unit."""
-    transaction_root = cfg.get('transaction_path')
+    transaction_root = cfg.get("transaction_path")
     entries = []
     for relpath in artifact_pair:
         local = local_by_relpath[relpath]
-        final = remote_transfer.scoped_archive_child(cfg['site_path'], relpath)
+        final = remote_transfer.scoped_archive_child(cfg["site_path"], relpath)
         name = Path(relpath).name
-        entries.append({
-            'relpath': relpath,
-            'local': local,
-            'final': final,
-            'tmp': f'{final}.pair-tmp',
-            # Read and remove these public paths only for compatibility with
-            # transactions created by older deploy code.
-            'legacy_backup': f'{final}.pair-backup',
-            'legacy_backup_tmp': f'{final}.pair-backup-tmp',
-            'legacy_restore_tmp': f'{final}.pair-restore-tmp',
-            'private_backup': (
-                remote_transfer.scoped_archive_child(
-                    transaction_root, f'{name}.pair-backup')
-                if transaction_root else None
-            ),
-            'private_backup_tmp': (
-                remote_transfer.scoped_archive_child(
-                    transaction_root, f'{name}.pair-backup-tmp')
-                if transaction_root else None
-            ),
-            'private_restore_tmp': (
-                remote_transfer.scoped_archive_child(
-                    transaction_root, f'{name}.pair-restore-tmp')
-                if transaction_root else None
-            ),
-        })
+        entries.append(
+            {
+                "relpath": relpath,
+                "local": local,
+                "final": final,
+                "tmp": f"{final}.pair-tmp",
+                # Read and remove these public paths only for compatibility with
+                # transactions created by older deploy code.
+                "legacy_backup": f"{final}.pair-backup",
+                "legacy_backup_tmp": f"{final}.pair-backup-tmp",
+                "legacy_restore_tmp": f"{final}.pair-restore-tmp",
+                "private_backup": (
+                    remote_transfer.scoped_archive_child(
+                        transaction_root, f"{name}.pair-backup"
+                    )
+                    if transaction_root
+                    else None
+                ),
+                "private_backup_tmp": (
+                    remote_transfer.scoped_archive_child(
+                        transaction_root, f"{name}.pair-backup-tmp"
+                    )
+                    if transaction_root
+                    else None
+                ),
+                "private_restore_tmp": (
+                    remote_transfer.scoped_archive_child(
+                        transaction_root, f"{name}.pair-restore-tmp"
+                    )
+                    if transaction_root
+                    else None
+                ),
+            }
+        )
 
-    local_digests = tuple(
-        _local_file_digest(entry['local']) for entry in entries)
+    local_digests = tuple(_local_file_digest(entry["local"]) for entry in entries)
 
     # A byte-identical pair needs no rollback storage. Check the public pair
     # before the first access to the configured private transaction root.
     for entry in entries:
-        _ensure_remote_dir(
-            remote, entry['final'].rsplit('/', 1)[0], dir_cache)
-        entry['final_exists'] = _remote_exists(remote, entry['final'])
-        entry['legacy_backup_exists'] = _remote_exists(
-            remote, entry['legacy_backup'])
-    has_legacy_backups = any(
-        entry['legacy_backup_exists'] for entry in entries)
-    if all(entry['final_exists'] for entry in entries):
+        _ensure_remote_dir(remote, entry["final"].rsplit("/", 1)[0], dir_cache)
+        entry["final_exists"] = _remote_exists(remote, entry["final"])
+        entry["legacy_backup_exists"] = _remote_exists(remote, entry["legacy_backup"])
+    has_legacy_backups = any(entry["legacy_backup_exists"] for entry in entries)
+    if all(entry["final_exists"] for entry in entries):
         final_digests = tuple(
-            _remote_file_digest(remote, entry['final']) for entry in entries)
+            _remote_file_digest(remote, entry["final"]) for entry in entries
+        )
         if final_digests == local_digests:
             for entry in entries:
                 for legacy_path in (
-                    entry['tmp'],
-                    entry['legacy_backup'],
-                    entry['legacy_backup_tmp'],
-                    entry['legacy_restore_tmp'],
+                    entry["tmp"],
+                    entry["legacy_backup"],
+                    entry["legacy_backup_tmp"],
+                    entry["legacy_restore_tmp"],
                 ):
                     _remove_remote_if_exists(remote, legacy_path)
             return
@@ -672,8 +678,7 @@ def _publish_recall_artifact_pair(
     # With no public member and no legacy backup, this is a first publication.
     # Private rollback state cannot be needed because no live pair was changed.
     probe_private_root = bool(
-        any(entry['final_exists'] for entry in entries)
-        or has_legacy_backups
+        any(entry["final_exists"] for entry in entries) or has_legacy_backups
     )
     private_root_exists = bool(
         transaction_root
@@ -685,8 +690,8 @@ def _publish_recall_artifact_pair(
         nonlocal private_root_exists
         if not transaction_root:
             raise RuntimeError(
-                'ROSEN_SFTP_TRANSACTION_PATH is required to replace the '
-                'existing recall artifact pair'
+                "ROSEN_SFTP_TRANSACTION_PATH is required to replace the "
+                "existing recall artifact pair"
             )
         if not private_root_exists:
             remote.mkdir(transaction_root)
@@ -694,64 +699,64 @@ def _publish_recall_artifact_pair(
 
     def scratch_paths(entry) -> List[str]:
         paths = [
-            entry['tmp'],
-            entry['legacy_backup_tmp'],
-            entry['legacy_restore_tmp'],
+            entry["tmp"],
+            entry["legacy_backup_tmp"],
+            entry["legacy_restore_tmp"],
         ]
         if private_root_exists:
-            paths.extend([
-                entry['private_backup_tmp'],
-                entry['private_restore_tmp'],
-            ])
+            paths.extend(
+                [
+                    entry["private_backup_tmp"],
+                    entry["private_restore_tmp"],
+                ]
+            )
         return paths
 
     # Inspect both members before changing either one. Recover an interrupted
     # transaction from the configured private root, while still accepting and
     # removing backup files left by the older public-path implementation.
     for entry in entries:
-        entry['private_backup_exists'] = bool(
-            private_root_exists
-            and _remote_exists(remote, entry['private_backup']))
+        entry["private_backup_exists"] = bool(
+            private_root_exists and _remote_exists(remote, entry["private_backup"])
+        )
 
-    has_private_backups = any(
-        entry['private_backup_exists'] for entry in entries)
+    has_private_backups = any(entry["private_backup_exists"] for entry in entries)
     if has_legacy_backups and has_private_backups:
-        raise RuntimeError('multiple recall artifact backup locations found')
+        raise RuntimeError("multiple recall artifact backup locations found")
 
     if has_private_backups:
-        backup_key = 'private_backup'
-        backup_exists_key = 'private_backup_exists'
-        restore_key = 'private_restore_tmp'
+        backup_key = "private_backup"
+        backup_exists_key = "private_backup_exists"
+        restore_key = "private_restore_tmp"
     else:
-        backup_key = 'legacy_backup'
-        backup_exists_key = 'legacy_backup_exists'
+        backup_key = "legacy_backup"
+        backup_exists_key = "legacy_backup_exists"
         # Legacy public backups are read in place, but all newly created
         # recovery files still belong in the private transaction directory.
-        restore_key = 'private_restore_tmp'
+        restore_key = "private_restore_tmp"
 
-    backup_entries = [
-        entry for entry in entries if entry[backup_exists_key]]
+    backup_entries = [entry for entry in entries if entry[backup_exists_key]]
     if backup_entries:
-        missing_finals = [entry for entry in entries if not entry['final_exists']]
+        missing_finals = [entry for entry in entries if not entry["final_exists"]]
         if len(backup_entries) == len(entries):
             if not missing_finals:
                 final_digests = tuple(
-                    _remote_file_digest(remote, entry['final'])
-                    for entry in entries)
+                    _remote_file_digest(remote, entry["final"]) for entry in entries
+                )
                 backup_digests = tuple(
-                    _remote_file_digest(remote, entry[backup_key])
-                    for entry in entries)
+                    _remote_file_digest(remote, entry[backup_key]) for entry in entries
+                )
                 # The hash-bound live pair is the durable commit record. If it
                 # is valid, retained backups are cleanup state from a publish
                 # that completed before the process stopped.
                 live_pair_is_committed = _remote_sidecar_binds_digest(
                     remote,
-                    entries[1]['final'],
+                    entries[1]["final"],
                     final_digests[0],
                 )
-                if (
-                    live_pair_is_committed
-                    or final_digests in (backup_digests, local_digests)
+                if live_pair_is_committed or final_digests in (
+                    backup_digests,
+                    local_digests,
                 ):
                     restore_entries = []
                 else:
@@ -770,32 +775,29 @@ def _publish_recall_artifact_pair(
             # Compatibility with the previous move-based backup transaction.
             restore_entries = missing_finals
         else:
-            raise RuntimeError(
-                'cannot restore incomplete recall artifact backup pair'
-            )
+            raise RuntimeError("cannot restore incomplete recall artifact backup pair")
 
         if restore_entries:
             ensure_private_root()
         for entry in restore_entries:
             _remove_remote_if_exists(remote, entry[restore_key])
-            _copy_remote_file(
-                remote, entry[backup_key], entry[restore_key])
+            _copy_remote_file(remote, entry[backup_key], entry[restore_key])
         for entry in restore_entries:
-            _replace_remote_file(
-                remote, entry[restore_key], entry['final'])
+            _replace_remote_file(remote, entry[restore_key], entry["final"])
         for entry in backup_entries:
             _remove_remote_if_exists(remote, entry[backup_key])
         for entry in entries:
-            entry['final_exists'] = _remote_exists(remote, entry['final'])
+            entry["final_exists"] = _remote_exists(remote, entry["final"])
 
     for entry in entries:
         for transaction_path in scratch_paths(entry):
             _remove_remote_if_exists(remote, transaction_path)
 
-    existing_entries = [entry for entry in entries if entry['final_exists']]
+    existing_entries = [entry for entry in entries if entry["final_exists"]]
     if len(existing_entries) == len(entries):
         final_digests = tuple(
-            _remote_file_digest(remote, entry['final']) for entry in entries)
+            _remote_file_digest(remote, entry["final"]) for entry in entries
+        )
         if final_digests == local_digests:
             return
         ensure_private_root()
@@ -803,66 +805,67 @@ def _publish_recall_artifact_pair(
         # An interrupted first publication has no previous complete pair to
         # preserve. Remove its orphan so the absent-target path can retry.
         for entry in existing_entries:
-            _remove_remote_if_exists(remote, entry['final'])
-            entry['final_exists'] = False
+            _remove_remote_if_exists(remote, entry["final"])
+            entry["final_exists"] = False
 
     if private_root_exists:
         for entry in entries:
             for transaction_path in (
-                entry['private_backup'],
-                entry['private_backup_tmp'],
-                entry['private_restore_tmp'],
+                entry["private_backup"],
+                entry["private_backup_tmp"],
+                entry["private_restore_tmp"],
             ):
                 _remove_remote_if_exists(remote, transaction_path)
 
     for entry in entries:
-        remote.put(str(entry['local']), entry['tmp'])
+        remote.put(str(entry["local"]), entry["tmp"])
 
     backed_up = []
     published = []
     try:
         for entry in entries:
-            if entry['final_exists']:
-                _copy_remote_file(
-                    remote, entry['final'], entry['private_backup_tmp'])
+            if entry["final_exists"]:
+                _copy_remote_file(remote, entry["final"], entry["private_backup_tmp"])
                 _replace_remote_file(
-                    remote, entry['private_backup_tmp'],
-                    entry['private_backup'])
+                    remote, entry["private_backup_tmp"], entry["private_backup"]
+                )
                 backed_up.append(entry)
 
         for entry in entries:
-            _replace_remote_file(remote, entry['tmp'], entry['final'])
+            _replace_remote_file(remote, entry["tmp"], entry["final"])
             published.append(entry)
     except Exception as publish_error:
         rollback_errors = []
         restorable = []
         for entry in backed_up:
             try:
-                final_matches_backup = (
-                    _remote_exists(remote, entry['final'])
-                    and _remote_file_digest(remote, entry['final'])
-                    == _remote_file_digest(remote, entry['private_backup'])
+                final_matches_backup = _remote_exists(
+                    remote, entry["final"]
+                ) and _remote_file_digest(
+                    remote, entry["final"]
+                ) == _remote_file_digest(
+                    remote, entry["private_backup"]
                 )
                 if final_matches_backup:
                     continue
-                _remove_remote_if_exists(
-                    remote, entry['private_restore_tmp'])
+                _remove_remote_if_exists(remote, entry["private_restore_tmp"])
                 _copy_remote_file(
-                    remote, entry['private_backup'],
-                    entry['private_restore_tmp'])
+                    remote, entry["private_backup"], entry["private_restore_tmp"]
+                )
                 restorable.append(entry)
             except Exception as exc:  # best-effort rollback, reported below
                 rollback_errors.append(exc)
         for entry in restorable:
             try:
                 _replace_remote_file(
-                    remote, entry['private_restore_tmp'], entry['final'])
+                    remote, entry["private_restore_tmp"], entry["final"]
+                )
             except Exception as exc:  # best-effort rollback, reported below
                 rollback_errors.append(exc)
         for entry in published:
             if entry not in backed_up:
                 try:
-                    _remove_remote_if_exists(remote, entry['final'])
+                    _remove_remote_if_exists(remote, entry["final"])
                 except Exception as exc:
                     rollback_errors.append(exc)
         for entry in entries:
@@ -874,20 +877,19 @@ def _publish_recall_artifact_pair(
         if not rollback_errors:
             for entry in entries:
                 try:
-                    _remove_remote_if_exists(
-                        remote, entry['private_backup'])
+                    _remove_remote_if_exists(remote, entry["private_backup"])
                 except Exception as exc:
                     rollback_errors.append(exc)
                     break
         if rollback_errors:
             raise RuntimeError(
-                f'{publish_error}; recall artifact rollback also failed: '
-                f'{rollback_errors[0]}'
+                f"{publish_error}; recall artifact rollback also failed: "
+                f"{rollback_errors[0]}"
             ) from publish_error
         raise
 
     for entry in backed_up:
-        _remove_remote_if_exists(remote, entry['private_backup'])
+        _remove_remote_if_exists(remote, entry["private_backup"])
 
 
 def push_files(
@@ -912,41 +914,38 @@ def push_files(
             name = Path(page).name
             if not RECORD_SHELL_RE.fullmatch(name):
                 return {
-                    'ok': False,
-                    'files_pushed': 0,
-                    'error': f'unsafe record shell name: {name!r}',
+                    "ok": False,
+                    "files_pushed": 0,
+                    "error": f"unsafe record shell name: {name!r}",
                 }
             expected_record_shells.add(name)
     try:
-        cfg['site_path'] = remote_transfer.validate_archive_root(
-            cfg['site_path'], cfg.get('protocol', 'sftp'))
-        if cfg.get('transaction_path'):
-            cfg['transaction_path'] = (
-                remote_transfer.validate_recall_transaction_root(
-                    cfg['transaction_path'],
-                    cfg['site_path'],
-                    cfg.get('protocol', 'sftp'),
-                )
+        cfg["site_path"] = remote_transfer.validate_archive_root(
+            cfg["site_path"], cfg.get("protocol", "sftp")
+        )
+        if cfg.get("transaction_path"):
+            cfg["transaction_path"] = remote_transfer.validate_recall_transaction_root(
+                cfg["transaction_path"],
+                cfg["site_path"],
+                cfg.get("protocol", "sftp"),
             )
     except ValueError as exc:
-        return {'ok': False, 'files_pushed': 0, 'error': str(exc)}
+        return {"ok": False, "files_pushed": 0, "error": str(exc)}
 
     local_by_relpath = {
-        local.relative_to(repo_root).as_posix(): local
-        for local in files
+        local.relative_to(repo_root).as_posix(): local for local in files
     }
     pair_by_member: Dict[str, Tuple[str, str]] = {}
     pair_by_trigger: Dict[str, Tuple[str, str]] = {}
     for artifact_pair in _RECALL_ARTIFACT_PAIRS:
         pair_members = [
-            relpath for relpath in artifact_pair
-            if relpath in local_by_relpath
+            relpath for relpath in artifact_pair if relpath in local_by_relpath
         ]
         if pair_members and len(pair_members) != len(artifact_pair):
             return {
-                'ok': False,
-                'files_pushed': 0,
-                'error': 'recall binary and sidecar must be deployed together',
+                "ok": False,
+                "files_pushed": 0,
+                "error": "recall binary and sidecar must be deployed together",
             }
         if pair_members:
             pair_trigger = min(
@@ -962,7 +961,7 @@ def push_files(
     # The archive root already exists. Treat it as the mkdir boundary so the
     # publisher never stats or creates its broader parent (the account can see
     # more of PressThink than this automation is authorized to touch).
-    dir_cache: Set[str] = {cfg['site_path']}
+    dir_cache: Set[str] = {cfg["site_path"]}
     remote = None
 
     try:
@@ -972,7 +971,8 @@ def push_files(
             if rel in pair_by_trigger:
                 artifact_pair = pair_by_trigger[rel]
                 _publish_recall_artifact_pair(
-                    remote, local_by_relpath, cfg, dir_cache, artifact_pair)
+                    remote, local_by_relpath, cfg, dir_cache, artifact_pair
+                )
                 pushed += len(artifact_pair)
                 if pushed % 25 == 0 or pushed == len(files):
                     logger.info(f"Pushed {pushed}/{len(files)} files")
@@ -980,10 +980,9 @@ def push_files(
             if rel in pair_by_member:
                 continue
 
-            remote_final = remote_transfer.scoped_archive_child(
-                cfg['site_path'], rel)
+            remote_final = remote_transfer.scoped_archive_child(cfg["site_path"], rel)
             remote_tmp = f"{remote_final}.tmp"
-            remote_dir = remote_final.rsplit('/', 1)[0]
+            remote_dir = remote_final.rsplit("/", 1)[0]
             _ensure_remote_dir(remote, remote_dir, dir_cache)
             remote.put(str(local), remote_tmp)
             try:
@@ -1000,53 +999,56 @@ def push_files(
 
         if expected_record_shells is not None:
             remote_record_dir = remote_transfer.scoped_archive_child(
-                cfg['site_path'], 'r')
+                cfg["site_path"], "r"
+            )
             removed = _prune_remote_record_shells(
-                remote, remote_record_dir, expected_record_shells)
+                remote, remote_record_dir, expected_record_shells
+            )
             if removed:
-                logger.info(f'Removed {removed} stale record metadata shells')
+                logger.info(f"Removed {removed} stale record metadata shells")
 
         for relpath in remote_prune_files:
             remote_file = remote_transfer.scoped_archive_child(
-                cfg['site_path'], relpath)
+                cfg["site_path"], relpath
+            )
             if _remove_remote_file(remote, remote_file):
-                logger.info(f'Removed retired file: {relpath}')
+                logger.info(f"Removed retired file: {relpath}")
 
         for relpath in remote_prune_dirs:
-            remote_dir = remote_transfer.scoped_archive_child(
-                cfg['site_path'], relpath)
+            remote_dir = remote_transfer.scoped_archive_child(cfg["site_path"], relpath)
             if _remove_remote_tree(remote, remote_dir):
-                logger.info(f'Removed non-public directory: {relpath}')
+                logger.info(f"Removed non-public directory: {relpath}")
     except Exception as exc:
-        error = f'Transfer error: {exc}'
+        error = f"Transfer error: {exc}"
         logger.error(error)
     finally:
         if remote is not None:
             remote.close()
 
     return {
-        'ok': error is None and pushed == len(files),
-        'files_pushed': pushed,
-        'error': error,
+        "ok": error is None and pushed == len(files),
+        "files_pushed": pushed,
+        "error": error,
     }
 
 
 # ---------- CLI -------------------------------------------------------------
 
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(
-        description='Push the full Jay Rosen archive site to pressthink.org.',
+        description="Push the full Jay Rosen archive site to pressthink.org.",
     )
     parser.add_argument(
-        '--dry-run',
-        action='store_true',
+        "--dry-run",
+        action="store_true",
         default=False,
-        help='Print the file list and exit without connecting',
+        help="Print the file list and exit without connecting",
     )
     parser.add_argument(
-        '--repo-root',
+        "--repo-root",
         default=None,
-        help='Override repo root (defaults to the path two parents up from this script)',
+        help="Override repo root (defaults to the path two parents up from this script)",
     )
     args = parser.parse_args(argv)
 
@@ -1056,7 +1058,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         repo_root = Path(__file__).resolve().parents[2]
 
     record_pages = generate_record_pages(repo_root)
-    logger.info(f'Generated {len(record_pages)} record-specific metadata pages')
+    logger.info(f"Generated {len(record_pages)} record-specific metadata pages")
     files = collect_local_files(repo_root)
 
     if args.dry_run:
@@ -1064,47 +1066,46 @@ def main(argv: Optional[List[str]] = None) -> int:
         for f in files:
             print(f"  {f.relative_to(repo_root).as_posix()}")
         print(
-            f'would remove {len(_REMOTE_PRUNE_DIRS)} retired directories '
-            'after upload'
+            f"would remove {len(_REMOTE_PRUNE_DIRS)} retired directories "
+            "after upload"
         )
         for relpath in _REMOTE_PRUNE_DIRS:
-            print(f'  {relpath}')
+            print(f"  {relpath}")
         print(
-            f'would remove {len(_REMOTE_INTERNAL_PRUNE_DIRS)} internal '
-            'prototype directory after upload'
+            f"would remove {len(_REMOTE_INTERNAL_PRUNE_DIRS)} internal "
+            "prototype directory after upload"
         )
         for relpath in _REMOTE_INTERNAL_PRUNE_DIRS:
-            print(f'  {relpath}')
-        print(
-            f'would remove {len(_REMOTE_PRUNE_FILES)} retired file '
-            'after upload'
-        )
+            print(f"  {relpath}")
+        print(f"would remove {len(_REMOTE_PRUNE_FILES)} retired file " "after upload")
         for relpath in _REMOTE_PRUNE_FILES:
-            print(f'  {relpath}')
+            print(f"  {relpath}")
         return 0
 
     try:
         cfg = _read_env()
     except ValueError as exc:
-        print(f'error: {exc}', file=sys.stderr)
+        print(f"error: {exc}", file=sys.stderr)
         return 2
     if cfg is None:
         print(
-            'error: required transfer env vars missing — set ROSEN_SFTP_HOST, '
-            'ROSEN_SFTP_USER, ROSEN_SFTP_SITE_PATH, and valid authentication '
-            'for the selected protocol',
+            "error: required transfer env vars missing — set ROSEN_SFTP_HOST, "
+            "ROSEN_SFTP_USER, ROSEN_SFTP_SITE_PATH, and valid authentication "
+            "for the selected protocol",
             file=sys.stderr,
         )
         return 2
 
     logger.info(f'Deploying {len(files)} files to {cfg["host"]}:{cfg["site_path"]}')
     result = push_files(files, repo_root, cfg, record_shells=record_pages)
-    if result['ok']:
+    if result["ok"]:
         logger.info(f'Deploy complete: {result["files_pushed"]} files pushed')
         return 0
-    logger.error(f'Deploy failed after {result["files_pushed"]} files: {result["error"]}')
+    logger.error(
+        f'Deploy failed after {result["files_pushed"]} files: {result["error"]}'
+    )
     return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

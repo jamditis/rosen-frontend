@@ -60,23 +60,50 @@ FEED_ENDPOINT = f"{API_BASE}/app.bsky.feed.getAuthorFeed"
 PAGE_LIMIT = 100  # API max
 DEFAULT_MAX_PAGES = 1_000
 REPOST_REASON = "app.bsky.feed.defs#reasonRepost"
-AT_POST_URI_RE = re.compile(
-    r"^at://([^/]+)/app\.bsky\.feed\.post/([A-Za-z0-9._~:-]+)$"
-)
+AT_POST_URI_RE = re.compile(r"^at://([^/]+)/app\.bsky\.feed\.post/([A-Za-z0-9._~:-]+)$")
 BSKY_POST_URL_RE = re.compile(
     r"^https://bsky\.app/profile/([^/]+)/post/([^/?#]+)/?(?:[?#].*)?$"
 )
 
 # Schema fields exactly mirror social_posts.csv header order
 SCHEMA_FIELDS = [
-    "id", "title", "url", "author", "publication_date", "original_publication",
-    "publisher", "platform", "content_type", "format", "word_count",
-    "length_in_seconds", "excerpt", "summary", "thematic_categories",
-    "key_concepts", "series", "era", "scope", "tags", "likes", "reposts",
-    "replies", "related_to", "responds_to", "influence", "copyright",
-    "license", "permissions", "date_processed", "gdrive_pdf_link",
-    "gdrive_raw_file_link", "gdrive_transcript_link", "pull_quote",
-    "raw_text", "verified", "notes",
+    "id",
+    "title",
+    "url",
+    "author",
+    "publication_date",
+    "original_publication",
+    "publisher",
+    "platform",
+    "content_type",
+    "format",
+    "word_count",
+    "length_in_seconds",
+    "excerpt",
+    "summary",
+    "thematic_categories",
+    "key_concepts",
+    "series",
+    "era",
+    "scope",
+    "tags",
+    "likes",
+    "reposts",
+    "replies",
+    "related_to",
+    "responds_to",
+    "influence",
+    "copyright",
+    "license",
+    "permissions",
+    "date_processed",
+    "gdrive_pdf_link",
+    "gdrive_raw_file_link",
+    "gdrive_transcript_link",
+    "pull_quote",
+    "raw_text",
+    "verified",
+    "notes",
 ]
 
 # Constants matching existing BSKY rows
@@ -101,8 +128,10 @@ def fetch_page(cursor: str | None) -> dict:
     if cursor:
         params["cursor"] = cursor
     r = requests.get(
-        FEED_ENDPOINT, params=params,
-        headers={"User-Agent": "RosenArchive-Backfill/1.0"}, timeout=30,
+        FEED_ENDPOINT,
+        params=params,
+        headers={"User-Agent": "RosenArchive-Backfill/1.0"},
+        timeout=30,
     )
     r.raise_for_status()
     return r.json()
@@ -399,9 +428,7 @@ def collect_new_rows(
                     continue
                 _record, created_at, _parent_uri = _post_record(item, post)
             except FeedValidationError as exc:
-                return fail(
-                    f"page {result.pages} item {item_index}: {exc}"
-                )
+                return fail(f"page {result.pages} item {item_index}: {exc}")
 
             identity = (uri_did, rkey)
             if identity in existing_identities:
@@ -429,9 +456,7 @@ def collect_new_rows(
         if next_cursor in requested_cursors:
             return fail(f"cursor cycle detected: {next_cursor!r}")
         if result.pages >= max_pages:
-            return fail(
-                f"page cap {max_pages} reached while a cursor remained"
-            )
+            return fail(f"page cap {max_pages} reached while a cursor remained")
 
         cursor = next_cursor
         sleep_fn(0.2)
@@ -482,8 +507,9 @@ def main():
             "many pages"
         ),
     )
-    ap.add_argument("--dry-run", action="store_true",
-                    help="Print summary, don't write CSV")
+    ap.add_argument(
+        "--dry-run", action="store_true", help="Print summary, don't write CSV"
+    )
     args = ap.parse_args()
 
     if args.sample is not None and args.sample < 1:
@@ -495,9 +521,7 @@ def main():
     print(f"Loaded {len(existing_urls):,} existing URLs from social_posts.csv")
     print(f"Highest existing BSKY id: BSKY-{max_id:05d}")
 
-    today = datetime.datetime.now(datetime.timezone.utc).strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
+    today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     result = collect_new_rows(
         existing_urls=existing_urls,
         max_id=max_id,
@@ -533,7 +557,9 @@ def main():
     if args.dry_run:
         print("\nDry-run: first 3 new rows:")
         for r in new_rows[:3]:
-            print(f"  {r['id']} | {r['publication_date']} | {r['title'][:50]!r} | {r['url']}")
+            print(
+                f"  {r['id']} | {r['publication_date']} | {r['title'][:50]!r} | {r['url']}"
+            )
         return
 
     # Append new rows to social_posts.csv via atomic-write
@@ -563,7 +589,9 @@ def main():
 
     print(f"\nAppended {len(new_rows):,} rows. Backup at {SOCIAL_POSTS_CSV}.bak")
     print(f"New id range: {new_rows[0]['id']} .. {new_rows[-1]['id']}")
-    print(f"Date range: {new_rows[0]['publication_date']} .. {new_rows[-1]['publication_date']}")
+    print(
+        f"Date range: {new_rows[0]['publication_date']} .. {new_rows[-1]['publication_date']}"
+    )
 
 
 if __name__ == "__main__":
