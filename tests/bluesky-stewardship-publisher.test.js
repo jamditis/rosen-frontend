@@ -211,6 +211,20 @@ describe('Bluesky release staging uses raw Git porcelain records', () => {
     );
   });
 
+  it('explicitly stages newly generated social embedding build metadata', (t) => {
+    const directory = gitFixture(t, { 'data/social_posts.csv': 'before\n' });
+    const metadataPath = path.join(directory, 'data/archive-social-embeddings-build.json');
+    fs.writeFileSync(metadataPath, '{"version":1}\n');
+
+    stageReleaseCommit(directory, []);
+
+    assert.equal(gitCommand(directory, ['status', '--porcelain']), '');
+    assert.equal(
+      gitCommand(directory, ['show', '--pretty=', '--name-only', 'HEAD']),
+      'data/archive-social-embeddings-build.json',
+    );
+  });
+
   it('keeps the first unstaged census path intact and commits only census output', (t) => {
     const directory = gitFixture(t, {
       'data/stewardship-census.json': '{"count":1}\n',
@@ -304,6 +318,22 @@ describe('Bluesky stewardship receipt and workflow boundary', () => {
     assert.match(workflow, /type: boolean\n\s+default: true/);
     assert.match(workflow, /if: github\.ref == 'refs\/heads\/main'/);
     assert.match(workflow, /npm ci --ignore-scripts/);
+    assert.match(workflow, /path: backend\/\.venv/);
+    assert.match(workflow, /hashFiles\('backend\/poetry\.lock'\)/);
+    assert.match(workflow, /poetry install --without dev --no-interaction/);
+    assert.match(
+      workflow,
+      /working-directory: backend\n\s+run: poetry run node \.\.\/\.github\/scripts\/bluesky-stewardship-publisher\.mjs prepare/,
+    );
+    assert.match(workflow, /poetry run python scripts\/deploy_full_site\.py/);
+    assert.match(workflow, /poetry run python scripts\/post_ingestion_receipt\.py/);
+    assert.doesNotMatch(workflow, /python -m pip install/);
+    assert.doesNotMatch(workflow, /^\s*run: python\b/m);
+    assert.ok(
+      workflow.indexOf('- name: Checkout tested main with write token')
+        < workflow.indexOf('- name: Cache Poetry dependencies'),
+      'the token checkout must finish before the in-project Poetry environment is restored',
+    );
     assert.match(publisher, /bluesky_batch_update\.py/);
     assert.match(publisher, /'--report', paths\.reportPath/);
     assert.match(workflow, /deploy_full_site\.py/);

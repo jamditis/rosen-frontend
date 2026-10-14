@@ -24,6 +24,7 @@ const RELEASE_DATA_PATHS = new Set([
   'data/archive-details.json',
   'data/archive-entities.json',
   'data/archive-social-embeddings.bin',
+  'data/archive-social-embeddings-build.json',
   'data/archive-social-embeddings.json',
   'data/graph-validation-holds.json',
   'data/relationship-adjacency-manifest.json',

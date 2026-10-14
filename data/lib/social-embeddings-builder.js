@@ -17,7 +17,7 @@
  *   node data/lib/social-embeddings-builder.js --incremental \
  *     --previous-archive /path/to/prior/archive-data.json
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import process from 'node:process';
@@ -35,6 +35,8 @@ import {
 } from './embeddings-builder.js';
 
 export const DEFAULT_SOCIAL_EMBED_BATCH_SIZE = 16;
+export const SOCIAL_EMBEDDING_BUILD_METADATA_VERSION = 1;
+export const SOCIAL_EMBEDDING_BUILD_METADATA_FILE = 'archive-social-embeddings-build.json';
 
 const str = value => (value == null ? '' : String(value));
 
@@ -61,6 +63,24 @@ export function socialEmbeddingTextSha256(record) {
   return sha256Hex(Buffer.from(buildSocialEmbeddingText(record), 'utf8'));
 }
 
+function orderedIdsSha256(ids) {
+  return sha256Hex(Buffer.from(JSON.stringify(ids), 'utf8'));
+}
+
+/** Keep exact-text reuse hashes out of the browser-facing index. */
+export function buildSocialEmbeddingReuseMetadata(index, textSha256) {
+  return {
+    version: SOCIAL_EMBEDDING_BUILD_METADATA_VERSION,
+    corpus: 'social',
+    model: index.model,
+    dim: index.dim,
+    count: index.count,
+    binarySha256: index.binarySha256,
+    orderedIdsSha256: orderedIdsSha256(index.ids),
+    textSha256,
+  };
+}
+
 function assertUniqueRecordIds(records, label) {
   const ids = new Set();
   for (const record of records) {
@@ -71,6 +91,18 @@ function assertUniqueRecordIds(records, label) {
   }
 }
 
+function textHashesForIndex(index, records) {
+  assertUniqueRecordIds(records, 'previous archive');
+  const previousRecordById = new Map(records.map(record => [str(record.id), record]));
+  return index.ids.map((id) => {
+    const record = previousRecordById.get(id);
+    if (!record) {
+      throw new Error(`social embeddings: previous archive has no social embedding record ${id}`);
+    }
+    return socialEmbeddingTextSha256(record);
+  });
+}
+
 /**
  * Validate an existing binary/index pair and return its safe reuse metadata.
  * Old indexes have no text hashes. They require the prior archive so reuse is
@@ -79,7 +111,7 @@ function assertUniqueRecordIds(records, label) {
 export function validatePreviousSocialArtifact(
   previousIndex,
   previousBinary,
-  { previousRecords = null } = {},
+  { previousBuildMetadata = null, previousRecords = null } = {},
 ) {
   if (!previousIndex || typeof previousIndex !== 'object') {
     throw new Error('social embeddings: previous index must be an object');
@@ -115,22 +147,37 @@ export function validatePreviousSocialArtifact(
     throw new Error('social embeddings: previous binary checksum does not match its index');
   }
 
-  let textSha256 = previousIndex.textSha256;
-  if (textSha256 === undefined) {
+  let textSha256;
+  let archiveTextSha256 = null;
+  if (previousBuildMetadata === null) {
     if (!Array.isArray(previousRecords)) {
       throw new Error(
-        'social embeddings: previous index has no text hashes; pass --previous-archive to migrate it safely',
+        'social embeddings: previous build metadata is absent; pass --previous-archive to migrate it safely',
       );
     }
-    assertUniqueRecordIds(previousRecords, 'previous archive');
-    const previousRecordById = new Map(previousRecords.map(record => [str(record.id), record]));
-    textSha256 = previousIndex.ids.map((id) => {
-      const record = previousRecordById.get(id);
-      if (!record) {
-        throw new Error(`social embeddings: previous archive has no social embedding record ${id}`);
+    archiveTextSha256 = textHashesForIndex(previousIndex, previousRecords);
+    textSha256 = archiveTextSha256;
+  } else {
+    if (!previousBuildMetadata || typeof previousBuildMetadata !== 'object') {
+      throw new Error('social embeddings: previous build metadata must be an object');
+    }
+    const expectedMetadata = {
+      version: SOCIAL_EMBEDDING_BUILD_METADATA_VERSION,
+      corpus: 'social',
+      model: previousIndex.model,
+      dim: previousIndex.dim,
+      count: previousIndex.count,
+      binarySha256: previousIndex.binarySha256,
+      orderedIdsSha256: orderedIdsSha256(previousIndex.ids),
+    };
+    for (const [field, value] of Object.entries(expectedMetadata)) {
+      if (previousBuildMetadata[field] !== value) {
+        throw new Error(
+          `social embeddings: previous build metadata ${field} does not match its index`,
+        );
       }
-      return socialEmbeddingTextSha256(record);
-    });
+    }
+    textSha256 = previousBuildMetadata.textSha256;
   }
   if (!Array.isArray(textSha256) || textSha256.length !== previousIndex.ids.length) {
     throw new Error('social embeddings: previous text hash count does not match its ids');
@@ -138,6 +185,16 @@ export function validatePreviousSocialArtifact(
   for (const [index, digest] of textSha256.entries()) {
     if (!/^[a-f0-9]{64}$/.test(digest || '')) {
       throw new Error(`social embeddings: previous text hash ${index} is not a SHA-256 digest`);
+    }
+  }
+  if (Array.isArray(previousRecords) && archiveTextSha256 === null) {
+    archiveTextSha256 = textHashesForIndex(previousIndex, previousRecords);
+    for (const [index, digest] of archiveTextSha256.entries()) {
+      if (textSha256[index] !== digest) {
+        throw new Error(
+          `social embeddings: previous text hash ${index} does not match the previous archive`,
+        );
+      }
     }
   }
 
@@ -183,9 +240,12 @@ export async function buildSocialEmbeddings(
   const index = {
     ...buildEmbeddingIndex(ids, sha256Hex(binBuffer)),
     corpus: 'social',
-    textSha256: records.map(socialEmbeddingTextSha256),
   };
-  return { index, binBuffer, count: ids.length };
+  const reuseMetadata = buildSocialEmbeddingReuseMetadata(
+    index,
+    records.map(socialEmbeddingTextSha256),
+  );
+  return { index, reuseMetadata, binBuffer, count: ids.length };
 }
 
 /** Build a current artifact while reusing only byte rows with identical text. */
@@ -195,6 +255,7 @@ export async function buildIncrementalSocialEmbeddings(
   {
     previousIndex,
     previousBinary,
+    previousBuildMetadata = null,
     previousRecords = null,
     batchSize = DEFAULT_SOCIAL_EMBED_BATCH_SIZE,
     onProgress = null,
@@ -202,6 +263,7 @@ export async function buildIncrementalSocialEmbeddings(
 ) {
   assertUniqueRecordIds(records, 'records');
   const previous = validatePreviousSocialArtifact(previousIndex, previousBinary, {
+    previousBuildMetadata,
     previousRecords,
   });
   const currentTextSha256 = records.map(socialEmbeddingTextSha256);
@@ -235,10 +297,11 @@ export async function buildIncrementalSocialEmbeddings(
   const index = {
     ...buildEmbeddingIndex(records.map(record => str(record.id)), sha256Hex(binBuffer)),
     corpus: 'social',
-    textSha256: currentTextSha256,
   };
+  const reuseMetadata = buildSocialEmbeddingReuseMetadata(index, currentTextSha256);
   return {
     index,
+    reuseMetadata,
     binBuffer,
     count: records.length,
     reused: records.length - changedRecords.length,
@@ -289,6 +352,7 @@ async function main(argv = process.argv.slice(2)) {
   const records = selectPublishedSocialRecords(archive);
   const binPath = path.join(root, 'data', 'archive-social-embeddings.bin');
   const jsonPath = path.join(root, 'data', 'archive-social-embeddings.json');
+  const buildMetadataPath = path.join(root, 'data', SOCIAL_EMBEDDING_BUILD_METADATA_FILE);
 
   const options = parseSocialEmbeddingArgs(argv);
   console.log(`social embeddings: ${records.length} records`);
@@ -303,15 +367,22 @@ async function main(argv = process.argv.slice(2)) {
   if (options.incremental) {
     const previousIndex = JSON.parse(readFileSync(jsonPath, 'utf8'));
     const previousBinary = readFileSync(binPath);
+    const previousBuildMetadata = existsSync(buildMetadataPath)
+      ? JSON.parse(readFileSync(buildMetadataPath, 'utf8'))
+      : null;
     const previousRecords = options.previousArchivePath
       ? selectPublishedSocialRecords(JSON.parse(readFileSync(options.previousArchivePath, 'utf8')))
       : null;
     // Reject an incompatible or corrupt artifact before loading the model.
-    validatePreviousSocialArtifact(previousIndex, previousBinary, { previousRecords });
+    validatePreviousSocialArtifact(previousIndex, previousBinary, {
+      previousBuildMetadata,
+      previousRecords,
+    });
     const embedMany = await createBatchExtractor();
     result = await buildIncrementalSocialEmbeddings(records, embedMany, {
       previousIndex,
       previousBinary,
+      previousBuildMetadata,
       previousRecords,
       ...progress,
     });
@@ -323,8 +394,9 @@ async function main(argv = process.argv.slice(2)) {
 
   writeFileSync(binPath, result.binBuffer);
   writeFileSync(jsonPath, JSON.stringify(result.index));
+  writeFileSync(buildMetadataPath, JSON.stringify(result.reuseMetadata));
   console.log(
-    `social embeddings: wrote ${result.count} vectors -> ${path.relative(root, binPath)} (${result.binBuffer.length} bytes), ${path.relative(root, jsonPath)}`,
+    `social embeddings: wrote ${result.count} vectors -> ${path.relative(root, binPath)} (${result.binBuffer.length} bytes), ${path.relative(root, jsonPath)}, ${path.relative(root, buildMetadataPath)}`,
   );
 }
 
@@ -337,7 +409,10 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
 
 export default {
   DEFAULT_SOCIAL_EMBED_BATCH_SIZE,
+  SOCIAL_EMBEDDING_BUILD_METADATA_VERSION,
+  SOCIAL_EMBEDDING_BUILD_METADATA_FILE,
   buildSocialEmbeddingText,
+  buildSocialEmbeddingReuseMetadata,
   socialEmbeddingTextSha256,
   selectPublishedSocialRecords,
   validatePreviousSocialArtifact,

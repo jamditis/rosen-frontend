@@ -83,7 +83,11 @@ npm run build-social-embeddings
 
 The first command covers non-social records. The second command covers social
 records. Both commands run the same model locally and write a binary plus its
-hash-bound JSON index. The first run can download the model files.
+hash-bound JSON index. The social command also writes
+`archive-social-embeddings-build.json`, which holds exact-text hashes for later
+incremental builds. That build metadata stays in the repository and is not in
+the FTPS deployment allowlist. The browser receives only the compact ID index.
+The first run can download the model files.
 
 For later social-only updates, reuse byte-identical vectors whose exact source
 text did not change:
@@ -92,8 +96,8 @@ text did not change:
 npm run build-social-embeddings -- --incremental
 ```
 
-An older social index has no per-record text hashes. Its first incremental run
-must name the matching baseline archive explicitly, for example:
+An older social artifact has no separate build metadata. Its first incremental
+run must name the matching baseline archive explicitly, for example:
 
 ```bash
 npm run build-social-embeddings -- --incremental \
@@ -101,9 +105,9 @@ npm run build-social-embeddings -- --incremental \
 ```
 
 The command verifies the previous model, vector layout, binary size, checksum,
-and text hashes before it reuses any vector. It writes current IDs in current
-archive order, so removed records disappear and reordered records move with
-their vectors.
+ordered IDs, and text hashes before it reuses any vector. It writes current IDs
+in current archive order, so removed records disappear and reordered records
+move with their vectors.
 
 ### Relationship adjacency export
 
