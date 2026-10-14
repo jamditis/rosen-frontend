@@ -310,6 +310,49 @@ describe('stewardship decision replay', () => {
     );
   });
 
+  it('selects the lowest proposal ID as the retained explicit rejection source', () => {
+    const sample = fixture('rejected-duplicate.json');
+    const base = sample.proposals[0];
+    const higher = {
+      ...base,
+      proposalId: 'urn:rosen-stewardship:proposal:retained-z',
+      currentValue: 'Higher ID observation'
+    };
+    const lower = {
+      ...base,
+      proposalId: 'urn:rosen-stewardship:proposal:retained-a',
+      currentValue: 'Lower ID observation'
+    };
+    const pending = {
+      ...base,
+      proposalId: 'urn:rosen-stewardship:proposal:retained-pending',
+      currentValue: 'Pending observation'
+    };
+    const rejectHigher = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:reject-retained-z',
+      proposalId: higher.proposalId
+    };
+    const rejectLower = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:reject-retained-a',
+      proposalId: lower.proposalId
+    };
+
+    const projection = replayDecisions(
+      [higher, pending, lower],
+      [rejectHigher, rejectLower]
+    );
+    const suppressed = entryFor(projection, pending.proposalId);
+
+    assert.equal(suppressed.suppressedByProposalId, lower.proposalId);
+    assert.equal(suppressed.inheritedRejectionEventId, rejectLower.eventId);
+    assert.deepEqual(
+      projection,
+      replayDecisions([lower, pending, higher], [rejectHigher, rejectLower])
+    );
+  });
+
   it('blocks successor approval until its original has a matching supersession', () => {
     const sample = fixture('linked-replacement.json');
     const successorId = sample.proposals[1].proposalId;
@@ -518,6 +561,66 @@ describe('stewardship decision replay', () => {
     );
   });
 
+  it('releases a successor reservation after inherited rejection suppression', () => {
+    const sample = fixture('field-approval.json');
+    const original = {
+      ...sample.proposals[0],
+      proposalId: 'urn:rosen-stewardship:proposal:inherited-original'
+    };
+    const successor = {
+      ...sample.proposals[0],
+      proposalId: 'urn:rosen-stewardship:proposal:inherited-successor',
+      proposedValue: 'Suppressed successor title',
+      reason: 'A named successor that will inherit a rejection.',
+      supersedesProposalId: original.proposalId
+    };
+    const rejectedMatch = {
+      ...successor,
+      proposalId: 'urn:rosen-stewardship:proposal:inherited-rejection-source',
+      currentValue: 'A separate observation',
+      reason: 'An explicit rejection with the successor fingerprint.'
+    };
+    delete rejectedMatch.supersedesProposalId;
+    const interloper = {
+      ...sample.proposals[0],
+      proposalId: 'urn:rosen-stewardship:proposal:inherited-interloper',
+      proposedValue: 'Available title after suppression',
+      reason: 'A proposal admitted after inherited suppression.'
+    };
+    const approveOriginal = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:approve-inherited-original',
+      proposalId: original.proposalId
+    };
+    const supersedeOriginal = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:supersede-inherited-original',
+      proposalId: original.proposalId,
+      operation: 'supersede',
+      expectedRevision: 1,
+      successorProposalId: successor.proposalId
+    };
+    const rejectMatch = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:reject-inherited-source',
+      proposalId: rejectedMatch.proposalId,
+      operation: 'reject'
+    };
+
+    const projection = replayDecisions(
+      [original, successor, rejectedMatch, interloper],
+      [approveOriginal, supersedeOriginal, rejectMatch]
+    );
+    const suppressed = entryFor(projection, successor.proposalId);
+    const available = entryFor(projection, interloper.proposalId);
+
+    assert.equal(suppressed.status, 'rejected');
+    assert.equal(suppressed.suppressedByProposalId, rejectedMatch.proposalId);
+    assert.equal(suppressed.targetReservedForProposalId, undefined);
+    assert.equal(available.targetAvailable, true);
+    assert.equal(available.targetReservedForProposalId, undefined);
+  });
+
   it('allows a changed linked successor and retains the rejection history', () => {
     const sample = fixture('linked-replacement.json');
     const projection = replayDecisions(sample.proposals, sample.decisions);
@@ -617,5 +720,37 @@ describe('stewardship decision replay', () => {
     assert.deepEqual(sample, before);
     assert.ok(Object.isFrozen(first));
     assert.ok(Object.isFrozen(first.superseded[0].proposal));
+  });
+
+  it('projects many independent proposal states independent of proposal input order', () => {
+    const sample = fixture('field-approval.json');
+    const baseProposal = sample.proposals[0];
+    const baseDecision = sample.decisions[0];
+    const proposals = [];
+    const decisions = [];
+
+    for (let index = 0; index < 1500; index += 1) {
+      const suffix = String(index).padStart(4, '0');
+      const proposal = {
+        ...baseProposal,
+        proposalId: `urn:rosen-stewardship:proposal:state-smoke-${suffix}`,
+        objectId: `urn:rosen:object:archive-record:STATE-SMOKE-${suffix}`
+      };
+      proposals.push(proposal);
+      if (index % 3 === 2) continue;
+      decisions.push({
+        ...baseDecision,
+        eventId: `urn:rosen-stewardship:decision-event:state-smoke-${suffix}`,
+        proposalId: proposal.proposalId,
+        operation: index % 3 === 0 ? 'approve' : 'reject'
+      });
+    }
+
+    const projection = replayDecisions(proposals, decisions);
+    assert.equal(projection.proposed.length, 500);
+    assert.equal(projection.accepted.length, 500);
+    assert.equal(projection.rejected.length, 500);
+    assert.equal(projection.superseded.length, 0);
+    assert.deepEqual(projection, replayDecisions([...proposals].reverse(), decisions));
   });
 });
