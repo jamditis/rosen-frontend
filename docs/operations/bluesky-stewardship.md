@@ -61,9 +61,11 @@ The release number, module imports, service worker, and data cache advance toget
 The publisher tests the complete generated release before pushing explicit data
 and version paths through the existing GitHub App. It refuses a moved main branch.
 Certificate-verified FTPS uploads dependencies before release entry points and keeps
-the existing making-of publication hold. Live byte verification compares the tested
-release with the ordinary public URLs. A successful Git push or upload alone does
-not count as publication.
+the existing making-of publication hold. Live byte verification compares all public
+record payloads, search indexes, embedding pairs, relationship shards, committed
+feeds, and release markers with the tested bytes at the ordinary public URLs.
+Runs with no new records use the same check. A successful Git push or upload alone
+does not count as publication.
 
 The authenticated receipt has a schema version, run/attempt ID, canonical commit,
 release version, outcome, counts, source timestamp, and candidate decisions. D1

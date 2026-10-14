@@ -1,12 +1,15 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
   LIVE_SITE_ROOT,
+  publishedReleaseArtifactPaths,
   verifyLiveArtifacts,
 } from '../.github/scripts/verify-live-deploy.mjs';
 
@@ -75,6 +78,59 @@ describe('weekly reviewed-main deployment', () => {
 });
 
 describe('live deployment verifier', () => {
+  it('covers all public release payloads and newly tracked feeds without private inputs', (t) => {
+    const fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'rosen-release-paths-'));
+    t.after(() => fs.rmSync(fixture, { recursive: true, force: true }));
+    execFileSync('git', ['init', '-q', fixture]);
+    for (const file of [
+      'data/feeds/categories/new-feed.xml',
+      'data/archive-social-embeddings-build.json',
+      'features/making-of/index.html',
+    ]) {
+      fs.mkdirSync(path.dirname(path.join(fixture, file)), { recursive: true });
+      fs.writeFileSync(path.join(fixture, file), 'fixture');
+      execFileSync('git', ['add', '--', file], { cwd: fixture });
+    }
+    fs.writeFileSync(path.join(fixture, 'data/feeds/private-scratch.xml'), 'untracked');
+    const paths = publishedReleaseArtifactPaths(fixture);
+    for (const required of [
+      'version.json', 'index.html', 'frontend/sw.js', 'frontend/services/cacheConfig.js',
+      'data/archive-data.json', 'data/archive-core.json', 'data/archive-details.json',
+      'data/archive-entities.json', 'data/archive-analytics.json', 'data/search-index.json',
+      'data/social-search-index.json', 'data/archive-social-embeddings.json',
+      'data/archive-social-embeddings.bin', 'data/relationship-adjacency-manifest.json',
+      'data/feeds/categories/new-feed.xml',
+    ]) assert.ok(paths.includes(required), `${required} must be verified`);
+    for (const nibble of '0123456789abcdef') {
+      assert.ok(paths.includes(`data/relationship-adjacency-${nibble}.json`));
+    }
+    assert.ok(!paths.includes('data/archive-social-embeddings-build.json'));
+    assert.ok(!paths.includes('features/making-of/index.html'));
+    assert.ok(!paths.includes('data/feeds/private-scratch.xml'));
+  });
+
+  it('rejects stale details, search, vectors and feeds when the entry point and core match', async () => {
+    const paths = publishedReleaseArtifactPaths();
+    const feed = paths.find(file => file.startsWith('data/feeds/') && file.endsWith('.xml'));
+    assert.ok(feed, 'the committed release must contain an RSS feed');
+    for (const stalePath of [
+      'data/archive-details.json', 'data/social-search-index.json',
+      'data/archive-social-embeddings.bin', feed,
+    ]) {
+      await assert.rejects(verifyLiveArtifacts({
+        readLocal: async relativePath => Buffer.from(`current:${relativePath}`),
+        fetchImpl: async url => {
+          const relativePath = new URL(url).pathname.replace('/j/rosen-archive/', '');
+          return new Response(relativePath === stalePath
+            ? 'stale payload'
+            : `current:${relativePath}`);
+        },
+        attempts: 1,
+        sleep: async () => {},
+      }), error => error.message.startsWith(`${stalePath} did not match`));
+    }
+  });
+
   it('uses the fixed archive root and verifies exact bytes with cache-busted URLs', async () => {
     assert.equal(LIVE_SITE_ROOT, 'https://pressthink.org/j/rosen-archive/');
     const files = new Map([

@@ -1,17 +1,43 @@
 #!/usr/bin/env node
 
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 import process from 'node:process';
 
 export const LIVE_SITE_ROOT = 'https://pressthink.org/j/rosen-archive/';
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 export const DEFAULT_ARTIFACT_PATHS = Object.freeze([
   'version.json',
   'index.html',
   'data/archive-core.json',
+  'frontend/sw.js',
+  'frontend/services/cacheConfig.js',
+  'data/archive-data.json',
+  'data/archive-details.json',
+  'data/archive-entities.json',
+  'data/archive-analytics.json',
+  'data/search-index.json',
+  'data/social-search-index.json',
+  'data/archive-embeddings.bin',
+  'data/archive-embeddings.json',
+  'data/archive-social-embeddings.bin',
+  'data/archive-social-embeddings.json',
+  ...Array.from({ length: 16 }, (_, index) =>
+    `data/relationship-adjacency-${index.toString(16)}.json`),
+  'data/relationship-adjacency-manifest.json',
 ]);
+
+/** Include every committed feed, including newly generated category feeds. */
+export function publishedReleaseArtifactPaths(root = REPO_ROOT) {
+  const feeds = execFileSync('git', ['ls-files', '-z', '--', 'data/feeds'], {
+    cwd: root,
+    encoding: 'utf8',
+  }).split('\0').filter(Boolean).sort();
+  return [...new Set([...DEFAULT_ARTIFACT_PATHS, ...feeds])];
+}
 
 const sha256 = (bytes) =>
   crypto.createHash('sha256').update(bytes).digest('hex');
@@ -24,7 +50,7 @@ const defaultSleep = (milliseconds) =>
  * Redirects fail closed so the fixed archive boundary cannot move unnoticed.
  */
 export async function verifyLiveArtifacts({
-  artifactPaths = DEFAULT_ARTIFACT_PATHS,
+  artifactPaths = publishedReleaseArtifactPaths(),
   readLocal = (relativePath) => readFile(path.resolve(relativePath)),
   fetchImpl = fetch,
   runId = process.env.GITHUB_RUN_ID || 'local',
