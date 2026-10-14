@@ -182,7 +182,7 @@ jobs:
           echo "Running job=$JOB limit=$LIMIT dry_run=$DRY_RUN"
           case "$JOB" in
             key_concepts)
-              poetry run python -m rosen_scraper.key_concepts_updater --limit "$LIMIT" $DRY_FLAG
+              poetry run python -m rosen_scraper.key_concepts_updater --durable-progress --limit "$LIMIT" $DRY_FLAG
               ;;
             dedup)
               poetry run python scripts/diagnostics/data_deduper.py --limit "$LIMIT" $DRY_FLAG

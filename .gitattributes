@@ -19,3 +19,7 @@ data/lib/graph-policy-refresh.js text eol=lf diff
 # This generated spreadsheet deliberately uses RFC 4180 CRLF records. Do not
 # report each changed row's carriage return as trailing whitespace.
 docs/feature-audit/feature-stories.csv -whitespace
+
+# This legacy updater uses CRLF. Keep its changed lines visible without
+# reporting each carriage return as trailing whitespace.
+backend/src/rosen_scraper/key_concepts_updater.py whitespace=cr-at-eol
