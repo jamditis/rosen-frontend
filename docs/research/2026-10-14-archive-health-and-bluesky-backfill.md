@@ -44,7 +44,7 @@ JSON, lexical search, analytics, RSS, OPML, relationship shards, and the steward
 
 The collector's 20 tests and the 362 pre-change data tests passed. Browser checks confirmed that a new record displays its source URL, authored summary, categories, and entity links. The new record count is 26,865. The complete Node suite, graph validation, dependency audit, and captured-feed idempotency check form the release checks recorded in the pull request.
 
-Review and merge this batch, then publish the exact reviewed main through the existing full-site deployment workflow and read back the new live version and record IDs. The batch does not connect discovery to the office runner or change a schedule. Finishing #812 and adding ingestion and publication health remain necessary for regular unattended ingestion.
+Review and merge this batch, then publish the exact reviewed main through the existing full-site deployment workflow and read back the new live version and record IDs. The batch does not connect discovery to the office runner or change a schedule. Finishing #812 and restoring D1 run visibility remain necessary for regular unattended ingestion.
 
 For the next manual batch, use an isolated worktree and the last canonical ingestion date:
 
