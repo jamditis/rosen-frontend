@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
+import { syncBuiltinESMExports } from 'node:module';
 import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -466,6 +467,51 @@ describe('rebuildable stewardship task index', () => {
       () => taskIndexConfig({ indexPath: path.join(root, 'tasks.sqlite') }),
       /eventPath must be a non-empty path string/
     );
+  });
+
+  it('reports an already replaced index when the final directory sync fails', () => {
+    if (process.platform !== 'linux') return;
+    const root = directory('post-replace-error');
+    const backupRoot = directory('post-replace-backup');
+    const eventPath = path.join(root, 'events.jsonl');
+    const indexPath = path.join(root, 'tasks.sqlite');
+    const backupPath = path.join(backupRoot, 'prior.sqlite');
+    fs.writeFileSync(eventPath, fixtureBytes);
+    rebuildTaskIndex({ eventPath, indexPath });
+    const prior = fs.readFileSync(indexPath);
+    writeStream(eventPath, [...fixtureEvents, additionalEvent({
+      suffix: 'post-replace-extra',
+      objectId: 'urn:rosen:object:archive-record:RECORD-00925'
+    })]);
+    const originalSync = fs.fsyncSync;
+    const directoryStats = fs.statSync(root);
+    const failure = Object.assign(new Error('injected directory sync failure'), { code: 'EIO' });
+    // Fault only the filesystem boundary for the live index directory. The
+    // backup has a different parent, so its successful sync remains real.
+    fs.fsyncSync = (descriptor) => {
+      const stats = fs.fstatSync(descriptor);
+      if (stats.isDirectory() && stats.dev === directoryStats.dev && stats.ino === directoryStats.ino) {
+        throw failure;
+      }
+      return originalSync(descriptor);
+    };
+    syncBuiltinESMExports();
+    try {
+      assert.throws(() => rebuildTaskIndex({ eventPath, indexPath, backupPath }), error => {
+        assert.equal(error.name, 'TaskIndexPostReplaceError');
+        assert.equal(error.indexReplaced, true);
+        assert.equal(error.indexPath, indexPath);
+        assert.equal(error.backupPath, backupPath);
+        assert.equal(error.cause, failure);
+        return true;
+      });
+    } finally {
+      fs.fsyncSync = originalSync;
+      syncBuiltinESMExports();
+    }
+    assert.equal(snapshotTaskIndex(indexPath).tasks.length, 2);
+    assert.deepEqual(fs.readFileSync(backupPath), prior);
+    assert.deepEqual(fs.readdirSync(root).filter(name => name.includes('.rebuild-')), []);
   });
 
   it('preserves symbolic-link index and backup destinations and their targets', () => {

@@ -44,6 +44,16 @@ if (nodeMajor < 22 || (nodeMajor === 22 && nodeMinor < 13)) {
 const { DatabaseSync } = await import('node:sqlite');
 const TASK_EVENT_TYPE_SET = new Set(TASK_EVENT_TYPES);
 
+export class TaskIndexPostReplaceError extends Error {
+  constructor(config, cause) {
+    super('Task index was replaced, but its directory sync failed; inspect it before retrying', { cause });
+    this.name = 'TaskIndexPostReplaceError';
+    this.indexReplaced = true;
+    this.indexPath = config.indexPath;
+    this.backupPath = config.backupPath;
+  }
+}
+
 const SCHEMA_V1 = `
 CREATE TABLE schema_migrations (
   version INTEGER PRIMARY KEY,
@@ -531,6 +541,7 @@ export function rebuildTaskIndex(configValue, { beforeReplace } = {}) {
   const temporaryIndex = siblingTemporaryPath(config.indexPath, 'rebuild');
   const descriptor = openSync(temporaryIndex, 'wx', 0o600);
   closeSync(descriptor);
+  let indexReplaced = false;
 
   try {
     buildIndexDatabase(temporaryIndex, snapshot);
@@ -557,6 +568,7 @@ export function rebuildTaskIndex(configValue, { beforeReplace } = {}) {
     assertSourceUnchanged(config.eventPath, snapshot.stamp);
     assertReplaceableIndex(config.indexPath, 'indexPath');
     renameSync(temporaryIndex, config.indexPath);
+    indexReplaced = true;
     fsyncDirectory(path.dirname(config.indexPath));
 
     return Object.freeze({
@@ -569,6 +581,7 @@ export function rebuildTaskIndex(configValue, { beforeReplace } = {}) {
       stateFingerprint
     });
   } catch (error) {
+    if (indexReplaced) throw new TaskIndexPostReplaceError(config, error);
     rmSync(temporaryIndex, { force: true });
     throw error;
   }

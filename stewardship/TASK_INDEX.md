@@ -63,6 +63,12 @@ sync errors are not suppressed. Other platforms retain the file flush and
 atomic rename but do not claim that a replacement directory entry survives a
 crash.
 
+If the final directory sync fails after the index rename, the caller receives
+`TaskIndexPostReplaceError` with `indexReplaced: true`, the state paths, and the
+original error as its cause. The new index is visible, but crash durability is
+unconfirmed. Inspect its source metadata and preserve the prior backup before
+retrying; a retry would replace that backup with the already published index.
+
 This sequence assumes an offline single writer. It detects simple source
 movement during a rebuild but does not provide a concurrent append or lease
 guarantee. The task-event JSONL file needs its own backup because an index
