@@ -149,7 +149,8 @@ enrichment evidence to an earlier real `capture-attempt` for the same object.
 The link does not imply a new capture. It must resolve to an earlier event in
 the append-only manifest, cannot point to an event already superseded when the
 link is appended or to a `not-requested` event, and cannot claim validation or
-enrichment before the linked capture occurred.
+enrichment before the linked capture occurred. An artifact-specific event must
+link to the same capture named by that artifact's `captureEventId`.
 
 All ISO timestamps must name a real UTC calendar instant, not merely match the
 timestamp character pattern. Wayback capture timestamps receive the same

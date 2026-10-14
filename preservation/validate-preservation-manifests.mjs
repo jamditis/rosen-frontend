@@ -387,6 +387,14 @@ function validateReferences(manifest) {
           `${event.eventId}: linked validation or enrichment cannot occur before its captureEventId`,
         );
       }
+      const artifactId = event.fixity?.artifactId
+        ?? (event.eventType === 'capture-attempt' ? undefined : event.artifactId);
+      const artifact = artifacts.get(artifactId);
+      if (artifact && artifact.captureEventId !== event.captureEventId) {
+        throw new PreservationValidationError(
+          `${event.eventId}: captureEventId must match artifact ${artifactId} declared capture provenance`,
+        );
+      }
     }
 
     if (event.supersedesEventId) {

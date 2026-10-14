@@ -173,6 +173,16 @@ describe('preservation manifest schema (#701)', () => {
     fixity.captureEventId = artifact.captureEventId;
     assert.equal(validatePreservationManifest(manifest), manifest);
 
+    const wrongArtifactCapture = clone(manifest);
+    wrongArtifactCapture.events.find(event => event.eventType === 'fixity-check').captureEventId =
+      wrongArtifactCapture.events.find(event => event.eventId.endsWith('-redirect')).eventId;
+    rejectsManifest(
+      wrongArtifactCapture,
+      'captureEventId',
+      'artifact',
+      'declared capture provenance',
+    );
+
     const missing = clone(manifest);
     missing.events.find(event => event.eventType === 'fixity-check').captureEventId =
       'urn:rosen-preservation:event:missing-capture';
