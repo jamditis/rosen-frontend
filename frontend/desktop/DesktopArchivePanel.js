@@ -68,6 +68,7 @@ const DesktopArchivePanel = ({
       const drawerActive = !window.matchMedia
         || window.matchMedia('(max-width: 1100px)').matches;
       if (event.key !== 'Escape' || !drawerActive) return;
+      if (event.defaultPrevented || event.target?.closest?.('dialog[open]')) return;
       event.preventDefault();
       setFilterOpen(false);
       filterButtonRef.current?.focus();
