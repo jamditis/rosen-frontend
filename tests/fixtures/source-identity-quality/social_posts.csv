@@ -1,0 +1,5 @@
+id,content_type,url,publication_date,summary,verified
+BSKY-00001,Social Media Post,,2025-10-14 2:12:59,,FALSE
+TWTR-00001,Social Media Post,not-a-url,2025-01-01T23:59:59Z,,TRUE
+RECORD-00004,Social Media Post,https://example.test/social,2025-01-01 12:00:00,,TRUE
+MAST-00001,Social Media Post,https://example.test/mastodon,2025-01-01T12:00:00+14:30,,TRUE

@@ -1,0 +1,57 @@
+{
+  "schema": {
+    "id": "source-identity-quality-evidence/1.0.0"
+  },
+  "exceptions": [],
+  "historical_measurements": [
+    {
+      "id": "social-source-recovery-unresolved-2026-07-23",
+      "observed_at_commit": "8b30a6d1c7cc7d49a79363ec3ffca7f05390d301",
+      "source_rows": 29868,
+      "missing_url": 38,
+      "uncertain_verification": 38,
+      "overlap": 38,
+      "evidence": "docs/social-source-recovery-queue-2026-07-23.md",
+      "overlap_record_ids": [
+        "BSKY-00334",
+        "BSKY-00336",
+        "BSKY-00441",
+        "BSKY-00446",
+        "BSKY-00459",
+        "BSKY-00785",
+        "BSKY-00863",
+        "BSKY-00902",
+        "BSKY-01188",
+        "BSKY-01269",
+        "BSKY-01270",
+        "BSKY-01271",
+        "BSKY-01277",
+        "BSKY-01401",
+        "BSKY-01418",
+        "BSKY-01426",
+        "BSKY-01441",
+        "BSKY-01629",
+        "BSKY-01640",
+        "BSKY-01689",
+        "BSKY-01694",
+        "BSKY-01830",
+        "BSKY-01832",
+        "BSKY-01911",
+        "BSKY-02220",
+        "BSKY-02344",
+        "BSKY-02355",
+        "BSKY-02518",
+        "BSKY-02522",
+        "BSKY-02585",
+        "BSKY-02616",
+        "BSKY-02690",
+        "BSKY-02796",
+        "BSKY-02847",
+        "BSKY-02874",
+        "BSKY-02878",
+        "BSKY-03038",
+        "BSKY-03062"
+      ]
+    }
+  ]
+}
