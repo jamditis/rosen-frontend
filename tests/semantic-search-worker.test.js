@@ -24,12 +24,15 @@ import {
   DEFAULT_SOCIAL_QUERY_K,
   MAX_QUERY_CHARS,
   QUERY_MODEL_ID,
+  QUERY_MODEL_REVISION,
   QUERY_PREFIX,
   TRANSFORMERS_MODULE_URL,
   buildQueryText,
+  isSafariRuntime,
   rankQuery,
   rankSemanticStores,
   registerSemanticSearchWorker,
+  selectLocalWasmAssets,
 } from '../frontend/services/semantic-search-worker.js';
 import { EMBED_DIM } from '../frontend/services/embeddings-worker.js';
 import { MODEL_ID as BUILDER_MODEL_ID } from '../data/lib/embeddings-builder.js';
@@ -66,11 +69,38 @@ test('runs the same transformers major the builder is pinned to', () => {
   );
   const buildRange = packageJson.devDependencies['@huggingface/transformers'];
   const buildMajor = buildRange.match(/(\d+)/)[1];
-  assert.match(
-    TRANSFORMERS_MODULE_URL,
-    new RegExp(`^https://esm\\.sh/@huggingface/transformers@${buildMajor}\\.`),
-    'the runtime encoder and the build-time encoder must share a major version',
-  );
+  const manifest = JSON.parse(fs.readFileSync(
+    path.join(repoRoot, 'frontend/vendor/semantic/v1/manifest.json'),
+    'utf8',
+  ));
+  assert.equal(manifest.runtime.transformers.version.split('.')[0], buildMajor);
+  assert.match(TRANSFORMERS_MODULE_URL, /\/frontend\/vendor\/semantic\/v1\/runtime\/transformers\.web\.min\.js$/);
+  assert.equal(QUERY_MODEL_REVISION, manifest.model.revision);
+});
+
+test('selects the pinned Safari fallback and default asyncify WASM pairs', () => {
+  const safari = {
+    vendor: 'Apple Computer, Inc.',
+    userAgent: 'Mozilla/5.0 Version/18.0 Safari/605.1.15',
+  };
+  const chrome = {
+    vendor: 'Google Inc.',
+    userAgent: 'Mozilla/5.0 Chrome/140.0.0.0 Safari/537.36',
+  };
+  const chromeOnIos = {
+    vendor: 'Apple Computer, Inc.',
+    userAgent: 'Mozilla/5.0 CriOS/140.0.0.0 Mobile/15E148 Safari/604.1',
+  };
+  const safariWorker = {
+    userAgent: 'Mozilla/5.0 AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15',
+  };
+
+  assert.equal(isSafariRuntime(safari), true);
+  assert.equal(isSafariRuntime(safariWorker), true);
+  assert.equal(isSafariRuntime(chrome), false);
+  assert.equal(isSafariRuntime(chromeOnIos), false);
+  assert.match(selectLocalWasmAssets(safari).wasm, /ort-wasm-simd-threaded\.wasm$/);
+  assert.match(selectLocalWasmAssets(chrome).wasm, /ort-wasm-simd-threaded\.asyncify\.wasm$/);
 });
 
 test('prefixes the query with the instruction bge prescribes for queries', () => {

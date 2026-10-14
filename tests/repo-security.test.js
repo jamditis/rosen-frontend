@@ -98,12 +98,9 @@ test('.htaccess content security policy allows exactly the required origins', ()
   ]);
   assertSources('font-src', ["'self'", 'https://fonts.gstatic.com']);
   // connect-src: esm.sh module fetches, the branded report/submission endpoint,
-  // the exact Apps Script ContentService redirect host, and the four sources the
-  // opt-in semantic search encoder downloads from (#279): huggingface.co for the
-  // model, the two Hugging Face storage suffixes its weight downloads redirect
-  // to, and jsdelivr for the onnxruntime WebAssembly binary. The two suffixes are
-  // wildcards because Hugging Face moves those hosts; every other source stays
-  // exact. The exact-source assertion still proves the internal data explorer
+  // and the exact Apps Script ContentService redirect host. Semantic search
+  // model and runtime assets are self-hosted, so they need no remote source.
+  // The exact-source assertion still proves the internal data explorer
   // does not widen production CSP for published Google Sheets or wildcard
   // Googleusercontent hosts.
   assertSources('connect-src', [
@@ -111,10 +108,6 @@ test('.htaccess content security policy allows exactly the required origins', ()
     'https://esm.sh',
     'https://script.google.com',
     'https://script.googleusercontent.com',
-    'https://huggingface.co',
-    'https://*.hf.co',
-    'https://*.huggingface.co',
-    'https://cdn.jsdelivr.net',
   ]);
   // frame-src: privacy-enhanced embeds plus the legacy origin during the
   // service-worker cache rollover from the previous deployment.

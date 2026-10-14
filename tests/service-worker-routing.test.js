@@ -90,6 +90,31 @@ describe('service worker request classification (#274)', () => {
     assert.equal(sandbox.isStaticAsset(`${BASE}/frontend/vendor/sql-wasm-1.10.3.wasm`), true);
   });
 
+  it('caches requested semantic assets without adding the heavy payload to install precache', async () => {
+    for (const file of [
+      'runtime/transformers.web.min.js',
+      'runtime/ort.webgpu.bundle.min.mjs',
+      'runtime/ort-wasm-simd-threaded.asyncify.wasm',
+      'models/Xenova/bge-small-en-v1.5/config.json',
+      'models/Xenova/bge-small-en-v1.5/onnx/model_quantized.onnx',
+    ]) {
+      assert.equal(
+        sandbox.isSemanticAsset(`${BASE}/frontend/vendor/semantic/v1/${file}`),
+        true,
+        file,
+      );
+    }
+    assert.equal(sandbox.isSemanticAsset(`${BASE}/data/archive-core.json`), false);
+
+    const { handlers, added } = loadSW();
+    await runInstall(handlers);
+    assert.equal(
+      added.some(url => url.includes('/frontend/vendor/semantic/')),
+      false,
+      'opt-out visitors must not download the model or runtime during install',
+    );
+  });
+
   it('treats a top-level navigation as an HTML request', () => {
     assert.equal(sandbox.isHtmlRequest({ mode: 'navigate' }, `${BASE}/`), true);
   });

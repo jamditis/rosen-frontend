@@ -252,6 +252,14 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // Semantic model and runtime files are large and optional. Cache them only
+  // after the reader enables meaning search; never add them to install-time
+  // precache where every visitor would pay the transfer cost.
+  if (isSemanticAsset(url.pathname)) {
+    event.respondWith(cacheFirst(event.request, CACHE_NAME));
+    return;
+  }
+
   // Handle static assets with cache-first
   if (isStaticAsset(url.pathname)) {
     event.respondWith(cacheFirst(event.request, CACHE_NAME));
@@ -281,6 +289,11 @@ function isSpaNavigation(request) {
   if (request.mode !== 'navigate') return false;
   const pathname = new URL(request.url).pathname;
   return pathname === `${SITE_ROOT}/` || pathname === `${SITE_ROOT}/index.html`;
+}
+
+function isSemanticAsset(pathname) {
+  if (!pathname.startsWith(`${FRONTEND_PATH}/vendor/semantic/v1/`)) return false;
+  return /\.(?:js|mjs|wasm|json|onnx)$/.test(pathname);
 }
 
 // Check if URL is a static asset. '.html' is deliberately excluded -- HTML is
