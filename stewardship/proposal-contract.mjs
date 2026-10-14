@@ -360,6 +360,10 @@ function addPublicationRefs(entry, event) {
   }
 }
 
+function compareCodeUnits(left, right) {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
 function sameTarget(left, right) {
   return left.proposal.objectId === right.proposal.objectId
     && left.proposal.target.kind === right.proposal.target.kind
@@ -370,6 +374,48 @@ function acceptedTargetOccupant(entry, entries) {
   return [...entries.values()].find(candidate =>
     candidate !== entry && candidate.status === 'accepted' && sameTarget(candidate, entry)
   );
+}
+
+function activeTargetReservation(entry, entries) {
+  const reservations = [...entries.values()]
+    .filter(candidate => {
+      if (candidate.status !== 'superseded' || !sameTarget(candidate, entry)) return false;
+      const successor = entries.get(candidate.successorProposalId);
+      return successor?.status === 'proposed';
+    })
+    .map(candidate => candidate.successorProposalId)
+    .sort(compareCodeUnits);
+  return reservations[0];
+}
+
+function retainedRejection(entry, entries) {
+  const sources = [...entries.values()]
+    .filter(candidate =>
+      candidate !== entry
+      && candidate.rejectionFingerprint === entry.rejectionFingerprint
+      && candidate.decisionHistory.some(event => event.operation === 'reject')
+    )
+    .sort((left, right) =>
+      compareCodeUnits(left.proposal.proposalId, right.proposal.proposalId)
+    );
+  const source = sources[0];
+  if (!source) return undefined;
+  return {
+    source,
+    event: source.decisionHistory.find(event => event.operation === 'reject')
+  };
+}
+
+function targetAdmission(entry, entries) {
+  const occupant = acceptedTargetOccupant(entry, entries);
+  if (occupant) return { available: false, occupant };
+
+  const reservedForProposalId = activeTargetReservation(entry, entries);
+  return {
+    available: reservedForProposalId === undefined
+      || reservedForProposalId === entry.proposal.proposalId,
+    reservedForProposalId
+  };
 }
 
 function assertApprovalAllowed(entry, entries, context) {
@@ -387,10 +433,51 @@ function assertApprovalAllowed(entry, entries, context) {
     }
   }
 
-  const occupant = acceptedTargetOccupant(entry, entries);
-  if (occupant) {
+  const rejection = retainedRejection(entry, entries);
+  if (rejection) {
     fail(
-      `approve cannot apply while proposal ${occupant.proposal.proposalId} occupies the target`,
+      `approve cannot apply because proposal ${rejection.source.proposal.proposalId} retains the same rejection fingerprint`,
+      context
+    );
+  }
+
+  const target = targetAdmission(entry, entries);
+  if (target.occupant) {
+    fail(
+      `approve cannot apply while proposal ${target.occupant.proposal.proposalId} occupies the target`,
+      context
+    );
+  }
+  if (!target.available) {
+    fail(
+      `approve cannot apply because the target is reserved for proposal ${target.reservedForProposalId}`,
+      context
+    );
+  }
+}
+
+function assertSupersessionAllowed(entry, successor, entries, context) {
+  const rejection = retainedRejection(successor, entries);
+  if (rejection) {
+    fail(
+      `supersede cannot reserve a successor matching retained rejection ${rejection.source.proposal.proposalId}`,
+      context
+    );
+  }
+
+  const target = targetAdmission(entry, entries);
+  if (target.occupant) {
+    fail(
+      `supersede cannot reserve the target while proposal ${target.occupant.proposal.proposalId} occupies it`,
+      context
+    );
+  }
+  if (
+    target.reservedForProposalId !== undefined
+    && target.reservedForProposalId !== successor.proposal.proposalId
+  ) {
+    fail(
+      `supersede cannot replace target reservation for proposal ${target.reservedForProposalId}`,
       context
     );
   }
@@ -429,6 +516,7 @@ function applyDecision(entry, event, entries, context) {
     if (successor.status !== 'proposed' || successor.decisionHistory.length !== 0) {
       fail('successor proposal must be undecided when supersession applies', context);
     }
+    assertSupersessionAllowed(entry, successor, entries, context);
     entry.status = 'superseded';
     entry.successorProposalId = event.successorProposalId;
   }
@@ -438,21 +526,31 @@ function applyDecision(entry, event, entries, context) {
   addPublicationRefs(entry, event);
 }
 
-function finalizeDuplicates(entries, source) {
+function suppressProposal(entry, original, rejection) {
+  entry.status = 'rejected';
+  entry.suppressedByProposalId = original.proposal.proposalId;
+  entry.inheritedRejectionEventId = rejection.eventId;
+}
+
+function finalizeRejectedFingerprints(entries, source) {
   for (const entry of entries.values()) {
     const originalId = entry.proposal.duplicateOfProposalId;
-    if (originalId === undefined) continue;
-    const original = entries.get(originalId);
-    const rejection = original.decisionHistory.find(event => event.operation === 'reject');
-    if (!rejection) {
-      fail(
-        `duplicateOfProposalId ${originalId} has no retained rejection decision`,
-        { source, index: entry.proposalIndex }
-      );
+    if (originalId !== undefined) {
+      const original = entries.get(originalId);
+      const rejection = original.decisionHistory.find(event => event.operation === 'reject');
+      if (!rejection) {
+        fail(
+          `duplicateOfProposalId ${originalId} has no retained rejection decision`,
+          { source, index: entry.proposalIndex }
+        );
+      }
+      suppressProposal(entry, original, rejection);
+      continue;
     }
-    entry.status = 'rejected';
-    entry.suppressedByProposalId = originalId;
-    entry.inheritedRejectionEventId = rejection.eventId;
+
+    if (entry.status !== 'proposed') continue;
+    const retained = retainedRejection(entry, entries);
+    if (retained) suppressProposal(entry, retained.source, retained.event);
   }
 }
 
@@ -471,16 +569,20 @@ function finalizeSuccessors(entries, source) {
 }
 
 function publicEntry(entry, entries) {
+  const target = targetAdmission(entry, entries);
   const output = {
     proposal: entry.proposal,
     proposalHash: proposalHash(entry.proposal),
-    rejectionFingerprint: rejectionFingerprint(entry.proposal),
+    rejectionFingerprint: entry.rejectionFingerprint,
     status: entry.status,
     revision: entry.revision,
     decisionHistory: entry.decisionHistory,
     publicationRefs: entry.publicationRefs,
-    targetAvailable: acceptedTargetOccupant(entry, entries) === undefined
+    targetAvailable: target.available
   };
+  if (target.reservedForProposalId !== undefined) {
+    output.targetReservedForProposalId = target.reservedForProposalId;
+  }
   if (entry.proposal.supersedesProposalId !== undefined) {
     const original = entries.get(entry.proposal.supersedesProposalId);
     output.supersessionReady = original.status === 'superseded'
@@ -517,6 +619,7 @@ export function replayDecisions(
       proposalIndex: index,
       status: 'proposed',
       revision: 0,
+      rejectionFingerprint: rejectionFingerprint(proposal),
       decisionHistory: [],
       publicationRefs: []
     });
@@ -552,16 +655,14 @@ export function replayDecisions(
       index
     });
   }
-  finalizeDuplicates(entries, proposalSource);
+  finalizeRejectedFingerprints(entries, proposalSource);
   finalizeSuccessors(entries, proposalSource);
 
   const ordered = [...entries.values()]
     .map(entry => publicEntry(entry, entries))
-    .sort((left, right) => {
-      const leftId = left.proposal.proposalId;
-      const rightId = right.proposal.proposalId;
-      return leftId < rightId ? -1 : leftId > rightId ? 1 : 0;
-    });
+    .sort((left, right) =>
+      compareCodeUnits(left.proposal.proposalId, right.proposal.proposalId)
+    );
   const result = {
     schemaVersion: '1.0.0',
     proposed: ordered.filter(entry => entry.status === 'proposed'),
@@ -582,7 +683,11 @@ function eligibility(entry, currentInputHash, requiredStatus) {
     reasons.push('supersession is pending');
   }
   if (requiredStatus === 'proposed' && entry.targetAvailable !== true) {
-    reasons.push('target already has an accepted proposal');
+    if (entry.targetReservedForProposalId !== undefined) {
+      reasons.push(`target is reserved for proposal ${entry.targetReservedForProposalId}`);
+    } else {
+      reasons.push('target already has an accepted proposal');
+    }
   }
   if (entry.proposal.relevantInputHash !== currentInputHash) reasons.push('relevant input changed');
   return deepFreeze({ eligible: reasons.length === 0, reasons });

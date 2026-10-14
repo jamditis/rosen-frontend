@@ -266,6 +266,50 @@ describe('stewardship decision replay', () => {
     );
   });
 
+  it('suppresses an unlinked proposal with a retained rejection fingerprint', () => {
+    const sample = fixture('rejected-duplicate.json');
+    const original = sample.proposals[0];
+    const unlinked = {
+      ...sample.proposals[1],
+      proposalId: 'urn:rosen-stewardship:proposal:rejected-unlinked-1',
+      currentValue: 'A later observation of the same current title'
+    };
+    delete unlinked.duplicateOfProposalId;
+    const projection = replayDecisions([original, unlinked], sample.decisions);
+    const suppressed = entryFor(projection, unlinked.proposalId);
+
+    assert.deepEqual(
+      projection,
+      replayDecisions([unlinked, original], sample.decisions)
+    );
+    assert.equal(suppressed.status, 'rejected');
+    assert.equal(suppressed.suppressedByProposalId, original.proposalId);
+    assert.equal(
+      suppressed.inheritedRejectionEventId,
+      sample.decisions[0].eventId
+    );
+    assert.deepEqual(
+      approvalEligibility(suppressed, suppressed.proposal.relevantInputHash),
+      { eligible: false, reasons: ['status is rejected'] }
+    );
+
+    const approveUnlinked = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:approve-rejected-unlinked-1',
+      proposalId: unlinked.proposalId,
+      operation: 'approve',
+      reason: 'Try to approve the repeated suggestion.'
+    };
+    assert.throws(
+      () => replayDecisions(
+        [original, unlinked],
+        [...sample.decisions, approveUnlinked],
+        { decisionSource: 'fixture/events.json' }
+      ),
+      /fixture\/events\.json\[1\]: approve cannot apply because proposal .*:rejected-original-1 retains the same rejection fingerprint/
+    );
+  });
+
   it('blocks successor approval until its original has a matching supersession', () => {
     const sample = fixture('linked-replacement.json');
     const successorId = sample.proposals[1].proposalId;
@@ -377,6 +421,101 @@ describe('stewardship decision replay', () => {
     );
     assert.deepEqual(proposalIds(replaced.accepted), [successor.proposalId]);
     assert.deepEqual(proposalIds(replaced.superseded), [original.proposalId]);
+  });
+
+  it('reserves a superseded target for its named successor until an explicit rejection', () => {
+    const sample = fixture('field-approval.json');
+    const original = {
+      ...sample.proposals[0],
+      proposalId: 'urn:rosen-stewardship:proposal:reserved-original'
+    };
+    const successor = {
+      ...sample.proposals[0],
+      proposalId: 'urn:rosen-stewardship:proposal:reserved-successor',
+      proposedValue: 'Successor title',
+      reason: 'The named successor for this target.',
+      supersedesProposalId: original.proposalId
+    };
+    const interloper = {
+      ...sample.proposals[0],
+      proposalId: 'urn:rosen-stewardship:proposal:reserved-interloper',
+      proposedValue: 'Unrelated title',
+      reason: 'An unrelated proposal for the reserved target.'
+    };
+    const approveOriginal = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:approve-reserved-original',
+      proposalId: original.proposalId
+    };
+    const supersedeOriginal = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:supersede-reserved-original',
+      proposalId: original.proposalId,
+      operation: 'supersede',
+      expectedRevision: 1,
+      successorProposalId: successor.proposalId
+    };
+    const approveInterloper = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:approve-reserved-interloper',
+      proposalId: interloper.proposalId
+    };
+    const proposals = [original, successor, interloper];
+    const reserved = replayDecisions(proposals, [approveOriginal, supersedeOriginal]);
+    const readySuccessor = entryFor(reserved, successor.proposalId);
+    const blockedInterloper = entryFor(reserved, interloper.proposalId);
+
+    assert.deepEqual(
+      reserved,
+      replayDecisions([...proposals].reverse(), [approveOriginal, supersedeOriginal])
+    );
+    assert.equal(readySuccessor.targetAvailable, true);
+    assert.equal(readySuccessor.targetReservedForProposalId, successor.proposalId);
+    assert.equal(blockedInterloper.targetAvailable, false);
+    assert.equal(blockedInterloper.targetReservedForProposalId, successor.proposalId);
+    assert.deepEqual(
+      approvalEligibility(blockedInterloper, interloper.relevantInputHash),
+      {
+        eligible: false,
+        reasons: [`target is reserved for proposal ${successor.proposalId}`]
+      }
+    );
+    assert.throws(
+      () => replayDecisions(
+        proposals,
+        [approveOriginal, supersedeOriginal, approveInterloper],
+        { decisionSource: 'fixture/events.json' }
+      ),
+      /fixture\/events\.json\[2\]: approve cannot apply because the target is reserved for proposal .*:reserved-successor/
+    );
+
+    const rejectSuccessor = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:reject-reserved-successor',
+      proposalId: successor.proposalId,
+      operation: 'reject',
+      reason: 'Reject and release the named successor reservation.'
+    };
+    const released = replayDecisions(
+      proposals,
+      [approveOriginal, supersedeOriginal, rejectSuccessor, approveInterloper]
+    );
+    assert.deepEqual(proposalIds(released.accepted), [interloper.proposalId]);
+    assert.equal(entryFor(released, successor.proposalId).status, 'rejected');
+
+    const rejectOriginal = {
+      ...approveOriginal,
+      eventId: 'urn:rosen-stewardship:decision-event:reject-reserved-original',
+      operation: 'reject'
+    };
+    assert.throws(
+      () => replayDecisions(
+        proposals,
+        [rejectOriginal, approveInterloper, supersedeOriginal],
+        { decisionSource: 'fixture/events.json' }
+      ),
+      /fixture\/events\.json\[2\]: supersede cannot reserve the target while proposal .*:reserved-interloper occupies it/
+    );
   });
 
   it('allows a changed linked successor and retains the rejection history', () => {

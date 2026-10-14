@@ -13,6 +13,8 @@ preserving array order, using JSON primitive encoding, and hashing the UTF-8
 bytes with SHA-256. It exposes deterministic value and proposal hashes. A
 rejection fingerprint binds the object class, object ID, target, relevant
 input hash, rule version, generation version, and proposed value.
+An undecided proposal with the same fingerprint as a retained rejection is
+suppressed even when it omits `duplicateOfProposalId`.
 
 `replayDecisions()` treats array order as authoritative. It rejects duplicate
 event IDs across the full input, missing references, stale revisions, and
@@ -29,8 +31,10 @@ eligible. A linked successor also needs the original proposal's matching
 supersession decision before it can be approved. The projection records this
 as `supersessionReady`; the checks do not infer it from the successor link alone.
 Only one proposal for an object target can be accepted at a time. The projection
-records whether that target is free for each proposal as `targetAvailable`; an
-explicit supersession frees the target for its linked successor.
+records whether that target is free for each proposal as `targetAvailable` and
+names an active reservation in `targetReservedForProposalId`. An explicit
+supersession reserves the target for its linked successor. The reservation ends
+when that successor is accepted or explicitly rejected.
 
 This slice reads no network source, calls no model, writes no canonical CSV,
 and publishes nothing. It provides no durable adapter, append operation,
