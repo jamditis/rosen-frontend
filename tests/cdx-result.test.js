@@ -127,6 +127,9 @@ describe('offline Wayback CDX result contract (#903)', () => {
 
   it('distinguishes a proven complete empty result from failure and exclusion', () => {
     const empty = parseCdxPage(fixture('zero-upstream.json'), metadata());
+    const headerOnly = parseCdxPage(fixture('zero.json'), metadata());
+    assert.deepEqual(headerOnly, empty);
+    assertSchemaAccepts(headerOnly, 'header-only compatibility result');
     const one = parseCdxPage(fixture('one.json'), metadata());
     assert.deepEqual(empty.coverage, {
       state: 'complete',
