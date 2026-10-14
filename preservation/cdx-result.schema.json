@@ -1,0 +1,466 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pressthink.org/j/rosen-archive/schemas/cdx-query-result-v1.json",
+  "title": "Wayback CDX query result sidecar",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "resultVersion",
+    "adapter",
+    "query",
+    "checkedAt",
+    "outcome",
+    "coverage"
+  ],
+  "properties": {
+    "resultVersion": {
+      "const": "1.0.0"
+    },
+    "adapter": {
+      "$ref": "#/$defs/adapter"
+    },
+    "query": {
+      "$ref": "#/$defs/query"
+    },
+    "checkedAt": {
+      "$ref": "#/$defs/utcTimestamp"
+    },
+    "outcome": {
+      "enum": [
+        "success",
+        "query-failure",
+        "excluded"
+      ]
+    },
+    "coverage": {
+      "$ref": "#/$defs/coverage"
+    },
+    "captures": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/capture"
+      }
+    },
+    "nextCursor": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "objectMappings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/objectMapping"
+      },
+      "uniqueItems": true
+    },
+    "failure": {
+      "$ref": "#/$defs/failure"
+    },
+    "exclusion": {
+      "$ref": "#/$defs/exclusion"
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "const": "success"
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "not": {
+                "enum": [
+                  "query-failure",
+                  "excluded"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "captures",
+        "nextCursor",
+        "objectMappings"
+      ],
+      "not": {
+        "anyOf": [
+          { "required": ["failure"] },
+          { "required": ["exclusion"] }
+        ]
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "coverage": {
+                "type": "object",
+                "properties": {
+                  "reason": { "const": "resume-key-present" }
+                },
+                "required": ["reason"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "nextCursor": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "nextCursor": { "const": null }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "coverage": {
+                "type": "object",
+                "properties": {
+                  "empty": { "const": true }
+                },
+                "required": ["empty"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "captures": {
+                "type": "array",
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "coverage": {
+                "type": "object",
+                "properties": {
+                  "empty": { "const": false }
+                },
+                "required": ["empty"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "captures": {
+                "type": "array",
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "const": "query-failure"
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "state": { "const": "unknown" },
+            "reason": { "const": "query-failure" }
+          }
+        }
+      },
+      "required": [
+        "failure",
+        "objectMappings"
+      ],
+      "not": {
+        "anyOf": [
+          { "required": ["captures"] },
+          { "required": ["nextCursor"] },
+          { "required": ["exclusion"] }
+        ]
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "const": "excluded"
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "state": { "const": "unknown" },
+            "reason": { "const": "excluded" }
+          }
+        }
+      },
+      "required": [
+        "exclusion",
+        "objectMappings"
+      ],
+      "not": {
+        "anyOf": [
+          { "required": ["captures"] },
+          { "required": ["nextCursor"] },
+          { "required": ["failure"] }
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+    },
+    "waybackTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{14}$"
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "const": "internet-archive-wayback-cdx-json"
+        },
+        "version": {
+          "const": "1.0.0"
+        }
+      }
+    },
+    "queryParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "query": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requestUrl",
+        "parameters",
+        "fingerprint"
+      ],
+      "properties": {
+        "requestUrl": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https?://"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/queryParameter"
+          }
+        },
+        "fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "coverage": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "reason",
+            "empty"
+          ],
+          "properties": {
+            "state": { "const": "complete" },
+            "reason": { "const": "full-history-exhausted" },
+            "empty": { "const": true }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "reason",
+            "empty",
+            "earliestCaptureTimestamp",
+            "latestCaptureTimestamp"
+          ],
+          "properties": {
+            "state": { "const": "complete" },
+            "reason": { "const": "full-history-exhausted" },
+            "empty": { "const": false },
+            "earliestCaptureTimestamp": {
+              "$ref": "#/$defs/waybackTimestamp"
+            },
+            "latestCaptureTimestamp": {
+              "$ref": "#/$defs/waybackTimestamp"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "reason"
+          ],
+          "properties": {
+            "state": { "const": "partial" },
+            "reason": {
+              "enum": [
+                "resume-key-present",
+                "continuation-page",
+                "restricted-query"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "reason"
+          ],
+          "properties": {
+            "state": { "const": "unknown" },
+            "reason": {
+              "enum": [
+                "request-scope-unproven",
+                "query-failure",
+                "excluded"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "captureTimestamp",
+        "returnedOriginalUrl",
+        "status",
+        "mediaType",
+        "opaqueDigest",
+        "replayUrl"
+      ],
+      "properties": {
+        "captureTimestamp": {
+          "$ref": "#/$defs/waybackTimestamp"
+        },
+        "returnedOriginalUrl": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mediaType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "opaqueDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "replayUrl": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "objectMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objectId",
+        "sourceUrl",
+        "sourceRole"
+      ],
+      "properties": {
+        "objectId": {
+          "type": "string",
+          "pattern": "^urn:rosen:object:[a-z0-9-]+:[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "sourceUrl": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https?://"
+        },
+        "sourceRole": {
+          "enum": [
+            "canonical",
+            "alternate"
+          ]
+        }
+      }
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "exclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "source"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

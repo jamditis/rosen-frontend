@@ -19,6 +19,10 @@ manifest instead of editing it.
 ## Files
 
 - `preservation-manifest.schema.json` is the JSON Schema 2020-12 contract.
+- `cdx-result.schema.json` is the separate version 1 contract for recorded
+  Wayback CDX query results.
+- `cdx-result.mjs` strictly parses recorded CDX JSON page bytes and emits a
+  deterministic result sidecar without making a network request.
 - `validate-preservation-manifests.mjs` validates schema rules, stable IDs,
   uniqueness, references, and append-only supersession.
 - `import-winer-evidence.mjs` maps the existing Winer method evidence artifact
@@ -38,6 +42,7 @@ Run all example and compatibility checks from the repository root:
 ```text
 npm run validate:preservation
 node --test tests/preservation-manifest.test.js
+node --test tests/cdx-result.test.js
 ```
 
 Validate one or more manifests directly:
@@ -45,6 +50,52 @@ Validate one or more manifests directly:
 ```text
 node preservation/validate-preservation-manifests.mjs path/to/manifest.json
 ```
+
+## Offline CDX result contract
+
+The CDX result sidecar is separate from the preservation manifest. It does not
+add fields to a version 1 `wayback-reference` event. Result version `1.0.0`
+records the exact request URL, its ordered decoded parameters, the adapter
+version, a query fingerprint, the check time, captures, coverage, and any next
+cursor. Object and source mappings are outside the query identity. This lets
+one query result map to more than one archive object without changing its
+fingerprint. The fingerprint is SHA-256 over compact UTF-8 JSON containing the
+exact `requestUrl` and ordered `parameters` fields.
+
+`parseCdxPage(bytes, metadata)` accepts only supplied UTF-8 bytes. It parses
+capture values by the declared header names. It preserves returned original
+URLs, status values, media types, and opaque digests. It does not lowercase a
+URL, remove a query, fold a print URL into another URL, deduplicate equal
+digests, or infer replay availability from an indexed status value. Replay
+URLs are references derived from each returned timestamp and original URL;
+they are not replay checks.
+
+The parser follows the Internet Archive's documented JSON resumption shape:
+an empty array separates capture rows from one final one-field resume-key row.
+It returns a cursor only after the header, every capture row, and the complete
+trailer validate. An invalid page throws `CdxResultError` with a one-based JSON
+row number where available and always exposes `nextCursor` as `null`.
+
+Coverage is conservative. A present resume key proves `partial` coverage. A
+terminal continuation page and requests with time filters, result filters, or
+collapse rules also stay `partial`. An absent resume key proves `complete`
+coverage only for an initial JSON request that explicitly used
+`showResumeKey=true`, requested a full capture history, and used no restricting
+or unknown parameter. Other requests stay `unknown`. Only a complete result can
+claim an empty result or absolute earliest and latest capture timestamps.
+
+`serializeCdxResult(result)` sorts object keys recursively, uses two-space JSON
+indentation, and ends with one newline. It preserves array order, including the
+recorded query-parameter and capture order.
+
+The schema keeps `success`, `query-failure`, and `excluded` outcomes distinct.
+Failure and exclusion sidecars use unknown coverage and cannot carry capture
+rows or a next cursor. The parser creates only successful sidecars; a later live
+adapter owns remote failure and exclusion evidence. Version `1.0.0` includes no
+live CDX fetch, Save Page Now call, cursor ledger, or canonical archive edit.
+
+The response shape is based on the Internet Archive
+[CDX Server JSON, field-order, and resumption-key documentation](https://github.com/internetarchive/wayback/blob/master/wayback-cdx-server/README.md#resumption-key).
 
 ## Bounded browser capture
 
