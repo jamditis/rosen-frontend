@@ -37,11 +37,11 @@
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": { "type": "string", "minLength": 1 }
+      "items": { "$ref": "#/$defs/nonemptyString" }
     },
     "ruleVersion": { "$ref": "#/$defs/version" },
     "generationVersion": { "$ref": "#/$defs/version" },
-    "reason": { "type": "string", "minLength": 1 },
+    "reason": { "$ref": "#/$defs/nonemptyString" },
     "confidence": {
       "oneOf": [
         { "type": "number", "minimum": 0, "maximum": 1 },
@@ -117,6 +117,10 @@
     }
   ],
   "$defs": {
+    "nonemptyString": {
+      "type": "string",
+      "pattern": "\\S"
+    },
     "sha256": {
       "type": "string",
       "pattern": "^[a-f0-9]{64}$"

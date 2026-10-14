@@ -360,6 +360,42 @@ function addPublicationRefs(entry, event) {
   }
 }
 
+function sameTarget(left, right) {
+  return left.proposal.objectId === right.proposal.objectId
+    && left.proposal.target.kind === right.proposal.target.kind
+    && left.proposal.target.key === right.proposal.target.key;
+}
+
+function acceptedTargetOccupant(entry, entries) {
+  return [...entries.values()].find(candidate =>
+    candidate !== entry && candidate.status === 'accepted' && sameTarget(candidate, entry)
+  );
+}
+
+function assertApprovalAllowed(entry, entries, context) {
+  const originalId = entry.proposal.supersedesProposalId;
+  if (originalId !== undefined) {
+    const original = entries.get(originalId);
+    if (
+      original.status !== 'superseded'
+      || original.successorProposalId !== entry.proposal.proposalId
+    ) {
+      fail(
+        `approve cannot apply before a matching supersede decision for ${originalId}`,
+        context
+      );
+    }
+  }
+
+  const occupant = acceptedTargetOccupant(entry, entries);
+  if (occupant) {
+    fail(
+      `approve cannot apply while proposal ${occupant.proposal.proposalId} occupies the target`,
+      context
+    );
+  }
+}
+
 function applyDecision(entry, event, entries, context) {
   if (entry.proposal.duplicateOfProposalId !== undefined) {
     fail('a declared duplicate cannot receive its own decision', context);
@@ -375,7 +411,12 @@ function applyDecision(entry, event, entries, context) {
     if (entry.status !== 'proposed') {
       fail(`${event.operation} cannot change a proposal in ${entry.status} state`, context);
     }
-    entry.status = event.operation === 'approve' ? 'accepted' : 'rejected';
+    if (event.operation === 'approve') {
+      assertApprovalAllowed(entry, entries, context);
+      entry.status = 'accepted';
+    } else {
+      entry.status = 'rejected';
+    }
   } else {
     if (!['accepted', 'rejected'].includes(entry.status)) {
       fail(`supersede cannot change a proposal in ${entry.status} state`, context);
@@ -437,7 +478,8 @@ function publicEntry(entry, entries) {
     status: entry.status,
     revision: entry.revision,
     decisionHistory: entry.decisionHistory,
-    publicationRefs: entry.publicationRefs
+    publicationRefs: entry.publicationRefs,
+    targetAvailable: acceptedTargetOccupant(entry, entries) === undefined
   };
   if (entry.proposal.supersedesProposalId !== undefined) {
     const original = entries.get(entry.proposal.supersedesProposalId);
@@ -515,7 +557,11 @@ export function replayDecisions(
 
   const ordered = [...entries.values()]
     .map(entry => publicEntry(entry, entries))
-    .sort((left, right) => left.proposal.proposalId.localeCompare(right.proposal.proposalId));
+    .sort((left, right) => {
+      const leftId = left.proposal.proposalId;
+      const rightId = right.proposal.proposalId;
+      return leftId < rightId ? -1 : leftId > rightId ? 1 : 0;
+    });
   const result = {
     schemaVersion: '1.0.0',
     proposed: ordered.filter(entry => entry.status === 'proposed'),
@@ -534,6 +580,9 @@ function eligibility(entry, currentInputHash, requiredStatus) {
   if (entry.status !== requiredStatus) reasons.push(`status is ${entry.status}`);
   if (entry.proposal.supersedesProposalId !== undefined && entry.supersessionReady !== true) {
     reasons.push('supersession is pending');
+  }
+  if (requiredStatus === 'proposed' && entry.targetAvailable !== true) {
+    reasons.push('target already has an accepted proposal');
   }
   if (entry.proposal.relevantInputHash !== currentInputHash) reasons.push('relevant input changed');
   return deepFreeze({ eligible: reasons.length === 0, reasons });

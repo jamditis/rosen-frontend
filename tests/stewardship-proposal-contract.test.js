@@ -98,6 +98,58 @@ describe('stewardship proposal schema and hashing', () => {
     assert.throws(() => valueHash([, 1]), /JSON arrays must not be sparse/);
   });
 
+  it('keeps JSON Schema and runtime non-empty string validation aligned', () => {
+    const sample = fixture('field-approval.json');
+    const proposalCases = [
+      ['valid reason', { reason: '  Source confirms the title.  ' }, true],
+      ['blank reason', { reason: ' \t\n' }, false],
+      ['valid evidence reference', { evidenceRefs: ['  urn:rosen:evidence:title  '] }, true],
+      ['blank evidence reference', { evidenceRefs: [' \t\n'] }, false]
+    ];
+    const decisionCases = [
+      ['valid reason', { reason: '  Source reviewed.  ' }, true],
+      ['blank reason', { reason: ' \t\n' }, false],
+      ['valid notes', { notes: '  Reviewed by a curator.  ' }, true],
+      ['blank notes', { notes: ' \t\n' }, false],
+      ['valid publication reference', { publicationRefs: ['  urn:rosen:publication:one  '] }, true],
+      ['blank publication reference', { publicationRefs: [' \t\n'] }, false]
+    ];
+
+    for (const [label, changes, expected] of proposalCases) {
+      const proposal = { ...sample.proposals[0], ...changes };
+      assert.equal(validateProposalSchema(proposal), expected, `proposal schema: ${label}`);
+      assert.equal(
+        (() => {
+          try {
+            validateProposal(proposal);
+            return true;
+          } catch {
+            return false;
+          }
+        })(),
+        expected,
+        `proposal runtime: ${label}`
+      );
+    }
+
+    for (const [label, changes, expected] of decisionCases) {
+      const decision = { ...sample.decisions[0], ...changes };
+      assert.equal(validateDecisionSchema(decision), expected, `decision schema: ${label}`);
+      assert.equal(
+        (() => {
+          try {
+            validateDecision(decision);
+            return true;
+          } catch {
+            return false;
+          }
+        })(),
+        expected,
+        `decision runtime: ${label}`
+      );
+    }
+  });
+
   it('keeps stable object identity independent of input position', () => {
     const field = fixture('field-approval.json').proposals[0];
     const assertion = fixture('assertion-approval.json').proposals[0];
@@ -108,6 +160,22 @@ describe('stewardship proposal schema and hashing', () => {
     assert.deepEqual(proposalIds(first.proposed), [
       'urn:rosen-stewardship:proposal:assertion-relationship-1',
       'urn:rosen-stewardship:proposal:field-title-1'
+    ]);
+  });
+
+  it('orders ASCII proposal IDs by code unit independent of locale collation', () => {
+    const base = fixture('field-approval.json').proposals[0];
+    const ids = [
+      'urn:rosen-stewardship:proposal:order:a',
+      'urn:rosen-stewardship:proposal:order:_',
+      'urn:rosen-stewardship:proposal:order:Z'
+    ];
+    const proposals = ids.map(proposalId => ({ ...base, proposalId }));
+
+    assert.deepEqual(proposalIds(replayDecisions(proposals, []).proposed), [
+      'urn:rosen-stewardship:proposal:order:Z',
+      'urn:rosen-stewardship:proposal:order:_',
+      'urn:rosen-stewardship:proposal:order:a'
     ]);
   });
 });
@@ -215,6 +283,100 @@ describe('stewardship decision replay', () => {
       reasons: [],
     });
     assert.equal(replayDecisions(sample.proposals, sample.decisions).accepted.length, 1);
+  });
+
+  it('reports premature successor approval at the offending decision', () => {
+    const sample = fixture('linked-replacement.json');
+    const laterInvalid = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:reject-successor-later',
+      proposalId: sample.proposals[1].proposalId,
+      expectedRevision: 1,
+      reason: 'This later transition must not hide the earlier error.'
+    };
+
+    assert.throws(
+      () => replayDecisions(
+        sample.proposals,
+        [sample.decisions[0], sample.decisions[2], laterInvalid],
+        { decisionSource: 'fixture/events.json' }
+      ),
+      /fixture\/events\.json\[1\]: approve cannot apply before a matching supersede decision/
+    );
+  });
+
+  it('keeps one accepted proposal per target until an explicit supersession', () => {
+    const sample = fixture('field-approval.json');
+    const original = {
+      ...sample.proposals[0],
+      proposalId: 'urn:rosen-stewardship:proposal:target-original',
+      currentValue: 'First observed title'
+    };
+    const competing = {
+      ...sample.proposals[0],
+      proposalId: 'urn:rosen-stewardship:proposal:target-competing',
+      currentValue: 'Second observed title',
+      proposedValue: 'A different corrected title',
+      reason: 'A competing correction for the same target.'
+    };
+    const approveOriginal = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:approve-target-original',
+      proposalId: original.proposalId
+    };
+    const approveCompeting = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:approve-target-competing',
+      proposalId: competing.proposalId
+    };
+    const occupied = replayDecisions([original, competing], [approveOriginal]);
+    const pendingCompeting = entryFor(occupied, competing.proposalId);
+
+    assert.equal(original.relevantInputHash, competing.relevantInputHash);
+    assert.notDeepEqual(original.currentValue, competing.currentValue);
+    assert.equal(pendingCompeting.targetAvailable, false);
+    assert.deepEqual(
+      approvalEligibility(pendingCompeting, competing.relevantInputHash),
+      { eligible: false, reasons: ['target already has an accepted proposal'] }
+    );
+    assert.throws(
+      () => replayDecisions(
+        [original, competing],
+        [approveOriginal, approveCompeting],
+        { decisionSource: 'fixture/events.json' }
+      ),
+      /fixture\/events\.json\[1\]: approve cannot apply while proposal .*:target-original occupies the target/
+    );
+
+    const successor = {
+      ...competing,
+      supersedesProposalId: original.proposalId
+    };
+    const supersedeOriginal = {
+      ...sample.decisions[0],
+      eventId: 'urn:rosen-stewardship:decision-event:supersede-target-original',
+      proposalId: original.proposalId,
+      operation: 'supersede',
+      expectedRevision: 1,
+      successorProposalId: successor.proposalId
+    };
+    const ready = replayDecisions(
+      [original, successor],
+      [approveOriginal, supersedeOriginal]
+    );
+    const readySuccessor = entryFor(ready, successor.proposalId);
+    assert.equal(readySuccessor.targetAvailable, true);
+    assert.deepEqual(approvalEligibility(readySuccessor, successor.relevantInputHash), {
+      eligible: true,
+      reasons: []
+    });
+
+    const replaced = replayDecisions(
+      [original, successor],
+      [approveOriginal, supersedeOriginal, approveCompeting]
+    );
+    assert.deepEqual(proposalIds(replaced.accepted), [successor.proposalId]);
+    assert.deepEqual(proposalIds(replaced.superseded), [original.proposalId]);
   });
 
   it('allows a changed linked successor and retains the rejection history', () => {

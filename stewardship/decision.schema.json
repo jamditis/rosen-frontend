@@ -39,17 +39,17 @@
       "format": "date-time",
       "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
     },
-    "reason": { "type": "string", "minLength": 1 },
+    "reason": { "$ref": "#/$defs/nonemptyString" },
     "notes": {
       "oneOf": [
-        { "type": "string", "minLength": 1 },
+        { "$ref": "#/$defs/nonemptyString" },
         { "type": "null" }
       ]
     },
     "publicationRefs": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "type": "string", "minLength": 1 }
+      "items": { "$ref": "#/$defs/nonemptyString" }
     },
     "successorProposalId": {
       "type": "string",
@@ -67,6 +67,10 @@
     }
   ],
   "$defs": {
+    "nonemptyString": {
+      "type": "string",
+      "pattern": "\\S"
+    },
     "actor": {
       "type": "object",
       "additionalProperties": false,

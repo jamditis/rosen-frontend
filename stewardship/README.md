@@ -19,7 +19,8 @@ event IDs across the full input, missing references, stale revisions, and
 invalid transitions with an input name and array index. An approval or
 rejection changes only a proposed item. A supersession changes only an accepted
 or rejected item and retains its full decision history and publication
-references. It does not reverse an earlier publication.
+references. It does not reverse an earlier publication. Projection entries are
+ordered by proposal ID code unit so the result does not depend on locale.
 
 Approval eligibility and release eligibility are separate pure checks. Both
 compare the proposal input hash with a current hash supplied by the caller.
@@ -27,6 +28,9 @@ Only a proposed item is approval eligible. Only an accepted item is release
 eligible. A linked successor also needs the original proposal's matching
 supersession decision before it can be approved. The projection records this
 as `supersessionReady`; the checks do not infer it from the successor link alone.
+Only one proposal for an object target can be accepted at a time. The projection
+records whether that target is free for each proposal as `targetAvailable`; an
+explicit supersession frees the target for its linked successor.
 
 This slice reads no network source, calls no model, writes no canonical CSV,
 and publishes nothing. It provides no durable adapter, append operation,
