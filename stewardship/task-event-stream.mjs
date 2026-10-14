@@ -99,6 +99,22 @@ export class TaskEventPostAppendError extends Error {
   }
 }
 
+export class TaskEventPartialWriteError extends Error {
+  constructor(source, eventId, bytesWritten, { cause } = {}) {
+    super(
+      `${source}: task event ${eventId} wrote ${bytesWritten} bytes but the record is incomplete; inspect and repair the authoritative stream tail before retry`,
+      cause === undefined ? undefined : { cause }
+    );
+    this.name = 'TaskEventPartialWriteError';
+    this.source = source;
+    this.eventId = eventId;
+    this.stage = 'partial-write';
+    this.bytesWritten = bytesWritten;
+    this.recordAppended = false;
+    this.fileSynced = false;
+  }
+}
+
 function fail(message, context, options) {
   throw new TaskEventStreamError(message, context, options);
 }
@@ -331,8 +347,8 @@ function syncCreatedFileDirectory(filePath) {
 }
 
 /**
- * Append one validated record, sync the file, sync its parent directory when
- * first created on Linux, close descriptors, and validate a reopened stream.
+ * Append one validated record, sync the file, sync its parent directory with
+ * the first record on Linux, close descriptors, and validate a reopened stream.
  * Callers must provide single-writer access; this function does not claim
  * concurrent append or crash-atomic repair guarantees.
  */
@@ -352,26 +368,41 @@ export function appendTaskEvent(filePath, value) {
   let recordAppended = false;
   let fileSynced = false;
   let operationError;
+  let bytesWritten = 0;
   try {
     descriptor = openSync(normalizedPath, 'a', 0o600);
-    let offset = 0;
-    while (offset < encoded.length) {
-      const written = writeSync(descriptor, encoded, offset, encoded.length - offset, null);
+    while (bytesWritten < encoded.length) {
+      const written = writeSync(
+        descriptor,
+        encoded,
+        bytesWritten,
+        encoded.length - bytesWritten,
+        null
+      );
       if (written <= 0) throw new Error('task event append made no write progress');
-      offset += written;
+      bytesWritten += written;
     }
     recordAppended = true;
     fsyncSync(descriptor);
     fileSynced = true;
   } catch (error) {
-    operationError = recordAppended
-      ? new TaskEventPostAppendError(
-          source,
-          appended.eventId,
-          'file-sync',
-          { fileSynced, cause: error }
-        )
-      : error;
+    if (recordAppended) {
+      operationError = new TaskEventPostAppendError(
+        source,
+        appended.eventId,
+        'file-sync',
+        { fileSynced, cause: error }
+      );
+    } else if (bytesWritten > 0) {
+      operationError = new TaskEventPartialWriteError(
+        source,
+        appended.eventId,
+        bytesWritten,
+        { cause: error }
+      );
+    } else {
+      operationError = error;
+    }
   }
   if (descriptor !== undefined) {
     try {
@@ -432,6 +463,7 @@ export default {
   TASK_EVENT_SCHEMA_VERSION,
   TASK_EVENT_VOCABULARY_VERSION,
   TASK_EVENT_TYPES,
+  TaskEventPartialWriteError,
   TaskEventPostAppendError,
   TaskEventStreamError,
   causalTaskKey,

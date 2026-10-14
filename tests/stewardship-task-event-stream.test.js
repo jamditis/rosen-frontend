@@ -9,6 +9,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
   TASK_EVENT_TYPES,
+  TaskEventPartialWriteError,
   TaskEventPostAppendError,
   appendTaskEvent,
   causalTaskKey,
@@ -343,6 +344,26 @@ describe('stewardship task event JSONL adapter', () => {
     assert.equal(failure.cause, cause);
     assert.match(failure.message, /file durability is incomplete/);
     assert.match(failure.message, /inspect the authoritative stream before retry/);
+  });
+
+  it('distinguishes an incomplete tail from a zero-byte write failure', () => {
+    const cause = Object.assign(new Error('space exhausted'), { code: 'ENOSPC' });
+    const failure = new TaskEventPartialWriteError(
+      '/tmp/events.jsonl',
+      lifecycle[0].eventId,
+      37,
+      { cause }
+    );
+
+    assert.equal(failure.source, '/tmp/events.jsonl');
+    assert.equal(failure.eventId, lifecycle[0].eventId);
+    assert.equal(failure.stage, 'partial-write');
+    assert.equal(failure.bytesWritten, 37);
+    assert.equal(failure.recordAppended, false);
+    assert.equal(failure.fileSynced, false);
+    assert.equal(failure.cause, cause);
+    assert.match(failure.message, /record is incomplete/);
+    assert.match(failure.message, /repair the authoritative stream tail before retry/);
   });
 
   it('appends, fsyncs, closes, and reopens across fresh processes', (t) => {

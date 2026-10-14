@@ -61,6 +61,12 @@ before retrying the same event ID. The original durability or verification
 failure can require operator repair; a later append does not repair it. A failed
 pre-append validation leaves every existing byte unchanged.
 
+If a write fails after it changes the stream but before the complete record is
+appended, the writer throws `TaskEventPartialWriteError`. It reports the path,
+event ID, written byte count, preserved cause, `recordAppended: false`, and
+`fileSynced: false`. The single writer must inspect and repair the incomplete
+authoritative stream tail before retrying.
+
 This is an offline, single-writer contract. It does not promise safe concurrent
 append, compare-and-swap leases, or record-level recovery after a partial write.
 Those guarantees belong at issue #706's atomic writer boundary. The SQLite
