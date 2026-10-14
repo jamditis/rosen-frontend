@@ -8,8 +8,10 @@ the source bytes.
 The projector requires Node 22.13 or newer and uses the built-in `node:sqlite`
 module. Schema version 1 stores every event and its one-based stream line. A
 correction remains in history and marks its referenced predecessor as
-superseded. The `tasks` table derives one current row per causal task key from
-events that have not been superseded.
+superseded. It inherits the original event's effective order, including through
+a chain of corrections, because it replaces that earlier fact instead of adding
+a later lifecycle step. The `tasks` table derives one current row per causal
+task key from effective order while retaining actual stream lines for history.
 
 The read-only `TaskIndex` API provides indexed queries for:
 
@@ -27,6 +29,11 @@ must select the lifecycle types that are eligible for that caller's workflow.
 `backupPath` receives the prior closed index. The three paths must not resolve
 to the same location, including through a symbolic link. Operators should keep
 these mutable state files outside the source checkout.
+
+An existing index or backup destination must identify itself with this task
+index's SQLite application ID and supported schema version. A rebuild refuses
+an unrelated SQLite database, a non-SQLite file, or an index from a newer
+schema without changing its bytes. There is no overwrite override.
 
 A rebuild validates the complete source stream, builds and checks a sibling
 temporary database, and records the source byte length, SHA-256, event count,

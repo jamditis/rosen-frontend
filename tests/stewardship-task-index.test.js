@@ -73,6 +73,30 @@ function metadata(snapshot) {
   return Object.fromEntries(snapshot.metadata.map(row => [row.key, row.value]));
 }
 
+function writeForeignDestination(filePath, kind) {
+  if (kind === 'non-sqlite') {
+    fs.writeFileSync(filePath, 'not a SQLite database\n');
+    return;
+  }
+
+  const database = new DatabaseSync(filePath);
+  try {
+    if (kind === 'unrelated-sqlite') {
+      database.exec('CREATE TABLE unrelated_records(value TEXT)');
+      database.exec(`PRAGMA user_version = ${TASK_INDEX_SCHEMA_VERSION}`);
+      return;
+    }
+    if (kind === 'newer-task-index') {
+      database.exec(`PRAGMA application_id = ${TASK_INDEX_APPLICATION_ID}`);
+      database.exec(`PRAGMA user_version = ${TASK_INDEX_SCHEMA_VERSION + 1}`);
+      return;
+    }
+    throw new Error(`unsupported destination fixture ${kind}`);
+  } finally {
+    database.close();
+  }
+}
+
 describe('rebuildable stewardship task index', () => {
   it('rebuilds equivalent query state twice from the authoritative byte snapshot', () => {
     const root = directory('deterministic');
@@ -105,10 +129,16 @@ describe('rebuildable stewardship task index', () => {
       source_sha256: first.sourceSha256,
       source_snapshot: 'validated-complete-jsonl-file'
     });
-    assert.equal(firstSnapshot.tasks[0].latest_event_type, 'supersession');
+    // A correction replaces line 10 at line 10's logical position. It does not
+    // move that fact after the cancellation at line 11.
+    assert.equal(firstSnapshot.tasks[0].latest_event_type, 'cancellation');
+    assert.equal(firstSnapshot.tasks[0].latest_stream_line, 11);
+    assert.equal(firstSnapshot.tasks[0].latest_effective_order, 11);
     assert.equal(firstSnapshot.tasks[0].attempt_count, 1);
     assert.equal(firstSnapshot.tasks[0].failure_event_count, 4);
     assert.equal(firstSnapshot.events[9].is_superseded, 1);
+    assert.equal(firstSnapshot.events[9].effective_order, 10);
+    assert.equal(firstSnapshot.events[11].effective_order, 10);
     assert.equal(
       firstSnapshot.events[9].superseded_by_event_id,
       fixtureEvents[11].eventId
@@ -145,13 +175,13 @@ describe('rebuildable stewardship task index', () => {
         {
           object_type: 'archive-record',
           task_type: fixtureEvents[0].taskType,
-          latest_event_type: 'eligibility',
+          latest_event_type: 'cancellation',
           task_count: 1
         },
         {
           object_type: 'archive-record',
           task_type: fixtureEvents[0].taskType,
-          latest_event_type: 'supersession',
+          latest_event_type: 'eligibility',
           task_count: 1
         }
       ]);
@@ -164,7 +194,7 @@ describe('rebuildable stewardship task index', () => {
     try {
       const plans = [
         [
-          "SELECT * FROM tasks WHERE latest_event_type = 'eligibility' ORDER BY latest_stream_line, causal_task_key",
+          "SELECT * FROM tasks WHERE latest_event_type = 'eligibility' ORDER BY latest_effective_order, causal_task_key",
           'idx_tasks_next'
         ],
         [
@@ -189,6 +219,64 @@ describe('rebuildable stewardship task index', () => {
       }
     } finally {
       database.close();
+    }
+  });
+
+  it('keeps old retry corrections before a later successful lifecycle state', () => {
+    const root = directory('corrected-retry-order');
+    const eventPath = path.join(root, 'events.jsonl');
+    const indexPath = path.join(root, 'tasks.sqlite');
+    const objectId = 'urn:rosen:object:archive-record:RECORD-00889';
+    const retry = {
+      ...additionalEvent({ suffix: 'old-retry', objectId, eventType: 'retry' }),
+      occurredAt: '2026-10-14T15:00:00.000Z'
+    };
+    const attempt = {
+      ...additionalEvent({ suffix: 'later-attempt', objectId, eventType: 'attempt' }),
+      occurredAt: '2026-10-14T15:01:00.000Z'
+    };
+    const success = {
+      ...additionalEvent({ suffix: 'later-success', objectId, eventType: 'success' }),
+      occurredAt: '2026-10-14T15:02:00.000Z'
+    };
+    const retryCorrection = {
+      ...retry,
+      eventId: 'urn:rosen-stewardship:task-event:old-retry-correction',
+      occurredAt: '2026-10-14T15:03:00.000Z',
+      supersedesEventId: retry.eventId
+    };
+    const chainedCorrection = {
+      ...retryCorrection,
+      eventId: 'urn:rosen-stewardship:task-event:old-retry-correction-two',
+      occurredAt: '2026-10-14T15:04:00.000Z',
+      supersedesEventId: retryCorrection.eventId
+    };
+    writeStream(eventPath, [
+      retry,
+      attempt,
+      success,
+      retryCorrection,
+      chainedCorrection
+    ]);
+
+    rebuildTaskIndex({ eventPath, indexPath });
+    const snapshot = snapshotTaskIndex(indexPath);
+    assert.equal(snapshot.tasks[0].latest_event_type, 'success');
+    assert.equal(snapshot.tasks[0].latest_stream_line, 3);
+    assert.equal(snapshot.tasks[0].latest_effective_order, 3);
+    assert.deepEqual(
+      snapshot.events.map(event => event.effective_order),
+      [1, 2, 3, 1, 1]
+    );
+
+    const index = new TaskIndex(indexPath);
+    try {
+      assert.deepEqual(index.nextTasks({ eventTypes: ['retry'] }), []);
+      assert.deepEqual(index.nextTasks({ eventTypes: ['success'] }).map(task => task.object_id), [
+        objectId
+      ]);
+    } finally {
+      index.close();
     }
   });
 
@@ -317,6 +405,44 @@ describe('rebuildable stewardship task index', () => {
       () => rebuildTaskIndex({ eventPath, indexPath, backupPath: backupDirectory })
     );
     assert.deepEqual(snapshotTaskIndex(indexPath), updated);
+  });
+
+  it('refuses foreign index and backup destinations without changing their bytes', () => {
+    for (const kind of ['non-sqlite', 'unrelated-sqlite', 'newer-task-index']) {
+      const indexRoot = directory(`foreign-index-${kind}`);
+      const indexEventPath = path.join(indexRoot, 'events.jsonl');
+      const foreignIndexPath = path.join(indexRoot, 'tasks.sqlite');
+      fs.writeFileSync(indexEventPath, fixtureBytes);
+      writeForeignDestination(foreignIndexPath, kind);
+      const foreignIndexBytes = fs.readFileSync(foreignIndexPath);
+
+      assert.throws(
+        () => rebuildTaskIndex({ eventPath: indexEventPath, indexPath: foreignIndexPath }),
+        /indexPath .* exists but is not a supported stewardship task index/
+      );
+      assert.deepEqual(fs.readFileSync(foreignIndexPath), foreignIndexBytes);
+
+      const backupRoot = directory(`foreign-backup-${kind}`);
+      const backupEventPath = path.join(backupRoot, 'events.jsonl');
+      const validIndexPath = path.join(backupRoot, 'tasks.sqlite');
+      const foreignBackupPath = path.join(backupRoot, 'tasks.previous.sqlite');
+      fs.writeFileSync(backupEventPath, fixtureBytes);
+      rebuildTaskIndex({ eventPath: backupEventPath, indexPath: validIndexPath });
+      const validIndexBytes = fs.readFileSync(validIndexPath);
+      writeForeignDestination(foreignBackupPath, kind);
+      const foreignBackupBytes = fs.readFileSync(foreignBackupPath);
+
+      assert.throws(
+        () => rebuildTaskIndex({
+          eventPath: backupEventPath,
+          indexPath: validIndexPath,
+          backupPath: foreignBackupPath
+        }),
+        /backupPath .* exists but is not a supported stewardship task index/
+      );
+      assert.deepEqual(fs.readFileSync(validIndexPath), validIndexBytes);
+      assert.deepEqual(fs.readFileSync(foreignBackupPath), foreignBackupBytes);
+    }
   });
 
   it('requires explicit non-aliasing state paths', () => {

@@ -57,6 +57,7 @@ CREATE TABLE metadata (
 
 CREATE TABLE events (
   stream_line INTEGER PRIMARY KEY CHECK (stream_line > 0),
+  effective_order INTEGER NOT NULL CHECK (effective_order > 0),
   event_id TEXT NOT NULL UNIQUE,
   schema_version TEXT NOT NULL,
   vocabulary_version TEXT NOT NULL,
@@ -87,6 +88,7 @@ CREATE TABLE tasks (
   latest_event_id TEXT NOT NULL REFERENCES events(event_id),
   latest_event_type TEXT NOT NULL,
   latest_occurred_at TEXT NOT NULL,
+  latest_effective_order INTEGER NOT NULL,
   latest_stream_line INTEGER NOT NULL UNIQUE REFERENCES events(stream_line),
   effective_event_count INTEGER NOT NULL CHECK (effective_event_count > 0),
   attempt_count INTEGER NOT NULL CHECK (attempt_count >= 0),
@@ -94,7 +96,7 @@ CREATE TABLE tasks (
 ) WITHOUT ROWID;
 
 CREATE INDEX idx_tasks_next
-ON tasks(latest_event_type, latest_stream_line, causal_task_key);
+ON tasks(latest_event_type, latest_effective_order, causal_task_key);
 
 CREATE INDEX idx_tasks_progress
 ON tasks(object_type, task_type, latest_event_type, causal_task_key);
@@ -190,6 +192,23 @@ function assertCurrentSchema(database) {
   const applicationId = pragmaNumber(database, 'application_id');
   if (applicationId !== TASK_INDEX_APPLICATION_ID) {
     throw new Error(`task index application_id ${applicationId} is not recognized`);
+  }
+}
+
+function assertReplaceableIndex(filePath, label) {
+  if (!existsSync(filePath)) return;
+
+  let database;
+  try {
+    database = new DatabaseSync(filePath, { readOnly: true });
+    assertCurrentSchema(database);
+  } catch (error) {
+    throw new Error(
+      `${label} ${filePath} exists but is not a supported stewardship task index`,
+      { cause: error }
+    );
+  } finally {
+    database?.close();
   }
 }
 
@@ -317,11 +336,11 @@ function buildIndexDatabase(databasePath, snapshot) {
 
     const insertEvent = database.prepare(`
       INSERT INTO events(
-        stream_line, event_id, schema_version, vocabulary_version, event_type,
-        causal_task_key, object_type, object_id, task_type, task_version,
-        input_hash, actor_type, actor_id, occurred_at, tool_version,
-        supersedes_event_id, canonical_event_json
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        stream_line, effective_order, event_id, schema_version,
+        vocabulary_version, event_type, causal_task_key, object_type, object_id,
+        task_type, task_version, input_hash, actor_type, actor_id, occurred_at,
+        tool_version, supersedes_event_id, canonical_event_json
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     const markSuperseded = database.prepare(`
       UPDATE events
@@ -331,9 +350,17 @@ function buildIndexDatabase(databasePath, snapshot) {
 
     database.exec('BEGIN IMMEDIATE');
     try {
+      const effectiveOrderByEventId = new Map();
       snapshot.events.forEach((event, index) => {
+        const effectiveOrder = event.supersedesEventId === undefined
+          ? index + 1
+          : effectiveOrderByEventId.get(event.supersedesEventId);
+        if (effectiveOrder === undefined) {
+          throw new Error(`missing effective order for ${event.supersedesEventId}`);
+        }
         insertEvent.run(
           index + 1,
+          effectiveOrder,
           event.eventId,
           event.schemaVersion,
           event.vocabularyVersion,
@@ -351,6 +378,7 @@ function buildIndexDatabase(databasePath, snapshot) {
           event.supersedesEventId ?? null,
           encodeTaskEvent(event).slice(0, -1)
         );
+        effectiveOrderByEventId.set(event.eventId, effectiveOrder);
         if (event.supersedesEventId !== undefined) {
           const result = markSuperseded.run(event.eventId, event.supersedesEventId);
           if (Number(result.changes) !== 1) {
@@ -363,13 +391,13 @@ function buildIndexDatabase(databasePath, snapshot) {
         INSERT INTO tasks(
           causal_task_key, object_type, object_id, task_type, task_version,
           input_hash, latest_event_id, latest_event_type, latest_occurred_at,
-          latest_stream_line, effective_event_count, attempt_count,
-          failure_event_count
+          latest_effective_order, latest_stream_line, effective_event_count,
+          attempt_count, failure_event_count
         )
         WITH aggregates AS (
           SELECT
             causal_task_key,
-            MAX(stream_line) AS latest_stream_line,
+            MAX(effective_order) AS latest_effective_order,
             COUNT(*) AS effective_event_count,
             SUM(CASE WHEN event_type = 'attempt' THEN 1 ELSE 0 END) AS attempt_count,
             SUM(CASE WHEN event_type IN ('retry', 'block', 'rejection', 'cancellation')
@@ -388,13 +416,16 @@ function buildIndexDatabase(databasePath, snapshot) {
           latest.event_id,
           latest.event_type,
           latest.occurred_at,
+          latest.effective_order,
           latest.stream_line,
           aggregates.effective_event_count,
           aggregates.attempt_count,
           aggregates.failure_event_count
         FROM aggregates
         JOIN events AS latest
-          ON latest.stream_line = aggregates.latest_stream_line
+          ON latest.causal_task_key = aggregates.causal_task_key
+          AND latest.effective_order = aggregates.latest_effective_order
+          AND latest.is_superseded = 0
         ORDER BY latest.causal_task_key
       `);
 
@@ -432,6 +463,7 @@ function copyPreviousIndex(indexPath, backupPath) {
   try {
     copyFileSync(indexPath, temporary, fsConstants.COPYFILE_EXCL);
     fsyncFile(temporary);
+    assertReplaceableIndex(backupPath, 'backupPath');
     renameSync(temporary, backupPath);
     fsyncDirectory(path.dirname(backupPath));
   } catch (error) {
@@ -468,6 +500,10 @@ export function rebuildTaskIndex(configValue, { beforeReplace } = {}) {
   if (beforeReplace !== undefined && typeof beforeReplace !== 'function') {
     throw new TypeError('beforeReplace must be a function');
   }
+  assertReplaceableIndex(config.indexPath, 'indexPath');
+  if (config.backupPath !== undefined) {
+    assertReplaceableIndex(config.backupPath, 'backupPath');
+  }
   const snapshot = readSourceSnapshot(config.eventPath);
   mkdirSync(path.dirname(config.indexPath), { recursive: true });
   const temporaryIndex = siblingTemporaryPath(config.indexPath, 'rebuild');
@@ -491,11 +527,13 @@ export function rebuildTaskIndex(configValue, { beforeReplace } = {}) {
 
     beforeReplace?.(Object.freeze({ sourceSha256: snapshot.sha256 }));
     assertSourceUnchanged(config.eventPath, snapshot.stamp);
+    assertReplaceableIndex(config.indexPath, 'indexPath');
 
     if (config.backupPath !== undefined && existsSync(config.indexPath)) {
       copyPreviousIndex(config.indexPath, config.backupPath);
     }
     assertSourceUnchanged(config.eventPath, snapshot.stamp);
+    assertReplaceableIndex(config.indexPath, 'indexPath');
     renameSync(temporaryIndex, config.indexPath);
     fsyncDirectory(path.dirname(config.indexPath));
 
@@ -557,7 +595,7 @@ export class TaskIndex {
     return freezeJson(plainRows(this.database.prepare(`
       SELECT * FROM tasks
       WHERE latest_event_type IN (${placeholders})
-      ORDER BY latest_stream_line, causal_task_key
+      ORDER BY latest_effective_order, causal_task_key
       LIMIT ?
     `).all(...types, limit)));
   }
