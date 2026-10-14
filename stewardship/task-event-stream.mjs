@@ -74,6 +74,20 @@ export class TaskEventStreamError extends Error {
   }
 }
 
+export class TaskEventPostAppendError extends Error {
+  constructor(source, stage, options = {}) {
+    super(
+      `${source}: task event appended and file synced, but ${stage} failed; inspect the stream before retry`,
+      options
+    );
+    this.name = 'TaskEventPostAppendError';
+    this.source = source;
+    this.stage = stage;
+    this.recordAppended = true;
+    this.fileSynced = true;
+  }
+}
+
 function fail(message, context, options) {
   throw new TaskEventStreamError(message, context, options);
 }
@@ -331,15 +345,30 @@ export function appendTaskEvent(filePath, value) {
   } finally {
     if (descriptor !== undefined) closeSync(descriptor);
   }
-  if (creating) syncCreatedFileDirectory(filePath);
+  if (creating) {
+    try {
+      syncCreatedFileDirectory(filePath);
+    } catch (error) {
+      throw new TaskEventPostAppendError(
+        source,
+        'parent directory sync',
+        { cause: error }
+      );
+    }
+  }
 
-  const reopened = readTaskEventStream(filePath);
+  let reopened;
+  try {
+    reopened = readTaskEventStream(filePath);
+  } catch (error) {
+    throw new TaskEventPostAppendError(source, 'reopen validation', { cause: error });
+  }
   const appended = next[next.length - 1];
   if (
     reopened.length !== next.length
     || reopened[reopened.length - 1].eventId !== appended.eventId
   ) {
-    throw new Error(`${source}: append verification did not find the committed event`);
+    throw new TaskEventPostAppendError(source, 'reopen validation');
   }
   return reopened[reopened.length - 1];
 }
@@ -348,6 +377,7 @@ export default {
   TASK_EVENT_SCHEMA_VERSION,
   TASK_EVENT_VOCABULARY_VERSION,
   TASK_EVENT_TYPES,
+  TaskEventPostAppendError,
   TaskEventStreamError,
   causalTaskKey,
   validateTaskEvent,

@@ -9,6 +9,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
   TASK_EVENT_TYPES,
+  TaskEventPostAppendError,
   appendTaskEvent,
   causalTaskKey,
   encodeTaskEvent,
@@ -243,6 +244,35 @@ describe('stewardship task event JSONL adapter', () => {
       assert.throws(() => appendTaskEvent(streamPath, lifecycle[2]), new RegExp(`${name}:${line}:`));
       assert.deepEqual(fs.readFileSync(streamPath), before);
     }
+  });
+
+  it('labels a Linux directory-sync failure after the file is synced', (t) => {
+    if (process.platform !== 'linux' || process.getuid?.() === 0) {
+      t.skip('the permission-boundary check requires a non-root Linux process');
+      return;
+    }
+    const directory = temporaryDirectory(t);
+    const restrictedDirectory = path.join(directory, 'write-only-parent');
+    const streamPath = path.join(restrictedDirectory, 'events.jsonl');
+    fs.mkdirSync(restrictedDirectory);
+    fs.chmodSync(restrictedDirectory, 0o300);
+
+    let failure;
+    try {
+      appendTaskEvent(streamPath, lifecycle[0]);
+    } catch (error) {
+      failure = error;
+    } finally {
+      fs.chmodSync(restrictedDirectory, 0o700);
+    }
+
+    assert.ok(failure instanceof TaskEventPostAppendError);
+    assert.equal(failure.stage, 'parent directory sync');
+    assert.equal(failure.recordAppended, true);
+    assert.equal(failure.fileSynced, true);
+    assert.equal(failure.cause?.code, 'EACCES');
+    assert.match(failure.message, /inspect the stream before retry/);
+    assert.equal(fs.readFileSync(streamPath, 'utf8'), encodeTaskEvent(lifecycle[0]));
   });
 
   it('appends, fsyncs, closes, and reopens across fresh processes', (t) => {

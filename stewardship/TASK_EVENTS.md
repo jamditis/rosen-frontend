@@ -50,8 +50,11 @@ syncs and closes the file, reopens it, and validates the full stream. On Linux,
 the supported deployment platform, first creation also opens, syncs, and closes
 the parent directory before the function returns. Directory sync errors are not
 suppressed. Other platforms retain file sync and do not claim durable directory
-entry creation. A failed pre-append validation leaves every existing byte
-unchanged.
+entry creation. If directory sync or reopened-stream validation fails after the
+record and file are synced, the writer throws `TaskEventPostAppendError` with
+`recordAppended` and `fileSynced` set to `true` and a stable failure `stage`.
+The message tells the single writer to inspect the stream before retrying the
+same event ID. A failed pre-append validation leaves every existing byte unchanged.
 
 This is an offline, single-writer contract. It does not promise safe concurrent
 append, compare-and-swap leases, or record-level recovery after a partial write.
