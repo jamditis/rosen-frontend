@@ -37,6 +37,24 @@ function assertRecordList(records, label) {
   if (!Array.isArray(records)) throw new Error(`${label} must be an array`);
 }
 
+function isVerifiedSourceRow(row) {
+  const value = row?.verified ?? row?.Verified;
+  return value === true || value === 'TRUE' || value === 'true' || value === 'Yes';
+}
+
+/**
+ * Keep existing thread coverage and require an admitted member for new threads.
+ * Context-only members remain available inside a mixed admitted thread, but an
+ * all-context chain does not receive an ID or enter the public member filter.
+ */
+export function selectPublishableThreadCandidates(candidates) {
+  assertRecordList(candidates, 'threadCandidates');
+  return candidates.filter(candidate => (
+    candidate?.alreadyCovered === true
+    || candidate?.posts?.some(post => isVerifiedSourceRow(post?.row)) === true
+  ));
+}
+
 /**
  * Assign stable container IDs to detected Bluesky thread roots.
  *

@@ -12,7 +12,10 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { assignStableThreadIds } from '../data/lib/thread-id-allocator.js';
+import {
+  assignStableThreadIds,
+  selectPublishableThreadCandidates,
+} from '../data/lib/thread-id-allocator.js';
 
 // ============================================
 // Re-implement thread detection functions
@@ -463,6 +466,18 @@ describe('stable thread ID allocation', () => {
     assert.equal(assignments.get('BSKY-NEW'), 'THREAD-00021');
   });
 
+  it('reserves all 19 public thread IDs before assigning a new root', () => {
+    const currentPublicThreads = Array.from({ length: 19 }, (_, index) => (
+      makeThreadRecord(`THREAD-${String(index + 1).padStart(5, '0')}`, `BSKY-ROOT-${index + 1}`)
+    ));
+    const assignments = assignStableThreadIds({
+      priorRuntimeRecords: currentPublicThreads,
+      sourceThreadRecords: [],
+      detectedRootIds: ['BSKY-NEW'],
+    });
+    assert.equal(assignments.get('BSKY-NEW'), 'THREAD-00020');
+  });
+
   it('rejects one root mapped to different IDs', () => {
     assert.throws(() => assignStableThreadIds({
       priorRuntimeRecords: [
@@ -520,6 +535,31 @@ describe('stable thread ID allocation', () => {
       sourceThreadRecords: [],
       detectedRootIds: ['BSKY-NEW', 'BSKY-NEW'],
     }), /duplicate current thread root BSKY-NEW/);
+  });
+});
+
+describe('thread publication admission', () => {
+  const candidate = (rootId, verified, alreadyCovered = false) => ({
+    alreadyCovered,
+    posts: verified.map((value, index) => ({
+      row: { id: index === 0 ? rootId : `${rootId}-${index}`, verified: value },
+      depth: index,
+    })),
+  });
+
+  it('excludes an all-context new chain before ID allocation', () => {
+    const allContext = candidate('BSKY-CONTEXT', ['FALSE', 'FALSE', 'FALSE']);
+    assert.deepEqual(selectPublishableThreadCandidates([allContext]), []);
+  });
+
+  it('retains a mixed chain with one admitted member', () => {
+    const mixed = candidate('BSKY-MIXED', ['FALSE', 'TRUE', 'FALSE']);
+    assert.deepEqual(selectPublishableThreadCandidates([mixed]), [mixed]);
+  });
+
+  it('preserves an already-covered container even when every current member is context-only', () => {
+    const covered = candidate('BSKY-COVERED', ['FALSE', 'FALSE', 'FALSE'], true);
+    assert.deepEqual(selectPublishableThreadCandidates([covered]), [covered]);
   });
 });
 

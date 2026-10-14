@@ -23,7 +23,10 @@ import { unescapeRow } from './lib/csv-unescape.js';
 import { buildSearchIndex, socialSearchIndexOptions } from './lib/search-index-builder.js';
 import { loadAuthoredExcerpts, resolveSummary } from './lib/summary-resolver.js';
 import { writeRelationshipAdjacencyArtifacts } from './export-relationship-adjacency.js';
-import { assignStableThreadIds } from './lib/thread-id-allocator.js';
+import {
+  assignStableThreadIds,
+  selectPublishableThreadCandidates,
+} from './lib/thread-id-allocator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -453,7 +456,7 @@ async function main() {
   const threadMemberIds = new Set([...existingThreadPostIds]);
   const generatedThreadRecords = [];
 
-  const threadCandidates = threadRoots.map(root => {
+  const detectedThreadCandidates = threadRoots.map(root => {
     const posts = collectChainPosts(root.rkey);
     const postIds = posts.map(post => post.row.id || post.row.ID);
     return {
@@ -462,6 +465,7 @@ async function main() {
       alreadyCovered: postIds.some(id => existingThreadPostIds.has(id)),
     };
   });
+  const threadCandidates = selectPublishableThreadCandidates(detectedThreadCandidates);
   const rootsToGenerate = threadCandidates
     .filter(candidate => !candidate.alreadyCovered)
     .map(candidate => candidate.posts[0].row.id || candidate.posts[0].row.ID);
