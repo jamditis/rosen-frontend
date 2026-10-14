@@ -132,7 +132,7 @@ function validateParameters(parameters) {
 
 function validateObjectMappings(objectMappings) {
   if (!Array.isArray(objectMappings)) fail('objectMappings must be an array');
-  return objectMappings.map((mapping, index) => {
+  const normalized = objectMappings.map((mapping, index) => {
     const label = `object mapping ${index + 1}`;
     assertExactKeys(mapping, ['objectId', 'sourceUrl', 'sourceRole'], [], label);
     if (!/^urn:rosen:object:[a-z0-9-]+:[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(mapping.objectId)) {
@@ -148,6 +148,22 @@ function validateObjectMappings(objectMappings) {
       sourceRole: mapping.sourceRole,
     };
   });
+
+  const firstIndexByMapping = new Map();
+  normalized.forEach((mapping, index) => {
+    const identity = JSON.stringify([
+      mapping.objectId,
+      mapping.sourceUrl,
+      mapping.sourceRole,
+    ]);
+    if (firstIndexByMapping.has(identity)) {
+      fail(
+        `object mapping ${index + 1} duplicates object mapping ${firstIndexByMapping.get(identity)}`,
+      );
+    }
+    firstIndexByMapping.set(identity, index + 1);
+  });
+  return normalized;
 }
 
 function validateMetadata(metadata) {

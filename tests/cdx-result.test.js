@@ -221,6 +221,49 @@ describe('offline Wayback CDX result contract (#903)', () => {
     assert.notDeepEqual(first.objectMappings, second.objectMappings);
   });
 
+  it('emits only unique schema-valid object mappings without changing query identity', () => {
+    const alternateMapping = {
+      objectId: 'urn:rosen:object:archive-record:RECORD-00002',
+      sourceUrl: 'https://archive.org/?edition=Web',
+      sourceRole: 'alternate',
+    };
+    const empty = parseCdxPage(fixture('one.json'), metadata({ objectMappings: [] }));
+    const distinct = parseCdxPage(fixture('one.json'), metadata({
+      objectMappings: [...defaultMappings, alternateMapping],
+    }));
+
+    assertSchemaAccepts(empty, 'empty object mappings');
+    assertSchemaAccepts(distinct, 'distinct object mappings');
+    assert.equal(empty.query.fingerprint, distinct.query.fingerprint);
+
+    const reorderedDuplicate = {
+      sourceRole: defaultMappings[0].sourceRole,
+      sourceUrl: defaultMappings[0].sourceUrl,
+      objectId: defaultMappings[0].objectId,
+    };
+    assert.throws(
+      () => parseCdxPage(fixture('one.json'), metadata({
+        objectMappings: [...defaultMappings, reorderedDuplicate],
+      })),
+      /object mapping 2 duplicates object mapping 1/,
+    );
+
+    const schemaDuplicate = structuredClone(distinct);
+    schemaDuplicate.objectMappings[1] = structuredClone(schemaDuplicate.objectMappings[0]);
+    assert.equal(validateSchema(schemaDuplicate), false);
+
+    const mappingWithUnknownProperty = { ...defaultMappings[0], note: 'not in contract' };
+    assert.throws(
+      () => parseCdxPage(fixture('one.json'), metadata({
+        objectMappings: [mappingWithUnknownProperty],
+      })),
+      /object mapping 1 has unsupported field note/,
+    );
+    const schemaUnknownProperty = structuredClone(distinct);
+    schemaUnknownProperty.objectMappings[0].note = 'not in contract';
+    assert.equal(validateSchema(schemaUnknownProperty), false);
+  });
+
   it('retains equal opaque digests at distinct capture timestamps', () => {
     const result = parseCdxPage(
       fixture('equal-digest-distinct-timestamps.json'),
