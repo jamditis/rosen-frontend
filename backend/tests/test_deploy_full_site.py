@@ -260,21 +260,16 @@ class TestCollectLocalFiles:
         assert "frontend/App.js" in rels
 
     def test_collects_every_declared_semantic_asset_for_ftps(self):
-        manifest_path = (
-            _REPO_ROOT / 'frontend/vendor/semantic/v1/manifest.json'
-        )
+        manifest_path = _REPO_ROOT / "frontend/vendor/semantic/v1/manifest.json"
         manifest = json.loads(manifest_path.read_text())
         expected = {
-            f'frontend/vendor/semantic/v1/{relative_path}'
-            for relative_path in manifest['files']
+            f"frontend/vendor/semantic/v1/{relative_path}"
+            for relative_path in manifest["files"]
         }
-        expected.add('frontend/vendor/semantic/v1/manifest.json')
+        expected.add("frontend/vendor/semantic/v1/manifest.json")
 
         files = deploy_full_site.collect_local_files(_REPO_ROOT)
-        collected = {
-            path.relative_to(_REPO_ROOT).as_posix()
-            for path in files
-        }
+        collected = {path.relative_to(_REPO_ROOT).as_posix() for path in files}
 
         assert expected <= collected
 

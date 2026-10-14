@@ -97,7 +97,7 @@ _DEPLOY_FILES: Tuple[str, ...] = (
 
 _DEPLOY_DIRS: Tuple[str, ...] = (
     "r",  # generated metadata shells for ?record= deep links
-    "frontend",
+    'frontend',  # fmt: skip
     "dissertation",
     "faq",
     "dissertation-launch",

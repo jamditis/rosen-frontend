@@ -616,13 +616,7 @@ def _run_test_gate() -> Optional[str]:
     otherwise a record built against the old schema could land a red main.
     """
     try:
-        subprocess.run(
-            ["npm", "test"],
-            cwd=str(PROJECT_ROOT),
-            check=True,
-            capture_output=True,
-            text=True,
-        )
+        subprocess.run(['npm', 'test'], cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)  # fmt: skip
         return None
     except subprocess.CalledProcessError as exc:
         combined = (exc.stderr or "") + (exc.stdout or "")
