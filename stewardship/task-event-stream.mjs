@@ -8,6 +8,7 @@ import {
   writeSync
 } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { TextDecoder } from 'node:util';
 
 import { canonicalJson } from './proposal-contract.mjs';
@@ -330,16 +331,19 @@ function syncCreatedFileDirectory(filePath) {
  * concurrent append or crash-atomic repair guarantees.
  */
 export function appendTaskEvent(filePath, value) {
-  const source = String(filePath);
-  const creating = !existsSync(filePath);
-  const current = creating ? Object.freeze([]) : readTaskEventStream(filePath);
+  const normalizedPath = filePath instanceof URL ? fileURLToPath(filePath) : filePath;
+  const source = String(normalizedPath);
+  const creating = !existsSync(normalizedPath);
+  const current = creating
+    ? Object.freeze([])
+    : readTaskEventStream(normalizedPath);
   const next = validateTaskEventSequence([...current, value], { source });
   const appended = next[next.length - 1];
   const encoded = Buffer.from(`${canonicalJson(appended)}\n`, 'utf8');
 
   let descriptor;
   try {
-    descriptor = openSync(filePath, 'a', 0o600);
+    descriptor = openSync(normalizedPath, 'a', 0o600);
     let offset = 0;
     while (offset < encoded.length) {
       const written = writeSync(descriptor, encoded, offset, encoded.length - offset, null);
@@ -352,7 +356,7 @@ export function appendTaskEvent(filePath, value) {
   }
   if (creating) {
     try {
-      syncCreatedFileDirectory(filePath);
+      syncCreatedFileDirectory(normalizedPath);
     } catch (error) {
       throw new TaskEventPostAppendError(
         source,
@@ -365,7 +369,7 @@ export function appendTaskEvent(filePath, value) {
 
   let reopened;
   try {
-    reopened = readTaskEventStream(filePath);
+    reopened = readTaskEventStream(normalizedPath);
   } catch (error) {
     throw new TaskEventPostAppendError(
       source,

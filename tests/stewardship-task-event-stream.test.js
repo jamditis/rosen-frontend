@@ -314,6 +314,16 @@ describe('stewardship task event JSONL adapter', () => {
     assert.equal(failure.content, encodeTaskEvent(lifecycle[0]));
   });
 
+  it('uses one filesystem path for a file URL append and directory sync', (t) => {
+    const directory = temporaryDirectory(t);
+    const streamPath = path.join(directory, 'events.jsonl');
+    const streamUrl = pathToFileURL(streamPath);
+
+    assert.equal(appendTaskEvent(streamUrl, lifecycle[0]).eventId, lifecycle[0].eventId);
+    assert.equal(fs.readFileSync(streamPath, 'utf8'), encodeTaskEvent(lifecycle[0]));
+    assert.equal(readTaskEventStream(streamUrl)[0].eventId, lifecycle[0].eventId);
+  });
+
   it('appends, fsyncs, closes, and reopens across fresh processes', (t) => {
     const directory = temporaryDirectory(t);
     const streamPath = path.join(directory, 'events.jsonl');
