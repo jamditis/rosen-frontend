@@ -56,6 +56,12 @@ not moved before replacement. When a backup is configured, it copies the live
 index into a sibling temporary backup, flushes it, and renames it into place.
 Only then does it atomically rename the rebuilt index over the live index. A
 failure before the final rename leaves the live index intact.
+The backup is one rolling generation. Once its rename completes, it replaces
+any older backup even if its directory sync or a later check prevents the live
+index swap. In that partial-success case, inspect both paths before retrying:
+the live index is unchanged, while the backup may already contain a copy of it.
+The two replacements are not a transaction. Retain historical index generations
+separately when they are needed beyond the authoritative event log.
 
 On Linux, the supported deployment platform, each replacement also opens,
 syncs, and closes its parent directory before the rebuild returns. Directory
