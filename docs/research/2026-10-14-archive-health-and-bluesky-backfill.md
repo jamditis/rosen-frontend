@@ -8,7 +8,7 @@ The public archive works, but regular publication of new Bluesky records is inco
 - The [production site](https://pressthink.org/j/rosen-archive/) loads, displays record cards and filters, and serves 26,816 records. Its newest Bluesky record is `BSKY-03334`, dated August 24. The live release is 3.8.36.
 - The [October 9 full-site deployment](https://github.com/jamditis/rosen-frontend/actions/runs/37957073901) passed its tests, upload, and live byte verification. Seven consecutive weekly deployments passed. Repeated deployments do not create new source records.
 - The [discovery Worker health endpoint](https://rosen-source-discovery.jamditis.workers.dev/health) returns HTTP 200, `status: ok`, and `mode: live`. Its configured schedule is daily at 09:17 UTC. This endpoint reports configuration, not successful discovery history.
-- The stored personal API tokens cannot read D1, but the existing Wrangler OAuth login has D1 permission. It confirms successful discovery on October 14 at 09:17 UTC and 216 Bluesky candidates pending review. Credentials and access policy were not changed.
+- The two documented personal Cloudflare credential routes cannot read this D1 database: Cloudflare returns error 7403. Recent discovery runs and candidate counts remain unverified. Credentials and access policy were not changed.
 - Discovery-to-processing remains open in [issue #812](https://github.com/jamditis/rosen-frontend/issues/812). [Issue #743](https://github.com/jamditis/rosen-frontend/issues/743) covers operational health reporting. The submission-row sweep handles submitted records; it does not pull Jay's feed.
 
 ## Batch receipt
