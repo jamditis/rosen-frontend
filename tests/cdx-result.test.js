@@ -79,6 +79,28 @@ function assertParseError(name, expectedRow, messagePattern) {
   );
 }
 
+function assertSyntaxError(name, expectedLocation) {
+  assert.throws(
+    () => parseCdxPage(fixture(name), metadata()),
+    error => {
+      assert.ok(error instanceof CdxResultError);
+      assert.equal(error.row, null);
+      assert.equal(error.nextCursor, null);
+      assert.equal(Object.hasOwn(error, 'captures'), false);
+      assert.equal(error.sourcePosition, expectedLocation.sourcePosition);
+      assert.equal(error.physicalLine, expectedLocation.physicalLine);
+      assert.equal(error.column, expectedLocation.column);
+      assert.equal(error.cause, undefined);
+      assert.match(
+        error.message,
+        /^CDX page is not valid JSON at source position \d+ \(physical line \d+, column \d+\)$/,
+      );
+      assert.doesNotMatch(error.message, /archive|resume|Q4YULN/);
+      return true;
+    },
+  );
+}
+
 describe('offline Wayback CDX result contract (#903)', () => {
   it('parses an official one-capture shape and validates the published schema', () => {
     const result = parseCdxPage(fixture('one.json'), metadata());
@@ -289,6 +311,37 @@ describe('offline Wayback CDX result contract (#903)', () => {
     );
   });
 
+  it('reports physical source locations for syntactically truncated pages', () => {
+    assertSyntaxError('truncated-capture.json', {
+      sourcePosition: 188,
+      physicalLine: 2,
+      column: 111,
+    });
+    assertSyntaxError('truncated-resume-trailer.json', {
+      sourcePosition: 246,
+      physicalLine: 4,
+      column: 38,
+    });
+  });
+
+  it('rejects invalid UTF-8 bytes before JSON parsing', () => {
+    const invalidUtf8 = Buffer.from([0x5b, 0x22, 0xc3, 0x28, 0x22, 0x5d]);
+    assert.throws(
+      () => parseCdxPage(invalidUtf8, metadata()),
+      error => {
+        assert.ok(error instanceof CdxResultError);
+        assert.equal(error.row, null);
+        assert.equal(error.nextCursor, null);
+        assert.equal(Object.hasOwn(error, 'captures'), false);
+        assert.equal(error.sourcePosition, null);
+        assert.equal(error.physicalLine, null);
+        assert.equal(error.column, null);
+        assert.equal(error.message, 'CDX page is not valid UTF-8');
+        return true;
+      },
+    );
+  });
+
   it('rejects a capture timestamp after the recorded check time', () => {
     const beforeCapture = metadata();
     beforeCapture.checkedAt = '1996-01-01T00:00:00.000Z';
@@ -322,8 +375,13 @@ describe('offline Wayback CDX result contract (#903)', () => {
 
   it('serializes the same result to byte-identical canonical JSON', () => {
     const result = parseCdxPage(fixture('one.json'), metadata());
+    const independentlyParsed = parseCdxPage(fixture('one.json'), metadata());
     const reordered = Object.fromEntries(Object.entries(result).reverse());
 
+    assert.deepEqual(
+      Buffer.from(serializeCdxResult(result)),
+      Buffer.from(serializeCdxResult(independentlyParsed)),
+    );
     assert.equal(serializeCdxResult(result), serializeCdxResult(reordered));
     assert.ok(serializeCdxResult(result).endsWith('\n'));
   });

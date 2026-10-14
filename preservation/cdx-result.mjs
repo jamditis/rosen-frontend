@@ -40,10 +40,19 @@ const RESTRICTING_QUERY_PARAMETERS = new Set([
 ]);
 
 export class CdxResultError extends Error {
-  constructor(message, { row = null, cause } = {}) {
+  constructor(message, {
+    row = null,
+    sourcePosition = null,
+    physicalLine = null,
+    column = null,
+    cause,
+  } = {}) {
     super(row == null ? message : `CDX row ${row}: ${message}`, { cause });
     this.name = 'CdxResultError';
     this.row = row;
+    this.sourcePosition = sourcePosition;
+    this.physicalLine = physicalLine;
+    this.column = column;
     this.nextCursor = null;
   }
 }
@@ -329,17 +338,60 @@ function decodePageBytes(bytes) {
   }
 }
 
-function parseRows(bytes) {
-  try {
-    const value = JSON.parse(decodePageBytes(bytes));
-    if (!Array.isArray(value) || value.length === 0) {
-      fail('CDX page must be a non-empty JSON array with a header row');
-    }
-    return value;
-  } catch (error) {
-    if (error instanceof CdxResultError) throw error;
-    fail('CDX page is not valid JSON', { cause: error });
+function jsonSyntaxLocation(error, text) {
+  const message = typeof error?.message === 'string' ? error.message : '';
+  const positionMatch = /\bposition (\d+)\b/.exec(message);
+  let sourcePosition = positionMatch === null ? null : Number(positionMatch[1]);
+  if (sourcePosition === null && /\bend of JSON input\b/i.test(message)) {
+    sourcePosition = text.length;
   }
+
+  if (!Number.isSafeInteger(sourcePosition)
+      || sourcePosition < 0
+      || sourcePosition > text.length) {
+    const coordinates = /\bline (\d+) column (\d+)\b/.exec(message);
+    return coordinates === null
+      ? { sourcePosition: null, physicalLine: null, column: null }
+      : {
+        sourcePosition: null,
+        physicalLine: Number(coordinates[1]),
+        column: Number(coordinates[2]),
+      };
+  }
+
+  const prefix = text.slice(0, sourcePosition);
+  const lastLineBreak = prefix.lastIndexOf('\n');
+  return {
+    sourcePosition,
+    physicalLine: prefix.split('\n').length,
+    column: sourcePosition - lastLineBreak,
+  };
+}
+
+function jsonSyntaxMessage({ sourcePosition, physicalLine, column }) {
+  if (sourcePosition !== null && physicalLine !== null && column !== null) {
+    return `CDX page is not valid JSON at source position ${sourcePosition}`
+      + ` (physical line ${physicalLine}, column ${column})`;
+  }
+  if (physicalLine !== null && column !== null) {
+    return `CDX page is not valid JSON at physical line ${physicalLine}, column ${column}`;
+  }
+  return 'CDX page is not valid JSON';
+}
+
+function parseRows(bytes) {
+  const text = decodePageBytes(bytes);
+  let value;
+  try {
+    value = JSON.parse(text);
+  } catch (error) {
+    const location = jsonSyntaxLocation(error, text);
+    fail(jsonSyntaxMessage(location), location);
+  }
+  if (!Array.isArray(value) || value.length === 0) {
+    fail('CDX page must be a non-empty JSON array with a header row');
+  }
+  return value;
 }
 
 function queryFingerprint(query) {

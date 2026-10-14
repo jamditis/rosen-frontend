@@ -74,7 +74,11 @@ The parser follows the Internet Archive's documented JSON resumption shape:
 an empty array separates capture rows from one final one-field resume-key row.
 It returns a cursor only after the header, every capture row, and the complete
 trailer validate. An invalid page throws `CdxResultError` with a one-based JSON
-row number where available and always exposes `nextCursor` as `null`.
+row number after the JSON structure parses and always exposes `nextCursor` as
+`null`. A JSON syntax error cannot identify a logical CDX row. The error keeps
+`row` null and reports the native decoded-text source position with a physical
+line and column when the runtime supplies a usable position. Error summaries
+do not include response source text. Invalid UTF-8 fails before JSON parsing.
 
 Coverage is conservative. A present resume key proves `partial` coverage. A
 terminal continuation page and requests with time filters, result filters, or
