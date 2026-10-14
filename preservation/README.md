@@ -79,6 +79,10 @@ row number after the JSON structure parses and always exposes `nextCursor` as
 `row` null and reports the native decoded-text source position with a physical
 line and column when the runtime supplies a usable position. Error summaries
 do not include response source text. Invalid UTF-8 fails before JSON parsing.
+The upstream Java writer emits `[]` when there are no results because it writes
+the header only with the first result. That shape contains no header to
+validate. Every non-empty response still requires and validates a strict
+header before any capture is returned.
 
 Coverage is conservative. A present resume key proves `partial` coverage. A
 terminal continuation page and requests with time filters, result filters, or
@@ -87,6 +91,8 @@ coverage only for an initial JSON request that explicitly used
 `showResumeKey=true`, requested a full capture history, and used no restricting
 or unknown parameter. Other requests stay `unknown`. Only a complete result can
 claim an empty result or absolute earliest and latest capture timestamps.
+A complete empty public-index result records only what that exact query
+returned. It does not prove exclusion, replay state, or non-publication.
 
 `serializeCdxResult(result)` sorts object keys recursively, uses two-space JSON
 indentation, and ends with one newline. It preserves array order, including the
@@ -100,6 +106,8 @@ live CDX fetch, Save Page Now call, cursor ledger, or canonical archive edit.
 
 The response shape is based on the Internet Archive
 [CDX Server JSON, field-order, and resumption-key documentation](https://github.com/internetarchive/wayback/blob/master/wayback-cdx-server/README.md#resumption-key).
+The zero-result shape is based on its
+[JSON writer implementation](https://github.com/internetarchive/wayback/blob/master/wayback-cdx-server/src/main/java/org/archive/cdxserver/writer/JsonWriter.java).
 
 ## Bounded browser capture
 

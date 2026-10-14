@@ -135,7 +135,8 @@ function validateObjectMappings(objectMappings) {
   const normalized = objectMappings.map((mapping, index) => {
     const label = `object mapping ${index + 1}`;
     assertExactKeys(mapping, ['objectId', 'sourceUrl', 'sourceRole'], [], label);
-    if (!/^urn:rosen:object:[a-z0-9-]+:[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(mapping.objectId)) {
+    if (typeof mapping.objectId !== 'string'
+        || !/^urn:rosen:object:[a-z0-9-]+:[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(mapping.objectId)) {
       fail(`${label} objectId must be a stable Rosen object URN`);
     }
     validateWebUrl(mapping.sourceUrl, `${label} sourceUrl`);
@@ -404,9 +405,7 @@ function parseRows(bytes) {
     const location = jsonSyntaxLocation(error, text);
     fail(jsonSyntaxMessage(location), location);
   }
-  if (!Array.isArray(value) || value.length === 0) {
-    fail('CDX page must be a non-empty JSON array with a header row');
-  }
+  if (!Array.isArray(value)) fail('CDX page must be a JSON array');
   return value;
 }
 
@@ -427,11 +426,16 @@ function queryFingerprint(query) {
 export function parseCdxPage(bytes, declaredMetadata) {
   const metadata = validateMetadata(declaredMetadata);
   const rows = parseRows(bytes);
-  const header = parseHeader(rows[0]);
-  const { captureRows, nextCursor } = splitTrailer(rows, metadata.query.parameters);
-  const captures = captureRows.map((row, index) => (
-    parseCapture(row, index + 2, header, rows[0].length, metadata.checkedAt)
-  ));
+  let captures = [];
+  let nextCursor = null;
+  if (rows.length > 0) {
+    const header = parseHeader(rows[0]);
+    const page = splitTrailer(rows, metadata.query.parameters);
+    nextCursor = page.nextCursor;
+    captures = page.captureRows.map((row, index) => (
+      parseCapture(row, index + 2, header, rows[0].length, metadata.checkedAt)
+    ));
+  }
   const requestState = requestCoverage(metadata.query.parameters, nextCursor);
   const coverage = requestState.state === 'complete'
     ? completeCoverage(captures)

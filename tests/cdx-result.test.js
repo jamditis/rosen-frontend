@@ -126,7 +126,7 @@ describe('offline Wayback CDX result contract (#903)', () => {
   });
 
   it('distinguishes a proven complete empty result from failure and exclusion', () => {
-    const empty = parseCdxPage(fixture('zero.json'), metadata());
+    const empty = parseCdxPage(fixture('zero-upstream.json'), metadata());
     const one = parseCdxPage(fixture('one.json'), metadata());
     assert.deepEqual(empty.coverage, {
       state: 'complete',
@@ -262,6 +262,22 @@ describe('offline Wayback CDX result contract (#903)', () => {
     const schemaUnknownProperty = structuredClone(distinct);
     schemaUnknownProperty.objectMappings[0].note = 'not in contract';
     assert.equal(validateSchema(schemaUnknownProperty), false);
+
+    for (const invalidObjectId of [
+      [defaultMappings[0].objectId],
+      { toString: () => defaultMappings[0].objectId },
+    ]) {
+      assert.throws(
+        () => parseCdxPage(fixture('one.json'), metadata({
+          objectMappings: [{ ...defaultMappings[0], objectId: invalidObjectId }],
+        })),
+        /object mapping 1 objectId must be a stable Rosen object URN/,
+      );
+    }
+
+    const schemaInvalidObjectId = structuredClone(distinct);
+    schemaInvalidObjectId.objectMappings[0].objectId = [defaultMappings[0].objectId];
+    assert.equal(validateSchema(schemaInvalidObjectId), false);
   });
 
   it('retains equal opaque digests at distinct capture timestamps', () => {
@@ -284,7 +300,7 @@ describe('offline Wayback CDX result contract (#903)', () => {
       { name: 'collapse', value: 'digest' },
       { name: 'from', value: '2000' },
     ]) {
-      const result = parseCdxPage(fixture('zero.json'), metadata({
+      const result = parseCdxPage(fixture('zero-upstream.json'), metadata({
         parameters: [...defaultParameters, restriction],
       }));
       assert.deepEqual(result.coverage, {
@@ -299,7 +315,7 @@ describe('offline Wayback CDX result contract (#903)', () => {
     const withoutResumeEvidence = defaultParameters.filter(
       parameter => parameter.name !== 'showResumeKey',
     );
-    const unknown = parseCdxPage(fixture('zero.json'), metadata({
+    const unknown = parseCdxPage(fixture('zero-upstream.json'), metadata({
       parameters: withoutResumeEvidence,
     }));
     assert.deepEqual(unknown.coverage, {
@@ -309,7 +325,7 @@ describe('offline Wayback CDX result contract (#903)', () => {
     assert.equal(Object.hasOwn(unknown.coverage, 'empty'), false);
     assertSchemaAccepts(unknown, 'unknown request scope');
 
-    const invalidMatchType = parseCdxPage(fixture('zero.json'), metadata({
+    const invalidMatchType = parseCdxPage(fixture('zero-upstream.json'), metadata({
       parameters: [...defaultParameters, { name: 'matchType', value: 'nearby' }],
     }));
     assert.deepEqual(invalidMatchType.coverage, {
@@ -400,14 +416,14 @@ describe('offline Wayback CDX result contract (#903)', () => {
     const unsupportedResult = metadata();
     unsupportedResult.resultVersion = '2.0.0';
     assert.throws(
-      () => parseCdxPage(fixture('zero.json'), unsupportedResult),
+      () => parseCdxPage(fixture('zero-upstream.json'), unsupportedResult),
       /unsupported CDX result version 2\.0\.0/,
     );
 
     const unsupportedAdapter = metadata();
     unsupportedAdapter.adapter.version = '2.0.0';
     assert.throws(
-      () => parseCdxPage(fixture('zero.json'), unsupportedAdapter),
+      () => parseCdxPage(fixture('zero-upstream.json'), unsupportedAdapter),
       /unsupported CDX adapter version 2\.0\.0/,
     );
     assert.throws(
@@ -447,7 +463,7 @@ describe('offline Wayback CDX result contract (#903)', () => {
       throw new Error('network access is forbidden in this test');
     };
     try {
-      const result = parseCdxPage(fixture('zero.json'), metadata());
+      const result = parseCdxPage(fixture('zero-upstream.json'), metadata());
       assert.equal(result.outcome, 'success');
       assert.equal(calls, 0);
     } finally {
