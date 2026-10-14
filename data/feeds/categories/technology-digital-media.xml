@@ -5,9 +5,62 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records in the &quot;Technology &amp; Digital Media&quot; category</description>
     <language>en-us</language>
-    <lastBuildDate>Thu, 27 Aug 2026 18:36:23 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 14 Oct 2026 15:45:36 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/categories/technology-digital-media.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Helping the web archive itself</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mxotyhnjks23</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3mxotyhnjks23</guid>
+    <pubDate>Mon, 12 Oct 2026 00:00:00 GMT</pubDate>
+    <description>Rosen shares Dave Winer&apos;s call to help the web preserve itself and links to Jay Rosen&apos;s Internet Archive as his own contribution.</description>
+    <category>Technology &amp; Digital Media</category>
+    <category>Audience &amp; Public Engagement</category>
+  </item>
+  <item>
+    <title>Josh Marshall on platform audiences</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mw5bvzhlvs27</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3mw5bvzhlvs27</guid>
+    <pubDate>Tue, 22 Sep 2026 00:00:00 GMT</pubDate>
+    <description>Rosen shares Josh Marshall&apos;s distinction between Bluesky users&apos; expectations and the belief among some X users that they encounter a representative population. Rosen corrects Marshall&apos;s name in a later post.</description>
+    <category>Technology &amp; Digital Media</category>
+    <category>Audience &amp; Public Engagement</category>
+  </item>
+  <item>
+    <title>Correcting Josh Marshall&apos;s name</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mw5dxrsdqs26</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3mw5dxrsdqs26</guid>
+    <pubDate>Tue, 22 Sep 2026 00:00:00 GMT</pubDate>
+    <description>Quoting his earlier post about platform audiences, Rosen corrects the attribution from the misspelled name in that post to Josh Marshall.</description>
+    <category>Technology &amp; Digital Media</category>
+    <category>Audience &amp; Public Engagement</category>
+  </item>
+  <item>
+    <title>Commercialization, gatekeepers, and internet distribution</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mvvkvfpqp22p</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3mvvkvfpqp22p</guid>
+    <pubDate>Sat, 19 Sep 2026 00:00:00 GMT</pubDate>
+    <description>Asked whether insider journalism began with Evans and Novak, Rosen describes a longer commercialization process. He argues that media companies&apos; control of distribution changed when the internet offered different terms.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Technology &amp; Digital Media</category>
+  </item>
+  <item>
+    <title>Truth Social mentions as unpaid promotion</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mumwnqgbcc2e</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3mumwnqgbcc2e</guid>
+    <pubDate>Thu, 03 Sep 2026 00:00:00 GMT</pubDate>
+    <description>Rosen shares an Editor and Publisher argument that news stories leading with Trump&apos;s Truth Social posts also promote a company controlled by their subject.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Technology &amp; Digital Media</category>
+  </item>
+  <item>
+    <title>Reporting on the OpenAI and Hugging Face incident</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3muhw545o6c2a</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3muhw545o6c2a</guid>
+    <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+    <description>Rosen shares accounts from Dwarkesh Patel and Platformer about OpenAI and Hugging Face, describing the reporting as startling and accessible.</description>
+    <category>Technology &amp; Digital Media</category>
+  </item>
   <item>
     <title>Does anyone know how to solve the problems of the public of square as revealed i...</title>
     <link>https://bsky.app/profile/jayrosen.bsky.social/post/3msiztd4bgc2a</link>
@@ -406,60 +459,6 @@
     <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3m2chjow4a22t</guid>
     <pubDate>Fri, 03 Oct 2025 00:00:00 GMT</pubDate>
     <description>A Bluesky post by Jay Rosen from 2025-10-03. Topics: Press &amp; Media Criticism, Technology &amp; Digital Media.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>Some important findings in this research, especially if you are worried about...</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3m2aifjifbs2a</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3m2aifjifbs2a</guid>
-    <pubDate>Thu, 02 Oct 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-10-02. Topics: Press &amp; Media Criticism, Technology &amp; Digital Media.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>Casey, I need you to read this and tell me what you think of the Reuters...</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3m2afzfql5227</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3m2afzfql5227</guid>
-    <pubDate>Thu, 02 Oct 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-10-02. Topics: Press &amp; Media Criticism, Technology &amp; Digital Media.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>Yes. It is.</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3m2afdr6hn227</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3m2afdr6hn227</guid>
-    <pubDate>Thu, 02 Oct 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-10-02. Topics: Press &amp; Media Criticism, Technology &amp; Digital Media.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>Got a link for that? That would be news I would circulate</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3m26huutpdk2b</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3m26huutpdk2b</guid>
-    <pubDate>Thu, 02 Oct 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-10-02. Topics: Press &amp; Media Criticism, Technology &amp; Digital Media.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>Thanks for the update</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3lzu5xlt7jk2y</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3lzu5xlt7jk2y</guid>
-    <pubDate>Sat, 27 Sep 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-09-27. Topics: Press &amp; Media Criticism, Technology &amp; Digital Media.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>Nothing wrong with that</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3lzmip2nuqs2s</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3lzmip2nuqs2s</guid>
-    <pubDate>Wed, 24 Sep 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-09-24. Topics: Press &amp; Media Criticism, Technology &amp; Digital Media.</description>
     <category>Press &amp; Media Criticism</category>
     <category>Technology &amp; Digital Media</category>
   </item>
