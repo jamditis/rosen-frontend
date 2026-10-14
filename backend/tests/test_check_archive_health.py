@@ -1,29 +1,44 @@
 import datetime
+import io
 import json
+from pathlib import Path
 import subprocess
+import sys
+import textwrap
+import urllib.error
+import urllib.request
 
 from scripts import check_archive_health as watcher
 
 
 NOW = datetime.datetime(2026, 10, 14, 17, 0, tzinfo=datetime.timezone.utc)
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 
 
 class _Response:
     def __init__(self, *, status=200, payload=None, body=None, headers=None, url=None):
-        self.status_code = status
+        self.status = status
         if body is None:
             body = json.dumps(payload).encode("utf-8")
-        self.body = body
+        self._body = io.BytesIO(body)
         self.headers = headers or {}
-        self.url = url or watcher.HEALTH_URL
+        self._url = url or watcher.HEALTH_URL
         self.closed = False
+        self.read_sizes = []
 
-    def iter_content(self, chunk_size):
-        for start in range(0, len(self.body), chunk_size):
-            yield self.body[start : start + chunk_size]
+    def read(self, size=-1):
+        self.read_sizes.append(size)
+        return self._body.read(size)
+
+    def getcode(self):
+        return self.status
+
+    def geturl(self):
+        return self._url
 
     def close(self):
         self.closed = True
+        self._body.close()
 
 
 def _health_payload(
@@ -57,12 +72,26 @@ def _health_payload(
 
 
 def _request_for(response, calls=None):
-    def request(url, **kwargs):
+    def request(request, **kwargs):
         if calls is not None:
-            calls.append((url, kwargs))
+            calls.append((request, kwargs))
+        if isinstance(response, urllib.error.HTTPError):
+            raise response
         return response
 
     return request
+
+
+def _http_error(*, status, payload=None, body=None, headers=None):
+    if body is None:
+        body = json.dumps(payload).encode("utf-8")
+    return urllib.error.HTTPError(
+        watcher.HEALTH_URL,
+        status,
+        "test response",
+        headers or {},
+        io.BytesIO(body),
+    )
 
 
 def _run(state_path, response, *, notify=False, sender=lambda _message: None):
@@ -98,12 +127,35 @@ def test_healthy_check_uses_only_the_fixed_bounded_request(tmp_path):
     assert report["consecutive_failures"] == 0
     assert report["notification"] == {"event": None, "status": "not_needed"}
     assert len(calls) == 1
-    assert calls[0][0] == watcher.HEALTH_URL
-    assert calls[0][1]["allow_redirects"] is False
-    assert calls[0][1]["stream"] is True
+    request = calls[0][0]
+    assert isinstance(request, urllib.request.Request)
+    assert request.full_url == watcher.HEALTH_URL
+    assert request.get_method() == "GET"
     assert calls[0][1]["timeout"] == watcher.REQUEST_TIMEOUT_SECONDS
-    assert calls[0][1]["headers"]["Accept-Encoding"] == "identity"
+    assert request.get_header("Accept-encoding") == "identity"
     assert response.closed is True
+
+
+def test_native_http_redirect_response_is_rejected_without_retry(tmp_path):
+    calls = []
+    response = _http_error(
+        status=302,
+        body=b"",
+        headers={"Location": "https://example.com/not-allowlisted"},
+    )
+
+    report, exit_code = watcher.run_check(
+        state_path=tmp_path / "state.json",
+        notify=False,
+        request_fn=_request_for(response, calls),
+        now_fn=lambda: NOW,
+    )
+
+    assert exit_code == watcher.EXIT_OUTAGE
+    assert report["http_status"] == 302
+    assert report["error"] == "unexpected_http_status"
+    assert len(calls) == 1
+    assert calls[0][0].full_url == watcher.HEALTH_URL
 
 
 def test_reported_false_health_cannot_pass_on_http_200(tmp_path):
@@ -167,13 +219,13 @@ def test_http_503_exposes_only_validated_failed_ingestion_diagnostics(tmp_path):
 
     first, first_exit = _run(
         state_path,
-        _Response(status=503, payload=payload),
+        _http_error(status=503, payload=payload),
         notify=True,
         sender=messages.append,
     )
     second, second_exit = _run(
         state_path,
-        _Response(status=503, payload=payload),
+        _http_error(status=503, payload=payload),
         notify=True,
         sender=messages.append,
     )
@@ -195,7 +247,7 @@ def test_http_503_exposes_only_validated_failed_ingestion_diagnostics(tmp_path):
 def test_http_503_exposes_validated_failed_discovery_source(tmp_path):
     report, exit_code = _run(
         tmp_path / "state.json",
-        _Response(
+        _http_error(
             status=503,
             payload=_health_payload(healthy=False, discovery_healthy=False),
         ),
@@ -213,19 +265,19 @@ def test_outage_alert_is_deduplicated_and_followed_by_one_recovery(tmp_path):
 
     first, first_exit = _run(
         state_path,
-        _Response(status=503, body=b"unavailable"),
+        _http_error(status=503, body=b"unavailable"),
         notify=True,
         sender=messages.append,
     )
     second, second_exit = _run(
         state_path,
-        _Response(status=503, body=b"unavailable"),
+        _http_error(status=503, body=b"unavailable"),
         notify=True,
         sender=messages.append,
     )
     third, third_exit = _run(
         state_path,
-        _Response(status=503, body=b"unavailable"),
+        _http_error(status=503, body=b"unavailable"),
         notify=True,
         sender=messages.append,
     )
@@ -261,7 +313,7 @@ def test_outage_alert_is_deduplicated_and_followed_by_one_recovery(tmp_path):
 
 def test_failed_outage_notification_retries_on_the_next_check(tmp_path):
     state_path = tmp_path / "state.json"
-    _run(state_path, _Response(status=503, body=b"unavailable"), notify=True)
+    _run(state_path, _http_error(status=503, body=b"unavailable"), notify=True)
     attempts = []
 
     def failed_sender(message):
@@ -270,13 +322,13 @@ def test_failed_outage_notification_retries_on_the_next_check(tmp_path):
 
     failed, failed_exit = _run(
         state_path,
-        _Response(status=503, body=b"unavailable"),
+        _http_error(status=503, body=b"unavailable"),
         notify=True,
         sender=failed_sender,
     )
     retried, retried_exit = _run(
         state_path,
-        _Response(status=503, body=b"unavailable"),
+        _http_error(status=503, body=b"unavailable"),
         notify=True,
         sender=attempts.append,
     )
@@ -306,6 +358,88 @@ def test_oversized_response_is_an_outage_without_reading_past_bound(tmp_path):
         assert exit_code == watcher.EXIT_OUTAGE
         assert report["health"] == "outage"
         assert report["error"] == "response_too_large"
+
+    assert responses[0].read_sizes == []
+    assert sum(responses[1].read_sizes) <= watcher.MAX_RESPONSE_BYTES + 1
+
+
+def test_systemd_script_cli_loads_without_site_packages():
+    service = (
+        REPOSITORY_ROOT
+        / "automation/systemd/rosen-source-discovery-health.service"
+    ).read_text(encoding="utf-8")
+    assert "ExecStart=/usr/bin/python3 -S " in service
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-S",
+            str(REPOSITORY_ROOT / "backend/scripts/check_archive_health.py"),
+            "--help",
+        ],
+        cwd=REPOSITORY_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert "--notify" in completed.stdout
+
+
+def test_probe_runs_without_site_packages_or_a_real_network_request():
+    payload = json.dumps(_health_payload()).encode("utf-8")
+    program = textwrap.dedent(
+        f"""
+        import io
+        import sys
+        from scripts import check_archive_health as watcher
+
+        assert "requests" not in sys.modules
+
+        class Response:
+            status = 200
+            headers = {{}}
+
+            def __init__(self):
+                self.body = io.BytesIO({payload!r})
+
+            def read(self, size=-1):
+                return self.body.read(size)
+
+            def getcode(self):
+                return self.status
+
+            def geturl(self):
+                return watcher.HEALTH_URL
+
+            def close(self):
+                self.body.close()
+
+        calls = []
+
+        def open_request(request, *, timeout):
+            calls.append((request.full_url, request.get_method(), timeout))
+            return Response()
+
+        result = watcher.probe_health(request_fn=open_request)
+        assert result.health == "healthy"
+        assert calls == [(
+            watcher.HEALTH_URL,
+            "GET",
+            watcher.REQUEST_TIMEOUT_SECONDS,
+        )]
+        """
+    )
+    completed = subprocess.run(
+        [sys.executable, "-S", "-c", program],
+        cwd=REPOSITORY_ROOT / "backend",
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
 
 
 def test_supported_telegram_command_uses_no_shell_or_copied_credentials(monkeypatch):

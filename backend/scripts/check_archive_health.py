@@ -10,11 +10,11 @@ import os
 import re
 import subprocess
 import tempfile
+import urllib.error
+import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
-
-import requests
 
 
 HEALTH_URL = "https://rosen-source-discovery.jamditis.workers.dev/health"
@@ -23,7 +23,7 @@ ACTIONS_URL = (
     "bluesky-stewardship.yml"
 )
 RUNBOOK_PATH = "docs/operations/bluesky-stewardship.md"
-REQUEST_TIMEOUT_SECONDS = (5, 10)
+REQUEST_TIMEOUT_SECONDS = 10
 MAX_RESPONSE_BYTES = 64 * 1024
 FAILURES_BEFORE_ALERT = 2
 DEFAULT_STATE_PATH = (
@@ -37,6 +37,14 @@ EXIT_HEALTHY = 0
 EXIT_DEGRADED = 1
 EXIT_OUTAGE = 2
 EXIT_WATCHER_ERROR = 3
+
+
+class _RejectRedirects(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+_HEALTH_OPENER = urllib.request.build_opener(_RejectRedirects())
 
 
 @dataclass(frozen=True)
@@ -76,13 +84,22 @@ def _read_bounded_body(response: object) -> bytes:
             raise ValueError("response_too_large")
 
     body = bytearray()
-    for chunk in response.iter_content(chunk_size=8192):
+    while True:
+        chunk = response.read(min(8192, MAX_RESPONSE_BYTES - len(body) + 1))
         if not chunk:
-            continue
+            break
         if len(chunk) > MAX_RESPONSE_BYTES - len(body):
             raise ValueError("response_too_large")
         body.extend(chunk)
     return bytes(body)
+
+
+def _open_health_request(
+    request: urllib.request.Request,
+    *,
+    timeout: int,
+) -> object:
+    return _HEALTH_OPENER.open(request, timeout=timeout)
 
 
 def _safe_value(value: object) -> bool:
@@ -184,23 +201,29 @@ def _parse_operational_health(payload: object) -> OperationalHealth | None:
 
 def probe_health(
     *,
-    request_fn: Callable[..., object] = requests.get,
+    request_fn: Callable[..., object] | None = None,
 ) -> ProbeResult:
     """Read and validate the one allowlisted public health endpoint."""
+    if request_fn is None:
+        request_fn = _open_health_request
+    request = urllib.request.Request(
+        HEALTH_URL,
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json",
+            "Accept-Encoding": "identity",
+        },
+        method="GET",
+    )
     response = None
     try:
-        response = request_fn(
-            HEALTH_URL,
-            headers={
-                "User-Agent": USER_AGENT,
-                "Accept": "application/json",
-                "Accept-Encoding": "identity",
-            },
-            timeout=REQUEST_TIMEOUT_SECONDS,
-            allow_redirects=False,
-            stream=True,
-        )
-        status_code = getattr(response, "status_code", None)
+        try:
+            response = request_fn(request, timeout=REQUEST_TIMEOUT_SECONDS)
+        except urllib.error.HTTPError as exc:
+            # urllib exposes non-2xx responses as file-like exceptions. Keep the
+            # fixed endpoint's HTTP 503 body available for safe diagnostics.
+            response = exc
+        status_code = response.getcode()
         if not isinstance(status_code, int):
             return ProbeResult(health="outage", error="invalid_http_status")
         if status_code not in {200, 503}:
@@ -209,7 +232,7 @@ def probe_health(
                 http_status=status_code,
                 error="unexpected_http_status",
             )
-        response_url = getattr(response, "url", HEALTH_URL)
+        response_url = response.geturl()
         if response_url != HEALTH_URL:
             return ProbeResult(
                 health="outage",
@@ -231,7 +254,7 @@ def probe_health(
                 http_status=status_code,
                 error=str(exc),
             )
-    except requests.RequestException:
+    except (urllib.error.URLError, TimeoutError, OSError):
         return ProbeResult(health="outage", error="request_failed")
     finally:
         close = getattr(response, "close", None)
@@ -380,7 +403,7 @@ def run_check(
     *,
     state_path: Path,
     notify: bool,
-    request_fn: Callable[..., object] = requests.get,
+    request_fn: Callable[..., object] | None = None,
     sender_fn: Callable[[str], None] = send_telegram,
     now_fn: Callable[[], datetime.datetime] = lambda: datetime.datetime.now(
         datetime.timezone.utc
