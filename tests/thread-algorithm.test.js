@@ -12,7 +12,10 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { assignStableThreadIds } from '../data/lib/thread-id-allocator.js';
+import {
+  assignStableThreadIds,
+  selectPublishableThreadCandidates,
+} from '../data/lib/thread-id-allocator.js';
 
 // ============================================
 // Re-implement thread detection functions
@@ -463,6 +466,18 @@ describe('stable thread ID allocation', () => {
     assert.equal(assignments.get('BSKY-NEW'), 'THREAD-00021');
   });
 
+  it('reserves all 19 public thread IDs before assigning a new root', () => {
+    const currentPublicThreads = Array.from({ length: 19 }, (_, index) => (
+      makeThreadRecord(`THREAD-${String(index + 1).padStart(5, '0')}`, `BSKY-ROOT-${index + 1}`)
+    ));
+    const assignments = assignStableThreadIds({
+      priorRuntimeRecords: currentPublicThreads,
+      sourceThreadRecords: [],
+      detectedRootIds: ['BSKY-NEW'],
+    });
+    assert.equal(assignments.get('BSKY-NEW'), 'THREAD-00020');
+  });
+
   it('rejects one root mapped to different IDs', () => {
     assert.throws(() => assignStableThreadIds({
       priorRuntimeRecords: [
@@ -520,6 +535,74 @@ describe('stable thread ID allocation', () => {
       sourceThreadRecords: [],
       detectedRootIds: ['BSKY-NEW', 'BSKY-NEW'],
     }), /duplicate current thread root BSKY-NEW/);
+  });
+});
+
+describe('thread publication admission', () => {
+  const candidate = (rootId, verified, alreadyCovered = false) => ({
+    alreadyCovered,
+    posts: verified.map((value, index) => ({
+      row: {
+        id: index === 0 ? rootId : `${rootId}-${index}`,
+        verified: value,
+        author: 'Jay Rosen',
+        platform: 'Bluesky',
+        url: `https://bsky.app/profile/jayrosen.bsky.social/post/${rootId}-${index}`,
+        raw_text: `Source post ${index}`,
+        permissions: 'Public Post',
+        date_processed: '2026-10-14T18:00:00Z',
+      },
+      depth: index,
+    })),
+  });
+
+  it('excludes an all-context new chain before ID allocation', () => {
+    const allContext = candidate('BSKY-CONTEXT', ['FALSE', 'FALSE', 'FALSE']);
+    assert.deepEqual(selectPublishableThreadCandidates([allContext]), []);
+  });
+
+  it('retains a mixed chain with one admitted member', () => {
+    const mixed = candidate('BSKY-MIXED', ['FALSE', 'TRUE', 'FALSE']);
+    assert.deepEqual(selectPublishableThreadCandidates([mixed]), [mixed]);
+  });
+
+  it('leaves a new media-only chain ungrouped before ID allocation', () => {
+    for (const position of [0, 1, 2]) {
+      const media = candidate('BSKY-MEDIA', ['TRUE', 'FALSE', 'TRUE']);
+      media.posts[position].row.raw_text = '';
+      assert.deepEqual(selectPublishableThreadCandidates([media]), []);
+      assert.equal(media.posts[0].row.verified, 'TRUE', 'standalone admission stays intact');
+    }
+  });
+
+  it('leaves unsupported historical source members out of new Jay thread containers', () => {
+    const otherAuthor = candidate('BSKY-OTHER', ['TRUE', 'TRUE', 'TRUE']);
+    otherAuthor.posts[1].row.author = 'Another author';
+    otherAuthor.posts[1].row.url = 'https://bsky.app/profile/another.bsky.social/post/example';
+    assert.deepEqual(selectPublishableThreadCandidates([otherAuthor]), []);
+  });
+
+  it('keeps an existing text thread and its ID when a media-only branch is added', () => {
+    const extended = candidate('BSKY-OLD', ['TRUE', 'TRUE', 'TRUE', 'FALSE', 'TRUE']);
+    extended.posts[3].row.raw_text = '';
+    const selected = selectPublishableThreadCandidates([extended]);
+    assert.deepEqual(selected[0].posts, extended.posts.slice(0, 3));
+    assert.deepEqual(selected[0].postIds, extended.posts.slice(0, 3).map(post => post.row.id));
+    const assigned = assignStableThreadIds({
+      priorRuntimeRecords: [{
+        id: 'THREAD-00019',
+        thread_data: { thread_id: 'BSKY-OLD', posts: [{ id: 'BSKY-OLD' }] },
+      }],
+      sourceThreadRecords: [],
+      detectedRootIds: [selected[0].posts[0].row.id],
+    });
+    assert.equal(assigned.get('BSKY-OLD'), 'THREAD-00019');
+    assert.equal(extended.posts[4].row.verified, 'TRUE', 'excluded descendant stays admitted');
+  });
+
+  it('preserves an already-covered container even when every current member is context-only', () => {
+    const covered = candidate('BSKY-COVERED', ['FALSE', 'FALSE', 'FALSE'], true);
+    assert.deepEqual(selectPublishableThreadCandidates([covered]), [covered]);
   });
 });
 

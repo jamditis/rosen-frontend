@@ -8,6 +8,10 @@ on:
   schedule:
     - cron: '0 8 * * 1'  # Weekly Monday 8am
 
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   analyze:
     runs-on: ubuntu-latest

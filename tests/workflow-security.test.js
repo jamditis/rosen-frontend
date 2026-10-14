@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
 const secretBearingWorkflows = [
+  '.github/workflows/bluesky-stewardship.yml',
   '.github/workflows/submit-record.yml',
   '.github/workflows/submit-prototype.yml',
   '.github/workflows/maintenance.yml',

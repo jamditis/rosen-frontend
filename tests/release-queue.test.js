@@ -13,6 +13,7 @@ describe('release workflow queue', () => {
       { id: 105, status: 'queued', path: '.github/workflows/deploy.yml' },
       { id: 104, status: 'in_progress', path: '.github/workflows/submit-record.yml' },
       { id: 103, status: 'waiting', path: '.github/workflows/submit-prototype.yml' },
+      { id: 100, status: 'requested', path: '.github/workflows/bluesky-stewardship.yml' },
       { id: 102, status: 'completed', path: '.github/workflows/deploy.yml' },
       { id: 101, status: 'queued', path: '.github/workflows/ci.yml' },
       { id: 106, status: 'queued', path: '.github/workflows/deploy.yml' },
@@ -20,11 +21,11 @@ describe('release workflow queue', () => {
 
     assert.deepEqual(
       findBlockingRuns(runs, 105).map(({ id }) => id),
-      [103, 104],
+      [100, 103, 104],
     );
   });
 
-  it('tracks every GitHub active state and the three release workflows', () => {
+  it('tracks every GitHub active state and all release workflows', () => {
     assert.deepEqual(
       [...ACTIVE_STATUSES],
       ['requested', 'queued', 'pending', 'waiting', 'in_progress'],
@@ -32,6 +33,7 @@ describe('release workflow queue', () => {
     assert.deepEqual(
       [...RELEASE_WORKFLOWS],
       [
+        '.github/workflows/bluesky-stewardship.yml',
         '.github/workflows/deploy.yml',
         '.github/workflows/submit-record.yml',
         '.github/workflows/submit-prototype.yml',

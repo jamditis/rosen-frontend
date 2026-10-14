@@ -107,7 +107,7 @@ Adding a record by hand is a three-step process (edit a CSV, run one command, up
 
 ## Continuous stewardship
 
-New public work now appears mainly on Bluesky. The planned stewardship flow finds Jay Rosen's public posts, keeps meaningful public discourse as record candidates, preserves needed thread context, and sends approved work through the existing archive review and release path.
+New public work now appears mainly on Bluesky. The daily stewardship workflow finds Jay Rosen's public posts, keeps meaningful public discourse as record candidates, preserves needed thread context, and sends approved work through the existing archive review and release path. If a release reaches `main` before deployment completes, the next run validates and deploys that exact commit before it settles pending source candidates.
 
 Read the plain-language system map: [Bluesky-first archive stewardship pipeline](docs/bluesky-stewardship-pipeline.md).
 

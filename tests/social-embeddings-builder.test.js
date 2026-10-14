@@ -11,6 +11,7 @@ import { BYTES_PER_VECTOR, EMBED_DIM, sha256Hex } from '../data/lib/embeddings-b
 import {
   buildSocialEmbeddingText,
   buildSocialEmbeddings,
+  buildIncrementalSocialEmbeddings,
   selectPublishedSocialRecords,
 } from '../data/lib/social-embeddings-builder.js';
 
@@ -57,6 +58,173 @@ test('buildSocialEmbeddings writes one aligned vector per social record', async 
   assert.equal(result.count, 2);
   assert.equal(result.binBuffer.length, 2 * BYTES_PER_VECTOR);
   assert.equal(result.index.binarySha256, sha256Hex(result.binBuffer));
+  assert.equal('textSha256' in result.index, false);
+  assert.equal(result.reuseMetadata.textSha256.length, 2);
+  assert.equal(result.reuseMetadata.binarySha256, result.index.binarySha256);
+  assert.equal(result.reuseMetadata.model, result.index.model);
+  assert.equal(result.reuseMetadata.dim, result.index.dim);
+});
+
+test('incremental build reuses identical bytes and encodes only changed text', async () => {
+  const previousRecords = [
+    { id: 'BSKY-A', type: 'social', quote: 'unchanged' },
+    { id: 'BSKY-B', type: 'social', quote: 'old text' },
+    { id: 'BSKY-C', type: 'social', quote: 'deleted' },
+  ];
+  const previous = await buildSocialEmbeddings(previousRecords, fakeEmbedMany());
+  const previousBytes = Buffer.from(previous.binBuffer);
+  const currentRecords = [
+    { id: 'BSKY-B', type: 'social', quote: 'new text with a different length' },
+    { id: 'BSKY-A', type: 'social', quote: 'unchanged' },
+  ];
+  const encodedTexts = [];
+  const result = await buildIncrementalSocialEmbeddings(
+    currentRecords,
+    async texts => {
+      encodedTexts.push(...texts);
+      return fakeEmbedMany()(texts);
+    },
+    {
+      previousIndex: previous.index,
+      previousBinary: previous.binBuffer,
+      previousBuildMetadata: previous.reuseMetadata,
+    },
+  );
+
+  assert.deepEqual(encodedTexts, ['new text with a different length']);
+  assert.deepEqual(result.index.ids, ['BSKY-B', 'BSKY-A']);
+  assert.equal(result.reused, 1);
+  assert.equal(result.encoded, 1);
+  assert.equal(result.binBuffer.length, 2 * BYTES_PER_VECTOR);
+  assert.deepEqual(
+    result.binBuffer.subarray(BYTES_PER_VECTOR),
+    previous.binBuffer.subarray(0, BYTES_PER_VECTOR),
+  );
+  assert.equal(result.index.binarySha256, sha256Hex(result.binBuffer));
+  assert.deepEqual(previous.binBuffer, previousBytes);
+  result.binBuffer[BYTES_PER_VECTOR] ^= 1;
+  assert.deepEqual(previous.binBuffer, previousBytes);
+});
+
+test('old sidecar migration requires the explicit previous archive records', async () => {
+  const previousRecords = [{ id: 'BSKY-A', type: 'social', quote: 'same text' }];
+  const previous = await buildSocialEmbeddings(previousRecords, fakeEmbedMany());
+
+  await assert.rejects(
+    buildIncrementalSocialEmbeddings(previousRecords, fakeEmbedMany(), {
+      previousIndex: previous.index,
+      previousBinary: previous.binBuffer,
+    }),
+    /--previous-archive/,
+  );
+
+  let encodeCalls = 0;
+  const migrated = await buildIncrementalSocialEmbeddings(
+    previousRecords,
+    async texts => {
+      encodeCalls += texts.length;
+      return fakeEmbedMany()(texts);
+    },
+    {
+      previousIndex: previous.index,
+      previousBinary: previous.binBuffer,
+      previousRecords,
+    },
+  );
+  assert.equal(encodeCalls, 0);
+  assert.equal(migrated.reused, 1);
+  assert.equal(migrated.reuseMetadata.textSha256.length, 1);
+  assert.equal('textSha256' in migrated.index, false);
+});
+
+test('incremental build rejects reuse metadata bound to another ordered index', async () => {
+  const records = [{ id: 'BSKY-A', type: 'social', quote: 'same text' }];
+  const previous = await buildSocialEmbeddings(records, fakeEmbedMany());
+  const mismatchedMetadata = {
+    ...previous.reuseMetadata,
+    orderedIdsSha256: '0'.repeat(64),
+  };
+  let called = false;
+
+  await assert.rejects(
+    buildIncrementalSocialEmbeddings(records, async () => {
+      called = true;
+      return [];
+    }, {
+      previousIndex: previous.index,
+      previousBinary: previous.binBuffer,
+      previousBuildMetadata: mismatchedMetadata,
+    }),
+    /orderedIdsSha256 does not match/,
+  );
+  assert.equal(called, false);
+});
+
+test('incremental build re-encodes a row when its reuse hash is stale', async () => {
+  const records = [{ id: 'BSKY-A', type: 'social', quote: 'same text' }];
+  const previous = await buildSocialEmbeddings(records, fakeEmbedMany());
+  const staleMetadata = {
+    ...previous.reuseMetadata,
+    textSha256: ['0'.repeat(64)],
+  };
+  const encodedTexts = [];
+
+  const result = await buildIncrementalSocialEmbeddings(records, async (texts) => {
+    encodedTexts.push(...texts);
+    return fakeEmbedMany()(texts);
+  }, {
+    previousIndex: previous.index,
+    previousBinary: previous.binBuffer,
+    previousBuildMetadata: staleMetadata,
+  });
+
+  assert.deepEqual(encodedTexts, ['same text']);
+  assert.equal(result.encoded, 1);
+  assert.equal(result.reused, 0);
+});
+
+test('explicit previous archive rejects stale reuse metadata before encoding', async () => {
+  const records = [{ id: 'BSKY-A', type: 'social', quote: 'same text' }];
+  const previous = await buildSocialEmbeddings(records, fakeEmbedMany());
+  const staleMetadata = {
+    ...previous.reuseMetadata,
+    textSha256: ['0'.repeat(64)],
+  };
+  let called = false;
+
+  await assert.rejects(
+    buildIncrementalSocialEmbeddings(records, async () => {
+      called = true;
+      return [];
+    }, {
+      previousIndex: previous.index,
+      previousBinary: previous.binBuffer,
+      previousBuildMetadata: staleMetadata,
+      previousRecords: records,
+    }),
+    /does not match the previous archive/,
+  );
+  assert.equal(called, false);
+});
+
+test('incremental build rejects a corrupt previous binary before encoding', async () => {
+  const records = [{ id: 'BSKY-A', type: 'social', quote: 'same text' }];
+  const previous = await buildSocialEmbeddings(records, fakeEmbedMany());
+  const corrupt = Buffer.from(previous.binBuffer);
+  corrupt[corrupt.length - 1] ^= 1;
+  let called = false;
+
+  await assert.rejects(
+    buildIncrementalSocialEmbeddings(records, async () => {
+      called = true;
+      return [];
+    }, {
+      previousIndex: previous.index,
+      previousBinary: corrupt,
+    }),
+    /checksum/,
+  );
+  assert.equal(called, false);
 });
 
 test('the committed social artifact covers every published social record', () => {
@@ -70,4 +238,9 @@ test('the committed social artifact covers every published social record', () =>
   assert.equal(index.count, expectedIds.length);
   assert.equal(binary.length, index.count * index.bytesPerVector);
   assert.equal(index.binarySha256, sha256Hex(binary));
+  assert.equal('textSha256' in index, false);
+  assert.ok(
+    fs.statSync(path.join(repoRoot, 'data', 'archive-social-embeddings.json')).size < 500_000,
+    'browser-facing social index must stay below 500 kB',
+  );
 });

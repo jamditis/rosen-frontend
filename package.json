@@ -30,6 +30,7 @@
     "bump-version": "node scripts/bump-version.mjs",
     "build-embeddings": "node data/lib/embeddings-builder.js",
     "build-social-embeddings": "node data/lib/social-embeddings-builder.js",
+    "refresh:social-release": "node scripts/refresh-social-release-artifacts.mjs",
     "preview": "node scripts/preview-server.js",
     "preview:audit": "node scripts/preview-audit.js"
   },

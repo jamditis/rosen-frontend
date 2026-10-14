@@ -212,6 +212,7 @@ describe('thread coverage', () => {
       ['THREAD-00016', 'BSKY-02060'],
       ['THREAD-00017', 'BSKY-02609'],
       ['THREAD-00018', 'BSKY-03278'],
+      ['THREAD-00019', 'BSKY-03409'],
     ]);
     const threadById = new Map(
       fullData.records

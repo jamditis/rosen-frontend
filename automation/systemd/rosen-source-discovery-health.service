@@ -1,0 +1,7 @@
+[Unit]
+Description=Check Rosen source-discovery health
+
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=/usr/bin/python3 -S /home/jamditis/projects/rosen-frontend/backend/scripts/check_archive_health.py --notify --state %h/.local/state/rosen-archive/source-discovery-health.json
