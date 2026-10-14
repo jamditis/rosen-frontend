@@ -836,13 +836,25 @@
   ],
   "duplicateEdgeExceptions": [
     {
-      "entityIds": ["O0903", "O0908"],
-      "types": ["Owns", "Owned By"],
+      "entityIds": [
+        "O0903",
+        "O0908"
+      ],
+      "types": [
+        "Owns",
+        "Owned By"
+      ],
       "reason": "RECORD-00374 asserts both 'Scripps-Howard Owns Ventura Country Star' (RECORD-00374_REL_013) and 'Ventura Country Star Owned By Scripps-Howard' (RECORD-00374_REL_014) -- the same ownership fact encoded twice. The 2026-08-27 issue #737 ruling keeps Owns as canonical and sends the Owned By row to data/relationship-review-report.json for removal review."
     },
     {
-      "entityIds": ["P0005", "O0033"],
-      "types": ["Owns", "Owned By"],
+      "entityIds": [
+        "P0005",
+        "O0033"
+      ],
+      "types": [
+        "Owns",
+        "Owned By"
+      ],
       "reason": "Records assert 'Jay Rosen Owns PressThink' against the PressThink entity O0033 (RECORD-00501_REL_003, RECORD-00835_REL_025, RECORD-00800_REL_002, RECORD-00847_REL_023) and separately 'PressThink Owned By Jay Rosen' against the same entity (RECORD-00483_REL_002, RECORD-00716_REL_003) -- the same ownership fact encoded twice. The 2026-08-27 issue #737 ruling keeps Owns as canonical and sends both Owned By rows to data/relationship-review-report.json for removal review. PressThink's duplicate Work-typed entity W0666 was merged into O0033 on 2026-08-27 (issue #859), which is why this entry covers rows that used to be split across two exceptions."
     }
   ]

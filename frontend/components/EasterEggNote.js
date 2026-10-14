@@ -1,4 +1,4 @@
-import { html } from '../html.js?v=3.8.37';
+import { html } from '../html.js?v=3.8.38';
 import { X } from 'lucide-react';
 
 /**
