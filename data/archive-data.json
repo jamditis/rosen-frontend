@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "generated": "2026-10-14T15:28:08.333Z",
+  "generated": "2026-10-14T15:45:29.513Z",
   "records": [
     {
       "id": "BSKY-03434",
@@ -452,10 +452,7 @@
       "verified": true,
       "needsReview": false,
       "type": "social",
-      "relatedIds": [
-        "O0015",
-        "P0005"
-      ]
+      "relatedIds": []
     },
     {
       "id": "BSKY-03396",
@@ -530,10 +527,7 @@
       "verified": true,
       "needsReview": false,
       "type": "social",
-      "relatedIds": [
-        "O0015",
-        "P0005"
-      ]
+      "relatedIds": []
     },
     {
       "id": "BSKY-03386",
@@ -633,10 +627,7 @@
       "verified": true,
       "needsReview": false,
       "type": "social",
-      "relatedIds": [
-        "O0015",
-        "P0005"
-      ]
+      "relatedIds": []
     },
     {
       "id": "BSKY-03381",
@@ -864,9 +855,8 @@
       "needsReview": false,
       "type": "social",
       "relatedIds": [
-        "O0015",
-        "P0005",
-        "P0238"
+        "P0238",
+        "P0005"
       ]
     },
     {

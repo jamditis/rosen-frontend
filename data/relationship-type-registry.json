@@ -172,7 +172,7 @@
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
         "violatingRows": 45,
-        "totalRows": 1597,
+        "totalRows": 1593,
         "asOfDate": "2026-10-14",
         "exampleRelationshipIds": [
           "RECORD-00043_REL_016",
@@ -181,7 +181,7 @@
           "RECORD-00089_REL_007",
           "RECORD-00126_REL_005"
         ],
-        "note": "45 of 1597 current Mentions rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 widened allowedSourceTypes to include Event and allowedTargetTypes to include Concept. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "45 of 1593 current Mentions rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 widened allowedSourceTypes to include Event and allowedTargetTypes to include Concept. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 31,
