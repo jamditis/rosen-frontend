@@ -23,7 +23,7 @@ limits. A 401, 403, policy denial, invalid payload, incomplete pagination, or
 invalid author identity fails before canonical rows are written.
 
 Each capture exhausts the feed within explicit page and item bounds. It starts
-with a 24-hour overlap before the newest canonical Bluesky source timestamp and
+with a 90-day overlap before the newest canonical Bluesky source timestamp and
 deduplicates by source URI. Reposts and other authors' posts are excluded. Original
 CSV bytes and IDs are preserved; new IDs are assigned in source-time order.
 Raw API snapshots, context, hashes, and the decision report stay in the runner's
@@ -38,6 +38,12 @@ Acknowledgments and uncertain cases remain context-only with `verified: FALSE`.
 They cannot become standalone records. This path uses no remote language-model API
 and does not invent entities or graph assertions. Manual batches can add reviewed
 editorial summaries and literal entity mentions separately.
+
+The 90-day window also repairs older omissions found in the discovery ledger. The
+October 14 audit found 43 Jay source posts from July 22 through August 18 that were
+still absent from canonical data. Other authors' reposts in the discovery ledger
+are excluded from the authenticated Jay ingestion queue. The public API walk
+still uses the same fixed endpoint and complete cursor checks.
 
 The publisher rebuilds public JSON, lexical indexes, analytics, feeds, and graph
 artifacts. A generated thread exception is added only when its members and reply

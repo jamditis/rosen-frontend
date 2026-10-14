@@ -76,8 +76,8 @@ export async function readPendingIngestionCandidates(request, env) {
     return { status: 400, body: { error: "invalid_cursor" } };
   }
   const rows = (await env.DISCOVERY_LEDGER.prepare(
-    "SELECT rowid AS cursor, canonical_url AS uri FROM discovery_candidates WHERE source_id = ? AND review_status = 'pending_review' AND rowid > ? ORDER BY rowid LIMIT 201",
-  ).bind("jay-rosen-bluesky", Number(value)).all()).results;
+    "SELECT rowid AS cursor, canonical_url AS uri FROM discovery_candidates WHERE source_id = ? AND canonical_url LIKE ? AND review_status = 'pending_review' AND rowid > ? ORDER BY rowid LIMIT 201",
+  ).bind("jay-rosen-bluesky", "at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/%", Number(value)).all()).results;
   const page = rows.slice(0, 200);
   if (page.some(row => !ACTOR_POST.test(row.uri))) throw new Error("invalid_ledger_candidate");
   return { status: 200, body: {

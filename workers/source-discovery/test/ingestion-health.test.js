@@ -85,6 +85,7 @@ test("pending candidate reads require authentication and paginate only Jay's uns
   const insert = (source, uri, status = "pending_review") => db.raw.run("INSERT INTO discovery_candidates (source_id,canonical_url,first_seen_at,last_seen_at,latest_run_id,review_status) VALUES (?,?,?,?,?,?)", [source, uri, "2026-10-14", "2026-10-14", "example", status]);
   for (let index = 0; index < 201; index++) insert("jay-rosen-bluesky", URI + index);
   insert("pressthink-wordpress-posts", "https://pressthink.org/example");
+  insert("jay-rosen-bluesky", "at://did:plc:anotherauthor/app.bsky.feed.post/repost");
   insert("jay-rosen-bluesky", URI + "accepted", "accepted");
   const env = { DISCOVERY_LEDGER: db, INGESTION_RECEIPT_TOKEN: TOKEN };
   const first = await readPendingIngestionCandidates(get(""), env);

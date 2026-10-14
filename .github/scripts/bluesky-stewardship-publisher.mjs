@@ -354,6 +354,7 @@ function captureBatch(root, paths, dryRun) {
     'backend/scripts/bluesky_batch_update.py',
     '--report', paths.reportPath,
     '--snapshot-dir', paths.snapshotDir,
+    '--overlap-hours', '2160',
   ];
   if (dryRun) adapterArgs.push('--dry-run');
   run(root, 'python', adapterArgs);
