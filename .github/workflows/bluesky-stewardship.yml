@@ -82,6 +82,9 @@ jobs:
           fetch-depth: 0
           lfs: false
 
+      - name: Materialize tested LFS objects
+        run: git lfs pull
+
       - name: Install root npm dependencies
         run: npm ci --ignore-scripts
 
@@ -92,7 +95,7 @@ jobs:
 
       - name: Deploy exact tested commit
         id: deploy
-        if: steps.prepare.outcome == 'success' && steps.prepare.outputs.has_changes == 'true' && env.DRY_RUN != 'true'
+        if: steps.prepare.outcome == 'success' && steps.prepare.outputs.needs_deploy == 'true' && env.DRY_RUN != 'true'
         working-directory: backend
         env:
           ROSEN_TRANSFER_PROTOCOL: ${{ secrets.ROSEN_TRANSFER_PROTOCOL }}
@@ -115,19 +118,18 @@ jobs:
         env:
           DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
           VERIFY_OUTCOME: ${{ steps.verify_live.outcome }}
-          RECEIPT_DELIVERY_OUTCOME: ${{ steps.send_receipt.outcome }}
         run: node .github/scripts/bluesky-stewardship-publisher.mjs finalize
 
       - name: Send final receipt
         id: send_receipt
-        if: always() && steps.receipt.outcome == 'success'
+        if: always() && env.DRY_RUN != 'true' && steps.receipt.outcome == 'success' && steps.receipt.outputs.receipt_path != ''
         env:
           ROSEN_INGESTION_RECEIPT_TOKEN: ${{ secrets.ROSEN_INGESTION_RECEIPT_TOKEN }}
           RECEIPT_PATH: ${{ steps.receipt.outputs.receipt_path }}
         run: python backend/scripts/post_ingestion_receipt.py "$RECEIPT_PATH"
 
       - name: Create or update failure issue
-        if: always() && (steps.receipt.outputs.status == 'failed' || steps.receipt.outcome != 'success' || steps.send_receipt.outcome != 'success')
+        if: always() && env.DRY_RUN != 'true' && (steps.receipt.outputs.status == 'failed' || steps.receipt.outcome != 'success' || steps.send_receipt.outcome != 'success')
         uses: actions/github-script@v8
         env:
           ERROR_CLASS: ${{ steps.receipt.outputs.error_class || 'workflow_failed' }}
@@ -166,6 +168,7 @@ jobs:
           PREPARE_OUTCOME: ${{ steps.prepare.outcome }}
           DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
           VERIFY_OUTCOME: ${{ steps.verify_live.outcome }}
+          RECEIPT_DELIVERY_OUTCOME: ${{ steps.send_receipt.outcome }}
         run: |
           {
             echo '## Bluesky stewardship publisher'
@@ -180,6 +183,14 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Fail unsuccessful publication
-        if: always() && (steps.receipt.outputs.status == 'failed' || steps.receipt.outcome != 'success' || steps.send_receipt.outcome != 'success')
+        if: >-
+          always() && (
+            (env.DRY_RUN == 'true' && steps.receipt.outputs.status != 'dry_run') ||
+            (env.DRY_RUN != 'true' && (
+              steps.receipt.outputs.status == 'failed' ||
+              steps.receipt.outcome != 'success' ||
+              steps.send_receipt.outcome != 'success'
+            ))
+          )
         run: exit 1
 

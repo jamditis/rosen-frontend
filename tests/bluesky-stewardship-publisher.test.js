@@ -6,7 +6,9 @@ import { fileURLToPath } from 'node:url';
 
 import {
   buildIngestionReceipt,
-  runPublicationLifecycle,
+  finalizePublication,
+  runPreparation,
+  validateRecoveryRelease,
 } from '../.github/scripts/bluesky-stewardship-publisher.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -29,80 +31,148 @@ function report(rows = 1) {
   };
 }
 
-function input() {
+function state() {
   return {
-    runId: '123_1',
-    checkedAt: NOW,
+    version: 1,
+    phase: 'initialized',
     startCommit: START,
     canonicalCommit: START,
     releaseVersion: '3.8.37',
-    dryRun: false,
-    emptyReport: report(0),
+    report: report(0),
+    errorClass: null,
+    liveVerified: false,
   };
 }
 
-function operations(overrides = {}) {
+function preparation(overrides = {}) {
   const calls = [];
+  const outputs = new Map();
   const api = {
     calls,
-    capture: async () => report(),
-    verifyLive: async () => calls.push('verify'),
-    prepare: async () => ({ canonicalCommit: PUBLISHED, releaseVersion: '3.8.38' }),
-    runChecks: async () => calls.push('checks'),
-    getRemoteHead: async () => START,
-    push: async () => calls.push('push'),
-    deploy: async () => calls.push('deploy'),
-    sendReceipt: async (receipt) => calls.push(`receipt:${receipt.status}`),
+    outputs,
+    dryRun: false,
+    state: state(),
+    capture: () => report(),
+    verifyLive: () => calls.push('verify'),
+    publishChangedRelease: () => {
+      calls.push('publish');
+      return { canonicalCommit: PUBLISHED, releaseVersion: '3.8.38' };
+    },
+    validateRecoveryRelease: () => calls.push('recover'),
+    persist: (nextState) => calls.push(`persist:${nextState.phase}`),
+    emit: (name, value) => outputs.set(name, value),
     ...overrides,
   };
   return api;
 }
 
-describe('Bluesky stewardship publication lifecycle', () => {
-  it('verifies live state and emits no_change without pushing when no rows are missing', async () => {
-    const ops = operations({ capture: async () => report(0) });
-    const receipt = await runPublicationLifecycle(input(), ops);
-    assert.equal(receipt.status, 'no_change');
-    assert.deepEqual(ops.calls, ['verify', 'receipt:no_change']);
+describe('Bluesky stewardship preparation used by the CLI', () => {
+  it('verifies live state and emits no_change without publishing when no rows are missing', () => {
+    const ops = preparation({ capture: () => report(0) });
+    const result = runPreparation(ops);
+    assert.equal(result.phase, 'no_change');
+    assert.equal(ops.outputs.get('needs_deploy'), 'false');
+    assert.deepEqual(ops.calls, ['verify', 'persist:no_change']);
   });
 
-  it('does not push when repository checks fail', async () => {
-    const ops = operations({
-      runChecks: async () => { throw new Error('tests failed'); },
+  it('records a successful dry run without producing an ingestion receipt', () => {
+    const ops = preparation({ dryRun: true });
+    const prepared = runPreparation(ops);
+    const finalized = finalizePublication(prepared, {
+      deployOutcome: 'skipped', verifyOutcome: 'skipped',
+      runId: '123_1', checkedAt: NOW,
     });
-    await assert.rejects(runPublicationLifecycle(input(), ops), /tests failed/);
-    assert.equal(ops.calls.includes('push'), false);
-    assert.equal(ops.calls.at(-1), 'receipt:failed');
+    assert.equal(prepared.phase, 'dry_run');
+    assert.equal(ops.outputs.get('needs_deploy'), 'false');
+    assert.equal(finalized.status, 'dry_run');
+    assert.equal(finalized.receipt, null);
+    assert.deepEqual(ops.calls, ['verify', 'persist:dry_run']);
   });
 
-  it('does not push when origin/main moved after the tested checkout', async () => {
-    const ops = operations({ getRemoteHead: async () => '3'.repeat(40) });
-    await assert.rejects(runPublicationLifecycle(input(), ops), /origin\/main moved/);
-    assert.equal(ops.calls.includes('push'), false);
-    assert.equal(ops.calls.at(-1), 'receipt:failed');
-  });
-
-  it('emits a failed receipt when push succeeds but deployment fails', async () => {
-    const ops = operations({
-      deploy: async () => { throw new Error('transfer failed'); },
+  it('does not request deployment when changed-release checks fail', () => {
+    const ops = preparation({
+      publishChangedRelease: () => { throw new Error('tests failed'); },
     });
-    let error;
-    try {
-      await runPublicationLifecycle(input(), ops);
-    } catch (caught) {
-      error = caught;
-    }
-    assert.ok(error);
-    assert.equal(ops.calls.includes('push'), true);
-    assert.equal(error.receipt.status, 'failed');
-    assert.equal(error.receipt.errorClass, 'deploy_failed');
-    assert.equal(error.receipt.canonicalCommit, PUBLISHED);
-    assert.equal(ops.calls.at(-1), 'receipt:failed');
+    assert.throws(() => runPreparation(ops), /tests failed/);
+    assert.equal(ops.outputs.get('needs_deploy'), 'false');
+    assert.equal(ops.state.phase, 'failed');
+  });
+
+  it('retries an already-pushed main without appending or publishing canonical rows again', (t) => {
+    const directory = fs.mkdtempSync(path.join(process.env.TMPDIR || '/tmp', 'rosen-recovery-'));
+    t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+    const canonical = path.join(directory, 'social_posts.csv');
+    const before = 'id,url\nBSKY-00001,https://example.test/one\n';
+    fs.writeFileSync(canonical, before);
+    const ops = preparation({
+      capture: () => report(0),
+      verifyLive: () => { throw new Error('live bytes differ'); },
+      validateRecoveryRelease: () => {
+        validateRecoveryRelease(directory, ops.state, {
+          execute: (_root, command, args) => {
+            assert.deepEqual([command, ...args], ['npm', 'test']);
+            ops.calls.push('tests');
+          },
+          gitCommand: (_root, args) => {
+            if (args[0] === 'status') return '';
+            if (args[0] === 'fetch') {
+              ops.calls.push('fetch-main');
+              return '';
+            }
+            if (args[0] === 'rev-parse') return START;
+            throw new Error(`unexpected git command: ${args.join(' ')}`);
+          },
+        });
+      },
+    });
+    const prepared = runPreparation(ops);
+    assert.equal(prepared.phase, 'recovery_ready');
+    assert.equal(ops.outputs.get('needs_deploy'), 'true');
+    assert.equal(ops.calls.includes('publish'), false);
+    assert.equal(fs.readFileSync(canonical, 'utf8'), before);
+
+    const finalized = finalizePublication(prepared, {
+      deployOutcome: 'success', verifyOutcome: 'success',
+      runId: '123_2', checkedAt: NOW,
+    });
+    assert.equal(finalized.status, 'published');
+    assert.equal(finalized.receipt.canonicalCommit, START);
+    assert.deepEqual(finalized.receipt.records, []);
+  });
+
+  it('fails recovery without deployment when main moved after validation', () => {
+    const ops = preparation({
+      capture: () => report(0),
+      verifyLive: () => { throw new Error('live bytes differ'); },
+      validateRecoveryRelease: () => validateRecoveryRelease('/tmp', ops.state, {
+        execute: () => {},
+        gitCommand: (_root, args) => {
+          if (args[0] === 'status' || args[0] === 'fetch') return '';
+          if (args[0] === 'rev-parse') return '3'.repeat(40);
+          throw new Error(`unexpected git command: ${args.join(' ')}`);
+        },
+      }),
+    });
+    assert.throws(() => runPreparation(ops), /origin\/main moved/);
+    assert.equal(ops.state.errorClass, 'stale_remote_head');
+    assert.equal(ops.outputs.get('needs_deploy'), 'false');
+  });
+
+  it('emits a failed receipt when a pushed commit fails deployment', () => {
+    const pushed = { ...state(), phase: 'pushed', canonicalCommit: PUBLISHED, releaseVersion: '3.8.38' };
+    const result = finalizePublication(pushed, {
+      deployOutcome: 'failure', verifyOutcome: 'skipped',
+      runId: '123_3', checkedAt: NOW,
+    });
+    assert.equal(result.status, 'failed');
+    assert.equal(result.errorClass, 'deploy_failed');
+    assert.equal(result.receipt.canonicalCommit, PUBLISHED);
+    assert.deepEqual(result.receipt.records, []);
   });
 });
 
 describe('Bluesky stewardship receipt and workflow boundary', () => {
-  it('builds a bounded valid receipt without copying credentials or source payloads', () => {
+  it('retains every validated decision without copying credentials or source payloads', () => {
     const largeReport = report(503);
     largeReport.decisions[1].decision = 'context_only';
     const receipt = buildIngestionReceipt({
@@ -114,11 +184,34 @@ describe('Bluesky stewardship receipt and workflow boundary', () => {
       report: largeReport,
     });
     assert.equal(receipt.version, 1);
-    assert.equal(receipt.records.length, 500);
+    assert.equal(receipt.records.length, 503);
     assert.equal(receipt.records[0].decision, 'accepted');
     assert.equal(receipt.records[1].decision, 'rejected');
     assert.deepEqual(Object.keys(receipt.records[0]), ['uri', 'decision', 'recordId']);
     assert.doesNotMatch(JSON.stringify(receipt), /token|password|raw_text|snapshot/i);
+  });
+
+  it('rejects an oversized report instead of silently truncating its decisions', () => {
+    assert.throws(() => buildIngestionReceipt({
+      runId: '123_oversized', status: 'published', checkedAt: NOW,
+      canonicalCommit: PUBLISHED, releaseVersion: '3.8.38', report: report(1001),
+    }), /1000-record safety bound/);
+  });
+
+  it('rejects duplicate receipt URIs and record IDs', () => {
+    const duplicateUri = report(2);
+    duplicateUri.decisions[1].uri = duplicateUri.decisions[0].uri;
+    assert.throws(() => buildIngestionReceipt({
+      runId: '123_duplicate_uri', status: 'published', checkedAt: NOW,
+      canonicalCommit: PUBLISHED, releaseVersion: '3.8.38', report: duplicateUri,
+    }), /unique URIs and record IDs/);
+
+    const duplicateId = report(2);
+    duplicateId.decisions[1].record_id = duplicateId.decisions[0].record_id;
+    assert.throws(() => buildIngestionReceipt({
+      runId: '123_duplicate_id', status: 'published', checkedAt: NOW,
+      canonicalCommit: PUBLISHED, releaseVersion: '3.8.38', report: duplicateId,
+    }), /unique URIs and record IDs/);
   });
 
   it('removes record decisions from failed receipts', () => {
@@ -140,15 +233,40 @@ describe('Bluesky stewardship receipt and workflow boundary', () => {
     assert.match(publisher, /bluesky_batch_update\.py/);
     assert.match(workflow, /deploy_full_site\.py/);
     assert.match(workflow, /verify-live-deploy\.mjs/);
+    assert.equal((workflow.match(/git lfs pull/g) || []).length, 2);
+    assert.match(workflow, /steps\.prepare\.outputs\.needs_deploy == 'true'/);
     assert.equal((workflow.match(/ROSEN_SFTP_PASSWORD:/g) || []).length, 1);
     assert.equal((workflow.match(/ROSEN_INGESTION_RECEIPT_TOKEN:/g) || []).length, 1);
     assert.doesNotMatch(workflow, /git (?:push|pull).*--force|git rebase/);
     assert.doesNotMatch(workflow, /git add -A/);
+
+    const receiptBlock = workflow.slice(
+      workflow.indexOf('- name: Build final receipt'),
+      workflow.indexOf('- name: Send final receipt'),
+    );
+    const sendBlock = workflow.slice(
+      workflow.indexOf('- name: Send final receipt'),
+      workflow.indexOf('- name: Create or update failure issue'),
+    );
+    const issueBlock = workflow.slice(
+      workflow.indexOf('- name: Create or update failure issue'),
+      workflow.indexOf('- name: Write run summary'),
+    );
+    const summaryBlock = workflow.slice(
+      workflow.indexOf('- name: Write run summary'),
+      workflow.indexOf('- name: Fail unsuccessful publication'),
+    );
+    assert.doesNotMatch(receiptBlock, /RECEIPT_DELIVERY_OUTCOME/);
+    assert.match(sendBlock, /env\.DRY_RUN != 'true'/);
+    assert.match(issueBlock, /env\.DRY_RUN != 'true'/);
+    assert.match(summaryBlock, /RECEIPT_DELIVERY_OUTCOME: \$\{\{ steps\.send_receipt\.outcome \}\}/);
+    assert.match(workflow, /steps\.receipt\.outputs\.status != 'dry_run'/);
   });
 
   it('posts receipts only to the fixed endpoint and does not print the token', () => {
     const sender = fs.readFileSync(path.join(root, 'backend/scripts/post_ingestion_receipt.py'), 'utf8');
     assert.match(sender, /https:\/\/rosen-source-discovery\.jamditis\.workers\.dev\/ingestion-receipt/);
+    assert.match(sender, /https:\/\/rosen-source-discovery\.jamditis\.workers\.dev\/ingestion-candidates/);
     assert.match(sender, /headers=\{"Authorization": f"Bearer \{token\}"\}/);
     assert.match(sender, /MAX_RECORDS_PER_REQUEST = 40/);
     assert.match(sender, /allow_redirects=False/);

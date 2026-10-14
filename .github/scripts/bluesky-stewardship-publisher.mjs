@@ -15,7 +15,7 @@ const SEMVER = /^\d+\.\d+\.\d+$/;
 const RUN_ID = /^[A-Za-z0-9_-]{1,64}$/;
 const RECORD_ID = /^BSKY-\d{5,}$/;
 const JAY_POST_URI = /^at:\/\/did:plc:3t37x6vfigdzzp2gjcfnzlz4\/app\.bsky\.feed\.post\/[A-Za-z0-9._~:-]+$/;
-const MAX_RECEIPT_RECORDS = 500;
+const MAX_REPORT_RECORDS = 1_000;
 
 const RELEASE_DATA_PATHS = new Set([
   'data/archive-analytics.json',
@@ -86,6 +86,9 @@ function validateReport(report) {
     throw new Error('Bluesky batch report has invalid rows_appended count');
   }
   if (!Array.isArray(report.decisions)) throw new Error('Bluesky batch report has no decisions array');
+  if (report.decisions.length > MAX_REPORT_RECORDS) {
+    throw new Error(`Bluesky batch report exceeds the ${MAX_REPORT_RECORDS}-record safety bound`);
+  }
   if (report.decisions.length !== report.counts.captured) {
     throw new Error('Bluesky batch report decision rows do not match the captured count');
   }
@@ -111,16 +114,23 @@ export function buildIngestionReceipt({
   if (!SEMVER.test(releaseVersion)) throw new Error('receipt releaseVersion must be semver');
   if (errorClass && !ERROR_CLASS.test(errorClass)) throw new Error('receipt errorClass must be a safe slug');
 
-  const decisions = status === 'failed' ? [] : report.decisions.slice(0, MAX_RECEIPT_RECORDS);
+  const decisions = status === 'failed' ? [] : report.decisions;
   const records = decisions.map((decision) => ({
     uri: text(decision.uri),
     decision: decision.decision === 'admit' ? 'accepted' : 'rejected',
     recordId: text(decision.record_id),
   }));
+  const recordUris = new Set();
+  const recordIds = new Set();
   for (const record of records) {
     if (!JAY_POST_URI.test(record.uri) || !RECORD_ID.test(record.recordId)) {
       throw new Error('receipt record has an invalid Jay Bluesky URI or record ID');
     }
+    if (recordUris.has(record.uri) || recordIds.has(record.recordId)) {
+      throw new Error('receipt records must have unique URIs and record IDs');
+    }
+    recordUris.add(record.uri);
+    recordIds.add(record.recordId);
   }
 
   const receipt = {
@@ -138,66 +148,6 @@ export function buildIngestionReceipt({
   };
   if (errorClass) receipt.errorClass = errorClass;
   return receipt;
-}
-
-/** Testable publication contract used by the workflow's split prepare/deploy/finalize steps. */
-export async function runPublicationLifecycle(input, operations) {
-  let report;
-  let canonicalCommit = input.startCommit;
-  let releaseVersion = input.releaseVersion;
-  let errorClass;
-  let pushed = false;
-  try {
-    report = validateReport(await operations.capture());
-    if (input.dryRun || report.canonical.rows_appended === 0) {
-      await operations.verifyLive();
-      const receipt = buildIngestionReceipt({
-        ...input,
-        report,
-        canonicalCommit,
-        releaseVersion,
-        status: 'no_change',
-      });
-      await operations.sendReceipt(receipt);
-      return receipt;
-    }
-
-    const prepared = await operations.prepare(report);
-    canonicalCommit = prepared.canonicalCommit;
-    releaseVersion = prepared.releaseVersion;
-    await operations.runChecks();
-    const remoteHead = await operations.getRemoteHead();
-    if (remoteHead !== input.startCommit) {
-      errorClass = 'stale_remote_head';
-      throw new Error('origin/main moved after the tested checkout');
-    }
-    await operations.push();
-    pushed = true;
-    await operations.deploy();
-    await operations.verifyLive();
-    const receipt = buildIngestionReceipt({
-      ...input,
-      report,
-      canonicalCommit,
-      releaseVersion,
-      status: 'published',
-    });
-    await operations.sendReceipt(receipt);
-    return receipt;
-  } catch (error) {
-    report ??= input.emptyReport;
-    const receipt = buildIngestionReceipt({
-      ...input,
-      report,
-      canonicalCommit: pushed ? canonicalCommit : input.startCommit,
-      releaseVersion: pushed ? releaseVersion : input.releaseVersion,
-      status: 'failed',
-      errorClass: errorClass || text(error.errorClass) || (pushed ? 'deploy_failed' : 'publication_failed'),
-    });
-    await operations.sendReceipt(receipt);
-    error.receipt = receipt;
-    throw error;
-  }
 }
 
 function incrementPatch(version) {
@@ -220,8 +170,7 @@ function incrementDataCache(root) {
   );
   after = after.replace(
     /\/\/ v\d+:.*\n(?:\/\/ .*\n)?/,
-    `// ${next}: The automated Bluesky release adds records and links.\n`
-      + '// Invalidate older entity payloads when the release reaches returning readers.\n',
+    `// ${next}: Archive payload changes require fresh client-side data caches.\n`,
   );
   if (after === before) throw new Error('frontend data cache version marker was not found');
   version.cache_version = next;
@@ -291,7 +240,7 @@ function emptyReport(now) {
   return {
     schema_version: 1,
     captured_at: now,
-    newest_source_time: now,
+    newest_source_time: null,
     counts: { captured: 0, admitted: 0, context_only: 0 },
     canonical: { rows_appended: 0 },
     decisions: [],
@@ -312,117 +261,219 @@ function initialState(root) {
   };
 }
 
-function prepare(root) {
-  const paths = statePaths();
-  const state = fs.existsSync(paths.statePath) ? readJson(paths.statePath) : initialState(root);
+function emitPreparationOutputs(state, emit) {
+  emit('has_changes', state.phase === 'pushed' ? 'true' : 'false');
+  emit('needs_deploy', ['pushed', 'recovery_ready'].includes(state.phase) ? 'true' : 'false');
+  emit('mode', state.phase);
+  emit('canonical_commit', state.canonicalCommit);
+}
+
+/** The preparation state machine used directly by the CLI and its regression tests. */
+export function runPreparation({
+  dryRun,
+  state,
+  capture,
+  verifyLive,
+  publishChangedRelease,
+  validateRecoveryRelease,
+  persist,
+  emit = () => {},
+}) {
+  state.dryRun = dryRun;
   try {
-    if (git(root, ['status', '--porcelain'])) throw new Error('starting checkout is not clean');
-    fs.copyFileSync(path.join(root, 'data/archive-data.json'), paths.baselinePath);
-    const adapterArgs = [
-      'backend/scripts/bluesky_batch_update.py',
-      '--report', paths.reportPath,
-      '--snapshot-dir', paths.snapshotDir,
-    ];
-    const dryRun = process.env.DRY_RUN === 'true';
-    if (dryRun) adapterArgs.push('--dry-run');
-    run(root, 'python', adapterArgs);
-    const report = validateReport(readJson(paths.reportPath));
+    const report = validateReport(capture());
     state.report = report;
 
-    if (dryRun || report.canonical.rows_appended === 0) {
-      run(root, process.execPath, ['.github/scripts/verify-live-deploy.mjs']);
-      state.phase = 'no_change';
+    if (dryRun) {
+      verifyLive();
+      state.phase = 'dry_run';
       state.liveVerified = true;
-      writeJson(paths.statePath, state);
-      output('has_changes', 'false');
-      output('canonical_commit', state.canonicalCommit);
-      return;
+    } else if (report.canonical.rows_appended === 0) {
+      try {
+        verifyLive();
+        state.phase = 'no_change';
+        state.liveVerified = true;
+      } catch (liveError) {
+        validateRecoveryRelease(liveError);
+        state.phase = 'recovery_ready';
+        state.liveVerified = false;
+      }
+    } else {
+      const release = publishChangedRelease(report);
+      state.phase = 'pushed';
+      state.canonicalCommit = release.canonicalCommit;
+      state.releaseVersion = release.releaseVersion;
+      state.liveVerified = false;
     }
 
-    const asOf = safeIso(report.captured_at).slice(0, 10);
-    run(root, 'npm', ['run', 'refresh:social-release', '--', '--as-of', asOf]);
-    run(root, 'npm', ['run', 'build-social-embeddings', '--', '--incremental', '--previous-archive', paths.baselinePath]);
-
-    const currentVersion = readJson(path.join(root, 'version.json')).version;
-    const nextVersion = incrementPatch(currentVersion);
-    const stamped = applyVersion(root, {
-      argVersion: nextVersion,
-      verify: () => run(root, process.execPath, ['--test', 'tests/version-consistency.test.js']),
-    });
-    const browserPaths = [...stamped.changedFiles, ...incrementDataCache(root)];
-
-    run(root, 'npm', ['test']);
-    configureJoeIdentity(root);
-    stageReleaseCommit(root, browserPaths);
-
-    if (git(root, ['status', '--porcelain'])) throw new Error('release commit left uncommitted changes');
-    run(root, 'npm', ['run', 'census:stewardship']);
-    const censusPaths = ['data/stewardship-census.json', 'data/stewardship-census.md'];
-    const nonCensus = changedPaths(root).filter((file) => !censusPaths.includes(file));
-    if (nonCensus.length > 0) throw new Error(`census changed an unapproved path: ${nonCensus.join(', ')}`);
-    if (changedPaths(root).length > 0) {
-      run(root, 'git', ['add', '--', ...censusPaths]);
-      run(root, 'git', ['commit', '-m', 'docs: refresh stewardship census']);
-    }
-
-    run(root, 'npm', ['test']);
-    if (git(root, ['status', '--porcelain'])) throw new Error('final tested tree is not clean');
-    git(root, ['fetch', 'origin', 'main']);
-    const fetchedHead = git(root, ['rev-parse', 'origin/main']);
-    if (fetchedHead !== state.startCommit) {
-      const error = new Error('origin/main moved after the tested checkout');
-      error.errorClass = 'stale_remote_head';
-      throw error;
-    }
-    run(root, 'git', ['push', 'origin', 'HEAD:main']);
-    state.phase = 'pushed';
-    state.canonicalCommit = git(root, ['rev-parse', 'HEAD']);
-    state.releaseVersion = nextVersion;
     state.errorClass = null;
-    writeJson(paths.statePath, state);
-    output('has_changes', 'true');
-    output('canonical_commit', state.canonicalCommit);
+    persist(state);
+    emitPreparationOutputs(state, emit);
+    return state;
   } catch (error) {
-    state.phase = 'failed';
-    state.errorClass = text(error.errorClass) || 'prepare_failed';
-    writeJson(paths.statePath, state);
-    output('has_changes', 'false');
+    state.phase = dryRun ? 'dry_run_failed' : 'failed';
+    state.errorClass = text(error.errorClass) || (dryRun ? 'dry_run_failed' : 'prepare_failed');
+    persist(state);
+    emitPreparationOutputs(state, emit);
     throw error;
   }
 }
 
-function finalize(root) {
+function captureBatch(root, paths, dryRun) {
+  if (git(root, ['status', '--porcelain'])) throw new Error('starting checkout is not clean');
+  fs.copyFileSync(path.join(root, 'data/archive-data.json'), paths.baselinePath);
+  const adapterArgs = [
+    'backend/scripts/bluesky_batch_update.py',
+    '--report', paths.reportPath,
+    '--snapshot-dir', paths.snapshotDir,
+  ];
+  if (dryRun) adapterArgs.push('--dry-run');
+  run(root, 'python', adapterArgs);
+  return readJson(paths.reportPath);
+}
+
+function assertRemoteHeadUnchanged(root, startCommit, gitCommand = git) {
+  gitCommand(root, ['fetch', 'origin', 'main']);
+  if (gitCommand(root, ['rev-parse', 'origin/main']) !== startCommit) {
+    const error = new Error('origin/main moved after the tested checkout');
+    error.errorClass = 'stale_remote_head';
+    throw error;
+  }
+}
+
+export function validateRecoveryRelease(root, state, {
+  execute = run,
+  gitCommand = git,
+} = {}) {
+  if (gitCommand(root, ['status', '--porcelain'])) {
+    throw new Error('zero-row recovery checkout contains uncommitted changes');
+  }
+  execute(root, 'npm', ['test']);
+  if (gitCommand(root, ['status', '--porcelain'])) {
+    throw new Error('recovery tests changed the checkout');
+  }
+  assertRemoteHeadUnchanged(root, state.startCommit, gitCommand);
+}
+
+function publishChangedRelease(root, paths, state, report) {
+  const asOf = safeIso(report.captured_at).slice(0, 10);
+  run(root, 'npm', ['run', 'refresh:social-release', '--', '--as-of', asOf]);
+  run(root, 'npm', [
+    'run', 'build-social-embeddings', '--', '--incremental',
+    '--previous-archive', paths.baselinePath,
+  ]);
+
+  const currentVersion = readJson(path.join(root, 'version.json')).version;
+  const nextVersion = incrementPatch(currentVersion);
+  const stamped = applyVersion(root, {
+    argVersion: nextVersion,
+    verify: () => run(root, process.execPath, ['--test', 'tests/version-consistency.test.js']),
+  });
+  const browserPaths = [...stamped.changedFiles, ...incrementDataCache(root)];
+
+  run(root, 'npm', ['test']);
+  configureJoeIdentity(root);
+  stageReleaseCommit(root, browserPaths);
+
+  if (git(root, ['status', '--porcelain'])) throw new Error('release commit left uncommitted changes');
+  run(root, 'npm', ['run', 'census:stewardship']);
+  const censusPaths = ['data/stewardship-census.json', 'data/stewardship-census.md'];
+  const nonCensus = changedPaths(root).filter((file) => !censusPaths.includes(file));
+  if (nonCensus.length > 0) throw new Error(`census changed an unapproved path: ${nonCensus.join(', ')}`);
+  if (changedPaths(root).length > 0) {
+    run(root, 'git', ['add', '--', ...censusPaths]);
+    run(root, 'git', ['commit', '-m', 'docs: refresh stewardship census']);
+  }
+
+  run(root, 'npm', ['test']);
+  if (git(root, ['status', '--porcelain'])) throw new Error('final tested tree is not clean');
+  assertRemoteHeadUnchanged(root, state.startCommit);
+  run(root, 'git', ['push', 'origin', 'HEAD:main']);
+  return {
+    canonicalCommit: git(root, ['rev-parse', 'HEAD']),
+    releaseVersion: nextVersion,
+  };
+}
+
+function prepare(root) {
   const paths = statePaths();
   const state = fs.existsSync(paths.statePath) ? readJson(paths.statePath) : initialState(root);
-  const deployOutcome = text(process.env.DEPLOY_OUTCOME);
-  const verifyOutcome = text(process.env.VERIFY_OUTCOME);
+  const dryRun = process.env.DRY_RUN === 'true';
+  return runPreparation({
+    dryRun,
+    state,
+    capture: () => captureBatch(root, paths, dryRun),
+    verifyLive: () => run(root, process.execPath, ['.github/scripts/verify-live-deploy.mjs']),
+    publishChangedRelease: (report) => publishChangedRelease(root, paths, state, report),
+    validateRecoveryRelease: () => validateRecoveryRelease(root, state),
+    persist: (nextState) => writeJson(paths.statePath, nextState),
+    emit: output,
+  });
+}
+
+export function finalizePublication(state, {
+  deployOutcome,
+  verifyOutcome,
+  runId,
+  checkedAt,
+}) {
+  if (state.phase === 'dry_run' || state.phase === 'dry_run_failed') {
+    return {
+      status: state.phase,
+      errorClass: state.errorClass || null,
+      receipt: null,
+    };
+  }
+
   let status = 'failed';
   let errorClass = state.errorClass || 'workflow_failed';
 
   if (state.phase === 'no_change' && state.liveVerified) {
     status = 'no_change';
     errorClass = null;
-  } else if (state.phase === 'pushed' && deployOutcome === 'success' && verifyOutcome === 'success') {
+  } else if (
+    ['pushed', 'recovery_ready'].includes(state.phase)
+    && deployOutcome === 'success'
+    && verifyOutcome === 'success'
+  ) {
     status = 'published';
     errorClass = null;
-  } else if (state.phase === 'pushed') {
+  } else if (['pushed', 'recovery_ready'].includes(state.phase)) {
     errorClass = deployOutcome === 'success' ? 'live_verification_failed' : 'deploy_failed';
   }
 
   const receipt = buildIngestionReceipt({
-    runId: `${process.env.GITHUB_RUN_ID || 'local'}_${process.env.GITHUB_RUN_ATTEMPT || '1'}`,
+    runId,
     status,
-    checkedAt: new Date().toISOString(),
+    checkedAt,
     canonicalCommit: state.canonicalCommit,
     releaseVersion: state.releaseVersion,
     report: state.report,
     errorClass: errorClass || undefined,
   });
-  writeJson(paths.receiptPath, receipt);
-  output('status', receipt.status);
-  output('error_class', receipt.errorClass || '');
-  output('receipt_path', paths.receiptPath);
-  console.log(`Stewardship receipt ready: ${receipt.status} at ${receipt.canonicalCommit}.`);
+  return { status, errorClass, receipt };
+}
+
+function finalize(root) {
+  const paths = statePaths();
+  const state = fs.existsSync(paths.statePath) ? readJson(paths.statePath) : initialState(root);
+  const result = finalizePublication(state, {
+    deployOutcome: text(process.env.DEPLOY_OUTCOME),
+    verifyOutcome: text(process.env.VERIFY_OUTCOME),
+    runId: `${process.env.GITHUB_RUN_ID || 'local'}_${process.env.GITHUB_RUN_ATTEMPT || '1'}`,
+    checkedAt: new Date().toISOString(),
+  });
+  if (result.receipt) {
+    writeJson(paths.receiptPath, result.receipt);
+  } else if (fs.existsSync(paths.receiptPath)) {
+    fs.rmSync(paths.receiptPath);
+  }
+  output('status', result.status);
+  output('error_class', result.errorClass || '');
+  output('receipt_path', result.receipt ? paths.receiptPath : '');
+  console.log(result.receipt
+    ? `Stewardship receipt ready: ${result.status} at ${result.receipt.canonicalCommit}.`
+    : `Stewardship ${result.status}; no ingestion receipt will be sent.`);
 }
 
 function main() {
