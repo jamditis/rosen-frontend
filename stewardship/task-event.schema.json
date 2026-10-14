@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pressthink.org/j/rosen-archive/stewardship/task-event.schema.json",
+  "title": "Rosen stewardship task event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "vocabularyVersion",
+    "eventId",
+    "eventType",
+    "causalTaskKey",
+    "objectType",
+    "objectId",
+    "taskType",
+    "taskVersion",
+    "inputHash",
+    "actor",
+    "occurredAt",
+    "toolVersion"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "vocabularyVersion": {
+      "const": "1.0.0"
+    },
+    "eventId": {
+      "$ref": "#/$defs/eventId"
+    },
+    "eventType": {
+      "enum": [
+        "discovery",
+        "eligibility",
+        "lease",
+        "attempt",
+        "success",
+        "retry",
+        "block",
+        "review",
+        "rejection",
+        "supersession",
+        "cancellation"
+      ]
+    },
+    "causalTaskKey": {
+      "type": "string",
+      "pattern": "^urn:rosen-stewardship:task:[a-f0-9]{64}$"
+    },
+    "objectType": {
+      "$ref": "#/$defs/objectType"
+    },
+    "objectId": {
+      "$ref": "#/$defs/objectId"
+    },
+    "taskType": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@+/-]*$"
+    },
+    "taskVersion": {
+      "$ref": "#/$defs/version"
+    },
+    "inputHash": {
+      "$ref": "#/$defs/sha256"
+    },
+    "actor": {
+      "$ref": "#/$defs/actor"
+    },
+    "occurredAt": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "toolVersion": {
+      "$ref": "#/$defs/version"
+    },
+    "supersedesEventId": {
+      "$ref": "#/$defs/eventId"
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "objectType": { "const": "archive-record" },
+        "objectId": { "type": "string", "pattern": "^urn:rosen:object:archive-record:" }
+      }
+    },
+    {
+      "properties": {
+        "objectType": { "const": "social-post" },
+        "objectId": { "type": "string", "pattern": "^urn:rosen:object:social-post:" }
+      }
+    },
+    {
+      "properties": {
+        "objectType": { "const": "entity" },
+        "objectId": { "type": "string", "pattern": "^urn:rosen:object:entity:" }
+      }
+    },
+    {
+      "properties": {
+        "objectType": { "const": "relationship" },
+        "objectId": { "type": "string", "pattern": "^urn:rosen:object:relationship:" }
+      }
+    },
+    {
+      "properties": {
+        "objectType": { "const": "dataset" },
+        "objectId": { "type": "string", "pattern": "^urn:rosen:object:dataset:" }
+      }
+    },
+    {
+      "properties": {
+        "objectType": { "const": "source-file" },
+        "objectId": { "type": "string", "pattern": "^urn:rosen:object:source-file:" }
+      }
+    },
+    {
+      "properties": {
+        "objectType": { "const": "generated-artifact" },
+        "objectId": { "type": "string", "pattern": "^urn:rosen:object:generated-artifact:" }
+      }
+    },
+    {
+      "properties": {
+        "objectType": { "const": "feature-record" },
+        "objectId": { "type": "string", "pattern": "^urn:rosen:object:feature-record:" }
+      }
+    }
+  ],
+  "$defs": {
+    "eventId": {
+      "type": "string",
+      "pattern": "^urn:rosen-stewardship:task-event:[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "objectType": {
+      "enum": [
+        "archive-record",
+        "social-post",
+        "entity",
+        "relationship",
+        "dataset",
+        "source-file",
+        "generated-artifact",
+        "feature-record"
+      ]
+    },
+    "objectId": {
+      "type": "string",
+      "pattern": "^urn:rosen:object:(?:archive-record|social-post|entity|relationship|dataset|source-file|generated-artifact|feature-record):[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+:-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actorType", "actorId"],
+      "properties": {
+        "actorType": {
+          "enum": ["human", "automation"]
+        },
+        "actorId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@+-]*$"
+        }
+      }
+    }
+  }
+}

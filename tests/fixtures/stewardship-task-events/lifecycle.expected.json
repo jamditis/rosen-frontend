@@ -1,0 +1,19 @@
+{
+  "canonicalCausalTupleJson": "{\"inputHash\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"objectId\":\"urn:rosen:object:archive-record:RECORD-00884\",\"objectType\":\"archive-record\",\"taskType\":\"preservation-source-check\",\"taskVersion\":\"preservation-source-check@1.0.0\"}",
+  "causalTaskKey": "urn:rosen-stewardship:task:f1f0a06a6df198e96251ee07caff451c9b57775547a699f8e78b268fa478a56d",
+  "recordCount": 12,
+  "eventTypes": [
+    "discovery",
+    "eligibility",
+    "lease",
+    "attempt",
+    "success",
+    "retry",
+    "block",
+    "review",
+    "rejection",
+    "supersession",
+    "cancellation",
+    "supersession"
+  ]
+}

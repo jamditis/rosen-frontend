@@ -1,5 +1,8 @@
 # Stewardship proposal contract
 
+The separate [task-event stream contract](TASK_EVENTS.md) defines the offline,
+append-only scheduler history for issue #884.
+
 This directory defines the offline version 1 contract for issue #912. It does
 not change the closed preservation-manifest schema.
 
