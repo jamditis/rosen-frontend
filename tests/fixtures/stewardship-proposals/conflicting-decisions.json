@@ -1,0 +1,47 @@
+{
+  "proposals": [
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "proposalId": "urn:rosen-stewardship:proposal:conflict-1",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00003",
+      "objectClass": "archive-record",
+      "target": { "kind": "field", "key": "quote" },
+      "currentValue": "A quote",
+      "proposedValue": "A corrected quote",
+      "relevantInputHash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "evidenceRefs": ["urn:rosen:evidence:record-00003-source"],
+      "ruleVersion": "quote-review@1.0.0",
+      "generationVersion": "manual-proposal@1.0.0",
+      "reason": "Correct a transcription.",
+      "confidence": 0.9,
+      "severity": "high",
+      "riskClass": "semantic"
+    }
+  ],
+  "decisions": [
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "eventId": "urn:rosen-stewardship:decision-event:approve-conflict-1",
+      "proposalId": "urn:rosen-stewardship:proposal:conflict-1",
+      "operation": "approve",
+      "expectedRevision": 0,
+      "actor": { "actorType": "human", "actorId": "curator:one" },
+      "occurredAt": "2026-10-14T14:04:00.000Z",
+      "reason": "Approve the correction."
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "eventId": "urn:rosen-stewardship:decision-event:reject-conflict-1",
+      "proposalId": "urn:rosen-stewardship:proposal:conflict-1",
+      "operation": "reject",
+      "expectedRevision": 0,
+      "actor": { "actorType": "human", "actorId": "curator:two" },
+      "occurredAt": "2026-10-14T14:05:00.000Z",
+      "reason": "Reject the correction."
+    }
+  ],
+  "expectedError": "decisions[1]: expectedRevision 0 does not match current revision 1"
+}

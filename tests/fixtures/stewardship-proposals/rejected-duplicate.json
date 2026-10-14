@@ -1,0 +1,61 @@
+{
+  "proposals": [
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "proposalId": "urn:rosen-stewardship:proposal:rejected-original-1",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00004",
+      "objectClass": "archive-record",
+      "target": { "kind": "field", "key": "title" },
+      "currentValue": "Current title",
+      "proposedValue": "Unverified title",
+      "relevantInputHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "evidenceRefs": ["urn:rosen:evidence:record-00004-source"],
+      "ruleVersion": "title-suggestion@1.0.0",
+      "generationVersion": "generator@2.0.0",
+      "reason": "Suggest a shorter title.",
+      "confidence": 0.7,
+      "severity": "low",
+      "riskClass": "semantic"
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "proposalId": "urn:rosen-stewardship:proposal:rejected-duplicate-1",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00004",
+      "objectClass": "archive-record",
+      "target": { "kind": "field", "key": "title" },
+      "currentValue": "Current title",
+      "proposedValue": "Unverified title",
+      "relevantInputHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "evidenceRefs": ["urn:rosen:evidence:record-00004-source"],
+      "ruleVersion": "title-suggestion@1.0.0",
+      "generationVersion": "generator@2.0.0",
+      "reason": "The same suggestion recurred.",
+      "confidence": 0.99,
+      "severity": "critical",
+      "riskClass": "restricted",
+      "duplicateOfProposalId": "urn:rosen-stewardship:proposal:rejected-original-1"
+    }
+  ],
+  "decisions": [
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "eventId": "urn:rosen-stewardship:decision-event:reject-original-1",
+      "proposalId": "urn:rosen-stewardship:proposal:rejected-original-1",
+      "operation": "reject",
+      "expectedRevision": 0,
+      "actor": { "actorType": "human", "actorId": "curator:joe-amditis" },
+      "occurredAt": "2026-10-14T14:06:00.000Z",
+      "reason": "The evidence does not support the suggested title."
+    }
+  ],
+  "expected": {
+    "rejectedProposalIds": [
+      "urn:rosen-stewardship:proposal:rejected-duplicate-1",
+      "urn:rosen-stewardship:proposal:rejected-original-1"
+    ],
+    "suppressedByProposalId": "urn:rosen-stewardship:proposal:rejected-original-1"
+  }
+}

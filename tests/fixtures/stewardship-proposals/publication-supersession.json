@@ -1,0 +1,87 @@
+{
+  "proposals": [
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "proposalId": "urn:rosen-stewardship:proposal:published-original-1",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00006",
+      "objectClass": "archive-record",
+      "target": { "kind": "field", "key": "category" },
+      "currentValue": "Other",
+      "proposedValue": "Press criticism",
+      "relevantInputHash": "3333333333333333333333333333333333333333333333333333333333333333",
+      "evidenceRefs": ["urn:rosen:evidence:record-00006-source-v1"],
+      "ruleVersion": "category-rule@1.0.0",
+      "generationVersion": "generator@1.0.0",
+      "reason": "Classify the record from the available text.",
+      "confidence": 0.88,
+      "severity": "low",
+      "riskClass": "semantic"
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "proposalId": "urn:rosen-stewardship:proposal:published-successor-1",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00006",
+      "objectClass": "archive-record",
+      "target": { "kind": "field", "key": "category" },
+      "currentValue": "Press criticism",
+      "proposedValue": "Media criticism",
+      "relevantInputHash": "4444444444444444444444444444444444444444444444444444444444444444",
+      "evidenceRefs": ["urn:rosen:evidence:record-00006-source-v2"],
+      "ruleVersion": "category-rule@2.0.0",
+      "generationVersion": "generator@2.0.0",
+      "reason": "Apply the revised category vocabulary.",
+      "confidence": 0.9,
+      "severity": "low",
+      "riskClass": "semantic",
+      "supersedesProposalId": "urn:rosen-stewardship:proposal:published-original-1"
+    }
+  ],
+  "decisions": [
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "eventId": "urn:rosen-stewardship:decision-event:approve-published-original-1",
+      "proposalId": "urn:rosen-stewardship:proposal:published-original-1",
+      "operation": "approve",
+      "expectedRevision": 0,
+      "actor": { "actorType": "human", "actorId": "curator:joe-amditis" },
+      "occurredAt": "2026-10-14T14:10:00.000Z",
+      "reason": "Approve the first category.",
+      "publicationRefs": [
+        "https://github.com/jamditis/rosen-frontend/pull/900",
+        "urn:git:commit:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ]
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "eventId": "urn:rosen-stewardship:decision-event:supersede-published-original-1",
+      "proposalId": "urn:rosen-stewardship:proposal:published-original-1",
+      "operation": "supersede",
+      "expectedRevision": 1,
+      "actor": { "actorType": "human", "actorId": "curator:joe-amditis" },
+      "occurredAt": "2026-10-14T14:11:00.000Z",
+      "reason": "Keep the publication record while moving review to the successor.",
+      "successorProposalId": "urn:rosen-stewardship:proposal:published-successor-1"
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "eventId": "urn:rosen-stewardship:decision-event:approve-published-successor-1",
+      "proposalId": "urn:rosen-stewardship:proposal:published-successor-1",
+      "operation": "approve",
+      "expectedRevision": 0,
+      "actor": { "actorType": "human", "actorId": "curator:joe-amditis" },
+      "occurredAt": "2026-10-14T14:12:00.000Z",
+      "reason": "Approve the revised category."
+    }
+  ],
+  "expected": {
+    "originalPublicationRefs": [
+      "https://github.com/jamditis/rosen-frontend/pull/900",
+      "urn:git:commit:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  }
+}
