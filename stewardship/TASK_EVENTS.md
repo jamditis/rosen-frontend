@@ -32,8 +32,9 @@ ownership, retry timing, lifecycle transitions, or scheduling policy.
 The file contains exactly one UTF-8 JSON object per line and every record ends
 with LF, including the last record. The writer emits canonical JSON. The reader
 uses one-based `path:line` diagnostics, rejects malformed UTF-8 or JSON, rejects
-a final record without LF, and rejects duplicate event IDs across the full
-stream even when their bodies are identical.
+a UTF-8 byte-order mark at the start of any line, rejects a final record without
+LF, and rejects duplicate event IDs across the full stream even when their
+bodies are identical.
 
 `supersedesEventId` follows the append-only correction convention from issue
 #701. It must point to an earlier event of the same lifecycle type for the same
@@ -45,8 +46,12 @@ correction to an earlier event. Earlier bytes remain in the stream.
 
 `appendTaskEvent()` validates the existing stream and candidate before opening
 the file. It opens with append mode, loops until all record bytes are written,
-calls `fsync`, closes the descriptor, reopens the file, and validates the full
-stream. A failed pre-append validation leaves every existing byte unchanged.
+syncs and closes the file, reopens it, and validates the full stream. On Linux,
+the supported deployment platform, first creation also opens, syncs, and closes
+the parent directory before the function returns. Directory sync errors are not
+suppressed. Other platforms retain file sync and do not claim durable directory
+entry creation. A failed pre-append validation leaves every existing byte
+unchanged.
 
 This is an offline, single-writer contract. It does not promise safe concurrent
 append, compare-and-swap leases, or record-level recovery after a partial write.

@@ -7,6 +7,7 @@ import {
   readFileSync,
   writeSync
 } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { TextDecoder } from 'node:util';
 
 import { canonicalJson } from './proposal-contract.mjs';
@@ -253,7 +254,9 @@ export function parseTaskEventStream(value, { source = 'task-events.jsonl' } = {
     });
   }
 
-  const decoder = new TextDecoder('utf-8', { fatal: true });
+  // Keep a BOM in the decoded text so JSON.parse rejects it at the exact line.
+  // With ignoreBOM false (the default), each independent decode strips one.
+  const decoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
   const values = [];
   let start = 0;
   let line = 1;
@@ -286,13 +289,32 @@ export function readTaskEventStream(filePath) {
 }
 
 /**
- * Append one validated record, sync the file, close it, and validate a reopened
- * stream. Callers must provide single-writer access; this function does not
- * claim concurrent append or crash-atomic repair guarantees.
+ * Persist a newly created directory entry on the Linux deployment platform.
+ * Node does not offer one portable directory-sync contract, so other platforms
+ * retain file fsync only. Linux open/fsync/close failures propagate to callers.
+ */
+function syncCreatedFileDirectory(filePath) {
+  if (process.platform !== 'linux') return;
+
+  let descriptor;
+  try {
+    descriptor = openSync(dirname(resolve(String(filePath))), 'r');
+    fsyncSync(descriptor);
+  } finally {
+    if (descriptor !== undefined) closeSync(descriptor);
+  }
+}
+
+/**
+ * Append one validated record, sync the file, sync its parent directory when
+ * first created on Linux, close descriptors, and validate a reopened stream.
+ * Callers must provide single-writer access; this function does not claim
+ * concurrent append or crash-atomic repair guarantees.
  */
 export function appendTaskEvent(filePath, value) {
   const source = String(filePath);
-  const current = existsSync(filePath) ? readTaskEventStream(filePath) : Object.freeze([]);
+  const creating = !existsSync(filePath);
+  const current = creating ? Object.freeze([]) : readTaskEventStream(filePath);
   const next = validateTaskEventSequence([...current, value], { source });
   const encoded = Buffer.from(`${canonicalJson(next[next.length - 1])}\n`, 'utf8');
 
@@ -309,6 +331,7 @@ export function appendTaskEvent(filePath, value) {
   } finally {
     if (descriptor !== undefined) closeSync(descriptor);
   }
+  if (creating) syncCreatedFileDirectory(filePath);
 
   const reopened = readTaskEventStream(filePath);
   const appended = next[next.length - 1];

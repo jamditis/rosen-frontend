@@ -36,6 +36,7 @@ const schema = JSON.parse(
 const validateSchema = compileJsonSchema(schema, {
   source: 'stewardship/task-event.schema.json'
 });
+const UTF8_BOM = Buffer.from([0xef, 0xbb, 0xbf]);
 
 function temporaryDirectory(t) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'rosen-task-events-'));
@@ -43,7 +44,7 @@ function temporaryDirectory(t) {
   return directory;
 }
 
-function appendInFreshProcess(streamPath, eventPath) {
+function appendProcessArguments(streamPath, eventPath) {
   const moduleUrl = pathToFileURL(
     path.join(repoRoot, 'stewardship', 'task-event-stream.mjs')
   ).href;
@@ -53,9 +54,13 @@ function appendInFreshProcess(streamPath, eventPath) {
     "const event = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));",
     'appendTaskEvent(process.argv[2], event);'
   ].join('\n');
+  return ['--input-type=module', '--eval', script, eventPath, streamPath];
+}
+
+function appendInFreshProcess(streamPath, eventPath) {
   return spawnSync(
     process.execPath,
-    ['--input-type=module', '--eval', script, eventPath, streamPath],
+    appendProcessArguments(streamPath, eventPath),
     { encoding: 'utf8' }
   );
 }
@@ -198,20 +203,89 @@ describe('stewardship task event JSONL adapter', () => {
     );
   });
 
+  it('rejects literal UTF-8 BOM bytes on the first and later lines', () => {
+    const first = Buffer.from(encodeTaskEvent(lifecycle[0]), 'utf8');
+    const second = Buffer.from(encodeTaskEvent(lifecycle[1]), 'utf8');
+
+    assert.throws(
+      () => parseTaskEventStream(
+        Buffer.concat([UTF8_BOM, first]),
+        { source: '/tmp/first-bom.jsonl' }
+      ),
+      /\/tmp\/first-bom\.jsonl:1: invalid JSON:/
+    );
+    assert.throws(
+      () => parseTaskEventStream(
+        Buffer.concat([first, UTF8_BOM, second]),
+        { source: '/tmp/later-bom.jsonl' }
+      ),
+      /\/tmp\/later-bom\.jsonl:2: invalid JSON:/
+    );
+  });
+
   it('does not alter the last good bytes when an existing tail is invalid', (t) => {
     const directory = temporaryDirectory(t);
+    const first = Buffer.from(encodeTaskEvent(lifecycle[0]), 'utf8');
+    const second = Buffer.from(encodeTaskEvent(lifecycle[1]), 'utf8');
     const cases = new Map([
-      ['malformed.jsonl', `${encodeTaskEvent(lifecycle[0])}{"eventId":\n`],
-      ['truncated.jsonl', `${encodeTaskEvent(lifecycle[0])}${encodeTaskEvent(lifecycle[1]).slice(0, -1)}`]
+      ['malformed.jsonl', { line: 2, content: Buffer.concat([
+        first,
+        Buffer.from('{"eventId":\n', 'utf8')
+      ]) }],
+      ['truncated.jsonl', { line: 2, content: Buffer.concat([
+        first,
+        Buffer.from(encodeTaskEvent(lifecycle[1]).slice(0, -1), 'utf8')
+      ]) }],
+      ['first-bom.jsonl', { line: 1, content: Buffer.concat([UTF8_BOM, first]) }],
+      ['later-bom.jsonl', { line: 2, content: Buffer.concat([first, UTF8_BOM, second]) }]
     ]);
 
-    for (const [name, content] of cases) {
+    for (const [name, { line, content }] of cases) {
       const streamPath = path.join(directory, name);
       fs.writeFileSync(streamPath, content);
       const before = fs.readFileSync(streamPath);
-      assert.throws(() => appendTaskEvent(streamPath, lifecycle[2]), new RegExp(`${name}:2:`));
+      assert.throws(() => appendTaskEvent(streamPath, lifecycle[2]), new RegExp(`${name}:${line}:`));
       assert.deepEqual(fs.readFileSync(streamPath), before);
     }
+  });
+
+  it('syncs the new file and its parent directory before returning on Linux', (t) => {
+    if (process.platform !== 'linux') {
+      t.skip('directory-entry durability is implemented and asserted on Linux');
+      return;
+    }
+    const straceProbe = spawnSync('strace', ['--version'], { encoding: 'utf8' });
+    if (straceProbe.status !== 0) {
+      t.skip('strace is unavailable for the real-filesystem syscall assertion');
+      return;
+    }
+
+    const directory = temporaryDirectory(t);
+    const streamPath = path.join(directory, 'created-events.jsonl');
+    const eventPath = path.join(directory, 'event.json');
+    const tracePath = path.join(directory, 'append.trace');
+    fs.writeFileSync(eventPath, JSON.stringify(lifecycle[0]));
+
+    const tracedAppend = spawnSync('strace', [
+      '-qq',
+      '-f',
+      '-yy',
+      '-e',
+      'trace=fsync',
+      '-o',
+      tracePath,
+      process.execPath,
+      ...appendProcessArguments(streamPath, eventPath)
+    ], { encoding: 'utf8' });
+    assert.equal(tracedAppend.status, 0, tracedAppend.stderr);
+
+    const trace = fs.readFileSync(tracePath, 'utf8');
+    const fileSync = trace.indexOf(`<${streamPath}>`);
+    const directorySync = trace.indexOf(`<${directory}>`, fileSync + 1);
+    assert.notEqual(fileSync, -1, `missing file fsync in trace:\n${trace}`);
+    assert.notEqual(directorySync, -1, `missing parent-directory fsync in trace:\n${trace}`);
+    assert.ok(fileSync < directorySync, `parent directory synced before file contents:\n${trace}`);
+    assert.equal(readTaskEventStream(streamPath)[0].eventId, lifecycle[0].eventId);
   });
 
   it('appends, fsyncs, closes, and reopens across fresh processes', (t) => {
