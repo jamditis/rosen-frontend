@@ -15,6 +15,10 @@ on:
       - 'backend/**'
       - '.github/workflows/backend-tests.yml'
 
+concurrency:
+  group: backend-tests-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest

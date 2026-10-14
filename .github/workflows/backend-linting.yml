@@ -12,6 +12,10 @@ on:
       - 'backend/**'
       - '.github/workflows/backend-linting.yml'
 
+concurrency:
+  group: backend-linting-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     runs-on: ubuntu-latest
