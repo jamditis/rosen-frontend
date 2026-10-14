@@ -10,13 +10,9 @@
  */
 
 // Increment to invalidate all caches (e.g. after a breaking payload change).
-// v11: the 3.8.34 data release genuinely changed the archive payloads -- seven
-// duplicate records dropped (#867), RECORD-00918 added by the RECORD-00429
-// split (#863), and the duplicate PressThink entity merged into O0033 (#859).
-// A returning visitor holding a v10 payload would otherwise be served records
-// that no longer exist, and a stale entity graph, for up to CACHE_TTL_MS after
-// deploy.
-export const CACHE_VERSION = 'v11';
+// v12: the 3.8.37 Bluesky backfill adds records and record/entity links.
+// Invalidate older entity payloads when the release reaches returning readers.
+export const CACHE_VERSION = 'v12';
 
 // Entity data is small (~1MB), so a short TTL keeps it current cheaply.
 export const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes

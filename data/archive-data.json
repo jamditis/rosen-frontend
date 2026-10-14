@@ -1,7 +1,1311 @@
 {
   "version": "1.1.0",
-  "generated": "2026-08-27T18:36:20.956Z",
+  "generated": "2026-10-14T15:28:08.333Z",
   "records": [
+    {
+      "id": "BSKY-03434",
+      "title": "Margaret Sullivan grades midterm coverage",
+      "author": "Jay Rosen",
+      "date": "2026-10-14",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mxtriyyquk2o",
+      "summary": "Rosen recommends Margaret Sullivan's assessment of midterm press coverage, noting that she explicitly uses the frame of stakes rather than odds.",
+      "quote": "Margaret Sullivan @sulliview.bsky.social gives grades to the press for its midterms coverage. Her frame is \"not the odds but the stakes,\" and she says so.\n\nmargaretsullivan.substack.com/p/the-midter...",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Not the odds but the stakes",
+        "Election coverage"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "P0238",
+        "P0005"
+      ]
+    },
+    {
+      "id": "BSKY-03435",
+      "title": "Exposure and accountability as different political tasks",
+      "author": "Jay Rosen",
+      "date": "2026-10-14",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mxttuf5qps2x",
+      "summary": "Rosen connects his earlier thread about distinctions in media criticism with Brian Beutler's argument that exposure is not accountability.",
+      "quote": "I wrote a thread a while ago about key distinctions I use to do my work as a critic. For example: \"An audience is not a public.\" bsky.app/profile/jayr...\n\nHere's one from the political world. Brian Beutler,\n@brianbeutler.bsky.social \"Exposure Is Not Accountability.\" open.substack.com/pub/brianbeu...",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Exposure and accountability",
+        "Audience and public",
+        "Conceptual distinctions"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03433",
+      "title": "An emergency setting for Trump coverage",
+      "author": "Jay Rosen",
+      "date": "2026-10-13",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mxrotujt3s2t",
+      "summary": "Rosen revisits his March 2020 PressThink essay written in the voice of a newsroom editor explaining a different approach to Trump coverage.",
+      "quote": "I've tried lots of things, as have others.\n\nHere, PressThink assumes the voice of a newsroom editor explaining to readers why Trump had to be put into a different category (March, 2020)\n\npressthink.org/2020/03/toda...\n\n\"Today we are switching our coverage of Donald Trump to an emergency setting...\"",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Normalization",
+        "Trump coverage",
+        "Journalism reform"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "P0073",
+        "P0005"
+      ]
+    },
+    {
+      "id": "BSKY-03432",
+      "title": "Helping the web archive itself",
+      "author": "Jay Rosen",
+      "date": "2026-10-12",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mxotyhnjks23",
+      "summary": "Rosen shares Dave Winer's call to help the web preserve itself and links to Jay Rosen's Internet Archive as his own contribution.",
+      "quote": "\"The web as designed was very resilient, but it can’t survive deliberate attempt[s] to destroy,\" writes Dave Winer... \"We should help the web we loved so much, archive itself.\" scripting.com/2026/10/11.h...\n\nHere's my attempt to do that. pressthink.org/j/rosen-arch...",
+      "categories": [
+        "Technology & Digital Media",
+        "Audience & Public Engagement"
+      ],
+      "concepts": [
+        "Web preservation",
+        "Internet archives"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "P0290",
+        "P0005"
+      ]
+    },
+    {
+      "id": "BSKY-03431",
+      "title": "Ellison, Trump, and access for CNN",
+      "author": "Jay Rosen",
+      "date": "2026-10-10",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mxjzhao7cs2n",
+      "summary": "Rosen highlights David Ellison's stated support for restoring CNN's access to cover Trump and argues that this conflict should lead coverage of the new CNN.",
+      "quote": "“Do you stand with CNN and our effort to completely restore access to covering President Trump?”...\n\n“Of course,” Ellison replied. www.status.news/p/donald-tru...\n\nI have been waiting for this.\n\nEllison and Trump are on a collision course, and that is where news coverage of the new CNN should begin.",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Press access",
+        "Editorial independence"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "O0015",
+        "P0005"
+      ]
+    },
+    {
+      "id": "BSKY-03423",
+      "title": "Not the odds but the stakes in election coverage",
+      "author": "Jay Rosen",
+      "date": "2026-10-08",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mxdfh6paec2p",
+      "summary": "Rosen restates his proposed organizing principle for election coverage: Focus on consequences for American democracy rather than winning probabilities. He refers back to September 11, 2023.",
+      "quote": "Not the odds, but the stakes. \n\nThat's my shorthand for the organizing principle we most need in election coverage. Not who has what chances of winning, but the consequences for American democracy. Not the odds, but the stakes.\n\nSep. 11, 2023",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Not the odds but the stakes",
+        "Election coverage"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03429",
+      "title": "Where can readers find the citizens agenda itself?",
+      "author": "Jay Rosen",
+      "date": "2026-10-08",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mxes3td4oc25",
+      "summary": "After James Brooks describes an Alaska Beacon decision guided by a citizens agenda, Rosen asks where the site presents the agenda itself rather than commentary about it.",
+      "quote": "James is there is a place on your site where you actually present the citizens agenda itself, as against writing something about it?",
+      "categories": [
+        "Audience & Public Engagement",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Citizens agenda",
+        "Public engagement"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03422",
+      "title": "David Ellison's claims about truth, trust, and Trump",
+      "author": "Jay Rosen",
+      "date": "2026-10-07",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mxcboeto5c2n",
+      "summary": "Rosen highlights Status's questions at David Ellison's press conference and the tension between Ellison's appeal to truth and trust and his account of Trump's enthusiasm.",
+      "quote": "New boss David Ellison has a press conference.\n\n@status.news gets to ask some questions. www.status.news/p/david-elli... \n\nListen closely. It's like: \n\n\"We want to be in the truth business, and thereby the trust business, so... yeah. In our conversations president Trump has been enthusiastic.\"",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Editorial independence",
+        "Trust in journalism"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03420",
+      "title": "The argument is not that earlier criticism never existed",
+      "author": "Jay Rosen",
+      "date": "2026-10-05",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mx3mip5rps2r",
+      "summary": "Responding to a comment about earlier work by Ornstein and Mann, Rosen rejects the suggestion that the discussion claims these ideas had never been expressed before.",
+      "quote": "No one is saying that such ideas have never been thunk before. That's silly.",
+      "categories": [
+        "Press & Media Criticism",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Both-sides journalism",
+        "Journalism criticism"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03411",
+      "title": "A revised recommendation of Polarization Is Not the Problem",
+      "author": "Jay Rosen",
+      "date": "2026-10-04",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mx2rb6dck227",
+      "summary": "Rosen again recommends Lilliana Mason's argument about polarization and both-sides journalism and invites readers' reactions.",
+      "quote": "\"Polarization Is Not the Problem.\"\n\nThe paragraph below says more about \"both sides\" journalism than just about anything I have read.\n\nBy @lilymasonphd.bsky.social\n\nIt's starting to get attaction. So read the rest, and let me know what you think. muse.jhu.edu/pub/1/articl...",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Both-sides journalism",
+        "Polarization"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03414",
+      "title": "An earlier Bluesky example of the same journalism problem",
+      "author": "Jay Rosen",
+      "date": "2026-10-04",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mx2swo3bls2j",
+      "summary": "In the discussion of Polarization Is Not the Problem, Rosen links to a 2024 Bluesky post that presents part of his earlier formulation.",
+      "quote": "Yes. Here's how I put a piece of it in 2024 . bsky.app/profile/jayr...",
+      "categories": [
+        "Press & Media Criticism",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Both-sides journalism",
+        "Journalism criticism"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "THREAD-00019",
+      "title": "\"Polarization Is Not the Problem\"\n\nThis paragraph says more about \"both sides\" j...",
+      "author": "Jay Rosen",
+      "date": "2026-10-03",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mwya2dvsa22w",
+      "summary": "A 3-post Bluesky thread by Jay Rosen.",
+      "quote": "\"Polarization Is Not the Problem\"\n\nThis paragraph says more about \"both sides\" journalism than just about anything I have read. \n\nRead the rest here: muse.jhu.edu/pub/1/articl... \n\nBy  @lilymasonphd.b",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Both-sides journalism",
+        "Polarization"
+      ],
+      "tags": [],
+      "verified": true,
+      "type": "social",
+      "relatedIds": [],
+      "thread_data": {
+        "thread_id": "BSKY-03409",
+        "total_posts": 3,
+        "max_depth": 2,
+        "posts": [
+          {
+            "number": 1,
+            "id": "BSKY-03409",
+            "content": "\"Polarization Is Not the Problem\"\n\nThis paragraph says more about \"both sides\" journalism than just about anything I have read. \n\nRead the rest here: muse.jhu.edu/pub/1/articl... \n\nBy  @lilymasonphd.bsky.social via  @brizzyc.bsky.social",
+            "date": "2026-10-03 15:42:54",
+            "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mwya2dvsa22w",
+            "depth": 0,
+            "parent_id": null
+          },
+          {
+            "number": 2,
+            "id": "BSKY-03410",
+            "content": "It's the same problem that I tried to get at here.",
+            "date": "2026-10-03 16:24:40",
+            "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mwycezheo222",
+            "depth": 1,
+            "parent_id": "BSKY-03409"
+          },
+          {
+            "number": 3,
+            "id": "BSKY-03412",
+            "content": "Yesterday I slipped and published the wrong draft of my post about, \"Polarization Is Not the Problem.\" But I got lucky with the error, which made enough sense that no one noticed.\n\nToday I am publishing a better version of what I was think is an important piece by @lilymasonphd.bsky.social",
+            "date": "2026-10-04 16:15:14",
+            "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mx2sd2p62c27",
+            "depth": 2,
+            "parent_id": "BSKY-03410"
+          }
+        ]
+      }
+    },
+    {
+      "id": "BSKY-03408",
+      "title": "The Daily Beast's character-driven election coverage",
+      "author": "Jay Rosen",
+      "date": "2026-10-02",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mwvpc5qqts27",
+      "summary": "Rosen argues that the Daily Beast's character-driven approach offers an alternative to the view from nowhere, while making Trump its central character also brings costs.",
+      "quote": "The Daily Beast knows that it is \"character driven\" in its election coverage. That's an improvement over the view from nowhere. www.editorandpublisher.com/stories/the-... \n\nThat the biggest character will always be Trump is their \"view from somewhere,\" which is valid but costly too. \n\nMake sense?",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "View from nowhere",
+        "View from somewhere",
+        "Election coverage"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03405",
+      "title": "A PressThink example from before Trump",
+      "author": "Jay Rosen",
+      "date": "2026-09-30",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mwpdonfxt22v",
+      "summary": "In a discussion about journalism's deterioration before Trump, Rosen links to a December 2006 PressThink post as an earlier example moving in the same direction.",
+      "quote": "Here's something that moves in the same direction, ten years before Trump.\n\narchive.pressthink.org/2006/12/18/s...",
+      "categories": [
+        "Press & Media Criticism",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Journalism reform",
+        "PressThink"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03406",
+      "title": "An older PressThink post in a discussion of political advertising",
+      "author": "Jay Rosen",
+      "date": "2026-09-30",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mwpe2cw2mk2v",
+      "summary": "Replying in a discussion of television stations' obligations around Trump-related advertising, Rosen offers a November 2004 PressThink post while acknowledging that it does not answer the precise question.",
+      "quote": "Not what you're asking for but see if you follow ... archive.pressthink.org/2004/11/16/s...",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Political advertising",
+        "PressThink"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03399",
+      "title": "A reporter's account of Trump's lying",
+      "author": "Jay Rosen",
+      "date": "2026-09-29",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mwoxawgqxs2w",
+      "summary": "Rosen recommends a Canadian reporter's CNN account of studying Trump's rhetoric, public reactions to his lying, and the way it is covered.",
+      "quote": "Can't think of any reporter who speaks for me more than this guy— a Canadian.   \n\n\"Hundreds of hours immersed in Trump’s rhetoric has given me some insights and personal opinions about the nature of his lying, how it is received by the public and how it is covered...\" www.cnn.com/2026/09/27/p...",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Political lying",
+        "News coverage"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "O0015",
+        "P0005"
+      ]
+    },
+    {
+      "id": "BSKY-03396",
+      "title": "Why the press pool fights matter",
+      "author": "Jay Rosen",
+      "date": "2026-09-28",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mwlqhv6bvk2o",
+      "summary": "Rosen recommends a Washington Post column, shared by Brian Stelter, as an explanation of why disputes over press pool access matter.",
+      "quote": "Amid all the coverage of it, this Washinging Post column does the best — for me — in explaining why the Pool fights matter. Via @brianstelter.bsky.social \n\nSee the original: www.washingtonpost.com/style/2026/0...",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Press access",
+        "Press pool"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03395",
+      "title": "Send the interns and the press pool boycott",
+      "author": "Jay Rosen",
+      "date": "2026-09-27",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mwjfcscr5k2w",
+      "summary": "Quoting On the Media's question about why journalists took so long to reconsider their norms, Rosen points to his January 2017 PressThink essay Send the interns.",
+      "quote": "See my post called, \"Send the Interns,\" from January of 2017.  pressthink.org/2017/01/send...",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Press access",
+        "Journalistic norms"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03385",
+      "title": "The problem of an unbiased detector of newsroom bias",
+      "author": "Jay Rosen",
+      "date": "2026-09-22",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mw4rfbximk2y",
+      "summary": "Rosen questions the idea of an unbiased measure of newsroom bias in a Paramount agreement discussed by CNN.",
+      "quote": "Show me the unbiased detector of newsroom bias and I will give you a penny. www.cnn.com/newsletters/...\n\nThere's more crazy in this part of the Paramount agreement. Read on...",
+      "categories": [
+        "Press & Media Criticism",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Newsroom bias",
+        "Objectivity"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "O0015",
+        "P0005"
+      ]
+    },
+    {
+      "id": "BSKY-03386",
+      "title": "An unbiased hat does not settle judgments about commentators",
+      "author": "Jay Rosen",
+      "date": "2026-09-22",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mw4sk4ggmk27",
+      "summary": "Replying to Alex's suggested list of commentators in the discussion of newsroom bias, Rosen uses irony to show how an assertion of impartiality does not settle the underlying judgment.",
+      "quote": "No. Alex. E cannot be grouped with Y. You know how I know? I put on my unbiased hat. See how that works",
+      "categories": [
+        "Press & Media Criticism",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Newsroom bias",
+        "Objectivity"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03388",
+      "title": "Josh Marshall on platform audiences",
+      "author": "Jay Rosen",
+      "date": "2026-09-22",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mw5bvzhlvs27",
+      "summary": "Rosen shares Josh Marshall's distinction between Bluesky users' expectations and the belief among some X users that they encounter a representative population. Rosen corrects Marshall's name in a later post.",
+      "quote": "\"No one on Bluesky thinks they're interacting with a cross section of the population. But a lot of people on X do think that.\"  —Josh Harshall\n\ntalkingpointsmemo.com/edblog/we-di...",
+      "categories": [
+        "Technology & Digital Media",
+        "Audience & Public Engagement"
+      ],
+      "concepts": [
+        "Platform audiences",
+        "Representativeness"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03391",
+      "title": "Correcting Josh Marshall's name",
+      "author": "Jay Rosen",
+      "date": "2026-09-22",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mw5dxrsdqs26",
+      "summary": "Quoting his earlier post about platform audiences, Rosen corrects the attribution from the misspelled name in that post to Josh Marshall.",
+      "quote": "People, I can't accept that I misspelled his name first time around. It should read: \n\n\"No one on Bluesky thinks they're interacting with a cross section of the population. But a lot of people on X do think that.\"  —Josh Marshall\"\n\nsorry @joshtpm.bsky.social",
+      "categories": [
+        "Technology & Digital Media",
+        "Audience & Public Engagement"
+      ],
+      "concepts": [
+        "Corrections",
+        "Platform audiences"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03380",
+      "title": "A press pool without shared presidential video",
+      "author": "Jay Rosen",
+      "date": "2026-09-21",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mw25fgmw3c23",
+      "summary": "Rosen shares Brian Stelter's account of a presidential appearance without a television camera supplying footage to the wider press corps.",
+      "quote": "“When the president does anything today, there will be no TV camera with the president that is broadcasting and sharing this footage” with the wider press corps and networks around the world.\"\n\nStelter:\n\n\"Last I checked, this president likes to be on camera.\"\n\nwww.cnn.com/newsletters/...",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Press access",
+        "Press pool"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "O0015",
+        "P0005"
+      ]
+    },
+    {
+      "id": "BSKY-03381",
+      "title": "Revisiting Send the interns",
+      "author": "Jay Rosen",
+      "date": "2026-09-21",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mw27kc6atk23",
+      "summary": "Rosen recommends his PressThink essay Send the interns, published on the second day of the first Trump White House.",
+      "quote": "If you have not read it, it's a fine day for \"Send the interns.\"\n\npressthink.org/2017/01/send...\n\nPublished on the second day of the first Trump White House.",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Press access",
+        "Journalistic norms"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03378",
+      "title": "The propaganda risks of a media merger",
+      "author": "Jay Rosen",
+      "date": "2026-09-20",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mvxpj67vac2y",
+      "summary": "Rosen shares an argument that combining entertainment and news in a large propaganda structure could make it especially effective.",
+      "quote": "\"I have studied propaganda for decades, including authoring a book on Italian Fascist propaganda cinema, and I can tell you that a merger that would create a propaganda megastructure encompassing entertainment content and news would be devastatingly effective...\" substack.com/inbox/post/2...",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Propaganda",
+        "Media consolidation"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03373",
+      "title": "News marketing and the promise of insider access",
+      "author": "Jay Rosen",
+      "date": "2026-09-19",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mvve6hphnc23",
+      "summary": "In the opening post of a two-part argument, Rosen questions news subscription imagery that promises readers greater access to an inner circle.",
+      "quote": "I have been looking at the imagery here. There's a tell.\n\nIt's not the paywall, almost everyone has a paywall. Every newsroom boasts of their \"exclusives\"— exclusive or not. Different levels of pay-dom are common too.\n\n\"Even more inside.\" Hmm. That's supposed to be funny, I think. But is it?\n\n1 of 2",
+      "categories": [
+        "Press & Media Criticism",
+        "Audience & Public Engagement"
+      ],
+      "concepts": [
+        "Insider journalism",
+        "News subscriptions"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03374",
+      "title": "Two meanings of journalism's inner circle",
+      "author": "Jay Rosen",
+      "date": "2026-09-19",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mvve6lehrs23",
+      "summary": "Continuing his post about news subscription imagery, Rosen distinguishes reporting that makes readers feel present from a paid promise of knowledge withheld from others.",
+      "quote": "\"Join us in the inner circle\" is read in two ways.\n\nOne is \"reporting so good it feels like you're there, in person.\" Exciting! And worth the money, right?\n\n\"Join the inner circle\" also says: \"You have the money. Now you get to know things unavailable to others.\" Awesome, right?\n\nThat's the tell.",
+      "categories": [
+        "Press & Media Criticism",
+        "Audience & Public Engagement"
+      ],
+      "concepts": [
+        "Insider journalism",
+        "News subscriptions"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03375",
+      "title": "Commercialization, gatekeepers, and internet distribution",
+      "author": "Jay Rosen",
+      "date": "2026-09-19",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mvvkvfpqp22p",
+      "summary": "Asked whether insider journalism began with Evans and Novak, Rosen describes a longer commercialization process. He argues that media companies' control of distribution changed when the internet offered different terms.",
+      "quote": "It's been a gradual commercialization since the 1960s. The media became widely profitable and influential, in large part because the media companies could control distribution. That's why we called them gate keepers— for a while. Then the internet solved the distribution part on differerent terms.",
+      "categories": [
+        "Press & Media Criticism",
+        "Technology & Digital Media"
+      ],
+      "concepts": [
+        "Gatekeeping",
+        "Media commercialization",
+        "Distribution"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03371",
+      "title": "Which newsrooms make up the national mainstream press?",
+      "author": "Jay Rosen",
+      "date": "2026-09-18",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mvtaf7b3ck23",
+      "summary": "Rosen revisits his 2016 PressThink essay on party asymmetry and notes that its definition of the national mainstream press would differ today.",
+      "quote": "Ten years ago, in my PressThink post, \"Asymmetry between the major parties fries the circuits of the mainstream press\" pressthink.org/2016/09/asym... I tried to say who the \"mainstream\" press is— at the national level, I meant. Which newsrooms make it up.\n\nWouldn't be the same today. Obviously.",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Asymmetry",
+        "Mainstream press"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03367",
+      "title": "A community's bond with the Lexington Herald-Leader",
+      "author": "Jay Rosen",
+      "date": "2026-09-17",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mvokupf44k2s",
+      "summary": "Rosen recommends a city council member's speech after newsroom cuts at the Lexington Herald-Leader as evidence of a newspaper's community bond and independence.",
+      "quote": "Startling speech by a city council member after newsroom cuts at the Lexington, KY Herald Leader.\n\nUrge you to watch, listen and learn of the bond that a good newspaper can create without losing its independence.\n\nOwner: Hedge fund Chatham Asset Management\n \nkiesow.net/how-to-talk-... via kiesow.net",
+      "categories": [
+        "Press & Media Criticism",
+        "Audience & Public Engagement"
+      ],
+      "concepts": [
+        "Local journalism",
+        "Newsroom cuts",
+        "Editorial independence"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03366",
+      "title": "The 60 Minutes premiere and its audience decline",
+      "author": "Jay Rosen",
+      "date": "2026-09-16",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mvm5mtsw4c2f",
+      "summary": "Rosen shares Status's comparison of the 60 Minutes premiere audience with the previous year and points to an accompanying view of the decline.",
+      "quote": "From @status.news: 60 Minutes debut episode drew 7.94 million viewers, 1.58 million of which were in the advertiser-coveted 25-54 year old demographic. Overall, viewership was down 21% compared to last year's premiere, which averaged 10.03 million viewers.\n\nI think this is the right view to take:",
+      "categories": [
+        "Press & Media Criticism",
+        "Audience & Public Engagement"
+      ],
+      "concepts": [
+        "Television news",
+        "Audience measurement"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03364",
+      "title": "Margaret Sullivan on midterm stakes",
+      "author": "Jay Rosen",
+      "date": "2026-09-15",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mvl35q7bgc2n",
+      "summary": "Rosen shares Margaret Sullivan's plan to track midterm coverage with greater attention to consequences and less attention to winning probabilities.",
+      "quote": "From Margaret Sullivan. @sulliview.bsky.social \n\n\"I’ll be pressing hard here for more on the stakes and less on the odds, and keeping track of how these extremely consequential midterms are being covered.\"\n\nmargaretsullivan.substack.com/p/the-truth-... \n\nSee also: www.cnn.com/2021/12/12/m...",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Not the odds but the stakes",
+        "Election coverage"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "O0015",
+        "P0005",
+        "P0238"
+      ]
+    },
+    {
+      "id": "BSKY-03362",
+      "title": "Brian Williams on normalization in news coverage",
+      "author": "Jay Rosen",
+      "date": "2026-09-14",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mvio3mh4ys2l",
+      "summary": "Rosen shares a video in which Brian Williams responds to a question about extremism reaching public life. Rosen highlights Williams's observation about normalization.",
+      "quote": "At 7:33 on this clip Brian Williams is asked if the mainstream press have acknowledged well enough the darkness that has spread from extremists to the public square (my paraphrase). \n\nHis reply: \"Nope. I think there's a wave of normalization going on.\"\n\nwww.youtube.com/watch?v=2YJc...",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Normalization",
+        "Extremism"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "P1880",
+        "P0005"
+      ]
+    },
+    {
+      "id": "BSKY-03360",
+      "title": "A reader points Rosen to Question Everything",
+      "author": "Jay Rosen",
+      "date": "2026-09-11",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mvb4sn7los2y",
+      "summary": "After a reader recommends KCRW's interview with Barton Gellman, Rosen praises The Journalist and the Firefighter and its follow-up as a rethinking of journalism he had hoped to hear.",
+      "quote": "Cannot believe I missed \"The Journalist and the Firefighter\" and the follow up when they came out. www.kcrw.com/shows/questi... \n\nBravo to the staff at @kcrw.com's Question Everything and of course to @bartongellman.bsky.social \n\nIt's the rethink in journalism I've waited for.\n\n@thimbles.bsky.social",
+      "categories": [
+        "Press & Media Criticism",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Journalistic norms",
+        "Journalism reform"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "O0780",
+        "P0005"
+      ]
+    },
+    {
+      "id": "BSKY-03361",
+      "title": "Question Everything and a rethink of journalism",
+      "author": "Jay Rosen",
+      "date": "2026-09-11",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mvb5mggxt226",
+      "summary": "Rosen recommends KCRW's The Journalist and the Firefighter and its follow-up, praising the staff of Question Everything and Barton Gellman.",
+      "quote": "My alert system failed! Cannot believe I missed \"The Journalist and the Firefighter\" and the follow up when they came out. www.kcrw.com/shows/questi...\n\nBravo to the staff at @kcrw.com's Question Everything and of course to @bartongellman.bsky.social\n\nThe rethink in journalism that I've waited for.",
+      "categories": [
+        "Press & Media Criticism",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Journalistic norms",
+        "Journalism reform"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "O0780",
+        "P0005"
+      ]
+    },
+    {
+      "id": "BSKY-03358",
+      "title": "60 Minutes and the Washington Post",
+      "author": "Jay Rosen",
+      "date": "2026-09-09",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mv3ww4lalk24",
+      "summary": "Rosen shares the Guardian's report on a former 60 Minutes editor's account of the program's destruction. He compares it with the Washington Post while distinguishing their prior business conditions.",
+      "quote": "From the Guardian: \n\nEx-60 Minutes managing editor says fired staffers ‘refused to be accomplices’ in show’s ‘destruction’\n\nwww.theguardian.com/media/2026/s...\n\n\"Destruction\" is the interesting part. Sort of like the Washington Post, but the Post was struggling in some ways. 60 Minutes was not.",
+      "categories": [
+        "Press & Media Criticism"
+      ],
+      "concepts": [
+        "Newsroom management",
+        "Editorial independence"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03355",
+      "title": "The media frenzy around Hasan Piker",
+      "author": "Jay Rosen",
+      "date": "2026-09-07",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3muva5c7jbk2b",
+      "summary": "Rosen points readers to Status, where he contributed a comment about the media attention surrounding Hasan Piker.",
+      "quote": "At @status.news this weekend I got a word in about the \"media frenzy\" surrounding Hasan Piker. www.status.news/p/hasan-pike...",
+      "categories": [
+        "Press & Media Criticism"
+      ],
+      "concepts": [
+        "Media criticism",
+        "News attention"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03350",
+      "title": "Bangor Daily News states what its journalism stands for",
+      "author": "Jay Rosen",
+      "date": "2026-09-03",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mumtbz2ayk23",
+      "summary": "Rosen returns to the Bangor Daily News values statement and highlights its refusal to be impartial about harms such as corruption, racism, and government incompetence.",
+      "quote": "When a newroom says it will drop the view from nowhere and find an alternative, I lean in.\n\nBangor Daily News: \"What BDN journalism stands for.\"\nwww.bangordailynews.com/values/\n\n\"We are not impartial about murder, corruption, domestic violence, racism, misogyny, government waste, incompetence...\"",
+      "categories": [
+        "Press & Media Criticism",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "View from nowhere",
+        "Journalistic values"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03352",
+      "title": "Truth Social mentions as unpaid promotion",
+      "author": "Jay Rosen",
+      "date": "2026-09-03",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mumwnqgbcc2e",
+      "summary": "Rosen shares an Editor and Publisher argument that news stories leading with Trump's Truth Social posts also promote a company controlled by their subject.",
+      "quote": "\"The press shouldn’t be Trump Media’s unpaid sales force.\"\n\nwww.editorandpublisher.com/stories/the-...   \n\n\"Every story that opens 'the president wrote on Truth Social...' delivers an unpaid brand impression for a Nasdaq-listed company whose controlling shareholder is the subject\nof the story.\"",
+      "categories": [
+        "Press & Media Criticism",
+        "Technology & Digital Media"
+      ],
+      "concepts": [
+        "Platform power",
+        "News framing"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03353",
+      "title": "How far Bangor Daily News moves beyond impartiality",
+      "author": "Jay Rosen",
+      "date": "2026-09-03",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mun5dezpt22r",
+      "summary": "Responding to criticism that the Bangor Daily News values statement is too vague, Rosen says it makes progress in some areas while remaining limited in others.",
+      "quote": "In some ways they are getting there. In many other ways not. \n\n\"We are not impartial about murder, corruption, domestic violence, racism, misogyny, government waste, incompetence, hypocrisy, crumbling infrastructure, chronic crises... we will not elevate ideas founded on misinformation or hate.\"",
+      "categories": [
+        "Press & Media Criticism",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "View from nowhere",
+        "Journalistic values"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03354",
+      "title": "The pull of journalism's industry consensus",
+      "author": "Jay Rosen",
+      "date": "2026-09-03",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mungmnhvz22m",
+      "summary": "In the discussion of the Bangor Daily News values statement, Rosen explains its limits as a desire to remain within the industry's consensus.",
+      "quote": "It wants to stay within industry consensus... is the way I would put it.",
+      "categories": [
+        "Press & Media Criticism",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Industry consensus",
+        "View from nowhere"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03346",
+      "title": "Bangor Daily News and the view from nowhere",
+      "author": "Jay Rosen",
+      "date": "2026-09-02",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mukygfarxc2f",
+      "summary": "Rosen highlights the Bangor Daily News statement of journalistic values as an attempt to find an alternative to the view from nowhere.",
+      "quote": "I aways look closer when a newroom says it will drop the view from nowhere and find an alternative.\n\nBangor Daily News: \"What BDN journalism stands for.\"\nwww.bangordailynews.com/values/",
+      "categories": [
+        "Press & Media Criticism",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "View from nowhere",
+        "Journalistic values"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03344",
+      "title": "Reporting on the OpenAI and Hugging Face incident",
+      "author": "Jay Rosen",
+      "date": "2026-09-01",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3muhw545o6c2a",
+      "summary": "Rosen shares accounts from Dwarkesh Patel and Platformer about OpenAI and Hugging Face, describing the reporting as startling and accessible.",
+      "quote": "Incredible. \n\nThe whole OpenAI/Hugging Face story in plain English\n\nwww.dwarkesh.com/p/openai-hug...\n\nThe Hugging Face attack was worse than we thought\n\nwww.platformer.news/openai-huggi...\n \nI try to save \"holy shit\" moments for when you really need them.\n\n\"This is not new Jay\" will be discarded.",
+      "categories": [
+        "Technology & Digital Media"
+      ],
+      "concepts": [
+        "Artificial intelligence",
+        "Technology reporting"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03343",
+      "title": "Opinion writers, audiences, and newsroom managers",
+      "author": "Jay Rosen",
+      "date": "2026-08-30",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3muctmvtwj22p",
+      "summary": "Rosen argues that opinion writers with their own brands and audiences limit managers' power. He recommends Eric Deggans's account of why Karen Attiah's victory matters.",
+      "quote": "Opinion writers stuck dealing with clueless managers often have their own brands and their own audience.\n\nThe managers have to realize they aren't the gods they once thought themselves to be. \n\n@edeggans.bsky.social on Why Karen Attiah’s victory matters. ericdeggans.substack.com/p/why-karen-...",
+      "categories": [
+        "Press & Media Criticism",
+        "Audience & Public Engagement"
+      ],
+      "concepts": [
+        "Editorial independence",
+        "Audience relationships"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03341",
+      "title": "A reader's comparison with George Lakoff",
+      "author": "Jay Rosen",
+      "date": "2026-08-28",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mu45rrmmm22q",
+      "summary": "A reader compares Rosen's approach to election stakes with George Lakoff's moral framing. Rosen replies that he has not met Lakoff but sees similarities in their approaches.",
+      "quote": "I haven't met George Lakoff, but we operate in some similar ways.",
+      "categories": [
+        "Journalism Theory & Practice",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Framing",
+        "Not the odds but the stakes"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "P0170",
+        "P0005"
+      ]
+    },
+    {
+      "id": "BSKY-03338",
+      "title": "A media studies doctorate and a journalism teaching career",
+      "author": "Jay Rosen",
+      "date": "2026-08-27",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mu3ccpg7fs2j",
+      "summary": "Replying to a reader who connected his media criticism with political analysis, Rosen explains that his media studies doctorate and journalism work could coexist in NYU's Arts and Sciences program.",
+      "quote": "Thanks, Natalie. 😎 \n\nI was fortunate in my academic career in that my degree is a PhD in media studies/communications, while my job was studying the press and producing better journalists. The NYU program in journalism allows for that. It was and still is lodged in the school of Arts and Sciences.",
+      "categories": [
+        "Journalism Education",
+        "Journalism Theory & Practice"
+      ],
+      "concepts": [
+        "Media studies",
+        "Journalism education"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03339",
+      "title": "Two weeks of reading for a journalism course",
+      "author": "Jay Rosen",
+      "date": "2026-08-27",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mu3juxw4zk23",
+      "summary": "Rosen proposes beginning a journalism course with Tom Rosenstiel and The Elements of Journalism, followed by The Next Journalism: How the Press Must Change to Serve Democracy.",
+      "quote": "Were I still teaching, I would assign for week one Tom Rosenstiel, co-author of the most commonly used text, \"The Elements of Journalism.\"\n\nFor week two, we read \"The Next Journalism: How the Press Must Change to Serve Democracy.\"\n\nwww.cjr.org/analysis/sho...\n\nBy week three we're in the thick of it.",
+      "categories": [
+        "Journalism Education",
+        "Journalism Theory & Practice",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Journalism education",
+        "Journalism and democracy"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": [
+        "P0347",
+        "P0005"
+      ]
+    },
+    {
+      "id": "BSKY-03336",
+      "title": "Election coverage: The stakes beyond the polls",
+      "author": "Jay Rosen",
+      "date": "2026-08-26",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mtymkmy7pk2b",
+      "summary": "Rosen points to Mike Podhorzer's midterm overview as an example of election coverage organized around consequences rather than winning probabilities.",
+      "quote": "This from @mikepod.bsky.social's Midterm Overview is a good example of why I say: \"Not the odds but the stakes.\" www.weekendreading.net/p/poll-washi...",
+      "categories": [
+        "Press & Media Criticism",
+        "Politics & Democracy"
+      ],
+      "concepts": [
+        "Not the odds but the stakes",
+        "Election coverage"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
+    {
+      "id": "BSKY-03337",
+      "title": "Karen Attiah's account of the Washington Post",
+      "author": "Jay Rosen",
+      "date": "2026-08-26",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mtyntlbg3k2b",
+      "summary": "Rosen recommends Karen Attiah's Columbia Journalism Review interview and calls her account damaging to the Washington Post.",
+      "quote": "The words of @karenattiah.bsky.social are just devastating for the Washington Post.\n\nRead the whole thing. www.cjr.org/the-intervie...",
+      "categories": [
+        "Press & Media Criticism"
+      ],
+      "concepts": [
+        "Newsroom management",
+        "Editorial independence"
+      ],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
     {
       "id": "BSKY-03334",
       "title": "A private arbitrator has ordered The Washington Post to rehire @karenattiah...",
@@ -797710,6 +799014,7 @@
     "60 Minutes Ii",
     "60 Minutes Killian memos report",
     "60 Minutes Wednesday",
+    "60 Minutes and the Washington Post",
     "60 Minutes interview",
     "60 Minutes: Wednesday",
     "60 minutes is regularly at the top of the ratings for all news programming",
@@ -798103,6 +799408,7 @@
     "A Politico for tech is coming",
     "A Politics that is Dumber Than Spam",
     "A Politics that is Dumber than Spam",
+    "A PressThink example from before Trump",
     "A Prime Time News Conference Before a Special Interest: Make Sense to You?",
     "A Public Editor for an Internet Public",
     "A Pulitzer Prize-winning chronicler of the COVID pandemic reflects on the...",
@@ -798139,6 +799445,7 @@
     "A common Twitter exchange",
     "A common denominator here is \"low information journalists,\" who just don't know...",
     "A common fallacy among media executives who chart a \"safety first\" course is...",
+    "A community's bond with the Lexington Herald-Leader",
     "A compelling description of a cycle that is unbuilding the polity before our...",
     "A complete wipe out for just now on with She rolled over him and sailed through...",
     "A consensus has gelled in Congress that local news outlets need Federal help",
@@ -798243,6 +799550,7 @@
     "A majority of the quote tweets said blockchain is actually very simple, or...",
     "A media critic urged 'not the odds, but the stakes.' Did it work?",
     "A media critic who defended Fox on free press grounds when the Obama...",
+    "A media studies doctorate and a journalism teaching career",
     "A meeting at which I wish I was",
     "A mentor of mine taught me to say in this situation: in what spirit do you ask...",
     "A mischievous reporter could ask Mitt Romney if he's following the news out of...",
@@ -798286,6 +799594,7 @@
     "A pool reporter is supposed to be a stenographer",
     "A post in your feed that attracts your interest",
     "A press critic's satisfied customer: circuits fried, now in recovery, with some...",
+    "A press pool without shared presidential video",
     "A private arbitrator has ordered The Washington Post to rehire @karenattiah...",
     "A problem I have with this POV is that it equates journalism and media",
     "A problem with the way you have stated it is that it encourages defenders of...",
@@ -798297,18 +799606,22 @@
     "A race is one thing elections are",
     "A read of the transcript tomorrow will really show it",
     "A reader here says: I've been following half a dozen US media critics for some...",
+    "A reader points Rosen to Question Everything",
     "A reader reminds me that \"when in doubt, draw a distinction\" is sometimes...",
     "A reader said, \"you left off the part where it was a terrible response though.\"...",
+    "A reader's comparison with George Lakoff",
     "A recommended watch if you wonder why you keep hearing about section 230",
     "A relevant book: My view: this is an \"all hands on deck\" situation",
     "A reluctant editor takes the plunge into participation",
     "A remarkable document",
     "A remarkable piece of writing",
     "A reporter from in Washington State writes in with an update on their 'citizen...",
+    "A reporter's account of Trump's lying",
     "A required text for the search committees as these crucial hires are made",
     "A response (thread) from inside the Post",
     "A revealing answer",
     "A revealing read, via Ratio of Ozy news supply compared to my interest in...",
+    "A revised recommendation of Polarization Is Not the Problem",
     "A roundup of trends that are changing journalism",
     "A self-described moderate did three seconds of research and found an example...",
     "A sense that we're coming to the end of this",
@@ -799249,10 +800562,12 @@
     "An apt warning",
     "An argument that we need to do something like this now",
     "An article that says Cavuto predicted that his plea would get him in trouble...",
+    "An earlier Bluesky example of the same journalism problem",
     "An editorial company is a different kind of company",
     "An editorial company is constructed in a different way from other businesses",
     "An editorial company — a special kind of firm — is built to withstand pressures...",
     "An editorial decision",
+    "An emergency setting for Trump coverage",
     "An endgame that feels more visible now: Twitter will try to force everyone into...",
     "An enterprising graduate student downloaded more than a million posts from an...",
     "An especially good cluster for Sunday morning interview shows",
@@ -799275,11 +800590,13 @@
     "An interview I did 15 years ago with scholar Herbert Gans about...",
     "An obscure piece of mine (from 2010) that comes in and out of relevance: \"The...",
     "An obscure story I am following closely: “We want diverse network backgrounds,...",
+    "An older PressThink post in a discussion of political advertising",
     "An online petition by former Australian PM Kevin Rudd calling for an inquiry...",
     "An online seminar meant for newsroom teams of three to six people",
     "An outlier among national newspapers deploying the digital subscription...",
     "An report on school board members quitting that never even hints that the chaos...",
     "An unappreciated reason for the ubiquity of horse race coverage: \"Presidential...",
+    "An unbiased hat does not settle judgments about commentators",
     "An under-appreciated source of power for changing journalism",
     "An unforgettable paragraph",
     "An uprising I would like to see at Staff to management: Can we, as public radio...",
@@ -800077,6 +801394,7 @@
     "Audience Surveillance",
     "Audience Trust",
     "Audience Understanding",
+    "Audience and public",
     "Audience atomization",
     "Audience atomization overcome",
     "Audience awareness",
@@ -800101,6 +801419,7 @@
     "Audience polarization",
     "Audience reaction",
     "Audience relationship",
+    "Audience relationships",
     "Audience rights",
     "Audience size",
     "Audience vs",
@@ -800283,6 +801602,8 @@
     "Banality of Evil",
     "Bangalore",
     "Bangor Daily News",
+    "Bangor Daily News and the view from nowhere",
+    "Bangor Daily News states what its journalism stands for",
     "Bank Data Is Sifted by U.S. in Secret to Block Terror",
     "Bank Data Is Sifted by U.S. in Secret to Block Terror.",
     "Banking Industry",
@@ -801036,6 +802357,7 @@
     "Brian Tierney",
     "Brian Tierney Makes a Pledge",
     "Brian Williams",
+    "Brian Williams on normalization in news coverage",
     "Brian Williams really flashing his centrist credentials tonight, and letting...",
     "Brian is not saying that Trump has given a lot of thought to it— or any",
     "Brian: are you familiar with the term \"wicked problems?\"",
@@ -802321,6 +803643,7 @@
     "Comments",
     "Commercial Pressures",
     "Commercialization",
+    "Commercialization, gatekeepers, and internet distribution",
     "Commerical classes will always have news",
     "Commission On Presidential Debates",
     "Commission on Presidential Debates",
@@ -802392,6 +803715,7 @@
     "Computational journalism",
     "Computer-assisted reporting",
     "Conan O'Brien",
+    "Conceptual distinctions",
     "Concerning which issue are you requesting a break?",
     "Concord Monitor",
     "Conde Nast",
@@ -802705,9 +804029,11 @@
     "Correct: 6/",
     "Correct: The prose is atrocious",
     "Correct: bad for public health",
+    "Correcting Josh Marshall's name",
     "Correction",
     "Correction re: \"Martha, our campaign operates on truth's demand side...\" That...",
     "Correction: Former NPR journalist",
+    "Corrections",
     "Correctiv",
     "Correspondent",
     "Correspondents Association",
@@ -803158,6 +804484,7 @@
     "David Duke interview decision",
     "David E. Sanger",
     "David Eaves",
+    "David Ellison's claims about truth, trust, and Trump",
     "David Fahrenthold",
     "David Folkenflik",
     "David French",
@@ -803806,6 +805133,7 @@
     "Distributed reporting",
     "Distributed responsibility",
     "Distributing Due Diligence",
+    "Distribution",
     "District of Columbia",
     "Ditto on thankful for",
     "Diverse hiring does not equal inclusion, he acknowledged",
@@ -804334,6 +805662,7 @@
     "Election certification",
     "Election coverage",
     "Election coverage begins by positing the existence of two parties operating in...",
+    "Election coverage: The stakes beyond the polls",
     "Election denial",
     "Election integrity",
     "Election integrity discourse",
@@ -804400,6 +805729,7 @@
     "Ellen is CEO of the and I am on their board of advisors",
     "Ellie Rushing",
     "Elliot Mincberg",
+    "Ellison, Trump, and access for CNN",
     "Elon Musk",
     "Elon Musk Might Buy Twitter This Week",
     "Elon Musk coverage",
@@ -804842,6 +806172,7 @@
     "Explainer.net",
     "ExplainerNet",
     "Explaining The Local: East Village, NYU's Collaboration with the New York Times",
+    "Explaining an earlier draft of the polarization post",
     "Explaining the News Industry Downturn",
     "Explanation",
     "Explanatory Journalism",
@@ -804852,6 +806183,8 @@
     "Exposes, as well, deep defects in the way we teach those norms (in J-school)...",
     "Exposing Earmarks Project",
     "Exposure",
+    "Exposure and accountability",
+    "Exposure and accountability as different political tasks",
     "Exposure model",
     "Exposure of lying sources",
     "Externalized memory",
@@ -807064,6 +808397,7 @@
     "Help this week came from author of \"The Undertow: Scenes From a Slow Civil...",
     "Helped to create by doing what....?",
     "Helpful. Thank you",
+    "Helping the web archive itself",
     "Helsinki summit",
     "Henry Abbott",
     "Henry Farrel",
@@ -807721,6 +809055,7 @@
     "How does the app know that a news article maybe need a correction?",
     "How does this view square with what you know of asymmetric polarization?",
     "How does your theory comport with this?",
+    "How far Bangor Daily News moves beyond impartiality",
     "How far back does the critique of horse race journalism go?",
     "How is hiring a reliable defender of Trump in Congress \"reaching out to Trump...",
     "How is it like NPR?",
@@ -812013,6 +813348,7 @@
     "Individual Republicans have started with that, yes",
     "Indonesia",
     "Industry Trends",
+    "Industry consensus",
     "Industry leaders provide expert counsel - The Peabody Awards",
     "IndyMedia",
     "Inevitable, in a way",
@@ -812087,6 +813423,7 @@
     "Inside-Out Reporting",
     "Insider Access",
     "Insider Information",
+    "Insider journalism",
     "Insiders",
     "Insiders acknowledged that Fox News was always, on one level, a political...",
     "Insights",
@@ -812191,6 +813528,7 @@
     "Internet Politics",
     "Internet Research Agency",
     "Internet activism",
+    "Internet archives",
     "Internet as a medium",
     "Internet era journalism",
     "Internet governance",
@@ -813809,6 +815147,7 @@
     "Josh Marshall",
     "Josh Marshall has an idea for getting DOJ journalism and factual reporting back...",
     "Josh Marshall on \"The White House doesn’t want to do an interview with the...",
+    "Josh Marshall on platform audiences",
     "Josh Marshall on the demand that Kamala Harris do more interviews of a certain...",
     "Josh PM",
     "Josh Ross",
@@ -813893,6 +815232,7 @@
     "Journalism achievement",
     "Journalism acknowledgement",
     "Journalism analysis",
+    "Journalism and democracy",
     "Journalism appointments",
     "Journalism as a public good",
     "Journalism awards",
@@ -814188,6 +815528,7 @@
     "Journalistic turmoil",
     "Journalistic uncertainty",
     "Journalistic understanding",
+    "Journalistic values",
     "Journalistic verification",
     "Journalistic vetting",
     "Journalistic viewpoints",
@@ -814410,6 +815751,7 @@
     "Kara's reaction (read the thread) is some good content",
     "Karen",
     "Karen Attiah",
+    "Karen Attiah's account of the Washington Post",
     "Karen Dorn Steele",
     "Karen G. Schneider",
     "Karen Hughes",
@@ -815311,6 +816653,7 @@
     "Mainstream Press",
     "Mainstream journalism",
     "Mainstream media, but regional rather than local",
+    "Mainstream press",
     "Mainz",
     "Major American news sites decided that since trust in their work is more in...",
     "Major Garrett",
@@ -815441,6 +816784,8 @@
     "Margaret Brennan interview",
     "Margaret Brennan: \"70 percent of the House GOP members denied the results of...",
     "Margaret Sullivan",
+    "Margaret Sullivan grades midterm coverage",
+    "Margaret Sullivan on midterm stakes",
     "Margaret Sullivan used this principle in her critique of the way the national...",
     "Margaret Thatcher",
     "Margo Hammond",
@@ -815948,6 +817293,7 @@
     "Media columnist for the Post, is asked, \"When will pundits demand that Trump...",
     "Media columnist for the Washington Post is asked, \"When will pundits demand...",
     "Media commentary",
+    "Media commercialization",
     "Media company success",
     "Media comparison",
     "Media competition",
@@ -815955,6 +817301,7 @@
     "Media complicity in democratic crisis",
     "Media comprehension",
     "Media confusion",
+    "Media consolidation",
     "Media consumption",
     "Media control",
     "Media controversy",
@@ -817779,6 +819126,7 @@
     "News as product or service",
     "News as stream",
     "News as two-way conversation",
+    "News attention",
     "News avoidance and news as a public good..",
     "News avoidance and news fatigue",
     "News business models",
@@ -817820,6 +819168,7 @@
     "News judgment",
     "News leadership",
     "News literacy",
+    "News marketing and the promise of insider access",
     "News media analysis",
     "News media coverage",
     "News media criticism",
@@ -817859,6 +819208,7 @@
     "News standards",
     "News story from the Washington bureau currently on the home page, sporting a...",
     "News structure",
+    "News subscriptions",
     "News treatment",
     "News turns from a lecture to a conversation",
     "News vs. opinion distinction",
@@ -817944,11 +819294,13 @@
     "Newsroom Religion",
     "Newsroom Security",
     "Newsroom Three",
+    "Newsroom bias",
     "Newsroom codes of ethics: Let’s pretend our reporters don’t think at all!",
     "Newsroom controversy",
     "Newsroom culture",
     "Newsroom culture change",
     "Newsroom culture is the author of the original",
+    "Newsroom cuts",
     "Newsroom decision-making",
     "Newsroom decisions",
     "Newsroom disputes",
@@ -818811,6 +820163,7 @@
     "Not the main problem, just \"a\" problem",
     "Not the news director, the Political Director",
     "Not the odds but the stakes",
+    "Not the odds but the stakes in election coverage",
     "Not the odds but the stakes, says",
     "Not the odds, but the stakes",
     "Not the odds, but the stakes..",
@@ -819760,6 +821113,7 @@
     "Opinion sections have gatekeepers",
     "Opinion shows in the evening based on a common set of facts that \"hold\"...",
     "Opinion vs. News",
+    "Opinion writers, audiences, and newsroom managers",
     "Opposite. Going back to being an analyst and writer.",
     "Opposition Press",
     "Opposition party",
@@ -820405,12 +821759,14 @@
     "Platform Policies",
     "Platform Trust",
     "Platform agnosticism",
+    "Platform audiences",
     "Platform comparison",
     "Platform control",
     "Platform decision-making",
     "Platform decisions",
     "Platform dynamics",
     "Platform moderation",
+    "Platform power",
     "Platform protection",
     "Platform use",
     "Platformer",
@@ -820465,6 +821821,7 @@
     "Point taken",
     "Point-of-View Journalism",
     "Polarization",
+    "Polarization and both-sides journalism",
     "Polarizing the electorate and flooding the zone with shit are alternatives to...",
     "Police",
     "Police Chief",
@@ -820550,6 +821907,7 @@
     "Political Transformation",
     "Political accountability",
     "Political accusations",
+    "Political advertising",
     "Political advice",
     "Political alignment",
     "Political alignment of journalists",
@@ -820602,6 +821960,7 @@
     "Political language in news",
     "Political leadership",
     "Political logic",
+    "Political lying",
     "Political media",
     "Political messaging",
     "Political misinformation",
@@ -821000,6 +822359,7 @@
     "Press invitations",
     "Press outlook",
     "Press performance",
+    "Press pool",
     "Press questioning",
     "Press relations",
     "Press scrutiny",
@@ -821705,6 +823065,7 @@
     "Quentin Peel",
     "Quentin Tarantino",
     "Quentin Young",
+    "Question Everything and a rethink of journalism",
     "Question five: What are you going to do when at these briefings he does inject...",
     "Question for you",
     "Question for you..",
@@ -823068,6 +824429,7 @@
     "Reporting methodology",
     "Reporting on Iraq Weapons of Mass Destruction",
     "Reporting on it? No",
+    "Reporting on the OpenAI and Hugging Face incident",
     "Reporting practices",
     "Reporting standards",
     "Reporting structure",
@@ -823078,6 +824440,7 @@
     "Representation",
     "Representation in journalism",
     "Representation of America",
+    "Representativeness",
     "Republic",
     "Republican Candidates",
     "Republican Congress",
@@ -823278,6 +824641,7 @@
     "Review-Journal",
     "Reviewing NBC's Meet the Press Trump Interview",
     "Revisited in the sense of reconsidered, could be wrong?",
+    "Revisiting Send the interns",
     "Revolving door corruption",
     "Rewatching whole show from last night with",
     "Rewrite: \"Trump successfully turned the vast majority of his supporters against...",
@@ -824106,6 +825470,7 @@
     "Send me a link to the AP or Washington Post stories about the rising tide of...",
     "Send me a screenshot of the part of the Constitution that mentions journalism",
     "Send the interns",
+    "Send the interns and the press pool boycott",
     "Sending 787 million dollars to the company we harmed shows our commitment to...",
     "Senior Vice President",
     "Senior engineer collects internal evidence that shows Facebook was giving...",
@@ -825710,6 +827075,7 @@
     "Technology Journalism",
     "Technology and news",
     "Technology and society",
+    "Technology reporting",
     "Technology skepticism in journalism",
     "Technopoly",
     "Technorati",
@@ -825741,6 +827107,7 @@
     "Television coverage",
     "Television criticism",
     "Television is hard",
+    "Television news",
     "Television series",
     "Television viewership",
     "Televisions influence",
@@ -827850,6 +829217,7 @@
     "The 11th Hour",
     "The 19th News",
     "The 3 key parts of news stories you usually don't get",
+    "The 60 Minutes premiere and its audience decline",
     "The AJP is a funding mechanism, like venture capital but for non-profits",
     "The AP gets barred from attending a press conference at the White House because...",
     "The AP, in its 14th paragraph: \"Republicans are probing the business dealings...",
@@ -827985,6 +829353,7 @@
     "The DC Mayor and Police Chief held a briefing and answered questions on Jan",
     "The Daily",
     "The Daily Beast",
+    "The Daily Beast's character-driven election coverage",
     "The Daily Caller",
     "The Daily Herald",
     "The Daily Howler",
@@ -828527,6 +829896,7 @@
     "The appeal was to the authority of the insider, combined with the illusion of...",
     "The appointment of Mark Thompson as the new boss at CNN shows how odd it was to...",
     "The arc is long",
+    "The argument is not that earlier criticism never existed",
     "The argument would be that Meet the Press is a brand, strongly associated with...",
     "The arguments have reached them",
     "The art of linking",
@@ -828866,6 +830236,7 @@
     "The masses?",
     "The media ecosystem around one of our two major parties runs on made up claims...",
     "The media empire built by former Hungarian Prime Minister Viktor Orban's governm...",
+    "The media frenzy around Hasan Piker",
     "The media reporter for Axios, told me she's seeing an increase in new media...",
     "The media scholar has made a similar point in her work on how to cover online...",
     "The medium is the message",
@@ -829030,6 +830401,7 @@
     "The problem is the Republican coalition is now constructed on falsehoods, plus...",
     "The problem is the demand side of the equation, not the supply",
     "The problem is the same in amplifying an authoritarian's lies",
+    "The problem of an unbiased detector of newsroom bias",
     "The problem of bad actors",
     "The problem with \"ignore him!\" is that when it's the President of the United...",
     "The problem with confidential sources is not that journalists make them up, or...",
@@ -829042,6 +830414,7 @@
     "The project called had its debut Tuesday",
     "The projections for newsroom size and revenue do show a sense of humor, though",
     "The promise of distributed reporting",
+    "The propaganda risks of a media merger",
     "The proper descriptor for Margorie Taylor Green is not \"ultra conservative,\"...",
     "The proposition that a journalist clear in her opinions cannot also be...",
     "The public broadcaster in Australia, the ABC, says: Cynical it may be, but the...",
@@ -829050,6 +830423,7 @@
     "The public interest rationale for the briefings is that they provide 1.)...",
     "The public service veto: How The Correspondent protects itself from profit maximization",
     "The published version says",
+    "The pull of journalism's industry consensus",
     "The purpose in asking, \"What do you want the candidates to be discussing as...",
     "The purpose of posting six headlines about the same event is not to proclaim...",
     "The purpose of press access is not to solve the problem, which is the...",
@@ -831338,6 +832712,7 @@
     "Trust in News",
     "Trust in PR is gone too",
     "Trust in institutions",
+    "Trust in journalism",
     "Trust in media",
     "Trust in the news media",
     "Trust in the press",
@@ -831353,6 +832728,7 @@
     "Truth Sandwich",
     "Truth Sandwich concept",
     "Truth Social",
+    "Truth Social mentions as unpaid promotion",
     "Truth Vs Accuracy",
     "Truth and Reconciliation Commission",
     "Truth and falsehood",
@@ -831572,6 +832948,7 @@
     "Two different questions",
     "Two facts are in evidence here",
     "Two maybe. Not complicated.",
+    "Two meanings of journalism's inner circle",
     "Two more fun facts",
     "Two of five Sunday shows (ABC and NBC) surrendered yesterday and booked a...",
     "Two of the most odious figures in publishing — Mark Zuckerberg and Robert...",
@@ -831590,6 +832967,7 @@
     "Two treatments: The Washington Post's outstanding tick tock of his flailing...",
     "Two ways Todd Gitlin influenced me as a critic: First, his 1990 essay for...",
     "Two ways to interview him",
+    "Two weeks of reading for a journalism course",
     "Two writers who have been tracking the coverage of almost every day of Trump’s...",
     "Two years ago at my site: It’s time for the press to suspend normal relations...",
     "Two years ago, I wrote about another version of this belief: that he is some...",
@@ -832091,6 +833469,7 @@
     "View from Nowhere journalism",
     "View from Somewhere",
     "View from nowhere",
+    "View from somewhere",
     "Viewer poll",
     "Viewers for Jan",
     "Viewership numbers",
@@ -832652,6 +834031,7 @@
     "Web Vs Print",
     "Web journalism",
     "Web permanence",
+    "Web preservation",
     "Web site arranges funding for freelancers",
     "Web-centricity",
     "WebMD",
@@ -833401,6 +834781,7 @@
     "Where are you getting this \"that's where the money is\" claim?",
     "Where are your specifics?",
     "Where can I find the backtracking?",
+    "Where can readers find the citizens agenda itself?",
     "Where did he say this today?",
     "Where did the \"fun\" thing come from? I missed that",
     "Where did they say they know more than experts? And which experts?",
@@ -833499,6 +834880,7 @@
     "Which media companies believed in that?",
     "Which meeting do you refer to?",
     "Which misdeed by news organizations is named for Sean Spicer?",
+    "Which newsrooms make up the national mainstream press?",
     "Which no one else on television does",
     "Which of Biden's statements is the most COVID is over?",
     "Which of her mistakes was as bad as Alex Jones claiming the Sandy Hook school...",
@@ -833864,6 +835246,7 @@
     "Why should they turn in their credentials, Todd?",
     "Why so certain?",
     "Why thank you",
+    "Why the press pool fights matter",
     "Why the view from nowhere is a harmful myth",
     "Why wait for the car when you can have the crash now?",
     "Why would I do that?",
