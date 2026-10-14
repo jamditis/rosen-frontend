@@ -48,6 +48,10 @@ still uses the same fixed endpoint and complete cursor checks.
 The publisher rebuilds public JSON, lexical indexes, analytics, feeds, and graph
 artifacts. A generated thread exception is added only when its members and reply
 chain match the canonical source rows. Existing graph holds remain in force.
+New text-thread containers omit media-only or unsupported source branches and
+their descendants. The remaining connected text must still contain at least
+three posts and one admitted member. Excluded posts keep their source rows and
+standalone admission state; an existing text thread keeps its stable ID.
 Semantic vectors use the existing local `Xenova/bge-small-en-v1.5` model. Checksummed,
 unchanged inputs reuse their vectors; new or changed inputs are encoded locally.
 The release number, module imports, service worker, and data cache advance together.

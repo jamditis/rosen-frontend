@@ -42,16 +42,52 @@ function isVerifiedSourceRow(row) {
   return value === true || value === 'TRUE' || value === 'true' || value === 'Yes';
 }
 
+function supportsNewJayThread(post) {
+  const row = post?.row;
+  const text = value => String(value ?? '').trim();
+  return text(row?.author).toLowerCase() === 'jay rosen'
+    && text(row?.platform) === 'Bluesky'
+    && /^https:\/\/bsky\.app\/profile\/jayrosen\.bsky\.social\/post\/[^/?#]+\/?$/.test(text(row?.url))
+    && text(row?.permissions) === 'Public Post'
+    && text(row?.date_processed).length > 0
+    && ['TRUE', 'FALSE'].includes(text(row?.verified).toUpperCase())
+    && text(row?.raw_text || row?.excerpt).length > 0;
+}
+
+function supportedThreadCandidate(candidate) {
+  if (candidate?.alreadyCovered === true) return candidate;
+  const posts = candidate?.posts ?? [];
+  const retained = [];
+  const includedAncestors = [];
+  for (const post of posts) {
+    // Depth follows the source reply path. A dropped parent also keeps its
+    // descendants outside the container, without inventing a replacement link.
+    includedAncestors.length = post.depth;
+    const parentIncluded = post.depth === 0 || includedAncestors[post.depth - 1] === true;
+    const included = parentIncluded && supportsNewJayThread(post);
+    includedAncestors.push(included);
+    if (included) retained.push(post);
+  }
+  return retained.length === posts.length ? candidate : {
+    ...candidate,
+    posts: retained,
+    postIds: retained.map(post => post.row.id || post.row.ID),
+  };
+}
+
 /**
  * Keep existing thread coverage and require an admitted member for new threads.
  * Context-only members remain available inside a mixed admitted thread, but an
  * all-context chain does not receive an ID or enter the public member filter.
+ * Media-only and unsupported historical branches stay ungrouped; they cannot
+ * form a source-supported text thread or suppress otherwise admitted posts.
  */
 export function selectPublishableThreadCandidates(candidates) {
   assertRecordList(candidates, 'threadCandidates');
-  return candidates.filter(candidate => (
+  return candidates.map(supportedThreadCandidate).filter(candidate => (
     candidate?.alreadyCovered === true
-    || candidate?.posts?.some(post => isVerifiedSourceRow(post?.row)) === true
+    || (candidate?.posts?.length >= 3
+      && candidate.posts.some(post => isVerifiedSourceRow(post?.row)))
   ));
 }
 
