@@ -16,6 +16,9 @@
 const CACHE_VERSION = '3.8.39';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
+// This immutable asset revision survives ordinary app releases. Change both
+// the directory and this namespace when replacing the pinned runtime/model.
+const SEMANTIC_CACHE_NAME = 'jrda-semantic-v1';
 
 // Detect deploy surface. Keep in sync with frontend/utils/pathResolver.js —
 // this classic worker is loaded through the root sw.js bridge, so it cannot
@@ -210,7 +213,8 @@ self.addEventListener('activate', event => {
       .then(cacheNames => {
         return Promise.all(
           cacheNames
-            .filter(name => name !== CACHE_NAME && name !== DATA_CACHE_NAME)
+            .filter(name => name !== CACHE_NAME && name !== DATA_CACHE_NAME
+              && name !== SEMANTIC_CACHE_NAME)
             .map(name => {
               console.log('[SW] Deleting old cache:', name);
               return caches.delete(name);
@@ -256,7 +260,7 @@ self.addEventListener('fetch', event => {
   // after the reader enables meaning search; never add them to install-time
   // precache where every visitor would pay the transfer cost.
   if (isSemanticAsset(url.pathname)) {
-    event.respondWith(cacheFirst(event.request, CACHE_NAME));
+    event.respondWith(cacheFirst(event.request, SEMANTIC_CACHE_NAME));
     return;
   }
 
