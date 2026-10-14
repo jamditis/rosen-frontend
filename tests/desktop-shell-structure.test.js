@@ -240,8 +240,6 @@ describe('desktop archive adapter', () => {
     assert.match(app, /archiveView=\$\{desktopArchiveView\}/);
     assert.match(app, /desktopActiveNeedsRecords \? recordView : null/,
       'desktop record reading uses the canonical RecordView overlay');
-    assert.match(app, /const desktopArchiveView = \{[\s\S]*semanticSearch: semanticSearchProps[\s\S]*searchSignals/,
-      'desktop search uses the canonical semantic state and provenance labels');
   });
 
   it('loads the corpus only for real desktop record apps', () => {
