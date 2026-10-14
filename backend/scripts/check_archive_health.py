@@ -7,6 +7,7 @@ import argparse
 import datetime
 import json
 import os
+import re
 import subprocess
 import tempfile
 from dataclasses import dataclass
@@ -17,6 +18,11 @@ import requests
 
 
 HEALTH_URL = "https://rosen-source-discovery.jamditis.workers.dev/health"
+ACTIONS_URL = (
+    "https://github.com/jamditis/rosen-frontend/actions/workflows/"
+    "bluesky-stewardship.yml"
+)
+RUNBOOK_PATH = "docs/operations/bluesky-stewardship.md"
 REQUEST_TIMEOUT_SECONDS = (5, 10)
 MAX_RESPONSE_BYTES = 64 * 1024
 FAILURES_BEFORE_ALERT = 2
@@ -24,6 +30,8 @@ DEFAULT_STATE_PATH = (
     Path.home() / ".local/state/rosen-archive/source-discovery-health.json"
 )
 USER_AGENT = "RosenArchive-HealthWatcher/1.0"
+SAFE_VALUE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:+-]{0,127}$")
+COMMIT_RE = re.compile(r"^[0-9a-f]{7,64}$")
 
 EXIT_HEALTHY = 0
 EXIT_DEGRADED = 1
@@ -35,11 +43,22 @@ EXIT_WATCHER_ERROR = 3
 class ProbeResult:
     health: str
     http_status: int | None = None
-    service_status: str | None = None
-    mode: str | None = None
-    manifest_version: str | None = None
-    source_count: int | None = None
+    discovery_count: int | None = None
+    ingestion_status: str | None = None
+    error_class: str | None = None
+    affected_components: tuple[str, ...] = ()
+    affected_sources: tuple[str, ...] = ()
     error: str | None = None
+
+
+@dataclass(frozen=True)
+class OperationalHealth:
+    healthy: bool
+    discovery_count: int
+    ingestion_status: str
+    error_class: str | None
+    affected_components: tuple[str, ...]
+    affected_sources: tuple[str, ...]
 
 
 def _utc_iso(value: datetime.datetime) -> str:
@@ -66,16 +85,100 @@ def _read_bounded_body(response: object) -> bytes:
     return bytes(body)
 
 
-def _valid_sources(value: object) -> bool:
-    if not isinstance(value, list):
+def _safe_value(value: object) -> bool:
+    return isinstance(value, str) and SAFE_VALUE_RE.fullmatch(value) is not None
+
+
+def _valid_timestamp(value: object, *, optional: bool = False) -> bool:
+    if value is None:
+        return optional
+    if not isinstance(value, str) or not value:
         return False
-    return all(
-        isinstance(source, dict)
-        and isinstance(source.get("id"), str)
-        and bool(source["id"])
-        and isinstance(source.get("kind"), str)
-        and bool(source["kind"])
-        for source in value
+    try:
+        parsed = datetime.datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return parsed.tzinfo is not None
+
+
+def _parse_discovery(value: object) -> list[tuple[str, bool]] | None:
+    if not isinstance(value, list) or not value:
+        return None
+    results: list[tuple[str, bool]] = []
+    seen: set[str] = set()
+    for source in value:
+        if not isinstance(source, dict):
+            return None
+        source_id = source.get("sourceId")
+        healthy = source.get("healthy")
+        if (
+            not _safe_value(source_id)
+            or source_id in seen
+            or type(healthy) is not bool
+            or not _safe_value(source.get("lastStatus"))
+            or not _valid_timestamp(source.get("lastCheckedAt"), optional=not healthy)
+            or not _valid_timestamp(source.get("lastSuccessAt"), optional=not healthy)
+        ):
+            return None
+        seen.add(source_id)
+        results.append((source_id, healthy))
+    return results
+
+
+def _parse_ingestion(value: object) -> tuple[bool, str, str | None] | None:
+    if not isinstance(value, dict):
+        return None
+    healthy = value.get("healthy")
+    status = value.get("status")
+    error_class = value.get("errorClass")
+    canonical_commit = value.get("canonicalCommit")
+    release_version = value.get("releaseVersion")
+    if type(healthy) is not bool or not _safe_value(status):
+        return None
+    if error_class is not None and not _safe_value(error_class):
+        return None
+    if not _valid_timestamp(value.get("checkedAt"), optional=not healthy):
+        return None
+    if canonical_commit is not None and (
+        not isinstance(canonical_commit, str)
+        or COMMIT_RE.fullmatch(canonical_commit) is None
+    ):
+        return None
+    if release_version is not None and not _safe_value(release_version):
+        return None
+    if healthy and (canonical_commit is None or release_version is None):
+        return None
+    return healthy, status, error_class
+
+
+def _parse_operational_health(payload: object) -> OperationalHealth | None:
+    if not isinstance(payload, dict) or type(payload.get("healthy")) is not bool:
+        return None
+    discovery = _parse_discovery(payload.get("discovery"))
+    ingestion = _parse_ingestion(payload.get("ingestion"))
+    if discovery is None or ingestion is None:
+        return None
+
+    ingestion_healthy, ingestion_status, error_class = ingestion
+    discovery_healthy = all(healthy for _source_id, healthy in discovery)
+    healthy = payload["healthy"] and discovery_healthy and ingestion_healthy
+    affected_sources = tuple(
+        source_id for source_id, source_healthy in discovery if not source_healthy
+    )
+    affected_components: list[str] = []
+    if affected_sources:
+        affected_components.append("archive discovery")
+    if not ingestion_healthy:
+        affected_components.append("archive publication")
+    if not healthy and not affected_components:
+        affected_components.extend(("archive discovery", "archive publication"))
+    return OperationalHealth(
+        healthy=healthy,
+        discovery_count=len(discovery),
+        ingestion_status=ingestion_status,
+        error_class=error_class,
+        affected_components=tuple(affected_components),
+        affected_sources=affected_sources,
     )
 
 
@@ -100,7 +203,7 @@ def probe_health(
         status_code = getattr(response, "status_code", None)
         if not isinstance(status_code, int):
             return ProbeResult(health="outage", error="invalid_http_status")
-        if status_code != 200:
+        if status_code not in {200, 503}:
             return ProbeResult(
                 health="outage",
                 http_status=status_code,
@@ -135,44 +238,36 @@ def probe_health(
         if callable(close):
             close()
 
-    if not isinstance(payload, dict):
+    operational = _parse_operational_health(payload)
+    if operational is None:
         return ProbeResult(
             health="outage",
-            http_status=200,
+            http_status=status_code,
             error="invalid_payload",
         )
 
-    service_status = payload.get("status")
-    mode = payload.get("mode")
-    manifest_version = payload.get("manifestVersion")
-    sources = payload.get("sources")
-    if not (
-        isinstance(service_status, str)
-        and isinstance(mode, str)
-        and isinstance(manifest_version, str)
-        and bool(manifest_version)
-        and _valid_sources(sources)
-    ):
-        return ProbeResult(
-            health="outage",
-            http_status=200,
-            error="invalid_payload",
+    if status_code == 200 and operational.healthy:
+        health = "healthy"
+        error = None
+    elif status_code == 200:
+        health = "degraded"
+        error = "reported_unhealthy"
+    else:
+        health = "outage"
+        error = (
+            "reported_unhealthy"
+            if not operational.healthy
+            else "unexpected_http_status"
         )
-
-    source_count = len(sources)
-    health = (
-        "healthy"
-        if service_status == "ok" and mode == "live" and source_count > 0
-        else "degraded"
-    )
     return ProbeResult(
         health=health,
-        http_status=200,
-        service_status=service_status,
-        mode=mode,
-        manifest_version=manifest_version,
-        source_count=source_count,
-        error=None if health == "healthy" else "unexpected_health_values",
+        http_status=status_code,
+        discovery_count=operational.discovery_count,
+        ingestion_status=operational.ingestion_status,
+        error_class=operational.error_class,
+        affected_components=operational.affected_components,
+        affected_sources=operational.affected_sources,
+        error=error,
     )
 
 
@@ -248,15 +343,25 @@ def send_telegram(message: str) -> None:
 def _notification_message(event: str, probe: ProbeResult, failures: int) -> str:
     if event == "recovery":
         return (
-            "Rosen source discovery health recovered. "
-            f"Endpoint: {HEALTH_URL}. Status: {probe.service_status}. "
-            f"Mode: {probe.mode}."
+            "Rosen archive discovery and publication health recovered. "
+            f"Endpoint: {HEALTH_URL}."
         )
-    detail = probe.error or "unexpected_health_values"
+    affected = ", ".join(probe.affected_components) or "archive health contract"
+    sources = (
+        f" Affected sources: {', '.join(probe.affected_sources)}."
+        if probe.affected_sources
+        else ""
+    )
+    error_class = f" Error class: {probe.error_class}." if probe.error_class else ""
+    ingestion_status = (
+        f" Publication status: {probe.ingestion_status}."
+        if probe.ingestion_status
+        else ""
+    )
     return (
-        "Rosen source discovery health alert. "
-        f"Endpoint: {HEALTH_URL}. State: {probe.health}. "
-        f"Consecutive failures: {failures}. Detail: {detail}."
+        f"Rosen archive health alert. Affected: {affected}.{sources}"
+        f"{ingestion_status}{error_class} Consecutive failures: {failures}. "
+        f"Action: inspect {ACTIONS_URL} and follow {RUNBOOK_PATH}."
     )
 
 
@@ -359,10 +464,11 @@ def run_check(
         "endpoint": HEALTH_URL,
         "health": probe.health,
         "http_status": probe.http_status,
-        "service_status": probe.service_status,
-        "mode": probe.mode,
-        "manifest_version": probe.manifest_version,
-        "source_count": probe.source_count,
+        "discovery_count": probe.discovery_count,
+        "ingestion_status": probe.ingestion_status,
+        "error_class": probe.error_class,
+        "affected_components": list(probe.affected_components),
+        "affected_sources": list(probe.affected_sources),
         "error": state_error
         or ("notification_failed" if notification_status == "failed" else probe.error),
         "consecutive_failures": state["consecutive_failures"],

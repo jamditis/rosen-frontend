@@ -26,19 +26,33 @@ class _Response:
         self.closed = True
 
 
-def _health_payload(*, status="ok", mode="live"):
+def _health_payload(
+    *,
+    healthy=True,
+    discovery_healthy=True,
+    ingestion_healthy=True,
+    ingestion_status="published",
+    error_class=None,
+):
     return {
-        "status": status,
-        "mode": mode,
-        "manifestVersion": "2026-08-14.3",
-        "sources": [
+        "healthy": healthy,
+        "discovery": [
             {
-                "id": "jay-rosen-bluesky",
-                "label": "Jay Rosen Bluesky activity",
-                "kind": "atproto-author-feed",
-                "maxCandidates": 100,
+                "sourceId": "jay-rosen-bluesky",
+                "lastCheckedAt": "2026-10-14T16:58:00Z",
+                "lastSuccessAt": "2026-10-14T16:58:00Z",
+                "lastStatus": "ok" if discovery_healthy else "request_failed",
+                "healthy": discovery_healthy,
             }
         ],
+        "ingestion": {
+            "status": ingestion_status,
+            "checkedAt": "2026-10-14T16:59:00Z",
+            "canonicalCommit": "a" * 40,
+            "releaseVersion": "3.8.38",
+            "healthy": ingestion_healthy,
+            "errorClass": error_class,
+        },
     }
 
 
@@ -77,9 +91,10 @@ def test_healthy_check_uses_only_the_fixed_bounded_request(tmp_path):
 
     assert exit_code == watcher.EXIT_HEALTHY
     assert report["health"] == "healthy"
-    assert report["service_status"] == "ok"
-    assert report["mode"] == "live"
-    assert report["source_count"] == 1
+    assert report["discovery_count"] == 1
+    assert report["ingestion_status"] == "published"
+    assert report["affected_components"] == []
+    assert report["affected_sources"] == []
     assert report["consecutive_failures"] == 0
     assert report["notification"] == {"event": None, "status": "not_needed"}
     assert len(calls) == 1
@@ -91,17 +106,105 @@ def test_healthy_check_uses_only_the_fixed_bounded_request(tmp_path):
     assert response.closed is True
 
 
-def test_live_endpoint_with_nonlive_mode_is_degraded(tmp_path):
+def test_reported_false_health_cannot_pass_on_http_200(tmp_path):
     report, exit_code = _run(
         tmp_path / "state.json",
-        _Response(payload=_health_payload(mode="disabled")),
+        _Response(payload=_health_payload(healthy=False)),
     )
 
     assert exit_code == watcher.EXIT_DEGRADED
     assert report["health"] == "degraded"
-    assert report["error"] == "unexpected_health_values"
+    assert report["error"] == "reported_unhealthy"
+    assert report["affected_components"] == [
+        "archive discovery",
+        "archive publication",
+    ]
     assert report["consecutive_failures"] == 1
     assert report["alert_active"] is False
+
+
+def test_old_configuration_only_health_payload_cannot_false_green(tmp_path):
+    old_payload = {
+        "status": "ok",
+        "mode": "live",
+        "manifestVersion": "2026-08-14.3",
+        "sources": [{"id": "jay-rosen-bluesky", "kind": "atproto-author-feed"}],
+    }
+
+    report, exit_code = _run(
+        tmp_path / "state.json",
+        _Response(payload=old_payload),
+    )
+
+    assert exit_code == watcher.EXIT_OUTAGE
+    assert report["health"] == "outage"
+    assert report["error"] == "invalid_payload"
+
+
+def test_http_200_with_malformed_nested_health_is_an_outage(tmp_path):
+    payload = _health_payload()
+    payload["discovery"][0]["healthy"] = "true"
+
+    report, exit_code = _run(
+        tmp_path / "state.json",
+        _Response(payload=payload),
+    )
+
+    assert exit_code == watcher.EXIT_OUTAGE
+    assert report["health"] == "outage"
+    assert report["error"] == "invalid_payload"
+
+
+def test_http_503_exposes_only_validated_failed_ingestion_diagnostics(tmp_path):
+    state_path = tmp_path / "state.json"
+    payload = _health_payload(
+        healthy=False,
+        ingestion_healthy=False,
+        ingestion_status="receipt_stale",
+        error_class="publication_receipt_stale",
+    )
+    messages = []
+
+    first, first_exit = _run(
+        state_path,
+        _Response(status=503, payload=payload),
+        notify=True,
+        sender=messages.append,
+    )
+    second, second_exit = _run(
+        state_path,
+        _Response(status=503, payload=payload),
+        notify=True,
+        sender=messages.append,
+    )
+
+    assert first_exit == watcher.EXIT_OUTAGE
+    assert first["affected_components"] == ["archive publication"]
+    assert first["affected_sources"] == []
+    assert first["ingestion_status"] == "receipt_stale"
+    assert first["error_class"] == "publication_receipt_stale"
+    assert second_exit == watcher.EXIT_OUTAGE
+    assert second["notification"] == {"event": "outage", "status": "sent"}
+    assert len(messages) == 1
+    assert "Affected: archive publication" in messages[0]
+    assert "publication_receipt_stale" in messages[0]
+    assert watcher.ACTIONS_URL in messages[0]
+    assert watcher.RUNBOOK_PATH in messages[0]
+
+
+def test_http_503_exposes_validated_failed_discovery_source(tmp_path):
+    report, exit_code = _run(
+        tmp_path / "state.json",
+        _Response(
+            status=503,
+            payload=_health_payload(healthy=False, discovery_healthy=False),
+        ),
+    )
+
+    assert exit_code == watcher.EXIT_OUTAGE
+    assert report["affected_components"] == ["archive discovery"]
+    assert report["affected_sources"] == ["jay-rosen-bluesky"]
+    assert report["error_class"] is None
 
 
 def test_outage_alert_is_deduplicated_and_followed_by_one_recovery(tmp_path):
