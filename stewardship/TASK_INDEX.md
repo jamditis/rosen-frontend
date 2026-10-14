@@ -36,6 +36,12 @@ index into a sibling temporary backup, flushes it, and renames it into place.
 Only then does it atomically rename the rebuilt index over the live index. A
 failure before the final rename leaves the live index intact.
 
+On Linux, the supported deployment platform, each replacement also opens,
+syncs, and closes its parent directory before the rebuild returns. Directory
+sync errors are not suppressed. Other platforms retain the file flush and
+atomic rename but do not claim that a replacement directory entry survives a
+crash.
+
 This sequence assumes an offline single writer. It detects simple source
 movement during a rebuild but does not provide a concurrent append or lease
 guarantee. The task-event JSONL file needs its own backup because an index

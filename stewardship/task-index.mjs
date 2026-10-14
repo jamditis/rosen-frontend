@@ -284,6 +284,8 @@ function fsyncFile(filePath) {
 }
 
 function fsyncDirectory(directory) {
+  if (process.platform !== 'linux') return;
+
   const descriptor = openSync(directory, 'r');
   try {
     fsyncSync(descriptor);
