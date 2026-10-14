@@ -436,7 +436,9 @@ def _quote_uri(record: dict) -> str:
     if not isinstance(reference, dict):
         return ""
     uri = reference.get("uri")
-    return uri if isinstance(uri, str) else ""
+    return (
+        uri if isinstance(uri, str) and backfill.AT_POST_URI_RE.fullmatch(uri) else ""
+    )
 
 
 def _post_type_and_context(item: dict) -> tuple[str, list[str]]:

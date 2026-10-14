@@ -33,6 +33,7 @@ def _feed_item(
     reply_parent="",
     reply_root="",
     quote_uri="",
+    quote_type="app.bsky.embed.record",
 ):
     record = {"text": text, "createdAt": created_at}
     if reply_parent:
@@ -41,10 +42,10 @@ def _feed_item(
             "root": {"uri": reply_root or reply_parent},
         }
     if quote_uri:
-        record["embed"] = {
-            "$type": "app.bsky.embed.record",
-            "record": {"uri": quote_uri, "cid": "bafy-quoted-reference"},
-        }
+        reference = {"uri": quote_uri, "cid": "bafy-quoted-reference"}
+        if quote_type == "app.bsky.embed.recordWithMedia":
+            reference = {"record": reference}
+        record["embed"] = {"$type": quote_type, "record": reference}
     return {
         "post": {
             "uri": f"at://{JAY_DID}/app.bsky.feed.post/{rkey}",
@@ -272,6 +273,85 @@ def test_runner_outputs_must_stay_under_runner_temp(tmp_path, monkeypatch):
         )
 
     assert csv_path.read_bytes() == original
+
+
+@pytest.mark.parametrize(
+    "collection",
+    [
+        "app.bsky.graph.list",
+        "app.bsky.feed.generator",
+        "app.bsky.graph.starterpack",
+    ],
+)
+@pytest.mark.parametrize(
+    "embed_type",
+    ["app.bsky.embed.record", "app.bsky.embed.recordWithMedia"],
+)
+def test_nonpost_record_embed_is_not_requested_as_quote_context(
+    tmp_path, collection, embed_type
+):
+    csv_path = tmp_path / "social_posts.csv"
+    _write_canonical(csv_path)
+    embedded_uri = f"at://did:plc:directory/{collection}/curation"
+    item = _feed_item(
+        "meaningful-linked-record",
+        "2026-10-15T12:00:00Z",
+        (
+            "This news coverage repeats false balance and the view from nowhere. "
+            "Journalists should explain how the press serves democracy."
+        ),
+        quote_uri=embedded_uri,
+        quote_type=embed_type,
+    )
+    context_requests = []
+
+    def fetch_context(uris):
+        context_requests.append(list(uris))
+        pytest.fail("non-post record embed must not be requested as post context")
+
+    result = batch.run_batch(
+        csv_path=csv_path,
+        snapshot_dir=tmp_path / "snapshot",
+        report_path=tmp_path / "report.json",
+        captured_at=_captured_at(),
+        fetch_page_fn=lambda _cursor: {"feed": [item], "cursor": None},
+        fetch_context_fn=fetch_context,
+        policy_check_fn=lambda: None,
+        sleep_fn=lambda _seconds: None,
+    )
+
+    rows = _read_rows(csv_path)
+    assert [row["id"] for row in rows] == ["BSKY-03435", "BSKY-03436"]
+    assert rows[-1]["verified"] == "TRUE"
+    assert context_requests == []
+    assert result.report["counts"] == {
+        "captured": 1,
+        "admitted": 1,
+        "context_only": 0,
+    }
+    assert result.report["decisions"][0]["post_type"] == "original"
+    assert result.report["decisions"][0]["context_uris"] == []
+
+
+@pytest.mark.parametrize(
+    "embed_type",
+    ["app.bsky.embed.record", "app.bsky.embed.recordWithMedia"],
+)
+def test_reply_context_excludes_nonpost_record_embed(embed_type):
+    parent_uri = "at://did:plc:reader/app.bsky.feed.post/parent"
+    item = _feed_item(
+        "reply-with-linked-record",
+        "2026-10-15T12:00:00Z",
+        (
+            "This news coverage repeats false balance and the view from nowhere. "
+            "Journalists should explain how the press serves democracy."
+        ),
+        reply_parent=parent_uri,
+        quote_uri="at://did:plc:directory/app.bsky.graph.list/curation",
+        quote_type=embed_type,
+    )
+
+    assert batch._post_type_and_context(item) == ("reply", [parent_uri])
 
 
 def test_admission_uses_text_taxonomy_and_public_context(tmp_path):
