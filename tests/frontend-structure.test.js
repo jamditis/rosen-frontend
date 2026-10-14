@@ -72,7 +72,7 @@ describe('component exports', () => {
 // that line -- and inside a lazily mounted route the ReferenceError is swallowed
 // by the route's error boundary, which shows a generic failure instead of naming
 // the module. That is exactly how a missing RELEVANCE_SORT import broke desktop
-// search only after a query was typed. This walks every shipped frontend module
+// search only after a query was typed. This walks every authored frontend module
 // and resolves the SCREAMING_SNAKE_CASE names it references -- the naming shape
 // the codebase reserves for cross-module constants -- against what the module
 // imports or declares itself.
@@ -80,9 +80,12 @@ describe('component exports', () => {
 const frontendModulePaths = (dir, out = []) => {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
-    // dist/ is pre-built Tailwind output, not authored modules.
+    // dist/ is pre-built Tailwind output. Pinned third-party vendor bundles use
+    // class members and minified bindings outside this source naming heuristic;
+    // semantic-self-host.test.js checks their materialized bytes and checksums.
     if (entry.isDirectory()) {
       if (entry.name === 'dist' || entry.name === 'node_modules') continue;
+      if (full === path.join(frontendDir, 'vendor')) continue;
       frontendModulePaths(full, out);
     } else if (entry.name.endsWith('.js') && !entry.name.startsWith('.')) {
       out.push(full);
@@ -102,7 +105,7 @@ const withoutCommentsAndStrings = (source) => source
 const SHARED_CONSTANT = /\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b/g;
 
 describe('shared constant resolution', () => {
-  it('every SCREAMING_SNAKE_CASE constant a frontend module uses is imported or declared there', () => {
+  it('every SCREAMING_SNAKE_CASE constant an authored frontend module uses is imported or declared there', () => {
     const unresolved = [];
 
     for (const file of frontendModulePaths(frontendDir)) {

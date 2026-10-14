@@ -48,7 +48,9 @@ frontend/                           # React application
   desktop/                          # Optional lazy desktop shell, adapters, registry, window state, and CSS
   services/                         # archiveService, router, sqliteService
   utils/                            # Design tokens
-  vendor/                           # Self-hosted sql.js wasm (sql-wasm-1.10.3.wasm)
+  vendor/                           # Self-hosted browser runtimes
+    sql-wasm-1.10.3.wasm
+    semantic/v1/                    # Pinned semantic model, runtime, checksums, and license notices
   design-system/                    # Semantic CSS tokens, interface recipes, demo
 
 data/                               # Published archive data and shared taxonomy
@@ -117,10 +119,12 @@ tools/                              # Deployed standalone tools
 ADDING-RECORDS.md                   # Instructions for adding new records
 ```
 
-The dissertation PDF is stored through Git LFS. The Actions deploy checkout
-materializes it automatically. Before a manual FTP deploy, run
-`git lfs pull --include="dissertation/reader/*.pdf"` and confirm the reader PDF
-is 18,500,765 bytes; never upload the 133-byte LFS pointer.
+The dissertation PDF and semantic `.onnx` and `.wasm` binaries are stored
+through Git LFS. The Actions deploy checkout materializes the current tree
+before upload. Before a manual FTP deploy, run
+`git lfs pull --include="dissertation/reader/*.pdf,frontend/vendor/semantic/v1/**"`.
+Confirm the reader PDF is 18,500,765 bytes and run
+`node --test tests/semantic-self-host.test.js`; never upload LFS pointer files.
 
 The full-site deploy uploads every standalone `index.html` under its deployed
 directories only after all walked assets and the shared data manifest. This

@@ -42,6 +42,8 @@ function loadSW(hostname = 'pressthink.org', {
   cacheMatch = async () => null,
   cachePut = async () => {},
   fetchImpl = async () => { throw new Error('offline'); },
+  cacheStorage,
+  source = SW_SRC,
 } = {}) {
   const handlers = {};
   const added = [];
@@ -58,7 +60,7 @@ function loadSW(hostname = 'pressthink.org', {
       skipWaiting: async () => {},
       clients: { claim: async () => {} },
     },
-    caches: {
+    caches: cacheStorage ?? {
       open: async () => fakeCache,
       keys: async () => [],
       delete: async () => true,
@@ -70,7 +72,7 @@ function loadSW(hostname = 'pressthink.org', {
     console: { log: () => {}, warn: () => {} },
   };
   vm.createContext(sandbox);
-  vm.runInContext(SW_SRC, sandbox);
+  vm.runInContext(source, sandbox);
   return { sandbox, handlers, added };
 }
 
@@ -88,6 +90,69 @@ describe('service worker request classification (#274)', () => {
     assert.equal(sandbox.isStaticAsset(`${BASE}/frontend/App.js`), true);
     assert.equal(sandbox.isStaticAsset(`${BASE}/frontend/dist/tailwind.css`), true);
     assert.equal(sandbox.isStaticAsset(`${BASE}/frontend/vendor/sql-wasm-1.10.3.wasm`), true);
+  });
+
+  it('caches requested semantic assets without adding the heavy payload to install precache', async () => {
+    for (const file of [
+      'runtime/transformers.web.min.js',
+      'runtime/ort.webgpu.bundle.min.mjs',
+      'runtime/ort-wasm-simd-threaded.asyncify.wasm',
+      'models/Xenova/bge-small-en-v1.5/config.json',
+      'models/Xenova/bge-small-en-v1.5/onnx/model_quantized.onnx',
+    ]) {
+      assert.equal(
+        sandbox.isSemanticAsset(`${BASE}/frontend/vendor/semantic/v1/${file}`),
+        true,
+        file,
+      );
+    }
+    assert.equal(sandbox.isSemanticAsset(`${BASE}/data/archive-core.json`), false);
+
+    const { handlers, added } = loadSW();
+    await runInstall(handlers);
+    assert.equal(
+      added.some(url => url.includes('/frontend/vendor/semantic/')),
+      false,
+      'opt-out visitors must not download the model or runtime during install',
+    );
+  });
+
+  it('retains an opted-in immutable semantic asset across release activation', async () => {
+    const stores = new Map();
+    const cacheStorage = {
+      async open(name) {
+        if (!stores.has(name)) stores.set(name, new Map());
+        const store = stores.get(name);
+        return {
+          async match(request) { return store.get(request.url)?.clone(); },
+          async put(request, response) { store.set(request.url, response.clone()); },
+        };
+      },
+      async keys() { return [...stores.keys()]; },
+      async delete(name) { return stores.delete(name); },
+    };
+    let downloads = 0;
+    const fetchImpl = async () => {
+      downloads += 1;
+      return new Response('fixed model bytes');
+    };
+    const request = new Request(`https://pressthink.org${BASE}/frontend/vendor/semantic/v1/models/example.onnx`);
+    const read = async (handlers) => {
+      let result;
+      handlers.fetch({ request, respondWith(pending) { result = pending; } });
+      return (await result).text();
+    };
+    const older = loadSW('pressthink.org', { cacheStorage, fetchImpl,
+      source: SW_SRC.replace(`const CACHE_VERSION = '${APP_VERSION}'`, "const CACHE_VERSION = '3.0.0'") });
+    assert.equal(await read(older.handlers), 'fixed model bytes');
+    const current = loadSW('pressthink.org', { cacheStorage, fetchImpl });
+    let activation;
+    current.handlers.activate({ waitUntil(pending) { activation = pending; } });
+    await activation;
+    assert.equal(await read(current.handlers), 'fixed model bytes');
+    assert.equal(downloads, 1, 'a release must not re-download an unchanged opted-in model');
+    assert.equal(stores.has('jrda-cache-3.0.0'), false);
+    assert.equal(stores.has('jrda-semantic-v1'), true);
   });
 
   it('treats a top-level navigation as an HTML request', () => {

@@ -8,8 +8,9 @@
  * model, and its download, out of `embeddings-worker.js`, which stays
  * model-free for the record modal.
  *
- * The model loads lazily on the first query, from a CDN, and the browser caches
- * it. Readers who never turn the toggle on never pay for it.
+ * The model loads lazily on the first query from archive-local, versioned
+ * assets, and the browser caches it. Readers who never turn the toggle on never
+ * pay for it.
  *
  * Two contracts must hold or recall degrades silently, with no error:
  *
@@ -31,58 +32,60 @@ import {
   normalizeInPlace,
   DEFAULT_EMBEDDINGS_BIN_URL,
   DEFAULT_EMBEDDINGS_INDEX_URL,
-} from './embeddings-worker.js?v=3.8.38';
+} from './embeddings-worker.js?v=3.8.39';
 
 // The sentence-transformer that produced data/archive-embeddings.bin. A query
 // encoded by any other model lands in a different space and ranks noise.
 // tests/semantic-search-worker.test.js pins this to the builder's MODEL_ID.
 export const QUERY_MODEL_ID = 'Xenova/bge-small-en-v1.5';
+export const QUERY_MODEL_REVISION = 'ea104dacec62c0de699686887e3f920caeb4f3e3';
 
 // The instruction prefix bge-small-en-v1.5 prescribes for the query side only.
 // The passage side stays bare, which is what the builder does.
 export const QUERY_PREFIX =
   'Represent this sentence for searching relevant passages: ';
 
-// Runtime source for the encoder. The same package the builder uses, served as
-// a browser module by the CDN the app already imports React from.
-export const TRANSFORMERS_MODULE_URL =
-  'https://esm.sh/@huggingface/transformers@4.2.0';
+// Runtime and model assets are pinned under one immutable local directory. Keep
+// these URLs relative to the worker so localhost, GitHub Pages, and the archive
+// subdirectory all resolve the same files.
+export const SEMANTIC_ASSET_BASE_URL = new URL('../vendor/semantic/v1/', import.meta.url).href;
+export const SEMANTIC_MODEL_BASE_URL = new URL('models/', SEMANTIC_ASSET_BASE_URL).href;
+export const TRANSFORMERS_MODULE_URL = new URL(
+  'runtime/transformers.web.min.js',
+  SEMANTIC_ASSET_BASE_URL,
+).href;
 
 // Semantic search loads this larger social store. The similar-in-theme feature
 // continues to load only the smaller edited-record store.
 export const DEFAULT_SOCIAL_EMBEDDINGS_BIN_URL =
-  '../../data/archive-social-embeddings.bin?v=3.8.38';
+  '../../data/archive-social-embeddings.bin?v=3.8.39';
 export const DEFAULT_SOCIAL_EMBEDDINGS_INDEX_URL =
-  '../../data/archive-social-embeddings.json?v=3.8.38';
+  '../../data/archive-social-embeddings.json?v=3.8.39';
 
-/**
- * Every host this worker reaches at runtime, so the deployed Content Security
- * Policy can be checked against it (tests/semantic-search-csp.test.js).
- *
- * The module is one import, but loading a model is three separate downloads:
- *
- *  - esm.sh serves the transformers module itself;
- *  - huggingface.co serves the model config, tokenizer, and weights, and
- *    redirects the weights to whichever storage host it is using that day
- *    (today an xet bridge under hf.co; older repos use cdn-lfs hosts). A
- *    redirect is re-checked against connect-src, so the targets must be
- *    allowed too, not just huggingface.co;
- *  - cdn.jsdelivr.net serves the onnxruntime-web WebAssembly runtime, which is
- *    where transformers points wasmPaths by default.
- *
- * All three are fetch/XHR, so all three are connect-src. Miss one and the
- * feature fails on the live site while working in local development, where no
- * policy header is served.
- */
-export const ENCODER_CONNECT_HOSTS = Object.freeze([
-  'https://esm.sh',
-  'https://huggingface.co',
-  'https://cas-bridge.xethub.hf.co',
-  'https://us.aws.cdn.hf.co',
-  'https://cdn-lfs-us-1.hf.co',
-  'https://cdn-lfs.huggingface.co',
-  'https://cdn.jsdelivr.net',
-]);
+/** Select Safari in both window and dedicated-worker navigator shapes. */
+export function isSafariRuntime({ userAgent = '', vendor = '' } = globalThis.navigator ?? {}) {
+  const identifiesSafari = vendor.includes('Apple')
+    || (!vendor && /Version\/[\d.]+.*Safari\//.test(userAgent));
+  return identifiesSafari
+    && !/CriOS|FxiOS|EdgiOS|OPiOS|mercury|brave/i.test(userAgent)
+    && !userAgent.includes('Chrome')
+    && !userAgent.includes('Android');
+}
+
+/** Select the pinned Safari/non-Safari WASM variants. */
+export function selectLocalWasmAssets(navigatorValue = globalThis.navigator) {
+  const suffix = isSafariRuntime(navigatorValue) ? '' : '.asyncify';
+  return {
+    mjs: new URL(
+      `runtime/ort-wasm-simd-threaded${suffix}.mjs`,
+      SEMANTIC_ASSET_BASE_URL,
+    ).href,
+    wasm: new URL(
+      `runtime/ort-wasm-simd-threaded${suffix}.wasm`,
+      SEMANTIC_ASSET_BASE_URL,
+    ).href,
+  };
+}
 
 // How many records one query may return, and how similar a match must be to
 // count.
@@ -182,13 +185,51 @@ export function buildQueryText(query) {
 }
 
 /**
- * Load the encoder from the CDN. Reached only through the `createEncoder` seam
- * below, so every other function here runs offline in tests.
+ * Load the encoder from local assets. Reached only through the `createEncoder`
+ * seam below, so every other function here runs offline in tests.
  */
 async function defaultCreateEncoder() {
-  const { pipeline } = await import(TRANSFORMERS_MODULE_URL);
-  const extractor = await pipeline('feature-extraction', QUERY_MODEL_ID, {
+  const {
+    AutoModel,
+    BertTokenizer,
+    env,
+    FeatureExtractionPipeline,
+  } = await import(TRANSFORMERS_MODULE_URL);
+  env.allowRemoteModels = false;
+  env.allowLocalModels = true;
+  env.localModelPath = SEMANTIC_MODEL_BASE_URL;
+  // The archive service worker owns the single persistent copy. Avoid a
+  // second Transformers.js Cache API copy of the same large model and WASM.
+  env.useBrowserCache = false;
+  env.useWasmCache = false;
+  env.backends.onnx.wasm.wasmPaths = selectLocalWasmAssets();
+
+  // Load the fixed tokenizer files directly to avoid the pipeline registry's
+  // remote metadata probe. The registry cannot discover a tokenizer at an HTTP
+  // localModelPath while remote model access is disabled.
+  const loadOptions = {
     dtype: 'q8',
+    local_files_only: true,
+    revision: QUERY_MODEL_REVISION,
+  };
+  const modelUrl = new URL(`${QUERY_MODEL_ID}/`, SEMANTIC_MODEL_BASE_URL);
+  const loadJson = async (filename) => {
+    const response = await fetch(new URL(filename, modelUrl));
+    if (!response.ok) {
+      throw new Error(`semantic search: ${filename} returned ${response.status}`);
+    }
+    return response.json();
+  };
+  const [model, tokenizerJson, tokenizerConfig] = await Promise.all([
+    AutoModel.from_pretrained(QUERY_MODEL_ID, loadOptions),
+    loadJson('tokenizer.json'),
+    loadJson('tokenizer_config.json'),
+  ]);
+  const tokenizer = new BertTokenizer(tokenizerJson, tokenizerConfig);
+  const extractor = new FeatureExtractionPipeline({
+    task: 'feature-extraction',
+    model,
+    tokenizer,
   });
   return async (text) => {
     const output = await extractor(text, { pooling: 'mean', normalize: true });
