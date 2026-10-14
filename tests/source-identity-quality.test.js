@@ -110,10 +110,10 @@ describe('source identity quality evaluator', () => {
     const report = fixtureReport(t);
 
     assert.deepEqual(report.denominators.source, {
-      total: 9,
+      total: 10,
       by_class: {
         curated_article: 2,
-        curated_other: 2,
+        curated_other: 3,
         social_post: 4,
         thread_container: 1
       }
@@ -149,9 +149,21 @@ describe('source identity quality evaluator', () => {
     assert.equal(resultFor(report, 'THREAD-00002', 'source.id.format').state, 'invalid');
     assert.equal(recordById(report, 'RECORD-00004').record_class, 'social_post');
     assert.equal(resultFor(report, 'RECORD-00004', 'source.id.format').state, 'invalid');
+    assert.equal(recordById(report, 'RECORD-00005').record_class, 'curated_other');
+    assert.equal(resultFor(report, 'RECORD-00005', 'source.publication_date.presence').state, 'pass');
+    assert.equal(resultFor(report, 'RECORD-00005', 'source.publication_date.parseability').state, 'invalid');
+    assert.equal(recordById(report, 'RECORD-00005').state, 'needs_review');
   });
 
-  it('refuses an unclassified source-file and content-type pair', t => {
+  it('keeps exact curated profiles ahead of the curated fallback', t => {
+    const report = fixtureReport(t);
+
+    assert.equal(recordById(report, 'RECORD-00001').record_class, 'curated_article');
+    assert.equal(recordById(report, 'THREAD-00001').record_class, 'thread_container');
+    assert.equal(recordById(report, 'RECORD-00005').record_class, 'curated_other');
+  });
+
+  it('refuses an unclassified social content type', t => {
     const inputs = fixtureInputs(t);
     inputs.rows.find(item => item.row.id === 'TWTR-00001').row.content_type = 'Unknown social form';
     assert.throws(
@@ -183,11 +195,11 @@ describe('source identity quality evaluator', () => {
 
     assert.deepEqual(report.summary.records.states, {
       critical_failure: 4,
-      needs_review: 2,
+      needs_review: 3,
       pass: 3
     });
     assert.deepEqual(report.summary.critical_failures, { results: 5, records: 4 });
-    assert.equal(report.summary.results.score_percent, 85.96);
+    assert.equal(report.summary.results.score_percent, 85.94);
     assert.equal(report.current_social_findings.summary_not_applicable.count, 4);
   });
 
@@ -215,6 +227,7 @@ describe('source identity quality evaluator', () => {
       'RECORD-00001',
       'RECORD-00002',
       'RECORD-00003',
+      'RECORD-00005',
       'THREAD-00001',
       'THREAD-00002',
       'BSKY-00001',
@@ -254,13 +267,50 @@ describe('source identity quality evaluator', () => {
     assert.match(summary, /Social rows missing a source URL: 1\. Explicitly unverified: 1\. Overlap: 1\./);
     assert.doesNotMatch(summary, /Curator summary/);
   });
+
+  it('reports producer-like Appearance findings without failing or changing inputs', t => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'source-identity-quality-cli-'));
+    t.after(() => fs.rmSync(tempDir, { recursive: true, force: true }));
+    const evidencePath = writeFixtureEvidence(tempDir);
+    const inputPaths = [
+      policyPath,
+      evidencePath,
+      path.join(fixtureDir, 'archive_records-public.csv'),
+      path.join(fixtureDir, 'social_posts.csv'),
+      path.join(fixtureDir, 'archive-data.json')
+    ];
+    const hashesBefore = inputPaths.map(fileSha256);
+
+    const summary = execFileSync(
+      process.execPath,
+      [
+        path.join(rootDir, 'scripts', 'evaluate-source-identity-quality.mjs'),
+        '--data-dir', fixtureDir,
+        '--policy', policyPath,
+        '--evidence', evidencePath
+      ],
+      { cwd: rootDir, encoding: 'utf8' }
+    );
+
+    assert.match(summary, /\| invalid \| 6 \|/);
+    assert.match(summary, /Critical findings: 5 results across 4 source records/);
+    assert.deepEqual(inputPaths.map(fileSha256), hashesBefore);
+  });
 });
 
 describe('current source identity baseline', () => {
-  it('reports current truth separately from the historical 38-row cohort', () => {
+  it('reconciles live source and runtime arithmetic without imposing quality thresholds', () => {
     const report = evaluateSourceIdentityQuality({ rootDir });
+    const registry = JSON.parse(fs.readFileSync(
+      path.join(rootDir, 'data', 'source-identity-quality-evidence.json'),
+      'utf8'
+    ));
     const curatedRows = readSourceRows(path.join(rootDir, 'data', 'archive_records-public.csv'));
     const socialRows = readSourceRows(path.join(rootDir, 'data', 'social_posts.csv'));
+    const runtimeRecords = JSON.parse(fs.readFileSync(
+      path.join(rootDir, 'data', 'archive-data.json'),
+      'utf8'
+    )).records;
     const missingUrlIds = socialRows
       .filter(row => !String(row.url || '').trim())
       .map(row => row.id)
@@ -271,28 +321,63 @@ describe('current source identity baseline', () => {
       .sort();
     const uncertainSet = new Set(uncertainIds);
     const overlapIds = missingUrlIds.filter(id => uncertainSet.has(id));
-    const curatedMissingUrls = report.records.filter(record => (
-      record.record_class !== 'social_post'
-      && record.results.some(result => (
-        result.rule_id === 'source.url.presence' && result.state === 'missing'
-      ))
-    ));
+    const curatedMissingUrlIds = curatedRows
+      .filter(row => !String(row.url || '').trim())
+      .map(row => row.id)
+      .sort();
 
     assert.equal(report.denominators.source.total, curatedRows.length + socialRows.length);
     assert.equal(report.denominators.source.by_class.social_post, socialRows.length);
-    assert.equal(curatedMissingUrls.length, 0);
+    assert.equal(
+      Object.values(report.denominators.source.by_class).reduce((sum, count) => sum + count, 0),
+      report.denominators.source.total
+    );
+    assert.equal(report.denominators.published_runtime.total, runtimeRecords.length);
+    assert.equal(
+      report.denominators.published_runtime.source_backed
+        + report.denominators.published_runtime.generated_or_injected,
+      report.denominators.published_runtime.total
+    );
+    assert.equal(
+      Object.values(report.denominators.published_runtime.source_backed_by_class)
+        .reduce((sum, count) => sum + count, 0),
+      report.denominators.published_runtime.source_backed
+    );
+    assert.equal(
+      Object.values(report.summary.records.states).reduce((sum, count) => sum + count, 0),
+      report.summary.records.total
+    );
+    assert.equal(
+      Object.values(report.summary.results.states).reduce((sum, count) => sum + count, 0),
+      report.summary.results.total
+    );
+    assert.equal(
+      report.summary.results.applicable + report.summary.results.states.not_applicable,
+      report.summary.results.total
+    );
+    assert.equal(
+      report.summary.results.passing,
+      report.summary.results.states.pass + report.summary.results.states.intentionally_absent
+    );
+    assert.equal(report.summary.critical_failures.results, report.critical_failures.length);
+    assert.equal(
+      report.summary.critical_failures.records,
+      new Set(report.critical_failures.map(finding => finding.record_id)).size
+    );
+    assert.deepEqual(report.current_curated_findings.missing_url, {
+      count: curatedMissingUrlIds.length,
+      record_ids: curatedMissingUrlIds
+    });
     assert.deepEqual(report.current_social_findings.missing_url.record_ids, missingUrlIds);
     assert.deepEqual(report.current_social_findings.uncertain_verification.record_ids, uncertainIds);
     assert.deepEqual(report.current_social_findings.missing_url_and_uncertain_verification_overlap.record_ids, overlapIds);
     assert.equal(report.current_social_findings.summary_not_applicable.count, socialRows.length);
-    assert.deepEqual(report.current_curated_findings.missing_url, { count: 0, record_ids: [] });
     const measuredIds = new Set(report.historical_measurements[0].measured.overlap_record_ids);
     assert.equal(
       report.historical_measurements[0].current_cohort.overlap,
       overlapIds.filter(id => measuredIds.has(id)).length
     );
-    assert.equal(report.exceptions.length, 0);
-    assert.equal(report.summary.results.states.invalid, 0);
+    assert.equal(report.exceptions.length, registry.exceptions.length);
   });
 
   it('grounds the historical overlap cohort in the archived recovery note', () => {

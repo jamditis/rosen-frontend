@@ -4,3 +4,4 @@ RECORD-00002,Interview (Audio/Video),,2023-12-01,Interview summary,TRUE
 THREAD-00001,Social Media Thread,https://example.test/thread,2024-01-31,Thread summary,TRUE
 THREAD-00002,Article,https://example.test/misclassified,2024-01-31,Article summary,TRUE
 RECORD-00003,Video,https://example.test/video,2023-02-29,,TRUE
+RECORD-00005,Appearance,https://www.youtube.com/watch?v=fixture,20261014,Video appearance summary,TRUE

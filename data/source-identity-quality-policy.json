@@ -4,7 +4,7 @@
   },
   "policy": {
     "id": "source-identity-quality",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "result_identity": "sha256(policy ID, source file, record ID, class, profile version, rule ID and rule version)"
   },
   "states": [
@@ -127,18 +127,10 @@
     },
     {
       "id": "curated_other",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "match": {
         "source_file": "archive_records-public.csv",
-        "content_types": [
-          "Book Chapter",
-          "Interview (Audio/Video)",
-          "Newspaper Clipping",
-          "Panel Discussion",
-          "Speech/Lecture",
-          "Tweet/Thread",
-          "Video"
-        ]
+        "fallback": true
       },
       "id_pattern": "^(?:RECORD|CLIP)-[0-9]{5}$",
       "applicable_rules": [
