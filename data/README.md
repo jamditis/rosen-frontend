@@ -85,6 +85,26 @@ The first command covers non-social records. The second command covers social
 records. Both commands run the same model locally and write a binary plus its
 hash-bound JSON index. The first run can download the model files.
 
+For later social-only updates, reuse byte-identical vectors whose exact source
+text did not change:
+
+```bash
+npm run build-social-embeddings -- --incremental
+```
+
+An older social index has no per-record text hashes. Its first incremental run
+must name the matching baseline archive explicitly, for example:
+
+```bash
+npm run build-social-embeddings -- --incremental \
+  --previous-archive /path/to/baseline/archive-data.json
+```
+
+The command verifies the previous model, vector layout, binary size, checksum,
+and text hashes before it reuses any vector. It writes current IDs in current
+archive order, so removed records disappear and reordered records move with
+their vectors.
+
 ### Relationship adjacency export
 
 `npm run export-data` also writes the relationship adjacency manifest and its
