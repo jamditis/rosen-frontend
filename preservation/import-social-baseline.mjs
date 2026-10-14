@@ -12,10 +12,10 @@
  * This is a baseline import, not a live crawl:
  *   - It never makes a network call.
  *   - It never replaces or edits data/social_posts.csv.
- *   - Every event uses the schema's `not-requested` retrieval outcome, which
- *     marks "we packaged existing evidence" as distinct from a real capture
- *     attempt. A later stewardship stage can append real capture-attempt,
- *     fixity, storage-copy, and rights events without touching this baseline.
+ *   - Every event is `artifact-created`, because this process creates local
+ *     metadata but does not attempt a network capture. A later stewardship
+ *     stage can append real capture-attempt, fixity, storage-copy, and rights
+ *     events without touching this baseline.
  *   - Its `review.state` is always `not-reviewed` on a normal row: nothing
  *     was actually captured or reviewed here, so nothing is asserted as
  *     `accepted`. A real capture or an explicit `review-decision` event can
@@ -26,24 +26,18 @@
  * that carries content, including `raw_text`, `excerpt`, `pull_quote`,
  * `related_to`, `responds_to`, and every taxonomy field — are copied verbatim
  * into that row's event as `normalizationEvidence.observations`, so nothing in
- * the row is silently dropped. The manifest also records one `metadata`
- * artifact per row: a SHA-256 digest of the row, used as a fixity anchor, not
- * a byte store — the artifact's `uri` is a content hash, not a resolvable
- * location, and `storageCopies` is empty because this baseline keeps no
- * separate copy of the row. The row's actual content lives in
- * `normalizationEvidence.observations` (for rows with a canonical URL) and,
- * unconditionally, in data/social_posts.csv itself.
+ * the row is silently dropped. The manifest records separate SHA-256 digests
+ * for the canonical JSON serialization of the parsed source fields, the
+ * normalized object, and the generated metadata artifact. These are logical
+ * JSON representations, not the exact CSV source bytes. The artifact's `uri`
+ * is a content hash, not a resolvable location, and `storageCopies` is empty
+ * because this baseline keeps no separate copy of the generated JSON.
  *
  * A row with no recoverable canonical URL (its source link was removed as
  * unresolved, see the row's own notes) still gets an object and a digest
  * artifact, but its canonical source becomes an explicit `missing-url` URN
- * and its event is an `artifact-created` event marked `review-required`
- * instead of a capture attempt. The schema's event vocabulary does not allow
- * `normalizationEvidence` on an `artifact-created` event, so those rows carry
- * no observations at all in the manifest — no preserved text, no author, no
- * relationships. The row's own data is untouched in data/social_posts.csv;
- * only the manifest-level record of it is thinner for these rows. See
- * preservation/README.md for the current count and disclosure.
+ * and its event is marked `review-required`. It retains the same normalization
+ * evidence as other rows without inventing a source URL or capture event.
  *
  * This script derives its manifest fresh from the CSV on every run, so
  * running it twice on an unchanged CSV verifies nothing about drift by
@@ -75,7 +69,8 @@ import { validatePreservationManifest } from './validate-preservation-manifests.
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const defaultCsvPath = path.resolve(moduleDir, '../data/social_posts.csv');
-const TASK_VERSION = 'social-baseline-import@1.0.0';
+const TASK_VERSION = 'social-baseline-import@1.1.0';
+const FIELD_MAPPING_ID = 'social-posts-csv-v1';
 const DEFAULT_CAPTURE_NOTES =
   'Baseline import of the existing CSV row; no new capture was performed.';
 const DEFAULT_MISSING_URL_NOTES =
@@ -83,9 +78,8 @@ const DEFAULT_MISSING_URL_NOTES =
   + 'from data/social_posts.csv as an explicit missing-source-url state.';
 
 // Fixed, human-readable crosswalk from every social_posts.csv column to where
-// it lands in the preserved manifest. This does not vary per row, so the
-// object itself is built once — but it is still serialized into every event's
-// normalizationEvidence, once per row (see preservation/README.md for why).
+// it lands in the preserved manifest. Schema 1.1 stores it once and events
+// refer to it by FIELD_MAPPING_ID.
 const FIELD_MAPPING = {
   id: 'sourceRecordId and the object/artifact stable-ID suffix',
   title: 'observations.title',
@@ -141,8 +135,12 @@ function canonicalize(value) {
   return value;
 }
 
+function canonicalJson(value) {
+  return JSON.stringify(canonicalize(value));
+}
+
 function digest(value) {
-  return createHash('sha256').update(JSON.stringify(canonicalize(value))).digest('hex');
+  return createHash('sha256').update(canonicalJson(value)).digest('hex');
 }
 
 function firstNonEmpty(...values) {
@@ -211,9 +209,9 @@ function buildObservations(row) {
  * Build a compact id -> row-digest checksum pin. This is what makes
  * `--verify` able to detect drift instead of just re-deriving the same
  * digest it is about to compare against itself (see the module doc comment).
- * Digests here must be computed the same way as the per-row digest in
- * convertSocialBaselineRows (raw, pre-unescape row) so a pin built by
- * --write-checksums matches what a later --verify run recomputes.
+ * Digests here use the same canonical JSON serialization of the parsed,
+ * pre-unescape fields as `rawSourceSha256` in convertSocialBaselineRows. This
+ * is parsed-record fixity, not exact CSV source-byte fixity.
  */
 export function buildChecksumPin(rawRows, options = {}) {
   if (!Array.isArray(rawRows) || rawRows.length === 0) {
@@ -321,13 +319,11 @@ export function checkChecksumDrift(rawRows, { pinPath, required }) {
  * into a preservation-manifest v1 baseline. Exported separately from the CSV
  * reader so tests and future importers can feed rows directly.
  *
- * `rows` are treated as raw, pre-unescape CSV rows: the row digest (and so
- * every artifact/event ID and the checksum pin) is computed on the row
- * exactly as parsed, before data/lib/csv-unescape.js's formula-injection
- * unescape runs. That digest is therefore a fixity check on the row's own
- * bytes, not on a derived form of them. The formula-safe apostrophe is
- * stripped only when building the human-facing text in
- * normalizationEvidence.observations.
+ * `rows` are treated as raw, pre-unescape parsed CSV rows. `rawSourceSha256`
+ * and the checksum pin hash a documented canonical JSON serialization of
+ * those parsed fields before data/lib/csv-unescape.js removes formula-safe
+ * apostrophes. This is not a digest of the source CSV row bytes. The apostrophe
+ * is stripped only when building the normalized object and observations.
  */
 export function convertSocialBaselineRows(rows, options = {}) {
   if (!Array.isArray(rows) || rows.length === 0) {
@@ -343,117 +339,92 @@ export function convertSocialBaselineRows(rows, options = {}) {
     const row = unescapeRow(rawRow);
     const id = requireText(row.id, 'id');
     const objectId = `urn:rosen:object:social-post:${id}`;
-    const rowDigest = digest(rawRow);
+    const rawSourceDigest = digest(rawRow);
     const hasUrl = typeof row.url === 'string' && row.url.length > 0;
     const canonicalSourceUrl = hasUrl ? row.url : `urn:rosen:social-source:missing-url:${id}`;
-    const artifactId = `urn:rosen-preservation:artifact:social-baseline:${id}:sha256:${rowDigest}`;
-    const artifactByteSize = Buffer.byteLength(JSON.stringify(canonicalize(rawRow)), 'utf8');
-
-    objects.push({
+    const archiveObject = {
       objectId,
       objectType: 'social-post',
       canonicalSourceUrl,
       sourceRecordId: id,
       ...(row.title ? { label: row.title } : {}),
-    });
+    };
+    const observations = buildObservations(row);
+    const normalizedObject = { archiveObject, observations };
+    const normalizedObjectDigest = digest(normalizedObject);
+    const artifactPayload = {
+      artifactSchemaVersion: '1.0.0',
+      fieldMappingId: FIELD_MAPPING_ID,
+      normalizedObject,
+      rawSourceRow: rawRow,
+    };
+    const artifactJson = canonicalJson(artifactPayload);
+    const artifactDigest = createHash('sha256').update(artifactJson).digest('hex');
+    const artifactId = `urn:rosen-preservation:artifact:social-baseline:${id}:sha256:${artifactDigest}`;
+    const eventId = `urn:rosen-preservation:event:social-baseline:${id}:${digest([
+      id,
+      rawSourceDigest,
+      normalizedObjectDigest,
+      artifactDigest,
+      'artifact-created',
+    ])}`;
 
-    if (hasUrl) {
-      const eventId = `urn:rosen-preservation:event:social-baseline:${id}:${digest([id, rowDigest, 'capture-attempt'])}`;
-      events.push({
-        eventId,
-        eventType: 'capture-attempt',
-        objectId,
-        taskVersion: TASK_VERSION,
-        inputHash: rowDigest,
-        actor: {
-          actorType: 'automation',
-          actorId: 'social-baseline-import-tool',
-        },
-        occurredAt: importedAt,
-        review: {
-          // Never 'accepted' here: no capture was attempted, so nothing has
-          // been reviewed and accepted yet. The CSV's own verified column is
-          // preserved honestly as observations.verified above, not folded
-          // into this event's review state.
-          state: 'not-reviewed',
-          notes: firstNonEmpty(row.notes, DEFAULT_CAPTURE_NOTES),
-        },
-        artifactId,
-        retrieval: {
-          requestedUrl: row.url,
-          httpStatus: null,
-          httpOutcome: 'not-requested',
-          mediaType: null,
-          bytesReceived: 0,
-          client: {
-            name: 'not-requested',
-            version: TASK_VERSION,
-          },
-          semanticOutcome: 'uncertain',
-        },
-        normalizationEvidence: {
-          sourceLocator: row.url,
-          observations: buildObservations(row),
-          fieldMapping: FIELD_MAPPING,
-          normalizedObjectSha256: rowDigest,
-          captureMode: 'baseline-import',
-          recordSource: 'data/social_posts.csv',
-          runtimeNetworkAccess: false,
-        },
-      });
-      artifacts.push({
-        artifactId,
-        objectId,
-        captureEventId: eventId,
-        artifactType: 'metadata',
-        uri: `urn:sha256:${rowDigest}`,
-        sha256: rowDigest,
-        byteSize: artifactByteSize,
-        mediaType: 'application/json',
-        storageCopies: [],
-      });
-    } else {
-      missingUrlCount += 1;
-      const eventId = `urn:rosen-preservation:event:social-baseline:${id}:${digest([id, rowDigest, 'artifact-created'])}`;
-      events.push({
-        eventId,
-        eventType: 'artifact-created',
-        objectId,
-        taskVersion: TASK_VERSION,
-        inputHash: rowDigest,
-        actor: {
-          actorType: 'automation',
-          actorId: 'social-baseline-import-tool',
-        },
-        occurredAt: importedAt,
-        review: {
-          state: 'review-required',
-          notes: firstNonEmpty(row.notes, DEFAULT_MISSING_URL_NOTES),
-        },
-        artifactId,
-      });
-      artifacts.push({
-        artifactId,
-        objectId,
-        artifactType: 'metadata',
-        uri: `urn:sha256:${rowDigest}`,
-        sha256: rowDigest,
-        byteSize: artifactByteSize,
-        mediaType: 'application/json',
-        storageCopies: [],
-      });
-    }
+    if (!hasUrl) missingUrlCount += 1;
+    objects.push(archiveObject);
+    events.push({
+      eventId,
+      eventType: 'artifact-created',
+      objectId,
+      taskVersion: TASK_VERSION,
+      inputHash: rawSourceDigest,
+      actor: {
+        actorType: 'automation',
+        actorId: 'social-baseline-import-tool',
+      },
+      occurredAt: importedAt,
+      review: {
+        // Never 'accepted' here: no source capture or review was performed.
+        state: hasUrl ? 'not-reviewed' : 'review-required',
+        notes: firstNonEmpty(
+          row.notes,
+          hasUrl ? DEFAULT_CAPTURE_NOTES : DEFAULT_MISSING_URL_NOTES,
+        ),
+      },
+      artifactId,
+      normalizationEvidence: {
+        sourceLocator: `data/social_posts.csv#id=${encodeURIComponent(id)}`,
+        observations,
+        fieldMappingId: FIELD_MAPPING_ID,
+        rawSourceSha256: rawSourceDigest,
+        normalizedObjectSha256: normalizedObjectDigest,
+        captureMode: 'baseline-import',
+        recordSource: 'data/social_posts.csv',
+        runtimeNetworkAccess: false,
+      },
+    });
+    artifacts.push({
+      artifactId,
+      objectId,
+      creationEventId: eventId,
+      artifactType: 'metadata',
+      uri: `urn:sha256:${artifactDigest}`,
+      sha256: artifactDigest,
+      byteSize: Buffer.byteLength(artifactJson, 'utf8'),
+      mediaType: 'application/json',
+      storageCopies: [],
+    });
   }
 
   const manifest = {
-    schemaVersion: '1.0.0',
+    schemaVersion: '1.1.0',
     vocabularyVersion: '1.0.0',
-    manifestId: `urn:rosen-preservation:manifest:social-baseline:${digest(rows)}`,
+    manifestId: `urn:rosen-preservation:manifest:social-baseline:${digest(['1.1.0', rows])}`,
     createdAt: importedAt,
     description:
       'Preservation baseline packaging existing data/social_posts.csv rows '
       + '(issue #717). No new live retrieval was performed. Regenerated fresh from '
       + 'the CSV on every run; see social-baseline-checksums.json for drift detection.',
+    fieldMappings: [{ fieldMappingId: FIELD_MAPPING_ID, fields: FIELD_MAPPING }],
     objects,
     events,
     artifacts,

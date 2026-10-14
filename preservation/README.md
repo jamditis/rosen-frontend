@@ -100,7 +100,7 @@ filesystem layout.
 
 | Field | Requirement | Meaning |
 |---|---|---|
-| `schemaVersion` | Required | Data-shape version. Version 1 requires `1.0.0`. |
+| `schemaVersion` | Required | Data-shape version. The validator accepts `1.0.0` and `1.1.0`. |
 | `vocabularyVersion` | Required | Event and state vocabulary version. Version 1 requires `1.0.0`. |
 | `manifestId` | Required | Stable `urn:rosen-preservation:manifest:*` identifier. |
 | `createdAt` | Required | UTC timestamp for this manifest representation, at or after every contained event and storage-copy creation. |
@@ -109,6 +109,7 @@ filesystem layout.
 | `artifacts` | Required | Captured or generated artifacts and their storage copies. May be empty. |
 | `supersedesManifestId` | Optional | Prior manifest when a versioned migration creates a new representation. |
 | `description` | Optional | Human-readable scope note. |
+| `fieldMappings` | Optional in 1.1 | Shared named field mappings referenced by normalization evidence. Inline `fieldMapping` remains valid for 1.1 producers that do not use the registry. |
 
 ### Object fields
 
@@ -143,6 +144,16 @@ missing targets, forward references, cross-object corrections, duplicate IDs,
 and two corrections that claim the same predecessor. Existing events are never
 removed or rewritten.
 
+Schema 1.1 events may use `captureEventId` to link later validation or
+enrichment evidence to an earlier real `capture-attempt` for the same object.
+The link does not imply a new capture. It must resolve to an earlier event in
+the append-only manifest, cannot point to an event already superseded when the
+link is appended or to a `not-requested` event, and cannot claim validation or
+enrichment before the linked capture occurred. Each current artifact-specific
+event must link to the same capture named by that artifact's `captureEventId`.
+A later correction can rebind the artifact when it also supersedes current
+artifact-specific links to the old capture; superseded links remain as history.
+
 All ISO timestamps must name a real UTC calendar instant, not merely match the
 timestamp character pattern. Wayback capture timestamps receive the same
 calendar check and must equal the timestamp embedded in their replay URL.
@@ -156,7 +167,7 @@ event's `occurredAt`.
 | `source-check` | `retrieval` | Observe a source without retaining an artifact. |
 | `capture-attempt` | `retrieval` | Record a bounded retrieval attempt, successful or not. |
 | `wayback-reference` | `wayback` | Record an existing timestamped replay without implying a new deposit. |
-| `artifact-created` | `artifactId` | Record creation of a manifest artifact. |
+| `artifact-created` | `artifactId` | Record creation of a manifest artifact. Schema 1.1 also permits normalization evidence. |
 | `storage-copy-created` | `artifactId`, `storageCopyId` | Record a new physical or service copy. |
 | `fixity-check` | `fixity` | Compare an artifact against an expected SHA-256. |
 | `rights-decision` | `rights` | Record versioned rights, access, and deposit states. |
@@ -187,13 +198,17 @@ An artifact requires a stable artifact ID, owning object ID, artifact type,
 URI, SHA-256, byte size, and `storageCopies` array. HTTP-response artifacts also
 require their originating capture-event ID. Generated metadata, checksum, and
 other non-response artifacts may omit that ID, but they must have one current
-`artifact-created` event. An artifact cannot have multiple current creation
-events, even when its capture also names it. A superseded capture no longer
-introduces an artifact. The retained artifact must point to a current correcting
-capture that declares it or have a current `artifact-created` event. The storage
-array may be empty when evidence proves a response digest but does not name a
-retained copy. Each named storage copy requires its own stable ID, URI, storage
-class, access state, and creation time.
+`artifact-created` event. Schema 1.1 artifacts may point to that event with
+`creationEventId`; this gives generated artifacts an explicit back-reference
+without fabricating a capture. A valid 1.0-style artifact may omit the link
+when its single current creation event is unambiguous. When supplied, the link
+must resolve to that current event. An artifact cannot have multiple current
+creation events, even when its capture also names it. A superseded capture no
+longer introduces an artifact. The retained artifact must point to a current
+correcting capture that declares it or have a current `artifact-created` event.
+The storage array may be empty when evidence proves a response digest but does
+not name a retained copy. Each named storage copy requires its own stable ID,
+URI, storage class, access state, and creation time.
 
 The validator ensures object, event, artifact, fixity, and storage-copy
 references resolve and remain within one object. When a capture attempt names
@@ -276,31 +291,42 @@ so the archive's own evidence survives even if a live post is deleted or a
 platform disappears before its screenshot is captured.
 
 This is a baseline import, not a live crawl. It never makes a network call and
-never edits `data/social_posts.csv`. Each row becomes one `social-post` object
-keyed by its own stable archive record ID (`BSKY-*`, `TWTR-*`, `MAST-*`), plus
-one `metadata` artifact. That artifact is a SHA-256 digest of the row and
-nothing more: it is a fixity anchor, not a byte store. Its `uri` is a content
-hash (`urn:sha256:<digest>`), not a resolvable location, and `storageCopies` is
-empty, because this baseline keeps no separate copy of the row. The archive's
-real, byte-for-byte copy of the row is `data/social_posts.csv` itself, which
-this script only ever reads.
+never edits `data/social_posts.csv`. Each row becomes one `social-post` object,
+one `artifact-created` event, and one generated `metadata` artifact. The
+artifact event is not a capture attempt. Its `uri` is a content hash, not a
+resolvable location, and `storageCopies` is empty because the importer does not
+retain a separate generated JSON file.
 
-For a row that has a canonical URL, every field the row carries — its raw
-text, excerpt, pull quote, taxonomy fields, engagement counts,
-`related_to`/`responds_to`, and the rest — is copied verbatim into that row's
-event as `normalizationEvidence.observations` (see `FIELD_MAPPING` in
-`import-social-baseline.mjs` for the full column crosswalk). That is where the
-row's content actually lives in the manifest; the artifact digest is a check
-against it, not a container for it. The event vocabulary treats this the same
-way as a real retrieval attempt that intentionally made no request:
+Every source field is copied into `normalizationEvidence.observations`, for
+rows with or without a canonical URL. One top-level `fieldMappings` entry holds
+the shared column crosswalk, and every event references it by
+`fieldMappingId`. This avoids copying the same mapping into every event.
+
+The importer records three separate digests:
+
+- `rawSourceSha256` and `inputHash` hash canonical JSON for the original parsed,
+  pre-unescape CSV fields. They do not claim exact CSV row-byte fixity.
+- `normalizedObjectSha256` hashes the normalized archive object and observations.
+- The artifact `sha256` hashes the generated metadata representation containing
+  the parsed source fields, normalized object, and mapping ID.
+
+The artifact points back to its event with `creationEventId`. It has no
+`captureEventId`, because no network capture occurred.
+
+This importer derives a new package from the current CSV. Its generated
+metadata envelope and corrected `artifact-created` assertion have their own
+content-addressed artifact, event, and manifest IDs. It does not migrate or
+overwrite a previously retained manifest. Keep any prior retained output as
+history; converting that history would require the major-version migration
+procedure in `MIGRATING.md`.
 
 | Row state | Event | `httpOutcome` | `review.state` | Carries `normalizationEvidence`? |
 |---|---|---|---|---|
-| Has a canonical URL | `capture-attempt` | `not-requested` | `not-reviewed` | Yes — every populated field, verbatim |
-| No recoverable canonical URL | `artifact-created` | n/a (no `retrieval` payload) | `review-required` | No — the schema's `artifact-created` event type carries only `artifactId` |
+| Has a canonical URL | `artifact-created` | n/a (no `retrieval` payload) | `not-reviewed` | Yes - every source field |
+| No recoverable canonical URL | `artifact-created` | n/a (no `retrieval` payload) | `review-required` | Yes - every source field, with an explicit missing-URL URN |
 
-`review.state` is `not-reviewed` on every baseline `capture-attempt`, whether
-or not the row's own `verified` column is `TRUE`: no capture was attempted, so
+`review.state` is `not-reviewed` on every baseline event with a source URL,
+whether or not the row's own `verified` column is `TRUE`: no capture was attempted, so
 nothing has actually been reviewed and accepted yet. `accepted` is reserved for
 a real capture or an explicit `review-decision` event made later. The CSV's own
 `verified` column is not discarded — it is preserved honestly as
@@ -308,34 +334,18 @@ a real capture or an explicit `review-decision` event made later. The CSV's own
 state, which would conflate "the archive already checked this content" with
 "this preservation event was reviewed."
 
-A row with no canonical URL — its source link was removed as unresolved — still
-gets an object and a digest artifact, but its canonical source becomes an
-explicit `urn:rosen:social-source:missing-url:<id>` placeholder instead of a
-fabricated link, and the row's own `notes` (or a default explanation) becomes
-the event's review notes. As of the current corpus this is 38 rows. **These 38
-rows are the thinnest ones in the manifest.** Because the schema does not allow
-`normalizationEvidence` on an `artifact-created` event, they get no
-observations at all — no preserved text, no author, no platform, and no
-`related_to`/`responds_to`. Of the current 38, 19 have `related_to`, 4 have
-`responds_to`, and all 38 have `raw_text` in the CSV — none of that reaches the
-manifest for these rows today. The row's own data is untouched in
-`data/social_posts.csv`, so nothing is lost from the archive itself, but the
-manifest does not yet carry it either. Do not read these rows as "preserved" in
-the same sense as a row with a URL; they are only "accounted for," pending a
-schema change that lets an `artifact-created` event (or a future dedicated
-event type) carry `normalizationEvidence` too. This gap is exactly the one
-issue #717's acceptance criteria about threads, replies, and deleted-post
-evidence are aimed at, and it is not closed for these 38 rows yet.
+A row with no canonical URL keeps an explicit
+`urn:rosen:social-source:missing-url:<id>` placeholder instead of a fabricated
+link. Its event is `review-required`, and its notes and observations remain in
+the manifest. That records the known row while leaving source recovery open.
 
-An image-only post with an empty `raw_text` is not treated as missing — it
-keeps its real URL and a normal `capture-attempt`, and the preserved text is
+An image-only post with an empty `raw_text` is not treated as missing. It
+keeps its real URL and generated artifact, and the preserved text is
 honestly recorded as empty (`observations.preservedTextSource: "none"`).
 
-For every row that does have a canonical URL, `related_to` and `responds_to`
-are preserved verbatim inside `normalizationEvidence.observations`, so thread
-and reply relationships for those rows survive even though the schema has no
-dedicated relationship field yet. That guarantee does not extend to the 38
-missing-url rows described above.
+For every row, `related_to` and `responds_to` are preserved verbatim inside
+`normalizationEvidence.observations`, so thread and reply relationships survive
+even though the schema has no dedicated relationship field yet.
 
 A later stewardship stage (the live discovery-and-capture pipeline in
 `docs/bluesky-stewardship-pipeline.md`) can append real `capture-attempt`,

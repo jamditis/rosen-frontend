@@ -11,6 +11,7 @@ import {
   validatePreservationManifest,
 } from '../preservation/validate-preservation-manifests.mjs';
 import { convertWinerEvidence } from '../preservation/import-winer-evidence.mjs';
+import { compileJsonSchema } from '../scripts/json-schema-validator.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const preservationDir = path.join(root, 'preservation');
@@ -19,6 +20,9 @@ const schema = JSON.parse(fs.readFileSync(
   path.join(preservationDir, 'preservation-manifest.schema.json'),
   'utf8',
 ));
+const validatePublishedSchema = compileJsonSchema(schema, {
+  source: 'preservation/preservation-manifest.schema.json',
+});
 
 const exampleNames = [
   'successful-capture',
@@ -36,6 +40,18 @@ function example(name) {
   return JSON.parse(fs.readFileSync(path.join(examplesDir, `${name}.json`), 'utf8'));
 }
 
+function useSchema11(manifest) {
+  manifest.schemaVersion = '1.1.0';
+  for (const artifact of manifest.artifacts) {
+    const creation = manifest.events.find(event => (
+      event.eventType === 'artifact-created'
+      && event.artifactId === artifact.artifactId
+    ));
+    if (creation) artifact.creationEventId = creation.eventId;
+  }
+  return manifest;
+}
+
 function rejectsManifest(manifest, ...messageParts) {
   assert.throws(
     () => validatePreservationManifest(manifest),
@@ -45,6 +61,28 @@ function rejectsManifest(manifest, ...messageParts) {
       return true;
     },
   );
+}
+
+function acceptsSchemaAndRuntime(manifest, label) {
+  assert.equal(validatePublishedSchema(manifest), true, `${label}: ${JSON.stringify(validatePublishedSchema.errors)}`);
+  assert.equal(validatePreservationManifest(manifest), manifest, label);
+}
+
+function rejectsSchemaAndRuntime(manifest, label) {
+  assert.equal(validatePublishedSchema(manifest), false, `${label}: schema accepted the manifest`);
+  assert.throws(
+    () => validatePreservationManifest(manifest),
+    PreservationValidationError,
+    `${label}: runtime accepted the manifest`,
+  );
+}
+
+function winerManifest() {
+  const evidence = JSON.parse(fs.readFileSync(
+    path.join(root, 'features', 'winer-method', 'retrieval-evidence.json'),
+    'utf8',
+  ));
+  return convertWinerEvidence(evidence);
 }
 
 describe('preservation manifest schema (#701)', () => {
@@ -85,6 +123,298 @@ describe('preservation manifest schema (#701)', () => {
     const withoutReviewState = clone(manifest);
     delete withoutReviewState.events[0].review.state;
     rejectsManifest(withoutReviewState, 'state', 'required');
+  });
+
+  it('keeps all legacy examples valid under the published schema and runtime', () => {
+    for (const name of exampleNames) {
+      const legacy = example(name);
+      acceptsSchemaAndRuntime(legacy, `${name} schema 1.0`);
+
+      const relabeled = example(name);
+      relabeled.schemaVersion = '1.1.0';
+      acceptsSchemaAndRuntime(relabeled, `${name} schema 1.1`);
+    }
+
+    const inlineMapping = winerManifest();
+    acceptsSchemaAndRuntime(inlineMapping, 'schema 1.0 inline field mapping');
+    inlineMapping.schemaVersion = '1.1.0';
+    acceptsSchemaAndRuntime(inlineMapping, 'schema 1.1 inline field mapping');
+    assert.ok(inlineMapping.events.every(event => (
+      event.normalizationEvidence.fieldMapping !== undefined
+      && event.normalizationEvidence.fieldMappingId === undefined
+    )));
+    assert.equal(inlineMapping.fieldMappings, undefined);
+  });
+
+  it('keeps every schema 1.1 addition out of schema 1.0 in both validators', () => {
+    const fieldMappings = example('bot-wall');
+    fieldMappings.fieldMappings = [];
+
+    const eventCaptureLink = example('successful-capture');
+    eventCaptureLink.events.find(event => event.eventType === 'fixity-check').captureEventId =
+      eventCaptureLink.artifacts[0].captureEventId;
+
+    const creationLink = example('successful-capture');
+    creationLink.artifacts[0].creationEventId = creationLink.events.find(
+      event => event.eventType === 'artifact-created',
+    ).eventId;
+
+    const registryMapping = winerManifest();
+    const registryEvidence = registryMapping.events[0].normalizationEvidence;
+    delete registryEvidence.fieldMapping;
+    registryEvidence.fieldMappingId = 'fixture-v1';
+
+    const rawSourceDigest = winerManifest();
+    rawSourceDigest.events[0].normalizationEvidence.rawSourceSha256 = 'a'.repeat(64);
+
+    const missingInlineMapping = winerManifest();
+    delete missingInlineMapping.events[0].normalizationEvidence.fieldMapping;
+
+    const artifactCreatedEvidence = example('successful-capture');
+    artifactCreatedEvidence.events.find(event => event.eventType === 'artifact-created')
+      .normalizationEvidence = {
+        sourceLocator: 'fixture.json#record-1',
+        observations: { title: 'Example successful capture' },
+        fieldMapping: { title: 'observations.title' },
+        normalizedObjectSha256: 'b'.repeat(64),
+      };
+
+    for (const [label, manifest] of [
+      ['top-level fieldMappings', fieldMappings],
+      ['event captureEventId', eventCaptureLink],
+      ['artifact creationEventId', creationLink],
+      ['normalization fieldMappingId', registryMapping],
+      ['normalization rawSourceSha256', rawSourceDigest],
+      ['normalization without inline fieldMapping', missingInlineMapping],
+      ['artifact-created normalizationEvidence', artifactCreatedEvidence],
+    ]) {
+      rejectsSchemaAndRuntime(manifest, label);
+    }
+  });
+
+  it('accepts schema 1.1 inline and registry normalization forms in both validators', () => {
+    const inline = winerManifest();
+    inline.schemaVersion = '1.1.0';
+    acceptsSchemaAndRuntime(inline, 'schema 1.1 inline normalization');
+
+    const registry = winerManifest();
+    registry.schemaVersion = '1.1.0';
+    const fields = registry.events[0].normalizationEvidence.fieldMapping;
+    registry.fieldMappings = [{
+      fieldMappingId: 'fixture-v1',
+      fields,
+    }];
+    for (const event of registry.events) {
+      delete event.normalizationEvidence.fieldMapping;
+      event.normalizationEvidence.fieldMappingId = 'fixture-v1';
+      event.normalizationEvidence.rawSourceSha256 = 'a'.repeat(64);
+    }
+    acceptsSchemaAndRuntime(registry, 'schema 1.1 registry normalization');
+
+    const missingRegistryEntry = clone(registry);
+    missingRegistryEntry.fieldMappings = [];
+    assert.equal(validatePublishedSchema(missingRegistryEntry), true);
+    rejectsManifest(missingRegistryEntry, 'fieldMappingId', 'missing field mapping');
+
+    const mixedForms = clone(registry);
+    mixedForms.events[0].normalizationEvidence.fieldMapping = fields;
+    rejectsSchemaAndRuntime(mixedForms, 'schema 1.1 mixed inline and registry normalization');
+  });
+
+  it('resolves schema 1.1 field mappings and rejects missing registry references', () => {
+    const manifest = useSchema11(example('successful-capture'));
+    manifest.fieldMappings = [{
+      fieldMappingId: 'fixture-v1',
+      fields: { title: 'observations.title' },
+    }];
+    const creation = manifest.events.find(event => event.eventType === 'artifact-created');
+    creation.normalizationEvidence = {
+      sourceLocator: 'fixture.json#record-1',
+      observations: { title: 'Example successful capture' },
+      fieldMappingId: 'fixture-v1',
+      rawSourceSha256: 'a'.repeat(64),
+      normalizedObjectSha256: 'b'.repeat(64),
+      recordSource: 'fixture.json',
+      runtimeNetworkAccess: false,
+    };
+    acceptsSchemaAndRuntime(manifest, 'schema 1.1 artifact-created registry evidence');
+
+    const missing = clone(manifest);
+    missing.events.find(event => event.eventType === 'artifact-created')
+      .normalizationEvidence.fieldMappingId = 'missing-v1';
+    rejectsManifest(missing, 'fieldMappingId', 'missing-v1', 'missing field mapping');
+
+    const duplicate = clone(manifest);
+    duplicate.fieldMappings.push(clone(duplicate.fieldMappings[0]));
+    rejectsManifest(duplicate, 'duplicate', 'fieldMappingId', 'fixture-v1');
+  });
+
+  it('links later validation events to an earlier capture of the same object', () => {
+    const manifest = useSchema11(example('successful-capture'));
+    const artifact = manifest.artifacts[0];
+    const fixity = manifest.events.find(event => event.eventType === 'fixity-check');
+    fixity.captureEventId = artifact.captureEventId;
+    acceptsSchemaAndRuntime(manifest, 'schema 1.1 linked validation event');
+
+    const wrongArtifactCapture = clone(manifest);
+    wrongArtifactCapture.events.find(event => event.eventType === 'fixity-check').captureEventId =
+      wrongArtifactCapture.events.find(event => event.eventId.endsWith('-redirect')).eventId;
+    rejectsManifest(
+      wrongArtifactCapture,
+      'captureEventId',
+      'artifact',
+      'declared capture provenance',
+    );
+
+    const missing = clone(manifest);
+    missing.events.find(event => event.eventType === 'fixity-check').captureEventId =
+      'urn:rosen-preservation:event:missing-capture';
+    rejectsManifest(missing, 'captureEventId', 'missing-capture', 'missing');
+
+    const wrongType = clone(manifest);
+    wrongType.events.find(event => event.eventType === 'fixity-check').captureEventId =
+      artifact.creationEventId;
+    rejectsManifest(wrongType, 'captureEventId', 'capture-attempt', 'same object');
+
+    const crossObject = clone(manifest);
+    const otherObject = clone(crossObject.objects[0]);
+    otherObject.objectId = 'urn:rosen:object:archive-record:RECORD-OTHER';
+    otherObject.sourceRecordId = 'RECORD-OTHER';
+    crossObject.objects.push(otherObject);
+    const otherCapture = crossObject.events.find(event => (
+      event.eventType === 'capture-attempt'
+      && event.eventId !== crossObject.artifacts[0].captureEventId
+    ));
+    otherCapture.objectId = otherObject.objectId;
+    crossObject.events.find(event => event.eventType === 'fixity-check').captureEventId =
+      otherCapture.eventId;
+    rejectsManifest(crossObject, 'captureEventId', 'same object');
+
+    const forwardReference = clone(manifest);
+    const linkedFixity = forwardReference.events.find(event => event.eventType === 'fixity-check');
+    forwardReference.events = [
+      linkedFixity,
+      ...forwardReference.events.filter(event => event.eventId !== linkedFixity.eventId),
+    ];
+    rejectsManifest(forwardReference, 'captureEventId', 'earlier event');
+
+    const impossibleChronology = clone(manifest);
+    impossibleChronology.events.find(event => event.eventType === 'fixity-check').occurredAt =
+      '2026-08-01T14:20:30.000Z';
+    rejectsManifest(impossibleChronology, 'cannot occur before', 'captureEventId');
+
+    const notRequested = clone(manifest);
+    const linkedCapture = notRequested.events.find(event => (
+      event.eventId === notRequested.artifacts[0].captureEventId
+    ));
+    Object.assign(linkedCapture.retrieval, {
+      httpStatus: null,
+      httpOutcome: 'not-requested',
+      mediaType: null,
+      bytesReceived: 0,
+      semanticOutcome: 'uncertain',
+    });
+    for (const field of ['observedSourceUrl', 'retrievedAt', 'finalUrl', 'redirectChain']) {
+      delete linkedCapture.retrieval[field];
+    }
+    rejectsManifest(notRequested, 'not-requested', 'capture provenance');
+
+    const correctedCapture = useSchema11(example('bot-wall'));
+    const staleCapture = correctedCapture.events[0];
+    const correction = clone(staleCapture);
+    correction.eventId = 'urn:rosen-preservation:event:corrected-not-requested';
+    correction.occurredAt = '2026-08-02T11:01:00.000Z';
+    correction.supersedesEventId = staleCapture.eventId;
+    correction.review = {
+      state: 'review-required',
+      notes: 'Correction: no network request occurred.',
+    };
+    correction.retrieval = {
+      requestedUrl: staleCapture.retrieval.requestedUrl,
+      httpStatus: null,
+      httpOutcome: 'not-requested',
+      mediaType: null,
+      bytesReceived: 0,
+      client: staleCapture.retrieval.client,
+      semanticOutcome: 'uncertain',
+    };
+    const laterReview = {
+      eventId: 'urn:rosen-preservation:event:review-after-correction',
+      eventType: 'review-decision',
+      objectId: staleCapture.objectId,
+      taskVersion: 'preservation-review@1.0.0',
+      inputHash: 'e'.repeat(64),
+      actor: {
+        actorType: 'human',
+        actorId: 'fixture-reviewer',
+      },
+      occurredAt: '2026-08-02T11:02:00.000Z',
+      review: {
+        state: 'review-required',
+        notes: 'Review must cite current capture provenance.',
+      },
+      captureEventId: staleCapture.eventId,
+    };
+    correctedCapture.events.push(correction, laterReview);
+    rejectsManifest(
+      correctedCapture,
+      'captureEventId',
+      'current capture-attempt',
+      'superseded',
+    );
+  });
+
+  it('lets current append-only corrections rebind artifact-specific capture links', () => {
+    const correctedCaptureOnly = useSchema11(example('successful-capture'));
+    const artifact = correctedCaptureOnly.artifacts[0];
+    const originalCapture = correctedCaptureOnly.events.find(event => (
+      event.eventId === artifact.captureEventId
+    ));
+    const originalFixity = correctedCaptureOnly.events.find(event => (
+      event.eventType === 'fixity-check'
+    ));
+    originalFixity.captureEventId = originalCapture.eventId;
+
+    const correctedCapture = clone(originalCapture);
+    correctedCapture.eventId = 'urn:rosen-preservation:event:corrected-linked-capture';
+    correctedCapture.occurredAt = '2026-08-01T14:21:30.000Z';
+    correctedCapture.retrieval.retrievedAt = correctedCapture.occurredAt;
+    correctedCapture.supersedesEventId = originalCapture.eventId;
+    artifact.captureEventId = correctedCapture.eventId;
+    correctedCaptureOnly.events.push(correctedCapture);
+
+    assert.equal(validatePublishedSchema(correctedCaptureOnly), true);
+    rejectsManifest(
+      correctedCaptureOnly,
+      originalFixity.eventId,
+      'captureEventId',
+      'declared capture provenance',
+    );
+
+    const fullyCorrected = clone(correctedCaptureOnly);
+    const currentFixity = fullyCorrected.events.find(event => event.eventType === 'fixity-check');
+    const correctedFixity = clone(currentFixity);
+    correctedFixity.eventId = 'urn:rosen-preservation:event:corrected-linked-fixity';
+    correctedFixity.occurredAt = '2026-08-01T14:26:00.000Z';
+    correctedFixity.captureEventId = correctedCapture.eventId;
+    correctedFixity.supersedesEventId = currentFixity.eventId;
+    fullyCorrected.events.push(correctedFixity);
+
+    acceptsSchemaAndRuntime(fullyCorrected, 'schema 1.1 current supersession chain');
+    assert.ok(fullyCorrected.events.includes(currentFixity));
+  });
+
+  it('validates an optional schema 1.1 artifact creation back-reference when supplied', () => {
+    const manifest = useSchema11(example('successful-capture'));
+    acceptsSchemaAndRuntime(manifest, 'schema 1.1 artifact creation link');
+
+    const missingLink = clone(manifest);
+    delete missingLink.artifacts[0].creationEventId;
+    assert.equal(validatePreservationManifest(missingLink), missingLink);
+
+    const wrongType = clone(manifest);
+    wrongType.artifacts[0].creationEventId = wrongType.artifacts[0].captureEventId;
+    rejectsManifest(wrongType, 'creationEventId', 'artifact-created', 'same artifact');
   });
 
   it('rejects unstable identifiers, malformed digests, and unknown vocabulary', () => {
