@@ -17,6 +17,8 @@ const DesktopArchivePanel = ({
   error,
   filters,
   setFilters,
+  semanticSearch,
+  searchSignals,
   facets,
   autocompleteIndex,
   sortBy,
@@ -38,6 +40,10 @@ const DesktopArchivePanel = ({
   const resultsRef = useRef(null);
   const filterPanelRef = useRef(null);
   const filterButtonRef = useRef(null);
+  const desktopSemanticSearch = semanticSearch && {
+    ...semanticSearch,
+    inputId: `desktop-${viewMode}-archive-search-semantic`,
+  };
 
   useEffect(() => {
     setFilterOpen(false);
@@ -185,6 +191,7 @@ const DesktopArchivePanel = ({
             onClose=${closeFilters}
             resetFilters=${onClearFilters}
             autocompleteIndex=${autocompleteIndex}
+            semanticSearch=${desktopSemanticSearch}
             variant="desktop"
           />
         </div>
@@ -204,6 +211,7 @@ const DesktopArchivePanel = ({
             folderGroups=${folderGroups}
             viewMode=${viewMode}
             searchTerm=${filters.search}
+            searchSignals=${searchSignals}
             currentPage=${currentPage}
             totalPages=${totalPages}
             onSelectRecord=${onSelectRecord}

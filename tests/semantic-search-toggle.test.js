@@ -30,6 +30,8 @@ const app = read('frontend', 'App.js');
 const toggle = read('frontend', 'components', 'SemanticSearchToggle.js');
 const help = read('frontend', 'components', 'SemanticSearchHelpDialog.js');
 const sidebar = read('frontend', 'components', 'Sidebar.js');
+const desktopShell = read('frontend', 'desktop', 'DesktopShell.js');
+const desktopArchive = read('frontend', 'desktop', 'DesktopArchivePanel.js');
 const results = read('frontend', 'components', 'ArchiveResults.js');
 const serviceWorker = read('frontend', 'sw.js');
 const css = read('frontend', 'index.css');
@@ -116,7 +118,22 @@ describe('semantic search toggle', () => {
     assert.match(app, /<\$\{SemanticSearchToggle\}/);
     assert.match(sidebar, /<\$\{SemanticSearchToggle\}/);
     assert.match(app, /inputId="archive-mobile-semantic-search"/);
-    assert.match(sidebar, /inputId=\$\{`\$\{searchInputId\}-semantic`\}/);
+    assert.match(sidebar, /inputId=\$\{semanticSearch\.inputId \|\| `\$\{searchInputId\}-semantic`\}/);
+  });
+
+  it('forwards the same toggle and result signals into desktop archive windows', () => {
+    assert.match(app, /const desktopArchiveView = \{[\s\S]*semanticSearch: semanticSearchProps/);
+    assert.match(app, /const desktopArchiveView = \{[\s\S]*semanticStatusText: semanticStatusMessage\(semanticSearchProps\)/);
+    assert.match(app, /const desktopArchiveView = \{[\s\S]*searchSignals/);
+    assert.match(desktopShell, /semanticSearch=\$\{archiveView\.semanticSearch\}/);
+    assert.match(desktopArchive, /semanticSearch=\$\{desktopSemanticSearch\}/);
+    assert.match(desktopArchive, /searchSignals=\$\{searchSignals\}/);
+  });
+
+  it('uses a stable toggle id for each desktop archive view', () => {
+    assert.match(desktopArchive, /const desktopSemanticSearch = semanticSearch && \{/);
+    assert.match(desktopArchive, /inputId: `desktop-\$\{viewMode\}-archive-search-semantic`/);
+    assert.match(sidebar, /inputId=\$\{semanticSearch\.inputId \|\| `\$\{searchInputId\}-semantic`\}/);
   });
 
   it('is a labelled, keyboard-operable checkbox with a described state', () => {
@@ -134,6 +151,8 @@ describe('semantic search toggle', () => {
     assert.match(app, /data-semantic-status/);
     assert.equal(app.match(/data-semantic-status/g).length, 1);
     assert.match(app, /semanticStatusMessage\(semanticSearchProps\)/);
+    assert.equal(desktopShell.match(/data-semantic-status/g)?.length, 1);
+    assert.match(desktopShell, /\$\{archiveView\.semanticStatusText\}/);
   });
 
   it('says what turning it on costs, and what it covers', () => {

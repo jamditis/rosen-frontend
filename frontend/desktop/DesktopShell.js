@@ -975,6 +975,8 @@ const DesktopShell = ({
       error=${archiveView.error}
       filters=${archiveView.filters}
       setFilters=${archiveView.setFilters}
+      semanticSearch=${archiveView.semanticSearch}
+      searchSignals=${archiveView.searchSignals}
       facets=${archiveView.facets}
       autocompleteIndex=${archiveView.autocompleteIndex}
       sortBy=${archiveView.sortBy}
@@ -1300,6 +1302,13 @@ const DesktopShell = ({
       </div>
 
       <p className="desktop-live-status" aria-live="polite" aria-atomic="true">${statusMessage}</p>
+      <p
+        className="desktop-live-status"
+        data-semantic-status
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >${archiveView.semanticStatusText}</p>
 
       ${startOpen && html`
         <div

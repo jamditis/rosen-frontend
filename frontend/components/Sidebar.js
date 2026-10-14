@@ -240,7 +240,7 @@ const Sidebar = ({
             ${semanticSearch && html`
               <${SemanticSearchToggle}
                 ...${semanticSearch}
-                inputId=${`${searchInputId}-semantic`}
+                inputId=${semanticSearch.inputId || `${searchInputId}-semantic`}
               />
             `}
           </div>
