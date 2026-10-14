@@ -17,7 +17,6 @@ Usage:
 import json
 import csv
 import sys
-import os
 from pathlib import Path
 
 
@@ -192,7 +191,7 @@ def main():
         if changed:
             updated += 1
 
-    print(f"\n--- Results ---")
+    print("\n--- Results ---")
     print(f"Matched to batch data: {matched} of {clip_count}")
     print(f"Records updated: {updated}")
     print(f"  Era names fixed: {era_fixed}")
@@ -201,11 +200,11 @@ def main():
     print(f"  Summaries enriched: {summary_updated}")
 
     if dry_run:
-        print(f"\n[DRY RUN] No changes written.")
+        print("\n[DRY RUN] No changes written.")
         # Show sample
         for row in rows:
             if row["id"] == "CLIP-00001":
-                print(f"\nSample updated record:")
+                print("\nSample updated record:")
                 for key in [
                     "id",
                     "title",
@@ -218,7 +217,7 @@ def main():
         return
 
     # Write updated CSV
-    print(f"\nWriting updated CSV...")
+    print("\nWriting updated CSV...")
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -227,7 +226,7 @@ def main():
 
     print(f"Done! Updated {updated} CLIP records.")
     print(
-        f'\nNext step: run "node data/export-archive-data.js" to regenerate JSON files.'
+        '\nNext step: run "node data/export-archive-data.js" to regenerate JSON files.'
     )
 
 

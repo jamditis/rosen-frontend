@@ -260,7 +260,7 @@ def main():
             y = ""
         if y:
             years[y] = years.get(y, 0) + 1
-    print(f"\nYear distribution:")
+    print("\nYear distribution:")
     for y in sorted(years.keys()):
         print(f"  {y}: {years[y]}")
 
@@ -271,7 +271,7 @@ def main():
             c = c.strip()
             if c:
                 cats[c] = cats.get(c, 0) + 1
-    print(f"\nCategory distribution:")
+    print("\nCategory distribution:")
     for c, count in sorted(cats.items(), key=lambda x: -x[1]):
         print(f"  {c}: {count}")
 
@@ -291,7 +291,7 @@ def main():
     print(f"Done! Added {len(csv_rows)} newspaper clipping records.")
     print(f"IDs: CLIP-{next_id:05d} through CLIP-{next_id + len(csv_rows) - 1:05d}")
     print(
-        f'\nNext step: run "node data/export-archive-data.js" to regenerate JSON files.'
+        '\nNext step: run "node data/export-archive-data.js" to regenerate JSON files.'
     )
 
 

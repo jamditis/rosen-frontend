@@ -13,7 +13,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SRC_DIR = os.path.join(SCRIPT_DIR, "src")
 sys.path.insert(0, SRC_DIR)
 
-from rosen_scraper import workflow, scraper, categorizer, dispatcher, entity_resolver
+from rosen_scraper import workflow, entity_resolver
 from typing import Dict, Any
 
 

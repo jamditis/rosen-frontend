@@ -56,19 +56,16 @@ jobs:
         working-directory: backend
         run: poetry install --with dev
 
-      # Ruff gates the build: a finding fails the job. The scope covers every
-      # backend Python tree, and per-file E402 ignores live in pyproject.toml.
+      # Ruff is required and covers every Python file under backend/.
+      # Exact per-file E402 exceptions live in pyproject.toml.
       - name: Run Ruff
         working-directory: backend
-        run: poetry run ruff check src/ tests/ submission_runtime/ scripts/
+        run: poetry run ruff check .
 
-      # Black is not yet enforced — the backend predates any black pass, so this
-      # step reports diffs without failing. Drop continue-on-error once the
-      # codebase has been reformatted.
+      # Black is required and covers every Python file under backend/.
       - name: Check Black formatting
         working-directory: backend
-        run: poetry run black --check src/ tests/
-        continue-on-error: true
+        run: poetry run black --check .
 
       # MyPy is not yet enforced — the codebase is not fully type-annotated
       # (see mypy.ini: disallow_untyped_defs = False). Drop continue-on-error

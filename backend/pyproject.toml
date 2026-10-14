@@ -79,3 +79,6 @@ pythonpath = ["src", "."]
 # unavoidable and intentional in these trees — every other rule still applies.
 "scripts/**" = ["E402"]
 "tests/**" = ["E402"]
+# This backend-root demonstration is run directly and extends sys.path before
+# importing rosen_scraper. Keep the exception exact so other root files stay gated.
+"validate_type_hints.py" = ["E402"]
