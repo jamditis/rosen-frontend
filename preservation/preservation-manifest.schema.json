@@ -63,6 +63,74 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": "1.0.0"
+          }
+        },
+        "required": [
+          "schemaVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "fieldMappings": false,
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "allOf": [
+                {
+                  "properties": {
+                    "captureEventId": false,
+                    "normalizationEvidence": {
+                      "type": "object",
+                      "required": [
+                        "fieldMapping"
+                      ],
+                      "properties": {
+                        "fieldMappingId": false,
+                        "rawSourceSha256": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "eventType": {
+                        "const": "artifact-created"
+                      }
+                    },
+                    "required": [
+                      "eventType"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "normalizationEvidence": false
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "creationEventId": false
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "timestamp": {
       "type": "string",

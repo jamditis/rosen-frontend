@@ -11,6 +11,7 @@ import {
   validatePreservationManifest,
 } from '../preservation/validate-preservation-manifests.mjs';
 import { convertWinerEvidence } from '../preservation/import-winer-evidence.mjs';
+import { compileJsonSchema } from '../scripts/json-schema-validator.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const preservationDir = path.join(root, 'preservation');
@@ -19,6 +20,9 @@ const schema = JSON.parse(fs.readFileSync(
   path.join(preservationDir, 'preservation-manifest.schema.json'),
   'utf8',
 ));
+const validatePublishedSchema = compileJsonSchema(schema, {
+  source: 'preservation/preservation-manifest.schema.json',
+});
 
 const exampleNames = [
   'successful-capture',
@@ -57,6 +61,28 @@ function rejectsManifest(manifest, ...messageParts) {
       return true;
     },
   );
+}
+
+function acceptsSchemaAndRuntime(manifest, label) {
+  assert.equal(validatePublishedSchema(manifest), true, `${label}: ${JSON.stringify(validatePublishedSchema.errors)}`);
+  assert.equal(validatePreservationManifest(manifest), manifest, label);
+}
+
+function rejectsSchemaAndRuntime(manifest, label) {
+  assert.equal(validatePublishedSchema(manifest), false, `${label}: schema accepted the manifest`);
+  assert.throws(
+    () => validatePreservationManifest(manifest),
+    PreservationValidationError,
+    `${label}: runtime accepted the manifest`,
+  );
+}
+
+function winerManifest() {
+  const evidence = JSON.parse(fs.readFileSync(
+    path.join(root, 'features', 'winer-method', 'retrieval-evidence.json'),
+    'utf8',
+  ));
+  return convertWinerEvidence(evidence);
 }
 
 describe('preservation manifest schema (#701)', () => {
@@ -99,43 +125,100 @@ describe('preservation manifest schema (#701)', () => {
     rejectsManifest(withoutReviewState, 'state', 'required');
   });
 
-  it('keeps schema 1.0 manifests valid while reserving new provenance fields for schema 1.1', () => {
-    const legacy = example('successful-capture');
-    assert.equal(validatePreservationManifest(legacy), legacy);
-
-    const registryOnLegacy = example('bot-wall');
-    registryOnLegacy.fieldMappings = [{
-      fieldMappingId: 'fixture-v1',
-      fields: { title: 'observations.title' },
-    }];
-    rejectsManifest(registryOnLegacy, 'fieldMappings', 'schemaVersion 1.1.0');
-
-    const creationLinkOnLegacy = example('successful-capture');
-    creationLinkOnLegacy.artifacts[0].creationEventId = creationLinkOnLegacy.events.find(
-      event => event.eventType === 'artifact-created',
-    ).eventId;
-    rejectsManifest(creationLinkOnLegacy, 'creationEventId', 'schemaVersion 1.1.0');
-  });
-
-  it('keeps valid schema 1.0 shapes valid when relabeled as schema 1.1', () => {
+  it('keeps all legacy examples valid under the published schema and runtime', () => {
     for (const name of exampleNames) {
+      const legacy = example(name);
+      acceptsSchemaAndRuntime(legacy, `${name} schema 1.0`);
+
       const relabeled = example(name);
       relabeled.schemaVersion = '1.1.0';
-      assert.equal(validatePreservationManifest(relabeled), relabeled, name);
+      acceptsSchemaAndRuntime(relabeled, `${name} schema 1.1`);
     }
 
-    const evidence = JSON.parse(fs.readFileSync(
-      path.join(root, 'features', 'winer-method', 'retrieval-evidence.json'),
-      'utf8',
-    ));
-    const inlineMapping = convertWinerEvidence(evidence);
+    const inlineMapping = winerManifest();
+    acceptsSchemaAndRuntime(inlineMapping, 'schema 1.0 inline field mapping');
     inlineMapping.schemaVersion = '1.1.0';
-    assert.equal(validatePreservationManifest(inlineMapping), inlineMapping);
+    acceptsSchemaAndRuntime(inlineMapping, 'schema 1.1 inline field mapping');
     assert.ok(inlineMapping.events.every(event => (
       event.normalizationEvidence.fieldMapping !== undefined
       && event.normalizationEvidence.fieldMappingId === undefined
     )));
     assert.equal(inlineMapping.fieldMappings, undefined);
+  });
+
+  it('keeps every schema 1.1 addition out of schema 1.0 in both validators', () => {
+    const fieldMappings = example('bot-wall');
+    fieldMappings.fieldMappings = [];
+
+    const eventCaptureLink = example('successful-capture');
+    eventCaptureLink.events.find(event => event.eventType === 'fixity-check').captureEventId =
+      eventCaptureLink.artifacts[0].captureEventId;
+
+    const creationLink = example('successful-capture');
+    creationLink.artifacts[0].creationEventId = creationLink.events.find(
+      event => event.eventType === 'artifact-created',
+    ).eventId;
+
+    const registryMapping = winerManifest();
+    const registryEvidence = registryMapping.events[0].normalizationEvidence;
+    delete registryEvidence.fieldMapping;
+    registryEvidence.fieldMappingId = 'fixture-v1';
+
+    const rawSourceDigest = winerManifest();
+    rawSourceDigest.events[0].normalizationEvidence.rawSourceSha256 = 'a'.repeat(64);
+
+    const missingInlineMapping = winerManifest();
+    delete missingInlineMapping.events[0].normalizationEvidence.fieldMapping;
+
+    const artifactCreatedEvidence = example('successful-capture');
+    artifactCreatedEvidence.events.find(event => event.eventType === 'artifact-created')
+      .normalizationEvidence = {
+        sourceLocator: 'fixture.json#record-1',
+        observations: { title: 'Example successful capture' },
+        fieldMapping: { title: 'observations.title' },
+        normalizedObjectSha256: 'b'.repeat(64),
+      };
+
+    for (const [label, manifest] of [
+      ['top-level fieldMappings', fieldMappings],
+      ['event captureEventId', eventCaptureLink],
+      ['artifact creationEventId', creationLink],
+      ['normalization fieldMappingId', registryMapping],
+      ['normalization rawSourceSha256', rawSourceDigest],
+      ['normalization without inline fieldMapping', missingInlineMapping],
+      ['artifact-created normalizationEvidence', artifactCreatedEvidence],
+    ]) {
+      rejectsSchemaAndRuntime(manifest, label);
+    }
+  });
+
+  it('accepts schema 1.1 inline and registry normalization forms in both validators', () => {
+    const inline = winerManifest();
+    inline.schemaVersion = '1.1.0';
+    acceptsSchemaAndRuntime(inline, 'schema 1.1 inline normalization');
+
+    const registry = winerManifest();
+    registry.schemaVersion = '1.1.0';
+    const fields = registry.events[0].normalizationEvidence.fieldMapping;
+    registry.fieldMappings = [{
+      fieldMappingId: 'fixture-v1',
+      fields,
+    }];
+    for (const event of registry.events) {
+      delete event.normalizationEvidence.fieldMapping;
+      event.normalizationEvidence.fieldMappingId = 'fixture-v1';
+      event.normalizationEvidence.rawSourceSha256 = 'a'.repeat(64);
+    }
+    acceptsSchemaAndRuntime(registry, 'schema 1.1 registry normalization');
+
+    const missingRegistryEntry = clone(registry);
+    missingRegistryEntry.fieldMappings = [];
+    assert.equal(validatePublishedSchema(missingRegistryEntry), true);
+    rejectsManifest(missingRegistryEntry, 'fieldMappingId', 'missing field mapping');
+
+    const mixedForms = clone(registry);
+    mixedForms.events[0].normalizationEvidence.fieldMapping = fields;
+    rejectsSchemaAndRuntime(mixedForms, 'schema 1.1 mixed inline and registry normalization');
   });
 
   it('resolves schema 1.1 field mappings and rejects missing registry references', () => {
@@ -154,7 +237,7 @@ describe('preservation manifest schema (#701)', () => {
       recordSource: 'fixture.json',
       runtimeNetworkAccess: false,
     };
-    assert.equal(validatePreservationManifest(manifest), manifest);
+    acceptsSchemaAndRuntime(manifest, 'schema 1.1 artifact-created registry evidence');
 
     const missing = clone(manifest);
     missing.events.find(event => event.eventType === 'artifact-created')
@@ -171,7 +254,7 @@ describe('preservation manifest schema (#701)', () => {
     const artifact = manifest.artifacts[0];
     const fixity = manifest.events.find(event => event.eventType === 'fixity-check');
     fixity.captureEventId = artifact.captureEventId;
-    assert.equal(validatePreservationManifest(manifest), manifest);
+    acceptsSchemaAndRuntime(manifest, 'schema 1.1 linked validation event');
 
     const wrongArtifactCapture = clone(manifest);
     wrongArtifactCapture.events.find(event => event.eventType === 'fixity-check').captureEventId =
@@ -300,6 +383,7 @@ describe('preservation manifest schema (#701)', () => {
     artifact.captureEventId = correctedCapture.eventId;
     correctedCaptureOnly.events.push(correctedCapture);
 
+    assert.equal(validatePublishedSchema(correctedCaptureOnly), true);
     rejectsManifest(
       correctedCaptureOnly,
       originalFixity.eventId,
@@ -316,13 +400,13 @@ describe('preservation manifest schema (#701)', () => {
     correctedFixity.supersedesEventId = currentFixity.eventId;
     fullyCorrected.events.push(correctedFixity);
 
-    assert.equal(validatePreservationManifest(fullyCorrected), fullyCorrected);
+    acceptsSchemaAndRuntime(fullyCorrected, 'schema 1.1 current supersession chain');
     assert.ok(fullyCorrected.events.includes(currentFixity));
   });
 
   it('validates an optional schema 1.1 artifact creation back-reference when supplied', () => {
     const manifest = useSchema11(example('successful-capture'));
-    assert.equal(validatePreservationManifest(manifest), manifest);
+    acceptsSchemaAndRuntime(manifest, 'schema 1.1 artifact creation link');
 
     const missingLink = clone(manifest);
     delete missingLink.artifacts[0].creationEventId;
