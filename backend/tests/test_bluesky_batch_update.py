@@ -13,6 +13,12 @@ from scripts import bluesky_feed_backfill as backfill
 JAY_DID = backfill.ACTOR_DID
 
 
+@pytest.fixture(autouse=True)
+def isolated_runner_temp(tmp_path, monkeypatch):
+    """Keep test snapshots inside their own runner root, including on Actions."""
+    monkeypatch.setenv("RUNNER_TEMP", str(tmp_path))
+
+
 class _HttpResponse:
     def __init__(self, status_code=200, *, payload=None, text="", headers=None):
         self.status_code = status_code
