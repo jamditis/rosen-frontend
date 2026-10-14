@@ -16,6 +16,7 @@ const RUN_ID = /^[A-Za-z0-9_-]{1,64}$/;
 const RECORD_ID = /^BSKY-\d{5,}$/;
 const JAY_POST_URI = /^at:\/\/did:plc:3t37x6vfigdzzp2gjcfnzlz4\/app\.bsky\.feed\.post\/[A-Za-z0-9._~:-]+$/;
 const MAX_REPORT_RECORDS = 1_000;
+const RECEIPT_ENDPOINT = 'https://rosen-source-discovery.jamditis.workers.dev/ingestion-receipt';
 
 const RELEASE_DATA_PATHS = new Set([
   'data/archive-analytics.json',
@@ -153,6 +154,44 @@ export function buildIngestionReceipt({
   };
   if (errorClass) receipt.errorClass = errorClass;
   return receipt;
+}
+
+export async function postFailedReceipt(payload, token, {
+  fetchFn = globalThis.fetch,
+  sleepFn = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
+} = {}) {
+  if (payload?.status !== 'failed' || !Array.isArray(payload.records) || payload.records.length) {
+    throw new Error('failure reporting requires a failed receipt with no record decisions');
+  }
+  if (!text(token)) throw new Error('ROSEN_INGESTION_RECEIPT_TOKEN is required');
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    let response;
+    try {
+      response = await fetchFn(RECEIPT_ENDPOINT, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        redirect: 'manual',
+        signal: AbortSignal.timeout(30_000),
+      });
+    } catch {
+      if (attempt === 2) throw new Error('failed receipt delivery exhausted network retries');
+      await sleepFn(1_000 * (2 ** attempt));
+      continue;
+    }
+    await response.body?.cancel();
+    if (response.ok) return;
+    if (response.status !== 429 && response.status < 500) {
+      throw new Error(`failed receipt delivery refused HTTP ${response.status}`);
+    }
+    if (attempt === 2) throw new Error(`failed receipt delivery exhausted retries: HTTP ${response.status}`);
+    const retryAfter = response.headers.get('Retry-After');
+    let seconds = retryAfter ? Number(retryAfter) : Number.NaN;
+    if (retryAfter && !Number.isFinite(seconds)) seconds = (Date.parse(retryAfter) - Date.now()) / 1_000;
+    await sleepFn(Number.isFinite(seconds)
+      ? Math.min(Math.max(seconds, 0), 30) * 1_000
+      : 1_000 * (2 ** attempt));
+  }
 }
 
 function incrementPatch(version) {
@@ -503,7 +542,7 @@ function finalize(root) {
     : `Stewardship ${result.status}; no ingestion receipt will be sent.`);
 }
 
-function main() {
+async function main() {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
   const command = process.argv[2];
   if (command === 'init') {
@@ -513,12 +552,17 @@ function main() {
   }
   if (command === 'prepare') return prepare(root);
   if (command === 'finalize') return finalize(root);
-  throw new Error('usage: bluesky-stewardship-publisher.mjs init|prepare|finalize');
+  if (command === 'send-failed-receipt') {
+    await postFailedReceipt(readJson(process.argv[3]), process.env.ROSEN_INGESTION_RECEIPT_TOKEN);
+    console.log('Failed ingestion receipt accepted.');
+    return;
+  }
+  throw new Error('usage: bluesky-stewardship-publisher.mjs init|prepare|finalize|send-failed-receipt');
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   try {
-    main();
+    await main();
   } catch (error) {
     console.error(`Bluesky stewardship publisher: ${error.message}`);
     process.exitCode = 1;

@@ -149,7 +149,13 @@ jobs:
         env:
           ROSEN_INGESTION_RECEIPT_TOKEN: ${{ secrets.ROSEN_INGESTION_RECEIPT_TOKEN }}
           RECEIPT_PATH: ${{ steps.receipt.outputs.receipt_path }}
-        run: poetry run python scripts/post_ingestion_receipt.py "$RECEIPT_PATH"
+          RECEIPT_STATUS: ${{ steps.receipt.outputs.status }}
+        run: |
+          if [ "$RECEIPT_STATUS" = 'failed' ]; then
+            node ../.github/scripts/bluesky-stewardship-publisher.mjs send-failed-receipt "$RECEIPT_PATH"
+          else
+            poetry run python scripts/post_ingestion_receipt.py "$RECEIPT_PATH"
+          fi
 
       - name: Create or update failure issue
         if: always() && env.DRY_RUN != 'true' && (steps.receipt.outputs.status == 'failed' || steps.receipt.outcome != 'success' || steps.send_receipt.outcome != 'success')

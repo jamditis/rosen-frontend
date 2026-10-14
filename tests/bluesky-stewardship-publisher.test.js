@@ -9,6 +9,7 @@ import {
   buildIngestionReceipt,
   changedPaths,
   finalizePublication,
+  postFailedReceipt,
   runPreparation,
   stageCensusCommit,
   stageReleaseCommit,
@@ -311,6 +312,90 @@ describe('Bluesky stewardship receipt and workflow boundary', () => {
     assert.deepEqual(receipt.records, []);
   });
 
+  it('delivers an early failed receipt without Python, Poetry or installed packages', (t) => {
+    const isolated = fs.mkdtempSync('/tmp/rosen-failure-receipt-');
+    t.after(() => fs.rmSync(isolated, { recursive: true, force: true }));
+    for (const file of ['.github/scripts/bluesky-stewardship-publisher.mjs', 'scripts/bump-version.mjs']) {
+      fs.mkdirSync(path.dirname(path.join(isolated, file)), { recursive: true });
+      fs.copyFileSync(path.join(root, file), path.join(isolated, file));
+    }
+    fs.mkdirSync(path.join(isolated, 'backend'));
+    const payload = buildIngestionReceipt({
+      runId: '123_early_failure', status: 'failed', checkedAt: NOW,
+      canonicalCommit: START, releaseVersion: '3.8.37', report: report(0),
+      errorClass: 'workflow_failed',
+    });
+    const receiptPath = path.join(isolated, 'receipt.json');
+    const capturedPath = path.join(isolated, 'captured.json');
+    const networkFixture = path.join(isolated, 'network-fixture.mjs');
+    fs.writeFileSync(receiptPath, JSON.stringify(payload));
+    fs.writeFileSync(networkFixture, `
+      import fs from 'node:fs';
+      globalThis.fetch = async (url, options) => {
+        fs.writeFileSync(${JSON.stringify(capturedPath)}, JSON.stringify({
+          url, method: options.method, headers: options.headers,
+          redirect: options.redirect, payload: JSON.parse(options.body),
+        }));
+        return new Response(null, { status: 204 });
+      };
+    `);
+    const output = execFileSync(process.execPath, [
+      '--import', networkFixture,
+      path.join(isolated, '.github/scripts/bluesky-stewardship-publisher.mjs'),
+      'send-failed-receipt', receiptPath,
+    ], {
+      cwd: path.join(isolated, 'backend'), encoding: 'utf8',
+      env: { PATH: '/nonexistent', ROSEN_INGESTION_RECEIPT_TOKEN: 'fixture-token' },
+    });
+    const captured = JSON.parse(fs.readFileSync(capturedPath, 'utf8'));
+    assert.equal(captured.url, 'https://rosen-source-discovery.jamditis.workers.dev/ingestion-receipt');
+    assert.equal(captured.method, 'POST');
+    assert.equal(captured.redirect, 'manual');
+    assert.deepEqual(captured.headers, {
+      Authorization: 'Bearer fixture-token', 'Content-Type': 'application/json',
+    });
+    assert.deepEqual(captured.payload, payload);
+    assert.match(output, /Failed ingestion receipt accepted/);
+    assert.doesNotMatch(output, /fixture-token/);
+  });
+
+  it('bounds transient failed-receipt retries and honors the retry-delay cap', async () => {
+    const delays = [];
+    let calls = 0;
+    const payload = { status: 'failed', records: [] };
+    await postFailedReceipt(payload, 'fixture-token', {
+      fetchFn: async () => {
+        calls += 1;
+        return new Response(null, calls === 1
+          ? { status: 503, headers: { 'Retry-After': '120' } }
+          : { status: 204 });
+      },
+      sleepFn: async (delay) => delays.push(delay),
+    });
+    assert.equal(calls, 2);
+    assert.deepEqual(delays, [30_000]);
+    calls = 0;
+    delays.length = 0;
+    await assert.rejects(postFailedReceipt(payload, 'fixture-token', {
+      fetchFn: async () => { calls += 1; throw new Error('offline'); },
+      sleepFn: async (delay) => delays.push(delay),
+    }), /exhausted network retries/);
+    assert.equal(calls, 3);
+    assert.deepEqual(delays, [1_000, 2_000]);
+  });
+
+  it('does not retry failed-receipt authentication errors or redirects', async () => {
+    for (const status of [401, 403, 302]) {
+      let calls = 0;
+      await assert.rejects(postFailedReceipt({ status: 'failed', records: [] }, 'fixture-token', {
+        fetchFn: async () => { calls += 1; return new Response(null, { status }); },
+        sleepFn: async () => assert.fail('permanent failures must not retry'),
+      }), new RegExp(`refused HTTP ${status}`));
+      assert.equal(calls, 1);
+    }
+    await assert.rejects(postFailedReceipt({ status: 'failed', records: [{}] }, 'fixture-token'), /no record decisions/);
+  });
+
   it('keeps the workflow on protected main and secrets at their final consumers', () => {
     const workflow = fs.readFileSync(path.join(root, '.github/workflows/bluesky-stewardship.yml'), 'utf8');
     const publisher = fs.readFileSync(path.join(root, '.github/scripts/bluesky-stewardship-publisher.mjs'), 'utf8');
@@ -363,6 +448,7 @@ describe('Bluesky stewardship receipt and workflow boundary', () => {
     );
     assert.doesNotMatch(receiptBlock, /RECEIPT_DELIVERY_OUTCOME/);
     assert.match(sendBlock, /env\.DRY_RUN != 'true'/);
+    assert.match(sendBlock, /if \[ "\$RECEIPT_STATUS" = 'failed' \]; then\n\s+node [^\n]+ send-failed-receipt/);
     assert.match(issueBlock, /env\.DRY_RUN != 'true'/);
     assert.match(issueBlock, /github-token: \$\{\{ github\.token \}\}/);
     assert.doesNotMatch(issueBlock, /app-token\.outputs\.token/);
