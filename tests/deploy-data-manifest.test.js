@@ -96,6 +96,10 @@ function deploymentMdDataFiles() {
 // (verify before adding); if deployed code links or fetches it, deploy it
 // instead — a referenced-but-undeployed file is exactly the #527 404 class.
 const KNOWN_NOT_DEPLOYED = new Map([
+  ['data/source-identity-quality-policy.json',
+    'versioned rules for the offline source-quality evaluator; no deployed page reads them'],
+  ['data/source-identity-quality-evidence.json',
+    'review evidence for the offline source-quality evaluator; no deployed page reads it'],
   ['data/graph-validation-holds.json',
     'validator policy input used only by repository and CI graph checks; no ' +
     'deployed page reads it'],
