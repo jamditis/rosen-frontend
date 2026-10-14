@@ -305,6 +305,12 @@ describe('current source identity baseline', () => {
       path.join(rootDir, 'data', 'source-identity-quality-evidence.json'),
       'utf8'
     ));
+    const policy = JSON.parse(fs.readFileSync(policyPath, 'utf8'));
+    const urlRuleVersion = policy.rules.find(rule => rule.id === 'source.url.presence').version;
+    const approvedUrlAbsences = new Set(registry.exceptions
+      .filter(item => item.rule_id === 'source.url.presence'
+        && item.rule_versions.includes(urlRuleVersion))
+      .map(item => item.record_id));
     const curatedRows = readSourceRows(path.join(rootDir, 'data', 'archive_records-public.csv'));
     const socialRows = readSourceRows(path.join(rootDir, 'data', 'social_posts.csv'));
     const runtimeRecords = JSON.parse(fs.readFileSync(
@@ -312,7 +318,7 @@ describe('current source identity baseline', () => {
       'utf8'
     )).records;
     const missingUrlIds = socialRows
-      .filter(row => !String(row.url || '').trim())
+      .filter(row => !String(row.url || '').trim() && !approvedUrlAbsences.has(row.id))
       .map(row => row.id)
       .sort();
     const uncertainIds = socialRows
@@ -322,7 +328,7 @@ describe('current source identity baseline', () => {
     const uncertainSet = new Set(uncertainIds);
     const overlapIds = missingUrlIds.filter(id => uncertainSet.has(id));
     const curatedMissingUrlIds = curatedRows
-      .filter(row => !String(row.url || '').trim())
+      .filter(row => !String(row.url || '').trim() && !approvedUrlAbsences.has(row.id))
       .map(row => row.id)
       .sort();
 
