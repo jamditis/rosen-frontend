@@ -99,6 +99,7 @@ function validateReferences(manifest) {
   const artifactCreationEvents = new Map();
   const artifactCaptureEvents = new Map();
   const artifactFixityEvents = new Map();
+  const artifactLinkedEvents = new Map();
   const storageCopyEvents = new Map();
 
   if (manifest.schemaVersion === '1.0.0' && manifest.fieldMappings !== undefined) {
@@ -390,10 +391,10 @@ function validateReferences(manifest) {
       const artifactId = event.fixity?.artifactId
         ?? (event.eventType === 'capture-attempt' ? undefined : event.artifactId);
       const artifact = artifacts.get(artifactId);
-      if (artifact && artifact.captureEventId !== event.captureEventId) {
-        throw new PreservationValidationError(
-          `${event.eventId}: captureEventId must match artifact ${artifactId} declared capture provenance`,
-        );
+      if (artifact) {
+        const linkedEvents = artifactLinkedEvents.get(artifactId) ?? [];
+        linkedEvents.push(event);
+        artifactLinkedEvents.set(artifactId, linkedEvents);
       }
     }
 
@@ -579,6 +580,15 @@ function validateReferences(manifest) {
       if (supersededEvents.has(creationEvent.eventId)) {
         throw new PreservationValidationError(
           `${artifact.artifactId}: creationEventId must identify a current artifact-created event`,
+        );
+      }
+    }
+    const currentLinkedEvents = (artifactLinkedEvents.get(artifact.artifactId) ?? [])
+      .filter(event => !supersededEvents.has(event.eventId));
+    for (const linkedEvent of currentLinkedEvents) {
+      if (linkedEvent.captureEventId !== artifact.captureEventId) {
+        throw new PreservationValidationError(
+          `${linkedEvent.eventId}: captureEventId must match artifact ${artifact.artifactId} declared capture provenance`,
         );
       }
     }

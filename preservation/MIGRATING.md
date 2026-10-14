@@ -57,8 +57,9 @@ validated.
    changed. If an event's assertion must be corrected, append a new event with
    `supersedesEventId`; do not edit or delete the old event. When a corrected
    capture retains the same artifact, rebind the artifact's `captureEventId` to
-   that current correction; superseded capture declarations do not remain
-   current provenance.
+   that current correction. Also supersede current artifact-specific events
+   whose `captureEventId` names the old capture. Superseded capture declarations
+   and event links remain as history but do not remain current provenance.
 5. Preserve original `taskVersion`, actor, event time, review, and
    `policyVersion` values. A migration must not make a historical decision look
    as if it used a newer policy.

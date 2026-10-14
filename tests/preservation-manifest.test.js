@@ -281,6 +281,45 @@ describe('preservation manifest schema (#701)', () => {
     );
   });
 
+  it('lets current append-only corrections rebind artifact-specific capture links', () => {
+    const correctedCaptureOnly = useSchema11(example('successful-capture'));
+    const artifact = correctedCaptureOnly.artifacts[0];
+    const originalCapture = correctedCaptureOnly.events.find(event => (
+      event.eventId === artifact.captureEventId
+    ));
+    const originalFixity = correctedCaptureOnly.events.find(event => (
+      event.eventType === 'fixity-check'
+    ));
+    originalFixity.captureEventId = originalCapture.eventId;
+
+    const correctedCapture = clone(originalCapture);
+    correctedCapture.eventId = 'urn:rosen-preservation:event:corrected-linked-capture';
+    correctedCapture.occurredAt = '2026-08-01T14:21:30.000Z';
+    correctedCapture.retrieval.retrievedAt = correctedCapture.occurredAt;
+    correctedCapture.supersedesEventId = originalCapture.eventId;
+    artifact.captureEventId = correctedCapture.eventId;
+    correctedCaptureOnly.events.push(correctedCapture);
+
+    rejectsManifest(
+      correctedCaptureOnly,
+      originalFixity.eventId,
+      'captureEventId',
+      'declared capture provenance',
+    );
+
+    const fullyCorrected = clone(correctedCaptureOnly);
+    const currentFixity = fullyCorrected.events.find(event => event.eventType === 'fixity-check');
+    const correctedFixity = clone(currentFixity);
+    correctedFixity.eventId = 'urn:rosen-preservation:event:corrected-linked-fixity';
+    correctedFixity.occurredAt = '2026-08-01T14:26:00.000Z';
+    correctedFixity.captureEventId = correctedCapture.eventId;
+    correctedFixity.supersedesEventId = currentFixity.eventId;
+    fullyCorrected.events.push(correctedFixity);
+
+    assert.equal(validatePreservationManifest(fullyCorrected), fullyCorrected);
+    assert.ok(fullyCorrected.events.includes(currentFixity));
+  });
+
   it('validates an optional schema 1.1 artifact creation back-reference when supplied', () => {
     const manifest = useSchema11(example('successful-capture'));
     assert.equal(validatePreservationManifest(manifest), manifest);
