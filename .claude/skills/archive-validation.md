@@ -115,8 +115,12 @@ const VALID_CATEGORIES = [
 
 ## Validation Commands
 
-Run the maintained validator from the backend directory. It checks the archive,
-social, entity, and relationship CSV files and exits nonzero on errors.
+Run the maintained validator from the backend directory. It validates the
+archive and social CSV files and reports entity and relationship findings when
+those inputs load. A missing or unreadable entity or relationship CSV is a
+warning, not an error, so the command can exit zero with either check skipped.
+Read the warning section as well as the exit status. The command exits nonzero
+when the report contains errors.
 
 ```bash
 cd /home/user/rosen-frontend/backend

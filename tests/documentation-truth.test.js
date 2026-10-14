@@ -124,16 +124,31 @@ describe('documentation truth', () => {
       .map((docPath) => fs.readFileSync(path.join(rootDir, docPath), 'utf8'))
       .join('\n');
 
-    for (const backendPath of [
-      path.join('src', 'rosen_scraper', 'workflow.py'),
-      path.join('src', 'rosen_scraper', 'categorizer.py'),
-      path.join('scripts', 'diagnostics', 'data_deduper.py'),
-      path.join('scripts', 'extract_entities_csv_batch.py'),
-      path.join('scripts', 'validate_archive_data.py'),
+    for (const backendPathParts of [
+      ['src', 'rosen_scraper', 'workflow.py'],
+      ['src', 'rosen_scraper', 'categorizer.py'],
+      ['scripts', 'diagnostics', 'data_deduper.py'],
+      ['scripts', 'extract_entities_csv_batch.py'],
+      ['scripts', 'validate_archive_data.py'],
     ]) {
-      const relativePath = path.join('backend', backendPath);
+      const nativeBackendPath = path.join(...backendPathParts);
+      const documentedBackendPath = path.posix.join(...backendPathParts);
+      const relativePath = path.join('backend', nativeBackendPath);
       assert.ok(fs.existsSync(path.join(rootDir, relativePath)), `${relativePath} must exist`);
-      assert.ok(guidance.includes(backendPath), `active backend guidance must name ${backendPath}`);
+      assert.ok(
+        guidance.includes(documentedBackendPath),
+        `active backend guidance must name ${documentedBackendPath}`,
+      );
+      assert.equal(
+        documentedBackendPath,
+        backendPathParts.join('/'),
+        'documented paths must use portable POSIX separators',
+      );
+      assert.equal(
+        path.win32.join(...backendPathParts).replaceAll('\\', '/'),
+        documentedBackendPath,
+        'Windows filesystem paths must normalize to the documented POSIX path',
+      );
     }
 
     assert.doesNotMatch(guidance, /\bsrc\/workflow\.py\b/);
@@ -148,6 +163,11 @@ describe('documentation truth', () => {
     assert.doesNotMatch(skill, /extract_entities_csv_batch\.py\s+--(?:workers|missing-only)\b/);
     assert.doesNotMatch(skill, /categorizer\.py\s+--(?:batch-size|delay)\b/);
     assert.doesNotMatch(skill, /python -m venv|pip install poetry|source venv\/bin\/activate/);
+    assert.match(skill, /poetry run playwright install/);
+    assert.doesNotMatch(skill, /^\s*playwright install\s*$/m);
+    assert.match(skill, /csv\/urls_to_scrape\.csv/);
+    assert.match(skill, /id,url,processed_on,Notes/);
+    assert.match(skill, /csv\/archive_records-public\.csv/);
 
     for (const sourcePath of [
       path.join('backend', 'src', 'rosen_scraper', 'workflow.py'),

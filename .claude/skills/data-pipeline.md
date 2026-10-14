@@ -24,7 +24,7 @@ cd /home/user/rosen-frontend/backend
 poetry install
 
 # Install Playwright browsers (for web scraping)
-playwright install
+poetry run playwright install
 ```
 
 ### Required Configuration
@@ -34,13 +34,14 @@ Copy `.env.example` to `.env`:
 cp .env.example .env
 ```
 
-Required values:
+The main local workflow requires:
 ```
-SPREADSHEET_NAME="Jay Rosen Archive Master"
 GEMINI_API_KEY="your_gemini_api_key"
 ```
 
-Place Google Cloud credentials in `backend/google_credentials.json`.
+`SPREADSHEET_NAME` and `backend/google_credentials.json` are for the separate
+Google Sheets maintenance tools. They do not create the main workflow's local
+CSV inputs.
 
 ## Script Categories
 
@@ -48,7 +49,7 @@ Place Google Cloud credentials in `backend/google_credentials.json`.
 
 | Script | Purpose | Input | Output |
 |--------|---------|-------|--------|
-| `src/rosen_scraper/workflow.py` | Main processing pipeline | URLs from spreadsheet | Processed records |
+| `src/rosen_scraper/workflow.py` | Main processing pipeline | Local `csv/urls_to_scrape.csv` | Local dated output CSVs |
 | `src/rosen_scraper/dispatcher.py` | Routes URLs to processors | URL | Processor selection |
 | `src/rosen_scraper/categorizer.py` | AI analysis via Gemini | Text content | Categories, concepts |
 
@@ -91,10 +92,28 @@ The Tumblr posts and newspaper clippings were imported once by the now-archived
 
 ### Workflow 1: Process New URLs
 
+The workflow defaults to repository-root `csv/`. Before a live run, manually
+export the current Google Sheets `urls_to_scrape` tab as
+`csv/urls_to_scrape.csv` and the `final` tab as
+`csv/archive_records-public.csv`. The first file uses
+`id,url,processed_on,Notes`; `url` selects runnable rows and a nonempty
+`processed_on` value is skipped by default. Lowercase `notes` is also accepted.
+The archive export supplies the output header. Credentials alone do not create
+either file.
+
+For a checkout-only test with the committed snapshots:
+
 ```bash
+cd /home/user/rosen-frontend
+mkdir -p csv
+cp data/urls_to_scrape.csv csv/urls_to_scrape.csv
+cp data/archive_records-public.csv csv/archive_records-public.csv
+# Optional: include social IDs and URLs in duplicate checks.
+cp data/social_posts.csv csv/social_posts.csv
+
 cd backend
 
-# 1. Run main workflow (processes URLs from spreadsheet)
+# 1. Run the local CSV workflow
 poetry run python src/rosen_scraper/workflow.py
 
 # 2. Extract entities from new records
@@ -107,6 +126,10 @@ poetry run python src/rosen_scraper/entity_deduplicator.py
 cd ../data
 node export-archive-data.js
 ```
+
+The workflow writes `csv/output/processed_records_YYYYMMDD.csv` and
+`processing_log_YYYYMMDD.csv`. Review and reconcile approved output back to the
+Google Sheet separately; this command does not write to Sheets.
 
 ### Workflow 2: Data Quality Audit
 
@@ -146,7 +169,10 @@ node export-archive-data.js
 ## Data Flow Diagram
 
 ```
-Google Spreadsheet (URLs)
+Google Sheet exports
+         │
+         ▼
+csv/urls_to_scrape.csv + csv/archive_records-public.csv
          │
          ▼
     workflow.py
@@ -159,16 +185,10 @@ dispatcher  categorizer
 processors ◄──┘
     │
     ▼
-archive_records-public.csv
+csv/output/processed_records_YYYYMMDD.csv
          │
-    ┌────┴────┐
-    ▼         ▼
-entity_   export-archive-
-extractor    data.js
-    │         │
-    ▼         ▼
-extracted_  archive-*.json
-entities.csv
+         ▼
+manual review and Google Sheets reconciliation
 ```
 
 ## Content Type Processors
