@@ -2306,14 +2306,15 @@ describe('social_posts.csv', () => {
   });
 
   it('categories use normalized values', () => {
-    const CANONICAL = new Set([
-      'Audience & Public Engagement',
-      'Journalism Education',
-      'Journalism Theory & Practice',
-      'Politics & Democracy',
-      'Press & Media Criticism',
-      'Technology & Digital Media',
-    ]);
+    const schema = JSON.parse(fs.readFileSync(path.join(repoDir, 'backend', 'schema.json'), 'utf8'));
+    const definitions = schema.taxonomy?.thematic_categories;
+    assert.ok(Array.isArray(definitions) && definitions.length > 0,
+      'backend/schema.json must define thematic_categories');
+    const names = definitions.map(definition => definition?.name?.trim());
+    assert.ok(names.every(Boolean), 'Every schema thematic category must have a name');
+    assert.strictEqual(new Set(names).size, names.length,
+      'Schema thematic category names must be unique');
+    const canonical = new Set(names);
 
     const unknownCats = new Set();
 
@@ -2321,7 +2322,7 @@ describe('social_posts.csv', () => {
       const raw = (row.thematic_categories || '');
       const cats = raw.replace(/[\[\]"']/g, '').split(/[;,]/).map(s => s.trim()).filter(Boolean);
       for (const cat of cats) {
-        if (!CANONICAL.has(cat)) unknownCats.add(cat);
+        if (!canonical.has(cat)) unknownCats.add(cat);
       }
     }
 

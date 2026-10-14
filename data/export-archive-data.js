@@ -14,7 +14,7 @@
 import fs from 'fs';
 import path from 'path';
 import { parse } from 'csv-parse/sync';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { generateAllFeeds } from './lib/rss-generator.js';
 import { generateOPML, generateSubscriptionOPML } from './lib/opml-generator.js';
 import { computeAnalytics } from './compute-analytics.js';
@@ -88,7 +88,7 @@ function getEra(dateStr) {
   return 'Platform Transition & Future Models (2021-Present)';
 }
 
-function processRecord(row, index, type, relationshipsMap, authoredExcerpts) {
+export function processRecord(row, index, type, relationshipsMap, authoredExcerpts) {
   const rawCats = row.thematic_categories || row.Thematic_Categories || row.Categories || '';
   const rawConcepts = row.key_concepts || row.Key_Concepts || row.Concepts || '';
   const rawTags = row.tags || row.Tags || '';
@@ -644,12 +644,7 @@ async function main() {
 
   // Filter records
   const beforeFilterCount = allRecords.length;
-  allRecords = allRecords.filter(r => {
-    if (!r.verified) return false;
-    if (!r.title || r.title === 'Untitled' || r.title.trim().length < 5) return false;
-    if (!r.date && r.url === '#') return false;
-    return true;
-  });
+  allRecords = allRecords.filter(isPublishableRecord);
   const afterFilterCount = allRecords.length;
 
   console.log(`  - Total records before filter: ${beforeFilterCount}`);
@@ -1029,7 +1024,16 @@ async function main() {
   console.log(`   Feed directory: ${feedsDir}`);
 }
 
-main().catch(err => {
-  console.error('❌ Error:', err);
-  process.exit(1);
-});
+export function isPublishableRecord(record) {
+  if (!record.verified) return false;
+  if (!record.title || record.title === 'Untitled' || record.title.trim().length < 5) return false;
+  if (!record.date && record.url === '#') return false;
+  return true;
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch(err => {
+    console.error('Error:', err);
+    process.exit(1);
+  });
+}

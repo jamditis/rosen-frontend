@@ -72,6 +72,11 @@ npm run export-data  # or: node data/export-archive-data.js
 
 The script reads the four source CSVs (plus `authored-excerpts.csv`), processes and links the records, and writes the JSON files listed above. It prints progress as it goes, including a row count for each CSV it reads.
 
+The legacy Python record-removal commands use the same Node CSV parser so they
+can preserve embedded newlines and untouched row bytes. Run `npm ci` from the
+repository root before `data/dedup_records.py`,
+`data/prune_orphan_references.py`, or `data/fixes/remove-record-00607.py`.
+
 ### Search-by-meaning vectors
 
 After published records change, rebuild both vector pairs from the repository root:
@@ -230,11 +235,13 @@ Regenerate the committed stewardship inventory from the canonical CSVs and the f
 npm run census:stewardship
 ```
 
-The command writes `stewardship-census.json` and `stewardship-census.md`. The JSON contract is `stewardship-census/1.0.0`: version 1 may gain fields, while renamed fields or changed count semantics require a new major version. Output has no wall-clock timestamp, so unchanged inputs in a full-history checkout produce byte-identical reports. A shallow checkout is rejected because it cannot reproduce the last input-changing commit used by the provenance stamp.
+The command writes `stewardship-census.json` and `stewardship-census.md`. The JSON contract is `stewardship-census/1.0.0`: version 1 may gain fields, while renamed fields or changed count semantics require a new major version. Output has no wall-clock timestamp, so unchanged inputs and the same Git history produce byte-identical reports. The generator rejects a shallow checkout because it uses the last input-changing commit for its informational provenance stamp.
 
 The census stamps the most recent Git commit that changed an input file, the clean/dirty state of those inputs, and a SHA-256 digest for each CSV and runtime JSON file. Source and runtime counts remain separate. Filtered rows use the exporter's ordered first-match taxonomy and retain exact record IDs in JSON. The report also keeps the measured 2026-07-22 baseline and explains later deltas rather than overwriting the historical checkpoint.
 
-The command refuses to write a stamped report while any census input is dirty. After a data change, run the data tests and commit the source and runtime files first. The committed-report freshness subtest skips while those inputs are dirty, then resumes after that commit. Run `npm run census:stewardship`, rerun the test, and commit the two reports. This two-commit sequence keeps the input commit truthful and lets the freshness test compare the generated files byte for byte. The automated submission and master-sheet sync pipelines use this same data-commit-then-report-commit sequence before they push.
+The command refuses to write a stamped report while any census input is dirty. After a data change, run the data tests and commit the source and runtime files first. The committed-report freshness subtest skips while those inputs are dirty, then resumes after that commit. Run `npm run census:stewardship`, rerun the test, and commit the two reports. The automated submission and master-sheet sync pipelines use this same data-commit-then-report-commit sequence before they push.
+
+The freshness test requires matching nonempty commit stamps in the committed JSON and Markdown reports. It then treats that stamp as informational when comparing regenerated content because rebases and squash merges can change commit IDs without changing input bytes (issue #879). It still checks input SHA-256 digests, clean state, counts, record IDs and all other report content. It does not prove that the historical commit named by the stamp exists in the current Git history.
 
 `tests/stewardship-census.test.js` exercises representative fixtures, proves an intentional source-row change alters the census, and fails when the committed reports drift from regenerated output.
 
