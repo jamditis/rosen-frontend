@@ -395,7 +395,11 @@ def _validated_observations(pages: list[dict]) -> tuple[list[dict], dict[str, di
             )
         for item_number, item in enumerate(response["feed"]):
             try:
+                if backfill._reason_type(item) == backfill.REPOST_REASON:
+                    continue
                 post, uri_did, rkey = backfill._post_identity(item)
+                if uri_did != backfill.ACTOR_DID:
+                    continue
                 _record, created_at, _parent_uri = backfill._post_record(item, post)
             except backfill.FeedValidationError as exc:
                 raise BatchPreparationError(

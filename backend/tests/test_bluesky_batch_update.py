@@ -225,6 +225,50 @@ def test_incomplete_walk_writes_neither_csv_nor_snapshots(tmp_path):
     assert not report_path.exists()
 
 
+@pytest.mark.parametrize("kind", ["foreign", "repost", "malformed_repost"])
+def test_batch_skips_malformed_third_party_records(tmp_path, kind):
+    csv_path = tmp_path / "social_posts.csv"
+    original = _write_canonical(csv_path)
+    ignored = {
+        "post": {
+            "uri": "at://did:plc:reader/app.bsky.feed.post/foreign",
+            "author": {"did": "did:plc:reader"},
+            "record": {"text": "Unrelated post", "createdAt": "invalid-date"},
+        }
+    }
+    reposted = kind != "foreign"
+    if reposted:
+        ignored["reason"] = {"$type": "app.bsky.feed.defs#reasonRepost"}
+    if kind == "malformed_repost":
+        ignored["post"] = None
+    jay = _feed_item(
+        "new-original",
+        "2026-10-15T12:00:00Z",
+        "Journalists should explain how news coverage serves public accountability.",
+    )
+
+    result = batch.run_batch(
+        csv_path=csv_path,
+        snapshot_dir=tmp_path / "snapshot",
+        report_path=tmp_path / "report.json",
+        captured_at=_captured_at(),
+        fetch_page_fn=lambda _cursor: {"feed": [ignored, jay], "cursor": None},
+        fetch_context_fn=lambda _uris: {"posts": []},
+        policy_check_fn=lambda: None,
+        sleep_fn=lambda _seconds: None,
+    )
+
+    assert csv_path.read_bytes().startswith(original)
+    assert [row["id"] for row in _read_rows(csv_path)] == ["BSKY-03435", "BSKY-03436"]
+    assert result.report["counts"] == {"captured": 1, "admitted": 1, "context_only": 0}
+    assert [source["uri"] for source in result.report["observed_sources"]] == [jay["post"]["uri"]]
+    assert datetime.datetime.fromisoformat(result.report["newest_source_time"]) == (
+        datetime.datetime(2026, 10, 15, 12, 0, tzinfo=datetime.timezone.utc)
+    )
+    assert result.report["collector"]["skipped_repost"] == int(reposted)
+    assert result.report["collector"]["skipped_wrong_author"] == int(not reposted)
+
+
 def test_bad_source_payload_writes_nothing(tmp_path):
     csv_path = tmp_path / "social_posts.csv"
     original = _write_canonical(csv_path)
