@@ -63,6 +63,89 @@ function appendInFreshProcess(streamPath, eventPath) {
   );
 }
 
+function appendWithFilesystemFault(streamPath, event, fault, bytesWritten = 0) {
+  const moduleUrl = pathToFileURL(
+    path.join(repoRoot, 'stewardship', 'task-event-stream.mjs')
+  ).href;
+  const script = [
+    "import fs from 'node:fs';",
+    "import { syncBuiltinESMExports } from 'node:module';",
+    `const moduleUrl = ${JSON.stringify(moduleUrl)};`,
+    'const streamPath = process.argv[1];',
+    'const event = JSON.parse(process.argv[2]);',
+    'const fault = process.argv[3];',
+    'const shortWriteLength = Number(process.argv[4]);',
+    'const originalWriteSync = fs.writeSync;',
+    "const failure = Object.assign(new Error('injected filesystem failure'), { code: 'EIO' });",
+    "if (fault === 'file-sync') {",
+    '  fs.fsyncSync = () => { throw failure; };',
+    "} else if (fault === 'partial-write') {",
+    '  let shortWriteComplete = false;',
+    '  fs.writeSync = (descriptor, buffer, offset, length, position) => {',
+    '    if (shortWriteComplete) throw failure;',
+    '    shortWriteComplete = true;',
+    '    return originalWriteSync(',
+    '      descriptor, buffer, offset, Math.min(shortWriteLength, length), position',
+    '    );',
+    '  };',
+    '} else {',
+    "  throw new Error(`unsupported fault ${fault}`);",
+    '}',
+    'syncBuiltinESMExports();',
+    'const { appendTaskEvent, readTaskEventStream } = await import(moduleUrl);',
+    'let appendFailure;',
+    'try {',
+    '  appendTaskEvent(streamPath, event);',
+    '  appendFailure = { unexpectedSuccess: true };',
+    '} catch (error) {',
+    '  appendFailure = {',
+    '    name: error.name,',
+    '    source: error.source,',
+    '    eventId: error.eventId,',
+    '    stage: error.stage,',
+    '    bytesWritten: error.bytesWritten,',
+    '    recordAppended: error.recordAppended,',
+    '    fileSynced: error.fileSynced,',
+    '    causeCode: error.cause?.code,',
+    '    message: error.message',
+    '  };',
+    '}',
+    'const content = fs.readFileSync(streamPath);',
+    'let readFailure;',
+    'try {',
+    '  readTaskEventStream(streamPath);',
+    '} catch (error) {',
+    '  readFailure = { name: error.name, message: error.message };',
+    '}',
+    'let retryFailure;',
+    'try {',
+    '  appendTaskEvent(streamPath, event);',
+    '  retryFailure = { unexpectedSuccess: true };',
+    '} catch (error) {',
+    '  retryFailure = { name: error.name, message: error.message };',
+    '}',
+    'process.stdout.write(JSON.stringify({',
+    '  appendFailure,',
+    '  content: content.toString("base64"),',
+    '  readFailure,',
+    '  retryFailure',
+    '}));'
+  ].join('\n');
+  return spawnSync(
+    process.execPath,
+    [
+      '--input-type=module',
+      '--eval',
+      script,
+      streamPath,
+      JSON.stringify(event),
+      fault,
+      String(bytesWritten)
+    ],
+    { encoding: 'utf8' }
+  );
+}
+
 describe('stewardship task event contract', () => {
   it('validates canonical fixture bytes for every lifecycle family', () => {
     assert.equal(lifecycleBytes[lifecycleBytes.length - 1], 0x0a);
@@ -336,43 +419,67 @@ describe('stewardship task event JSONL adapter', () => {
     assert.equal(readTaskEventStream(streamUrl)[0].eventId, lifecycle[0].eventId);
   });
 
-  it('does not label a failed file sync as durable or rolled back', () => {
-    const cause = Object.assign(new Error('writeback failed'), { code: 'EIO' });
-    const failure = new TaskEventPostAppendError(
-      '/tmp/events.jsonl',
-      lifecycle[0].eventId,
-      'file-sync',
-      { fileSynced: false, cause }
-    );
+  it('reports a complete append whose real file sync fails', (t) => {
+    const directory = temporaryDirectory(t);
+    const streamPath = path.join(directory, 'file-sync-failure.jsonl');
+    const boundary = appendWithFilesystemFault(streamPath, lifecycle[0], 'file-sync');
+    assert.equal(boundary.status, 0, boundary.stderr);
+    const result = JSON.parse(boundary.stdout);
+    const failure = result.appendFailure;
 
-    assert.equal(failure.source, '/tmp/events.jsonl');
+    assert.equal(failure.name, TaskEventPostAppendError.name);
+    assert.equal(failure.source, streamPath);
     assert.equal(failure.eventId, lifecycle[0].eventId);
     assert.equal(failure.stage, 'file-sync');
     assert.equal(failure.recordAppended, true);
     assert.equal(failure.fileSynced, false);
-    assert.equal(failure.cause, cause);
+    assert.equal(failure.causeCode, 'EIO');
     assert.match(failure.message, /file durability is incomplete/);
     assert.match(failure.message, /inspect the authoritative stream before retry/);
+    assert.equal(
+      Buffer.from(result.content, 'base64').toString('utf8'),
+      encodeTaskEvent(lifecycle[0])
+    );
+    assert.deepEqual(readTaskEventStream(streamPath).map(event => event.eventId), [
+      lifecycle[0].eventId
+    ]);
+    assert.equal(result.readFailure, undefined);
+    assert.equal(result.retryFailure.name, 'TaskEventStreamError');
+    assert.match(result.retryFailure.message, /duplicate eventId/);
   });
 
-  it('distinguishes an incomplete tail from a zero-byte write failure', () => {
-    const cause = Object.assign(new Error('space exhausted'), { code: 'ENOSPC' });
-    const failure = new TaskEventPartialWriteError(
-      '/tmp/events.jsonl',
-      lifecycle[0].eventId,
-      37,
-      { cause }
+  it('reports and preserves a real partial write as an invalid stream tail', (t) => {
+    const directory = temporaryDirectory(t);
+    const streamPath = path.join(directory, 'partial-write-failure.jsonl');
+    const writtenBytes = 37;
+    const boundary = appendWithFilesystemFault(
+      streamPath,
+      lifecycle[0],
+      'partial-write',
+      writtenBytes
     );
+    assert.equal(boundary.status, 0, boundary.stderr);
+    const result = JSON.parse(boundary.stdout);
+    const failure = result.appendFailure;
 
-    assert.equal(failure.source, '/tmp/events.jsonl');
+    assert.equal(failure.name, TaskEventPartialWriteError.name);
+    assert.equal(failure.source, streamPath);
     assert.equal(failure.eventId, lifecycle[0].eventId);
     assert.equal(failure.stage, 'partial-write');
-    assert.equal(failure.bytesWritten, 37);
+    assert.equal(failure.bytesWritten, writtenBytes);
     assert.equal(failure.recordAppended, false);
     assert.equal(failure.fileSynced, false);
-    assert.equal(failure.cause, cause);
+    assert.equal(failure.causeCode, 'EIO');
     assert.match(failure.message, /record is incomplete/);
     assert.match(failure.message, /repair the authoritative stream tail before retry/);
+    assert.equal(Buffer.from(result.content, 'base64').length, writtenBytes);
+    assert.throws(
+      () => readTaskEventStream(streamPath),
+      /truncated final record/
+    );
+    assert.match(result.readFailure.message, /truncated final record/);
+    assert.equal(result.retryFailure.name, 'TaskEventStreamError');
+    assert.match(result.retryFailure.message, /truncated final record/);
   });
 
   it('appends, fsyncs, closes, and reopens across fresh processes', (t) => {
