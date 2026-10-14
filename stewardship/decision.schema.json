@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pressthink.org/j/rosen-archive/schemas/stewardship-decision-v1.json",
+  "title": "Rosen archive stewardship decision event",
+  "description": "An ordered approval, rejection, or supersession decision for one immutable proposal.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "vocabularyVersion",
+    "eventId",
+    "proposalId",
+    "operation",
+    "expectedRevision",
+    "actor",
+    "occurredAt",
+    "reason"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "vocabularyVersion": { "const": "1.0.0" },
+    "eventId": {
+      "type": "string",
+      "pattern": "^urn:rosen-stewardship:decision-event:[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "proposalId": {
+      "type": "string",
+      "pattern": "^urn:rosen-stewardship:proposal:[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "operation": { "enum": ["approve", "reject", "supersede"] },
+    "expectedRevision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "actor": { "$ref": "#/$defs/actor" },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+    },
+    "reason": { "type": "string", "minLength": 1 },
+    "notes": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "type": "null" }
+      ]
+    },
+    "publicationRefs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "successorProposalId": {
+      "type": "string",
+      "pattern": "^urn:rosen-stewardship:proposal:[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "operation": { "const": "supersede" } },
+        "required": ["operation"]
+      },
+      "then": { "required": ["successorProposalId"] },
+      "else": { "not": { "required": ["successorProposalId"] } }
+    }
+  ],
+  "$defs": {
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actorType", "actorId"],
+      "properties": {
+        "actorType": { "enum": ["human", "automation"] },
+        "actorId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@+-]*$"
+        }
+      }
+    }
+  }
+}

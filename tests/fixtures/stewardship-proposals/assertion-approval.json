@@ -1,0 +1,55 @@
+{
+  "proposals": [
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "proposalId": "urn:rosen-stewardship:proposal:assertion-relationship-1",
+      "objectId": "urn:rosen:object:relationship:REL-00001",
+      "objectClass": "relationship",
+      "target": {
+        "kind": "assertion",
+        "key": "relationship:P0001|Mentions|RECORD-00001"
+      },
+      "currentValue": null,
+      "proposedValue": {
+        "sourceEntityId": "P0001",
+        "relationshipType": "Mentions",
+        "targetRecordId": "RECORD-00001"
+      },
+      "relevantInputHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "evidenceRefs": [
+        "urn:rosen:evidence:record-00001-paragraph-4"
+      ],
+      "ruleVersion": "relationship-evidence@2.0.0",
+      "generationVersion": "reviewed-extractor@3.1.0",
+      "reason": "The source text explicitly names the person.",
+      "confidence": 0.92,
+      "severity": "low",
+      "riskClass": "restricted"
+    }
+  ],
+  "decisions": [
+    {
+      "schemaVersion": "1.0.0",
+      "vocabularyVersion": "1.0.0",
+      "eventId": "urn:rosen-stewardship:decision-event:approve-assertion-1",
+      "proposalId": "urn:rosen-stewardship:proposal:assertion-relationship-1",
+      "operation": "approve",
+      "expectedRevision": 0,
+      "actor": {
+        "actorType": "human",
+        "actorId": "curator:joe-amditis"
+      },
+      "occurredAt": "2026-10-14T14:01:00.000Z",
+      "reason": "The evidence supports the relationship assertion."
+    }
+  ],
+  "expected": {
+    "acceptedProposalIds": [
+      "urn:rosen-stewardship:proposal:assertion-relationship-1"
+    ],
+    "proposedValueHash": "f4ea6a4d4ecf1316c61fb59a31b97eb7bbbbddf9360849ff3b4d9059960a6e66",
+    "proposalHash": "262b31c4104527f51a97a05d6413c740f576c90243616feee97cdb8baec4ed1c",
+    "rejectionFingerprint": "bad812fefffac38bdde620c33fecbe9122852d3885c515183e30cd036c647a78"
+  }
+}
