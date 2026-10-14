@@ -343,6 +343,7 @@ export function appendTaskEvent(filePath, value) {
   const current = creating
     ? Object.freeze([])
     : readTaskEventStream(normalizedPath);
+  const needsDirectorySync = current.length === 0;
   const next = validateTaskEventSequence([...current, value], { source });
   const appended = next[next.length - 1];
   const encoded = Buffer.from(`${canonicalJson(appended)}\n`, 'utf8');
@@ -389,7 +390,7 @@ export function appendTaskEvent(filePath, value) {
     }
   }
   if (operationError !== undefined) throw operationError;
-  if (creating) {
+  if (needsDirectorySync) {
     try {
       syncCreatedFileDirectory(normalizedPath);
     } catch (error) {

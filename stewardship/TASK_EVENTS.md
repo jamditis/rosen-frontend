@@ -47,11 +47,12 @@ correction to an earlier event. Earlier bytes remain in the stream.
 `appendTaskEvent()` validates the existing stream and candidate before opening
 the file. It opens with append mode, loops until all record bytes are written,
 syncs and closes the file, reopens it, and validates the full stream. On Linux,
-the supported deployment platform, first creation also opens, syncs, and closes
-the parent directory before the function returns. Directory sync errors are not
-suppressed. Other platforms retain file sync and do not claim durable directory
-entry creation. After all record bytes are appended, file sync, file close,
-directory sync, and reopened-stream validation failures throw
+the supported deployment platform, the first record append also opens, syncs,
+and closes the parent directory before the function returns. This includes an
+append to an empty file left by an earlier failed creation attempt. Directory
+sync errors are not suppressed. Other platforms retain file sync and do not
+claim durable directory entry creation. After all record bytes are appended,
+file sync, file close, directory sync, and reopened-stream validation failures throw
 `TaskEventPostAppendError`. It contains the path, event ID, underlying cause
 when one exists, stable failure `stage`, `recordAppended: true`, and a truthful
 `fileSynced` flag. A visible record with `fileSynced: false` is not confirmed

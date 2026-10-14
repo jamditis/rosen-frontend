@@ -250,6 +250,7 @@ describe('stewardship task event JSONL adapter', () => {
     if (process.platform !== 'linux') {
       const directory = temporaryDirectory(t);
       const streamPath = path.join(directory, 'events.jsonl');
+      fs.writeFileSync(streamPath, '');
       assert.equal(appendTaskEvent(streamPath, lifecycle[0]).eventId, lifecycle[0].eventId);
       assert.equal(fs.readFileSync(streamPath, 'utf8'), encodeTaskEvent(lifecycle[0]));
       return;
@@ -268,6 +269,7 @@ describe('stewardship task event JSONL adapter', () => {
       "const restricted = path.join(directory, 'write-only-parent');",
       "const stream = path.join(restricted, 'events.jsonl');",
       'fs.mkdirSync(restricted);',
+      "fs.writeFileSync(stream, '', { mode: 0o600 });",
       'fs.chmodSync(restricted, 0o300);',
       'let result;',
       'try {',
