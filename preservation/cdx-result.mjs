@@ -1,15 +1,18 @@
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 import { compileJsonSchema } from '../scripts/json-schema-validator.mjs';
 
 export const CDX_RESULT_VERSION = '1.0.0';
 export const CDX_ADAPTER_NAME = 'internet-archive-wayback-cdx-json';
 export const CDX_ADAPTER_VERSION = '1.0.0';
 
-const isWebUri = compileJsonSchema({
-  type: 'string',
-  format: 'uri',
-  pattern: '^[hH][tT][tT][pP][sS]?://',
-}, { source: 'CDX web URL' });
+const resultSchema = createRequire(import.meta.url)('./cdx-result.schema.json');
+const isWebUri = compileJsonSchema(resultSchema.$defs.objectMapping.properties.sourceUrl, {
+  source: 'CDX web URL',
+});
+const isIaCdxUri = compileJsonSchema(resultSchema.$defs.query.properties.requestUrl, {
+  source: 'CDX request endpoint',
+});
 
 const REQUIRED_FIELDS = Object.freeze([
   'timestamp',
@@ -194,6 +197,9 @@ function validateMetadata(metadata) {
   }
 
   assertExactKeys(metadata.query, ['requestUrl', 'parameters'], [], 'CDX query');
+  if (!isIaCdxUri(metadata.query.requestUrl)) {
+    fail('query requestUrl must identify the Internet Archive CDX endpoint');
+  }
   const requestUrl = validateWebUrl(metadata.query.requestUrl, 'query requestUrl');
   if (requestUrl.hostname !== 'web.archive.org'
       || requestUrl.port || requestUrl.username || requestUrl.password || requestUrl.hash

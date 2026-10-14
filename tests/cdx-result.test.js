@@ -475,6 +475,20 @@ describe('offline Wayback CDX result contract (#903)', () => {
       sidecar.query.requestUrl = declared.query.requestUrl;
       assert.equal(validateSchema(sidecar), false);
     }
+    for (const requestUrl of [
+      metadata().query.requestUrl + '#',
+      metadata().query.requestUrl.replace('https://', 'https://@'),
+      metadata().query.requestUrl.replace('web.archive.org/', 'web.archive.org:/'),
+      metadata().query.requestUrl.replace('/search/cdx', '/search/./cdx'),
+      metadata().query.requestUrl.replace('web.archive.org', 'web.archive.%6Frg'),
+    ]) {
+      const declared = metadata();
+      declared.query.requestUrl = requestUrl;
+      assert.throws(() => parseCdxPage(fixture('one.json'), declared), /Internet Archive CDX endpoint/);
+      const sidecar = parseCdxPage(fixture('one.json'), metadata());
+      sidecar.query.requestUrl = requestUrl;
+      assert.equal(validateSchema(sidecar), false);
+    }
     for (const endpoint of ['HTTP://WEB.ARCHIVE.ORG:80', 'HTTPS://WEB.ARCHIVE.ORG:443']) {
       const declared = metadata();
       declared.query.requestUrl = declared.query.requestUrl.replace('https://web.archive.org', endpoint);
