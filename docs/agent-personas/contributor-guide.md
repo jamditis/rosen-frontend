@@ -102,7 +102,7 @@ node data/export-archive-data.js
 # Backend pipeline
 cd backend
 poetry install
-poetry run python src/workflow.py
+poetry run python src/rosen_scraper/workflow.py
 ```
 
 ## Directory structure

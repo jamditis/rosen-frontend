@@ -83,7 +83,7 @@ Backend pipeline work lives in `backend/` and uses Poetry:
 cd backend
 poetry install
 playwright install
-poetry run python src/workflow.py
+poetry run python src/rosen_scraper/workflow.py
 ```
 
 ## Structure

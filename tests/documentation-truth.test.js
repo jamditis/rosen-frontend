@@ -108,4 +108,61 @@ describe('documentation truth', () => {
       'this test assumes backfill_worker.py takes no CLI arguments; update the doc assertion above if it grows a parser',
     );
   });
+
+  it('keeps active backend commands aligned with the maintained Poetry entry points', () => {
+    const activeGuides = [
+      'AGENTS.md',
+      'CLAUDE.md',
+      path.join('.claude', 'skills', 'archive-validation.md'),
+      path.join('.claude', 'skills', 'data-pipeline.md'),
+      path.join('backend', 'docs', 'RATE_LIMITING.md'),
+      path.join('docs', 'agent-personas', 'contributor-guide.md'),
+      path.join('docs', 'agent-personas', 'data-pipeline-engineer.md'),
+      path.join('docs', 'narrative', 'data-pipeline.md'),
+    ];
+    const guidance = activeGuides
+      .map((docPath) => fs.readFileSync(path.join(rootDir, docPath), 'utf8'))
+      .join('\n');
+
+    for (const backendPath of [
+      path.join('src', 'rosen_scraper', 'workflow.py'),
+      path.join('src', 'rosen_scraper', 'categorizer.py'),
+      path.join('scripts', 'diagnostics', 'data_deduper.py'),
+      path.join('scripts', 'extract_entities_csv_batch.py'),
+      path.join('scripts', 'validate_archive_data.py'),
+    ]) {
+      const relativePath = path.join('backend', backendPath);
+      assert.ok(fs.existsSync(path.join(rootDir, relativePath)), `${relativePath} must exist`);
+      assert.ok(guidance.includes(backendPath), `active backend guidance must name ${backendPath}`);
+    }
+
+    assert.doesNotMatch(guidance, /\bsrc\/workflow\.py\b/);
+    assert.doesNotMatch(guidance, /\btools\/diagnostics\/data_deduper\.py\b/);
+    assert.doesNotMatch(guidance, /\bscripts\/validate_schema\.py\b/);
+
+    const skill = fs.readFileSync(
+      path.join(rootDir, '.claude', 'skills', 'data-pipeline.md'),
+      'utf8',
+    );
+    assert.doesNotMatch(skill, /workflow\.py\s+--(?:retry-failed|ids|incremental)\b/);
+    assert.doesNotMatch(skill, /extract_entities_csv_batch\.py\s+--(?:workers|missing-only)\b/);
+    assert.doesNotMatch(skill, /categorizer\.py\s+--(?:batch-size|delay)\b/);
+    assert.doesNotMatch(skill, /python -m venv|pip install poetry|source venv\/bin\/activate/);
+
+    for (const sourcePath of [
+      path.join('backend', 'src', 'rosen_scraper', 'workflow.py'),
+      path.join('backend', 'src', 'rosen_scraper', 'categorizer.py'),
+    ]) {
+      const source = fs.readFileSync(path.join(rootDir, sourcePath), 'utf8');
+      assert.doesNotMatch(source, /\bimport\s+argparse\b|\bArgumentParser\(/);
+    }
+
+    const extractor = fs.readFileSync(
+      path.join(rootDir, 'backend', 'scripts', 'extract_entities_csv_batch.py'),
+      'utf8',
+    );
+    const longOptions = [...extractor.matchAll(/parser\.add_argument\(\s*['"](--[^'"]+)/g)]
+      .map((match) => match[1]);
+    assert.deepEqual(longOptions, ['--yes']);
+  });
 });

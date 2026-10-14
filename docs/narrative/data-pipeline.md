@@ -38,7 +38,7 @@ A practical reference for contributors working on Jay Rosen's Internet Archive d
 
 | Command | Purpose |
 |---------|---------|
-| `poetry run python src/workflow.py` | Main pipeline (scrape, enrich, generate) |
+| `poetry run python src/rosen_scraper/workflow.py` | Main pipeline (scrape, enrich, generate) |
 | `poetry run python src/rosen_scraper/key_concepts_updater.py` | AI key concept tagging |
 | `poetry run python src/rosen_scraper/key_concepts_updater.py --limit 50` | Process a specific batch size |
 | `poetry run python src/rosen_scraper/key_concepts_updater.py --reset-progress` | Start from beginning |
@@ -361,7 +361,7 @@ The existing `test_*.py` files are interactive smoke scripts. There is no automa
 
 ### Logic duplication
 
-`scripts/backfill/bulk_reprocessor.py` re-implements ID generation, enrichment, and sheet-writing logic found in `src/workflow.py`. Changes to one path can drift from the other.
+`scripts/backfill/bulk_reprocessor.py` re-implements ID generation, enrichment, and sheet-writing logic found in `src/rosen_scraper/workflow.py`. Changes to one path can drift from the other.
 
 ### Configuration surface
 

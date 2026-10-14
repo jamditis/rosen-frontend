@@ -51,8 +51,8 @@ To use custom rate limits, set the environment variables before running your app
 export GEMINI_API_RATE_LIMIT_CALLS=30
 export GEMINI_API_RATE_LIMIT_PERIOD=60
 
-# Run your application
-python src/workflow.py
+# Run your application from backend/
+poetry run python src/rosen_scraper/workflow.py
 ```
 
 Or add them to your `.env` file:
@@ -77,10 +77,10 @@ Comprehensive tests are available in `tests/test_rate_limiting.py`:
 
 ```bash
 # Run rate limiting tests
-pytest tests/test_rate_limiting.py -v
+poetry run pytest tests/test_rate_limiting.py -v
 
 # Run all tests
-pytest tests/ -v
+poetry run pytest tests/ -v
 ```
 
 ## Architecture
