@@ -324,6 +324,25 @@ describe('stewardship task event JSONL adapter', () => {
     assert.equal(readTaskEventStream(streamUrl)[0].eventId, lifecycle[0].eventId);
   });
 
+  it('does not label a failed file sync as durable or rolled back', () => {
+    const cause = Object.assign(new Error('writeback failed'), { code: 'EIO' });
+    const failure = new TaskEventPostAppendError(
+      '/tmp/events.jsonl',
+      lifecycle[0].eventId,
+      'file-sync',
+      { fileSynced: false, cause }
+    );
+
+    assert.equal(failure.source, '/tmp/events.jsonl');
+    assert.equal(failure.eventId, lifecycle[0].eventId);
+    assert.equal(failure.stage, 'file-sync');
+    assert.equal(failure.recordAppended, true);
+    assert.equal(failure.fileSynced, false);
+    assert.equal(failure.cause, cause);
+    assert.match(failure.message, /file durability is incomplete/);
+    assert.match(failure.message, /inspect the authoritative stream before retry/);
+  });
+
   it('appends, fsyncs, closes, and reopens across fresh processes', (t) => {
     const directory = temporaryDirectory(t);
     const streamPath = path.join(directory, 'events.jsonl');

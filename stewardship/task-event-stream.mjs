@@ -76,20 +76,26 @@ export class TaskEventStreamError extends Error {
 }
 
 export class TaskEventPostAppendError extends Error {
-  constructor(source, eventId, stage, options = {}) {
-    const incomplete = stage === 'parent-directory-sync'
-      ? 'directory durability'
-      : 'reopen verification';
+  constructor(source, eventId, stage, { fileSynced, cause } = {}) {
+    const incomplete = {
+      'file-sync': 'file durability',
+      'file-close': 'file close',
+      'parent-directory-sync': 'directory durability',
+      'reopen-validation': 'reopen verification'
+    }[stage];
+    const syncStatus = fileSynced
+      ? 'the file was synced'
+      : 'file sync was not confirmed';
     super(
-      `${source}: task event ${eventId} was appended and the file was synced, but ${incomplete} is incomplete; inspect the authoritative stream before retry`,
-      options
+      `${source}: task event ${eventId} was appended; ${syncStatus}, but ${incomplete} is incomplete; inspect the authoritative stream before retry`,
+      cause === undefined ? undefined : { cause }
     );
     this.name = 'TaskEventPostAppendError';
     this.source = source;
     this.eventId = eventId;
     this.stage = stage;
     this.recordAppended = true;
-    this.fileSynced = true;
+    this.fileSynced = fileSynced;
   }
 }
 
@@ -342,6 +348,9 @@ export function appendTaskEvent(filePath, value) {
   const encoded = Buffer.from(`${canonicalJson(appended)}\n`, 'utf8');
 
   let descriptor;
+  let recordAppended = false;
+  let fileSynced = false;
+  let operationError;
   try {
     descriptor = openSync(normalizedPath, 'a', 0o600);
     let offset = 0;
@@ -350,10 +359,36 @@ export function appendTaskEvent(filePath, value) {
       if (written <= 0) throw new Error('task event append made no write progress');
       offset += written;
     }
+    recordAppended = true;
     fsyncSync(descriptor);
-  } finally {
-    if (descriptor !== undefined) closeSync(descriptor);
+    fileSynced = true;
+  } catch (error) {
+    operationError = recordAppended
+      ? new TaskEventPostAppendError(
+          source,
+          appended.eventId,
+          'file-sync',
+          { fileSynced, cause: error }
+        )
+      : error;
   }
+  if (descriptor !== undefined) {
+    try {
+      closeSync(descriptor);
+    } catch (error) {
+      if (operationError === undefined) {
+        operationError = recordAppended
+          ? new TaskEventPostAppendError(
+              source,
+              appended.eventId,
+              'file-close',
+              { fileSynced, cause: error }
+            )
+          : error;
+      }
+    }
+  }
+  if (operationError !== undefined) throw operationError;
   if (creating) {
     try {
       syncCreatedFileDirectory(normalizedPath);
@@ -362,7 +397,7 @@ export function appendTaskEvent(filePath, value) {
         source,
         appended.eventId,
         'parent-directory-sync',
-        { cause: error }
+        { fileSynced: true, cause: error }
       );
     }
   }
@@ -375,7 +410,7 @@ export function appendTaskEvent(filePath, value) {
       source,
       appended.eventId,
       'reopen-validation',
-      { cause: error }
+      { fileSynced: true, cause: error }
     );
   }
   if (
@@ -385,7 +420,8 @@ export function appendTaskEvent(filePath, value) {
     throw new TaskEventPostAppendError(
       source,
       appended.eventId,
-      'reopen-validation'
+      'reopen-validation',
+      { fileSynced: true }
     );
   }
   return reopened[reopened.length - 1];
