@@ -103,6 +103,9 @@ function validatePolicy(policy) {
     assertString(profile.id, `policy.profiles[${index}].id`);
     assertVersion(profile.version, `policy.profiles[${index}].version`);
     assertString(profile?.match?.source_file, `policy.profiles[${index}].match.source_file`);
+    if (typeof profile.id_pattern !== 'string' || profile.id_pattern.trim().length === 0) {
+      throw new Error(`policy.profiles[${index}].id_pattern must be a non-empty string`);
+    }
     try {
       new RegExp(profile.id_pattern);
     } catch {
@@ -169,6 +172,11 @@ function validateEvidenceRegistry(registry, policy) {
     for (const field of ['source_rows', 'missing_url', 'uncertain_verification', 'overlap']) {
       if (!Number.isSafeInteger(item[field]) || item[field] < 0) {
         throw new Error(`${location}.${field} must be a nonnegative integer`);
+      }
+    }
+    for (const field of ['missing_url', 'uncertain_verification']) {
+      if (item[field] > item.source_rows) {
+        throw new Error(`${location}.${field} cannot exceed source_rows`);
       }
     }
     if (!Array.isArray(item.overlap_record_ids)) {
@@ -341,14 +349,18 @@ function evaluateObservedRule(rule, profile, row) {
     if (!text) {
       return { state: 'missing', evidence: valueEvidence(rule.field, value), reason: 'The verification state is missing.' };
     }
-    const normalized = text.toLowerCase();
-    if (['true', 'yes', '1'].includes(normalized)) {
-      return { state: 'pass', evidence: { field: rule.field, value: text }, reason: 'The source row is verified.' };
+    const canonicalValue = String(value);
+    if (canonicalValue === 'TRUE') {
+      return { state: 'pass', evidence: { field: rule.field, value: canonicalValue }, reason: 'The source row is verified.' };
     }
-    if (['false', 'no', '0'].includes(normalized)) {
-      return { state: 'uncertain', evidence: { field: rule.field, value: text }, reason: 'The source row is explicitly unverified.' };
+    if (canonicalValue === 'FALSE') {
+      return { state: 'uncertain', evidence: { field: rule.field, value: canonicalValue }, reason: 'The source row is explicitly unverified.' };
     }
-    return { state: 'invalid', evidence: { field: rule.field, value: text }, reason: 'The verification state is not supported.' };
+    return {
+      state: 'invalid',
+      evidence: { field: rule.field, value: canonicalValue },
+      reason: 'The verification state must be exactly TRUE or FALSE.'
+    };
   }
   throw new Error(`Unsupported evaluator: ${rule.evaluator}`);
 }

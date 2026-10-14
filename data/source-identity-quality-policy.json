@@ -4,7 +4,7 @@
   },
   "policy": {
     "id": "source-identity-quality",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "result_identity": "sha256(policy ID, source file, record ID, class, profile version, rule ID and rule version)"
   },
   "states": [
@@ -79,11 +79,11 @@
     },
     {
       "id": "source.verification.state",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "field": "verified",
       "evaluator": "verification",
       "severity": "critical",
-      "evidence_requirement": "An explicit supported verification value.",
+      "evidence_requirement": "An exact canonical verification value: TRUE or FALSE.",
       "remediation_type": "verify_source_identity",
       "allows_intentional_absence": false
     }

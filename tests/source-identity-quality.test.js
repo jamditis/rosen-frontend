@@ -55,12 +55,19 @@ function writeFixtureEvidence(directory, transform = value => value) {
   return evidencePath;
 }
 
-function fixtureInputs(t, transformEvidence) {
+function writeFixturePolicy(directory, transform) {
+  const policy = transform(JSON.parse(fs.readFileSync(policyPath, 'utf8')));
+  const fixturePolicyPath = path.join(directory, 'policy.json');
+  fs.writeFileSync(fixturePolicyPath, `${JSON.stringify(policy, null, 2)}\n`);
+  return fixturePolicyPath;
+}
+
+function fixtureInputs(t, transformEvidence, transformPolicy) {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'source-identity-quality-'));
   t.after(() => fs.rmSync(tempDir, { recursive: true, force: true }));
   return loadSourceIdentityInputs({
     dataDir: fixtureDir,
-    policyPath,
+    policyPath: transformPolicy ? writeFixturePolicy(tempDir, transformPolicy) : policyPath,
     evidencePath: writeFixtureEvidence(tempDir, transformEvidence)
   });
 }
@@ -172,6 +179,22 @@ describe('source identity quality evaluator', () => {
     );
   });
 
+  it('rejects profiles with missing or blank ID patterns', t => {
+    for (const malformedPattern of [undefined, '', ' \t ']) {
+      assert.throws(
+        () => fixtureInputs(t, undefined, policy => {
+          if (malformedPattern === undefined) {
+            delete policy.profiles[0].id_pattern;
+          } else {
+            policy.profiles[0].id_pattern = malformedPattern;
+          }
+          return policy;
+        }),
+        /policy\.profiles\[0\]\.id_pattern must be a non-empty string/
+      );
+    }
+  });
+
   it('keeps missing, invalid, uncertain, intentional and not-applicable states distinct', t => {
     const report = fixtureReport(t);
 
@@ -201,6 +224,35 @@ describe('source identity quality evaluator', () => {
     assert.deepEqual(report.summary.critical_failures, { results: 5, records: 4 });
     assert.equal(report.summary.results.score_percent, 85.94);
     assert.equal(report.current_social_findings.summary_not_applicable.count, 4);
+  });
+
+  it('accepts only canonical uppercase verification states', t => {
+    const inputs = fixtureInputs(t);
+    const expectedStates = new Map([
+      ['TRUE', 'pass'],
+      ['FALSE', 'uncertain'],
+      ['true', 'invalid'],
+      ['false', 'invalid'],
+      ['Yes', 'invalid'],
+      ['yes', 'invalid'],
+      ['1', 'invalid'],
+      ['0', 'invalid'],
+      [' TRUE ', 'invalid'],
+      ['FALSE ', 'invalid'],
+      ['   ', 'missing']
+    ]);
+
+    for (const [value, expectedState] of expectedStates) {
+      const changedInputs = structuredClone(inputs);
+      changedInputs.rows.find(item => item.row.id === 'TWTR-00001').row.verified = value;
+      const result = resultFor(
+        buildSourceIdentityReport(changedInputs),
+        'TWTR-00001',
+        'source.verification.state'
+      );
+      assert.equal(result.state, expectedState, JSON.stringify(value));
+      if (expectedState === 'invalid') assert.equal(result.evidence.value, value);
+    }
   });
 
   it('retains the measured cohort while recomputing its current overlap', t => {
@@ -258,6 +310,19 @@ describe('source identity quality evaluator', () => {
       }),
       /evidence must not be empty/
     );
+  });
+
+  it('rejects historical finding counts above their source denominator', t => {
+    for (const field of ['missing_url', 'uncertain_verification']) {
+      assert.throws(
+        () => fixtureInputs(t, registry => {
+          registry.historical_measurements[0].source_rows = 1;
+          registry.historical_measurements[0][field] = 2;
+          return registry;
+        }),
+        new RegExp(`evidence\\.historical_measurements\\[0\\]\\.${field} cannot exceed source_rows`)
+      );
+    }
   });
 
   it('formats a short summary without embedding per-record source payloads', t => {
@@ -322,7 +387,7 @@ describe('current source identity baseline', () => {
       .map(row => row.id)
       .sort();
     const uncertainIds = socialRows
-      .filter(row => ['false', 'no', '0'].includes(String(row.verified || '').trim().toLowerCase()))
+      .filter(row => row.verified === 'FALSE')
       .map(row => row.id)
       .sort();
     const uncertainSet = new Set(uncertainIds);
