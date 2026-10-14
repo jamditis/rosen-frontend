@@ -24,6 +24,7 @@ on:
       - 'backend/entity_extraction_schema.json'
       - 'backend/entity_extraction_schema_v3.json'
       - 'preservation/**'
+      - 'stewardship/**'
       - 'workers/**'
       - 'package.json'
       - 'package-lock.json'
@@ -52,7 +53,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          # Stewardship projection tests use node:sqlite, stable in Node 22.13+.
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
