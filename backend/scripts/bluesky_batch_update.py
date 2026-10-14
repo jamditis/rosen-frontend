@@ -659,7 +659,8 @@ def _decision_rows(
         if context_uris:
             context_note = " Context references: " + "; ".join(context_uris) + "."
         evidence = (
-            f"Public source evidence: uri={uri}; cid={cid}; "
+            f"Public source evidence from the public API endpoint "
+            f"{backfill.FEED_ENDPOINT}: uri={uri}; cid={cid}; "
             f"record_sha256={record_hash}."
         )
         if admitted:

@@ -2,6 +2,7 @@ import csv
 import datetime
 import io
 import json
+import subprocess
 
 import pytest
 
@@ -389,6 +390,112 @@ def test_admission_uses_text_taxonomy_and_public_context(tmp_path):
     }
     assert result.report["input_cutoff"] == "2026-10-13T15:19:22+00:00"
     assert result.report["newest_source_time"] == "2026-10-15T15:00:00+00:00"
+
+
+def test_adapter_self_thread_passes_generated_thread_evidence_gate(tmp_path):
+    evidence_module = batch.REPO_ROOT / "scripts/refresh-social-release-artifacts.mjs"
+    root_uri = f"at://{JAY_DID}/app.bsky.feed.post/thread-root"
+    middle_uri = f"at://{JAY_DID}/app.bsky.feed.post/thread-middle"
+    items = [
+        _feed_item(
+            "thread-root",
+            "2026-10-15T12:00:00Z",
+            (
+                "This news coverage repeats false balance and the view from nowhere. "
+                "Journalists should explain how the press serves democracy."
+            ),
+        ),
+        _feed_item(
+            "thread-middle",
+            "2026-10-15T12:01:00Z",
+            "Thanks.",
+            reply_parent=root_uri,
+            reply_root=root_uri,
+        ),
+        _feed_item(
+            "thread-final",
+            "2026-10-15T12:02:00Z",
+            (
+                "This thread explains why public trust depends on accountable news "
+                "coverage and transparent choices by the press."
+            ),
+            reply_parent=middle_uri,
+            reply_root=root_uri,
+        ),
+    ]
+    source_rows = [
+        backfill.post_to_row(item, 10000 + index, "2026-10-16 12:00:00")
+        for index, item in enumerate(items)
+    ]
+    item_by_url = {row["url"]: item for row, item in zip(source_rows, items)}
+    context_by_uri = {
+        root_uri: _context_post(root_uri, handle=backfill.ACTOR),
+        middle_uri: _context_post(middle_uri, handle=backfill.ACTOR),
+    }
+
+    rows, _decisions = batch._decision_rows(
+        source_rows,
+        item_by_url,
+        context_by_uri,
+        _captured_at(),
+    )
+
+    assert {row["verified"] for row in rows} == {"TRUE", "FALSE"}
+    assert all(backfill.FEED_ENDPOINT in row["notes"] for row in rows)
+    generated_thread = {
+        "id": "THREAD-99999",
+        "type": "social",
+        "author": "Jay Rosen",
+        "pub": "Bluesky",
+        "url": rows[0]["url"],
+        "thread_data": {
+            "thread_id": rows[0]["id"],
+            "posts": [
+                {
+                    "id": row["id"],
+                    "content": row["raw_text"],
+                    "url": row["url"],
+                    "parent_id": None if index == 0 else rows[index - 1]["id"],
+                }
+                for index, row in enumerate(rows)
+            ],
+        },
+    }
+    payload_path = tmp_path / "adapter-thread.json"
+    payload_path.write_text(
+        json.dumps({"record": generated_thread, "rows": rows}),
+        encoding="utf-8",
+    )
+    if not evidence_module.exists():
+        pytest.skip(
+            "generated-thread evidence module is supplied by the artifact layer"
+        )
+    node_program = """
+import { readFile } from 'node:fs/promises';
+import { pathToFileURL } from 'node:url';
+const [payloadPath, modulePath] = process.argv.slice(1);
+const { assertJayGeneratedThreadEvidence } = await import(pathToFileURL(modulePath));
+const payload = JSON.parse(await readFile(payloadPath, 'utf8'));
+assertJayGeneratedThreadEvidence(
+  payload.record,
+  new Map(payload.rows.map(row => [row.id, row])),
+);
+"""
+    subprocess.run(
+        [
+            "node",
+            "--input-type=module",
+            "--eval",
+            node_program,
+            str(payload_path),
+            str(evidence_module),
+        ],
+        cwd=batch.REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
 
 
 @pytest.mark.parametrize(
