@@ -401,8 +401,8 @@ def test_manual_cursor_mode_remains_available(monkeypatch):
         "9ad57290e1fe09a601058a3d9149c2f955b49b1de55d8637af68c9fd121e1675",
     ),
     (
-        "BSKY-90001", "“Press” 🗞️ 𐐀", "Mindcasting 🧠",
-        ["Mindcasting", "視点 📰"], True,
+        "BSKY-90001", "“Press” \U0001f5de\ufe0f \U00010400", "Mindcasting \U0001f9e0",
+        ["Mindcasting", "視点 \U0001f4f0"], True,
         "fcc2822b130bcdae008e025fd149228f45991b4cbaa145a812cc04b5b592ea95",
         "1e9a88b958de7a71b9c881443aecf1d686281df0821c4856360da867ba8bfe5b",
     ),

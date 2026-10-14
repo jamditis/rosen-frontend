@@ -110,6 +110,8 @@ the receipt in one Google Sheets batch request. [Google Sheets applies all
 updates in a request atomically](https://developers.google.com/workspace/sheets/api/limits),
 so a failed request cannot leave an output without its receipt. A dry run logs
 the same task keys but does not add the header or write a receipt.
+If the receipt needs another grid column, the live run adds only the required
+empty columns before a model call. It preserves populated cells without headers.
 
 Each receipt binds the stable record ID, source text, current curator-assigned
 concepts, ordered taxonomy, force mode, rule version, model version, and task
