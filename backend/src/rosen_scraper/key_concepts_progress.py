@@ -45,6 +45,13 @@ def _sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+def normalize_key_concepts(value: str) -> str:
+    """Match the maintenance deduper's stable multi-value representation."""
+
+    concepts = (item.strip() for item in re.split(r"[,;]", value))
+    return ", ".join(sorted({concept for concept in concepts if concept}))
+
+
 def _object_identity(record_id: str) -> tuple[str, str]:
     prefix = record_id.split("-", 1)[0]
     object_type = (
@@ -95,6 +102,7 @@ def key_concept_task(
 ) -> KeyConceptTask:
     """Build the task identity from every value that can change the prompt."""
 
+    current_concepts = normalize_key_concepts(current_concepts)
     context = _context_value(
         raw_text,
         taxonomy,
@@ -135,7 +143,9 @@ def encode_receipt(task: KeyConceptTask, expected_concepts: str) -> str:
         "modelVersion": task.model_version,
         "inputHash": task.input_hash,
         "contextHash": task.context_hash,
-        "expectedConceptsHash": _sha256_text(expected_concepts),
+        "expectedConceptsHash": _sha256_text(
+            normalize_key_concepts(expected_concepts)
+        ),
     })
 
 
@@ -219,12 +229,14 @@ def receipt_matches(
         })
     )
     if receipt["taskKey"] != expected_task_key:
-        raise ProgressReceiptError("receipt taskKey does not match its input identity")
+        return False
 
     return (
         receipt["ruleVersion"] == rule_version
         and receipt["modelVersion"] == model_version
         and receipt["contextHash"] == current_task.context_hash
-        and receipt["expectedConceptsHash"] == _sha256_text(current_concepts)
+        and receipt["expectedConceptsHash"] == _sha256_text(
+            normalize_key_concepts(current_concepts)
+        )
         and _sha256_text(_canonical_json(stored_context)) == receipt["contextHash"]
     )

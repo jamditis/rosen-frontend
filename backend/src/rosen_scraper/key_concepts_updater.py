@@ -59,6 +59,7 @@ from rosen_scraper.key_concepts_progress import (
     ProgressReceiptError,
     encode_receipt,
     key_concept_task,
+    normalize_key_concepts,
     receipt_matches,
 )
 
@@ -284,6 +285,11 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
                           *, limit: Optional[int], force_reprocess: bool,
                           dry_run: bool) -> Dict:
     """Process source-bound tasks and atomically store each Sheet receipt."""
+    if limit is None:
+        limit = BATCH_SIZE
+    elif limit < 0:
+        raise ValueError("limit must be zero or greater")
+
     sheet_name = os.getenv("ROSEN_MASTER_SHEET_TAB") or DEFAULT_SHEET_NAME
     worksheet = spreadsheet.worksheet(sheet_name)
     rows = worksheet.get_all_values()
@@ -458,7 +464,9 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
     for row_number, row in selected:
         record_id = row[id_index].strip()
         raw_text = row[raw_text_index] if len(row) > raw_text_index else ""
-        concepts = row[key_concepts_index] if len(row) > key_concepts_index else ""
+        concepts = normalize_key_concepts(
+            row[key_concepts_index] if len(row) > key_concepts_index else ""
+        )
         notes = row[notes_index] if len(row) > notes_index else ""
         task = key_concept_task(
             record_id,
@@ -505,7 +513,9 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
                 reviewed += 1
             else:
                 identified = analysis.get('concepts', [])
-                expected_concepts = ", ".join(identified) if identified else ""
+                expected_concepts = normalize_key_concepts(
+                    ", ".join(identified)
+                )
                 pending_write(
                     pending,
                     row_number,

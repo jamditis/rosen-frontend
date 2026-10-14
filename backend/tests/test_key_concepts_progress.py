@@ -10,6 +10,7 @@ import pytest
 
 from rosen_scraper import key_concepts_progress as progress
 from rosen_scraper import key_concepts_updater as kc
+from scripts.diagnostics.data_deduper import clean_and_dedupe_cell
 
 
 class _Response:
@@ -41,11 +42,12 @@ def _column_number(cell: str) -> int:
 
 class _Worksheet:
     def __init__(self, values, *, col_count=None, fail_batch=False,
-                 fail_growth=False):
+                 fail_growth=False, raise_after_batch=False):
         self.values = copy.deepcopy(values)
         self.col_count = col_count or max(map(len, values), default=0)
         self.fail_batch = fail_batch
         self.fail_growth = fail_growth
+        self.raise_after_batch = raise_after_batch
         self.add_cols_calls = []
         self.batch_updates = []
 
@@ -76,6 +78,8 @@ class _Worksheet:
             next_values[row - 1][column - 1] = update["values"][0][0]
         self.values = next_values
         self.batch_updates.append(copy.deepcopy(data))
+        if self.raise_after_batch:
+            raise RuntimeError("response lost after atomic apply")
         return {"totalUpdatedCells": len(data)}
 
 
@@ -152,6 +156,42 @@ def test_small_live_runs_resume_by_receipt_after_process_restart():
     assert worksheet.add_cols_calls == [1]
 
 
+def test_default_limit_processes_one_batch_and_zero_is_unlimited():
+    rows = [_header()]
+    rows.extend(_row(f"RECORD-{index:05d}", "a") for index in range(1, 102))
+    worksheet = _Worksheet(rows)
+    default_model = _Model()
+
+    limited = _run(worksheet, default_model, limit=None)
+
+    assert limited["processed"] == kc.BATCH_SIZE
+    assert len(default_model.prompts) == kc.BATCH_SIZE
+    assert worksheet.values[100][-1]
+    assert worksheet.values[101][-1] == ""
+
+    unlimited_model = _Model()
+    unlimited = _run(worksheet, unlimited_model, limit=0)
+
+    assert unlimited["processed"] == 1
+    assert len(unlimited_model.prompts) == 1
+    assert worksheet.values[101][-1]
+
+
+def test_negative_limit_fails_before_model_or_sheet_write():
+    worksheet = _Worksheet([
+        _header(receipt=False),
+        _row("RECORD-00001", "a")[:-1],
+    ])
+    model = _Model()
+
+    with pytest.raises(ValueError, match="limit must be zero or greater"):
+        _run(worksheet, model, limit=-1)
+
+    assert model.prompts == []
+    assert worksheet.add_cols_calls == []
+    assert worksheet.batch_updates == []
+
+
 def test_dry_run_does_not_create_header_or_receipt():
     worksheet = _Worksheet([
         _header(receipt=False),
@@ -226,13 +266,29 @@ def test_empty_spacer_rows_are_ignored_but_nonempty_rows_require_ids():
     assert missing_id_model.prompts == []
 
 
-def test_curator_concept_edit_invalidates_matching_source_receipt():
+def test_dedup_rewrite_stays_complete_but_curator_edit_invalidates_receipt():
     worksheet = _Worksheet([
         _header(),
-        _row("RECORD-00001", "a"),
-        _row("RECORD-00002", "b"),
+        _row(
+            "RECORD-00001",
+            "a",
+            concepts="Mindcasting; False balance, Mindcasting",
+        ),
     ])
-    _run(worksheet, _Model())
+    first_model = _Model(recommendations="N/A")
+    _run(worksheet, first_model)
+
+    assert "Current assigned concepts: False balance, Mindcasting" in (
+        first_model.prompts[0]
+    )
+    worksheet.values[1][2] = clean_and_dedupe_cell(worksheet.values[1][2])
+    assert worksheet.values[1][2] == "False balance, Mindcasting"
+
+    restarted_model = _Model()
+    complete = _run(worksheet, restarted_model)
+
+    assert complete["processed"] == 0
+    assert restarted_model.prompts == []
 
     worksheet.values[1][2] = "False balance"
     model = _Model(concepts=["False balance"], recommendations="N/A")
@@ -302,6 +358,28 @@ def test_atomic_batch_failure_writes_neither_output_nor_receipt():
     assert worksheet.batch_updates == []
 
 
+def test_restart_skips_receipt_when_atomic_write_landed_before_response_error():
+    worksheet = _Worksheet([
+        _header(receipt=False),
+        _row("RECORD-00001", "a")[:-1],
+    ], raise_after_batch=True)
+    first_model = _Model()
+
+    with pytest.raises(kc.SheetWriteError, match="response lost after atomic apply"):
+        _run(worksheet, first_model)
+
+    assert len(first_model.prompts) == 1
+    assert worksheet.values[0][-1] == progress.TASK_RECEIPT_COLUMN
+    assert worksheet.values[1][-1]
+
+    worksheet.raise_after_batch = False
+    restarted_model = _Model()
+    complete = _run(worksheet, restarted_model)
+
+    assert complete["processed"] == 0
+    assert restarted_model.prompts == []
+
+
 def test_empty_model_result_is_recorded_as_a_durable_no_concepts_result():
     worksheet = _Worksheet([
         _header(),
@@ -360,6 +438,26 @@ def test_malformed_receipt_and_duplicate_ids_fail_before_model_call():
     with pytest.raises(ValueError, match="row 3.*duplicate.*RECORD-00001"):
         _run(duplicates, duplicate_model)
     assert duplicate_model.prompts == []
+
+
+def test_receipt_copied_to_another_id_is_stale_without_blocking_original():
+    worksheet = _Worksheet([
+        _header(),
+        _row("RECORD-00001", "a"),
+    ])
+    _run(worksheet, _Model())
+    original_receipt = worksheet.values[1][-1]
+    worksheet.values.append(
+        _row("RECORD-00002", "a", concepts="Mindcasting", receipt=original_receipt)
+    )
+    model = _Model(recommendations="N/A")
+
+    summary = _run(worksheet, model)
+
+    assert summary["processed"] == 1
+    assert len(model.prompts) == 1
+    assert worksheet.values[1][-1] == original_receipt
+    assert worksheet.values[2][-1] != original_receipt
 
 
 def test_manual_cursor_mode_remains_available(monkeypatch):
