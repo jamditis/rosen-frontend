@@ -1,0 +1,167 @@
+{
+  "schema": {
+    "id": "source-identity-quality-policy/1.0.0"
+  },
+  "policy": {
+    "id": "source-identity-quality",
+    "version": "1.2.0",
+    "result_identity": "sha256(policy ID, source file, record ID, class, profile version, rule ID and rule version)"
+  },
+  "states": [
+    "pass",
+    "missing",
+    "invalid",
+    "stale",
+    "uncertain",
+    "intentionally_absent",
+    "not_applicable"
+  ],
+  "rules": [
+    {
+      "id": "source.id.format",
+      "version": "1.0.0",
+      "field": "id",
+      "evaluator": "id_format",
+      "severity": "critical",
+      "evidence_requirement": "The source row ID and the class-specific ID pattern.",
+      "remediation_type": "correct_source_identity",
+      "allows_intentional_absence": false
+    },
+    {
+      "id": "source.url.presence",
+      "version": "1.0.0",
+      "field": "url",
+      "evaluator": "presence",
+      "severity": "critical",
+      "evidence_requirement": "A source URL or an approved absence decision with evidence.",
+      "remediation_type": "recover_source_url",
+      "allows_intentional_absence": true
+    },
+    {
+      "id": "source.url.syntax",
+      "version": "1.0.0",
+      "field": "url",
+      "evaluator": "http_url",
+      "severity": "critical",
+      "evidence_requirement": "A syntactically valid HTTP or HTTPS URL with a host.",
+      "remediation_type": "correct_source_url",
+      "allows_intentional_absence": false
+    },
+    {
+      "id": "source.publication_date.presence",
+      "version": "1.0.0",
+      "field": "publication_date",
+      "evaluator": "presence",
+      "severity": "high",
+      "evidence_requirement": "A publication date or an approved absence decision with evidence.",
+      "remediation_type": "recover_publication_date",
+      "allows_intentional_absence": true
+    },
+    {
+      "id": "source.publication_date.parseability",
+      "version": "1.0.0",
+      "field": "publication_date",
+      "evaluator": "publication_date",
+      "severity": "high",
+      "evidence_requirement": "A real calendar date in YYYY-MM-DD form, optionally followed by a valid time and timezone.",
+      "remediation_type": "correct_publication_date",
+      "allows_intentional_absence": false
+    },
+    {
+      "id": "source.curated_summary.presence",
+      "version": "1.0.0",
+      "field": "summary",
+      "evaluator": "presence",
+      "severity": "medium",
+      "evidence_requirement": "A curator-written summary or an approved absence decision with evidence.",
+      "remediation_type": "write_curated_summary",
+      "allows_intentional_absence": true
+    },
+    {
+      "id": "source.verification.state",
+      "version": "1.1.0",
+      "field": "verified",
+      "evaluator": "verification",
+      "severity": "critical",
+      "evidence_requirement": "An exact canonical verification value: TRUE or FALSE.",
+      "remediation_type": "verify_source_identity",
+      "allows_intentional_absence": false
+    }
+  ],
+  "profiles": [
+    {
+      "id": "curated_article",
+      "version": "1.0.0",
+      "match": {
+        "source_file": "archive_records-public.csv",
+        "content_types": ["Article"]
+      },
+      "id_pattern": "^(?:RECORD|TUMBLR|CLIP)-[0-9]{5}$",
+      "applicable_rules": [
+        "source.id.format",
+        "source.url.presence",
+        "source.url.syntax",
+        "source.publication_date.presence",
+        "source.publication_date.parseability",
+        "source.curated_summary.presence",
+        "source.verification.state"
+      ]
+    },
+    {
+      "id": "thread_container",
+      "version": "1.0.0",
+      "match": {
+        "source_file": "archive_records-public.csv",
+        "content_types": ["Social Media Thread"]
+      },
+      "id_pattern": "^THREAD-[0-9]{5}$",
+      "applicable_rules": [
+        "source.id.format",
+        "source.url.presence",
+        "source.url.syntax",
+        "source.publication_date.presence",
+        "source.publication_date.parseability",
+        "source.curated_summary.presence",
+        "source.verification.state"
+      ]
+    },
+    {
+      "id": "curated_other",
+      "version": "1.1.0",
+      "match": {
+        "source_file": "archive_records-public.csv",
+        "fallback": true
+      },
+      "id_pattern": "^(?:RECORD|CLIP)-[0-9]{5}$",
+      "applicable_rules": [
+        "source.id.format",
+        "source.url.presence",
+        "source.url.syntax",
+        "source.publication_date.presence",
+        "source.publication_date.parseability",
+        "source.curated_summary.presence",
+        "source.verification.state"
+      ]
+    },
+    {
+      "id": "social_post",
+      "version": "1.0.0",
+      "match": {
+        "source_file": "social_posts.csv",
+        "content_types": ["Social Media Post"]
+      },
+      "id_pattern": "^(?:TWTR|BSKY|MAST)-[0-9]{5}$",
+      "applicable_rules": [
+        "source.id.format",
+        "source.url.presence",
+        "source.url.syntax",
+        "source.publication_date.presence",
+        "source.publication_date.parseability",
+        "source.verification.state"
+      ],
+      "not_applicable_rules": [
+        "source.curated_summary.presence"
+      ]
+    }
+  ]
+}
