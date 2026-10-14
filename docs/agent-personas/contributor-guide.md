@@ -100,10 +100,20 @@ npm install                # First time only
 node data/export-archive-data.js
 
 # Backend pipeline
+mkdir -p csv
+# For a current run, export the Google Sheets urls_to_scrape and final tabs to
+# csv/urls_to_scrape.csv and csv/archive_records-public.csv. These copies use
+# the tracked snapshots for a checkout-only test.
+cp data/urls_to_scrape.csv csv/urls_to_scrape.csv
+cp data/archive_records-public.csv csv/archive_records-public.csv
 cd backend
 poetry install
-poetry run python src/workflow.py
+poetry run playwright install
+poetry run python src/rosen_scraper/workflow.py
 ```
+
+The workflow writes local dated files under `csv/output/`. Review and reconcile
+approved results back to Google Sheets separately.
 
 ## Directory structure
 

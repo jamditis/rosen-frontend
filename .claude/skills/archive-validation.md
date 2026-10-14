@@ -115,110 +115,16 @@ const VALID_CATEGORIES = [
 
 ## Validation Commands
 
-### Quick Validation Script
+Run the maintained validator from the backend directory. It validates the
+archive and social CSV files and reports entity and relationship findings when
+those inputs load. A missing or unreadable entity or relationship CSV is a
+warning, not an error, so the command can exit zero with either check skipped.
+Read the warning section as well as the exit status. The command exits nonzero
+when the report contains errors.
 
 ```bash
 cd /home/user/rosen-frontend/backend
-source venv/bin/activate
-
-# Validate schema compliance
-python -c "
-import pandas as pd
-import json
-
-# Load CSV
-df = pd.read_csv('../data/archive_records-public.csv')
-
-# Check required fields
-required = ['id', 'title', 'author', 'date', 'year', 'pub', 'url', 'summary', 'categories', 'era', 'verified']
-missing = [col for col in required if col not in df.columns]
-print(f'Missing columns: {missing or \"None\"}')
-
-# Check for empty required fields
-for col in ['id', 'title', 'date', 'summary']:
-    empty = df[df[col].isna() | (df[col] == '')].shape[0]
-    print(f'Empty {col}: {empty}')
-
-# Check ID format
-invalid_ids = df[~df['id'].str.match(r'^[A-Z]+-\d{5}$')]['id'].tolist()[:5]
-print(f'Invalid ID format (first 5): {invalid_ids or \"None\"}')
-
-# Check date format
-import re
-invalid_dates = df[~df['date'].astype(str).str.match(r'^\d{4}-\d{2}-\d{2}$')]['date'].tolist()[:5]
-print(f'Invalid date format (first 5): {invalid_dates or \"None\"}')
-
-print(f'\\nTotal records: {len(df)}')
-"
-```
-
-### Comprehensive Validation
-
-```python
-# backend/scripts/validate_schema.py
-import pandas as pd
-import json
-from pathlib import Path
-
-def validate_archive():
-    data_dir = Path(__file__).parent.parent.parent / 'data'
-
-    errors = []
-    warnings = []
-
-    # Load CSV
-    df = pd.read_csv(data_dir / 'archive_records-public.csv')
-
-    # 1. ID Format Validation
-    invalid_ids = df[~df['id'].str.match(r'^[A-Z]+-\d{5}$', na=False)]
-    if len(invalid_ids):
-        errors.append(f"Invalid ID format: {len(invalid_ids)} records")
-
-    # 2. Duplicate IDs
-    dupes = df[df['id'].duplicated()]['id'].tolist()
-    if dupes:
-        errors.append(f"Duplicate IDs: {dupes}")
-
-    # 3. Date Validation
-    invalid_dates = df[~df['date'].astype(str).str.match(r'^\d{4}-\d{2}-\d{2}$', na=False)]
-    if len(invalid_dates):
-        errors.append(f"Invalid dates: {len(invalid_dates)} records")
-
-    # 4. Year Range
-    out_of_range = df[(df['year'] < 1950) | (df['year'] > 2030)]
-    if len(out_of_range):
-        warnings.append(f"Year out of range: {len(out_of_range)} records")
-
-    # 5. Summary Length
-    short_summaries = df[df['summary'].str.len() < 50]
-    if len(short_summaries):
-        warnings.append(f"Short summaries (<50 chars): {len(short_summaries)} records")
-
-    # 6. Era Validation
-    valid_eras = [
-        "Dissertation Era (1982-1986)",
-        "Public Journalism Era (1990-2000)",
-        "Early Internet Era (1999-2004)",
-        "Blogging Revolution (2004-2010)",
-        "Social Media Era (2010-2016)",
-        "Trump Era (2016-2020)",
-        "COVID-19 Era (2020-2021)",
-        "Trump II & Beyond (2025-Present)"
-    ]
-    invalid_eras = df[~df['era'].isin(valid_eras)]
-    if len(invalid_eras):
-        errors.append(f"Invalid eras: {invalid_eras['era'].unique().tolist()}")
-
-    return {
-        'errors': errors,
-        'warnings': warnings,
-        'record_count': len(df),
-        'valid': len(errors) == 0
-    }
-
-if __name__ == '__main__':
-    result = validate_archive()
-    print(json.dumps(result, indent=2))
+poetry run python scripts/validate_archive_data.py
 ```
 
 ### Entity Validation

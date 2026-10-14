@@ -82,9 +82,16 @@ Backend pipeline work lives in `backend/` and uses Poetry:
 ```bash
 cd backend
 poetry install
-playwright install
-poetry run python src/workflow.py
+poetry run playwright install
+# Stage repository-root csv/urls_to_scrape.csv and
+# csv/archive_records-public.csv before this command.
+poetry run python src/rosen_scraper/workflow.py
 ```
+
+The workflow reads local CSV files. Export the current `urls_to_scrape` and
+`final` Google Sheets tabs to those paths before a live run. For a checkout-only
+test, copy the tracked `data/urls_to_scrape.csv` and
+`data/archive_records-public.csv` snapshots into repository-root `csv/` first.
 
 ## Structure
 

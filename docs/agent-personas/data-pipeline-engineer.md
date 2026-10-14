@@ -59,13 +59,20 @@ backend/
 ```bash
 cd backend
 poetry install
-playwright install
+poetry run playwright install
 
 # Configuration
 cp .env.example .env
-# Edit .env: set SPREADSHEET_NAME, GEMINI_API_KEY
-# Place Google Cloud service account key as google_credentials.json
+# Edit .env: set GEMINI_API_KEY.
 ```
+
+The main workflow reads repository-root `csv/urls_to_scrape.csv` and uses
+`csv/archive_records-public.csv` for output columns. Export the current Google
+Sheets `urls_to_scrape` and `final` tabs to those paths before a live run. The
+worklist header is `id,url,processed_on,Notes`; nonempty `processed_on` rows are
+skipped by default. `SPREADSHEET_NAME` and Google credentials are for separate
+Sheet-backed tools and do not create these local files. The workflow writes to
+`csv/output/`; import approved output to Google Sheets separately.
 
 ## Key commands
 
@@ -104,8 +111,8 @@ URLs (csv/urls_to_scrape.csv)
   -> processors/*.py (scrape + extract content)
   -> categorizer.py (Gemini analysis: summary, categories, concepts)
   -> entity_extractor.py (named entities)
-  -> csv_data_service.py (write to output CSV)
-  -> Google Sheets (optional sync)
+  -> csv_data_service.py (write dated files under csv/output/)
+  -> manual review and Google Sheets reconciliation
 ```
 
 Then separately on the frontend side:

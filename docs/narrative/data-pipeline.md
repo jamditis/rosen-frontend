@@ -12,24 +12,45 @@ A practical reference for contributors working on Jay Rosen's Internet Archive d
    ```bash
    cd backend
    poetry install
-   playwright install
+   poetry run playwright install
    ```
 
 2. Configure environment variables:
    ```bash
-   cp backend/.env.example backend/.env
+   cp .env.example .env
    # Edit .env with:
-   #   SPREADSHEET_NAME — Google Sheets spreadsheet name
-   #   GEMINI_API_KEY   — Gemini API key for AI enrichment
-   # Place Google Cloud credentials in backend/google_credentials.json
+   #   GEMINI_API_KEY — Gemini API key for AI enrichment
    ```
 
-3. Verify your API key is set:
+   `SPREADSHEET_NAME` and Google credentials are used by separate Sheet-backed
+   maintenance tools. They do not populate the main workflow's local inputs.
+
+3. Stage the local workflow inputs. For a current live run, manually export the
+   Google Sheets `urls_to_scrape` tab to repository-root
+   `csv/urls_to_scrape.csv` and the `final` tab to
+   `csv/archive_records-public.csv`. For a checkout-only test, use the tracked
+   snapshots:
+
+   ```bash
+   cd ..
+   mkdir -p csv
+   cp data/urls_to_scrape.csv csv/urls_to_scrape.csv
+   cp data/archive_records-public.csv csv/archive_records-public.csv
+   cd backend
+   ```
+
+   The worklist header is `id,url,processed_on,Notes`; only `url` is needed for
+   a row to run, and nonempty `processed_on` rows are skipped by default. The
+   archive export supplies output columns. The workflow writes dated files to
+   `csv/output/`; review and import approved results into Google Sheets
+   separately.
+
+4. Verify your API key is set:
    ```bash
    echo $GEMINI_API_KEY
    ```
 
-4. Confirm writable directories exist:
+5. Confirm writable directories exist:
    - `logs/`
    - `data/processed_pdf_library/`
    - `data/processed_transcripts/`
@@ -38,7 +59,7 @@ A practical reference for contributors working on Jay Rosen's Internet Archive d
 
 | Command | Purpose |
 |---------|---------|
-| `poetry run python src/workflow.py` | Main pipeline (scrape, enrich, generate) |
+| `poetry run python src/rosen_scraper/workflow.py` | Main pipeline (scrape, enrich, generate) |
 | `poetry run python src/rosen_scraper/key_concepts_updater.py` | AI key concept tagging |
 | `poetry run python src/rosen_scraper/key_concepts_updater.py --limit 50` | Process a specific batch size |
 | `poetry run python src/rosen_scraper/key_concepts_updater.py --reset-progress` | Start from beginning |
@@ -73,7 +94,9 @@ Work through these in order. Each step validates a layer of the pipeline before 
 
 ### Priority B: spot-test the pipeline
 
-1. Run a limited ingest: `poetry run python src/rosen_scraper/workflow.py` with a small `urls_to_scrape` queue, or invoke the article processor manually.
+1. Export or create the local CSV worklist described above, then run a limited
+   ingest from `backend/` with `PROCESS_START_ROW` and `PROCESS_END_ROW`, or
+   invoke the article processor manually.
 2. For bulk reprocessing, use `poetry run python scripts/backfill/bulk_reprocessor.py` only after confirming validation logic works. Start with a handful of URLs.
 
 ### Priority C: resume key concepts processing
@@ -357,11 +380,11 @@ The existing `test_*.py` files are interactive smoke scripts. There is no automa
 
 ### Dependency friction
 
-`pyproject.toml` has unpinned versions, mixes `google-generativeai` and `google-genai`, and references `playwright-stealth` without any imports. Playwright requires a post-install step (`playwright install`) that's easy to miss.
+`pyproject.toml` has unpinned versions, mixes `google-generativeai` and `google-genai`, and references `playwright-stealth` without any imports. Playwright requires a post-install step (`poetry run playwright install`) that's easy to miss.
 
 ### Logic duplication
 
-`scripts/backfill/bulk_reprocessor.py` re-implements ID generation, enrichment, and sheet-writing logic found in `src/workflow.py`. Changes to one path can drift from the other.
+`scripts/backfill/bulk_reprocessor.py` re-implements ID generation, enrichment, and sheet-writing logic found in `src/rosen_scraper/workflow.py`. Changes to one path can drift from the other.
 
 ### Configuration surface
 
@@ -387,7 +410,7 @@ Actionable improvements, roughly prioritized:
 
 5. **Consolidate shared helpers.** Extract ID generation, enrichment, and sheet writes into a dedicated module so the streaming workflow and `bulk_reprocessor.py` stay in sync.
 
-6. **Pin dependency versions.** Document the `playwright install` step. Clarify whether both `google-generativeai` and `google-genai` are needed. Drop unused packages.
+6. **Pin dependency versions.** Document the `poetry run playwright install` step. Clarify whether both `google-generativeai` and `google-genai` are needed. Drop unused packages.
 
 7. **Build a real pytest suite.** Use fixtures that mock Gemini and Google Sheets. Focus first on ID generation, poison pill classifications, data enrichment, and schema adherence.
 
