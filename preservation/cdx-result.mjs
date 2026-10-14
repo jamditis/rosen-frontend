@@ -364,23 +364,16 @@ function decodePageBytes(bytes) {
 
 function jsonSyntaxLocation(error, text) {
   const message = typeof error?.message === 'string' ? error.message : '';
-  const positionMatch = /\bposition (\d+)\b/.exec(message);
+  const positionMatch = / in JSON at position (\d+)(?: \(line (\d+) column (\d+)\))?$/.exec(message);
   let sourcePosition = positionMatch === null ? null : Number(positionMatch[1]);
-  if (sourcePosition === null && /\bend of JSON input\b/i.test(message)) {
+  if (sourcePosition === null && /^Unexpected end of JSON input$/.test(message)) {
     sourcePosition = text.length;
   }
 
   if (!Number.isSafeInteger(sourcePosition)
       || sourcePosition < 0
       || sourcePosition > text.length) {
-    const coordinates = /\bline (\d+) column (\d+)\b/.exec(message);
-    return coordinates === null
-      ? { sourcePosition: null, physicalLine: null, column: null }
-      : {
-        sourcePosition: null,
-        physicalLine: Number(coordinates[1]),
-        column: Number(coordinates[2]),
-      };
+    return { sourcePosition: null, physicalLine: null, column: null };
   }
 
   const prefix = text.slice(0, sourcePosition);

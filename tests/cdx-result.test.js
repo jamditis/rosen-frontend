@@ -424,6 +424,24 @@ describe('offline Wayback CDX result contract (#903)', () => {
     });
   });
 
+  it('never interprets quoted response text as a native JSON source location', () => {
+    for (const body of ['position 12 line 3 column 4', 'end of JSON input']) {
+      assert.throws(() => parseCdxPage(Buffer.from(body), metadata()), error => {
+        assert.ok(error instanceof CdxResultError);
+        assert.equal(error.nextCursor, null);
+        assert.equal(error.row, null);
+        // Older V8 reports the actual first-token offset; current V8 quotes
+        // this response snippet without supplying a source location.
+        const oldV8 = Number(process.versions.node.split('.')[0]) < 20;
+        assert.equal(error.sourcePosition, oldV8 ? 0 : null);
+        assert.equal(error.physicalLine, oldV8 ? 1 : null);
+        assert.equal(error.column, oldV8 ? 1 : null);
+        assert.doesNotMatch(error.message, /position 12|line 3 column 4|end of JSON input/);
+        return true;
+      });
+    }
+  });
+
   it('rejects invalid UTF-8 bytes before JSON parsing', () => {
     const invalidUtf8 = Buffer.from([0x5b, 0x22, 0xc3, 0x28, 0x22, 0x5d]);
     assert.throws(
