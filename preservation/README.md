@@ -76,7 +76,9 @@ Resumable pages must include `urlkey` in the header. The upstream server can
 produce a cursor that skips captures when custom fields omit it; see
 [Wayback issue 121](https://github.com/internetarchive/wayback/issues/121).
 Declared request and mapping URLs retain their original scheme casing. Both
-interfaces require HTTP(S) URI syntax. The parser also requires WHATWG URL
+interfaces require HTTP(S) URI syntax. Query provenance is restricted to
+`web.archive.org/cdx/search/cdx` without credentials, fragments, or nondefault
+ports. The parser also requires WHATWG URL
 validation; schema-only consumers must apply that check before using a URL.
 It returns a cursor only after the header, every capture row, and the complete
 trailer validate. An invalid page throws `CdxResultError` with a one-based JSON

@@ -450,6 +450,38 @@ describe('offline Wayback CDX result contract (#903)', () => {
     }
   });
 
+  it('reports the native location of bytes appended after a complete JSON page', () => {
+    assert.throws(() => parseCdxPage(Buffer.from('[]\n!'), metadata()), error => {
+      assert.ok(error instanceof CdxResultError);
+      assert.equal(error.sourcePosition, 3);
+      assert.equal(error.physicalLine, 2);
+      assert.equal(error.column, 1);
+      assert.equal(error.nextCursor, null);
+      return true;
+    });
+  });
+
+  it('binds query provenance to the IA endpoint in both parser and schema', () => {
+    for (const replacement of [
+      'https://example.org/cdx/search/cdx',
+      'https://web.archive.org/other',
+      'https://user@web.archive.org/cdx/search/cdx',
+      'https://web.archive.org:8443/cdx/search/cdx',
+    ]) {
+      const declared = metadata();
+      declared.query.requestUrl = declared.query.requestUrl.replace('https://web.archive.org/cdx/search/cdx', replacement);
+      assert.throws(() => parseCdxPage(fixture('one.json'), declared), /Internet Archive CDX endpoint/);
+      const sidecar = parseCdxPage(fixture('one.json'), metadata());
+      sidecar.query.requestUrl = declared.query.requestUrl;
+      assert.equal(validateSchema(sidecar), false);
+    }
+    for (const endpoint of ['HTTP://WEB.ARCHIVE.ORG:80', 'HTTPS://WEB.ARCHIVE.ORG:443']) {
+      const declared = metadata();
+      declared.query.requestUrl = declared.query.requestUrl.replace('https://web.archive.org', endpoint);
+      assertSchemaAccepts(parseCdxPage(fixture('one.json'), declared), endpoint);
+    }
+  });
+
   it('rejects invalid UTF-8 bytes before JSON parsing', () => {
     const invalidUtf8 = Buffer.from([0x5b, 0x22, 0xc3, 0x28, 0x22, 0x5d]);
     assert.throws(

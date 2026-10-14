@@ -90,8 +90,16 @@
       ],
       "not": {
         "anyOf": [
-          { "required": ["failure"] },
-          { "required": ["exclusion"] }
+          {
+            "required": [
+              "failure"
+            ]
+          },
+          {
+            "required": [
+              "exclusion"
+            ]
+          }
         ]
       },
       "allOf": [
@@ -101,9 +109,13 @@
               "coverage": {
                 "type": "object",
                 "properties": {
-                  "reason": { "const": "resume-key-present" }
+                  "reason": {
+                    "const": "resume-key-present"
+                  }
                 },
-                "required": ["reason"]
+                "required": [
+                  "reason"
+                ]
               }
             }
           },
@@ -117,7 +129,9 @@
           },
           "else": {
             "properties": {
-              "nextCursor": { "const": null }
+              "nextCursor": {
+                "const": null
+              }
             }
           }
         },
@@ -127,9 +141,13 @@
               "coverage": {
                 "type": "object",
                 "properties": {
-                  "empty": { "const": true }
+                  "empty": {
+                    "const": true
+                  }
                 },
-                "required": ["empty"]
+                "required": [
+                  "empty"
+                ]
               }
             }
           },
@@ -148,9 +166,13 @@
               "coverage": {
                 "type": "object",
                 "properties": {
-                  "empty": { "const": false }
+                  "empty": {
+                    "const": false
+                  }
                 },
-                "required": ["empty"]
+                "required": [
+                  "empty"
+                ]
               }
             }
           },
@@ -174,8 +196,12 @@
         "coverage": {
           "type": "object",
           "properties": {
-            "state": { "const": "unknown" },
-            "reason": { "const": "query-failure" }
+            "state": {
+              "const": "unknown"
+            },
+            "reason": {
+              "const": "query-failure"
+            }
           }
         }
       },
@@ -185,9 +211,21 @@
       ],
       "not": {
         "anyOf": [
-          { "required": ["captures"] },
-          { "required": ["nextCursor"] },
-          { "required": ["exclusion"] }
+          {
+            "required": [
+              "captures"
+            ]
+          },
+          {
+            "required": [
+              "nextCursor"
+            ]
+          },
+          {
+            "required": [
+              "exclusion"
+            ]
+          }
         ]
       }
     },
@@ -200,8 +238,12 @@
         "coverage": {
           "type": "object",
           "properties": {
-            "state": { "const": "unknown" },
-            "reason": { "const": "excluded" }
+            "state": {
+              "const": "unknown"
+            },
+            "reason": {
+              "const": "excluded"
+            }
           }
         }
       },
@@ -211,9 +253,21 @@
       ],
       "not": {
         "anyOf": [
-          { "required": ["captures"] },
-          { "required": ["nextCursor"] },
-          { "required": ["failure"] }
+          {
+            "required": [
+              "captures"
+            ]
+          },
+          {
+            "required": [
+              "nextCursor"
+            ]
+          },
+          {
+            "required": [
+              "failure"
+            ]
+          }
         ]
       }
     }
@@ -273,7 +327,7 @@
         "requestUrl": {
           "type": "string",
           "format": "uri",
-          "pattern": "^[hH][tT][tT][pP][sS]?://"
+          "pattern": "^[hH][tT][tT][pP](?:://[wW][eE][bB]\\.[aA][rR][cC][hH][iI][vV][eE]\\.[oO][rR][gG](?::80)?|[sS]://[wW][eE][bB]\\.[aA][rR][cC][hH][iI][vV][eE]\\.[oO][rR][gG](?::443)?)/cdx/search/cdx(?:\\?[^#]*)?$"
         },
         "parameters": {
           "type": "array",
@@ -298,9 +352,15 @@
             "empty"
           ],
           "properties": {
-            "state": { "const": "complete" },
-            "reason": { "const": "full-history-exhausted" },
-            "empty": { "const": true }
+            "state": {
+              "const": "complete"
+            },
+            "reason": {
+              "const": "full-history-exhausted"
+            },
+            "empty": {
+              "const": true
+            }
           }
         },
         {
@@ -314,9 +374,15 @@
             "latestCaptureTimestamp"
           ],
           "properties": {
-            "state": { "const": "complete" },
-            "reason": { "const": "full-history-exhausted" },
-            "empty": { "const": false },
+            "state": {
+              "const": "complete"
+            },
+            "reason": {
+              "const": "full-history-exhausted"
+            },
+            "empty": {
+              "const": false
+            },
             "earliestCaptureTimestamp": {
               "$ref": "#/$defs/waybackTimestamp"
             },
@@ -333,7 +399,9 @@
             "reason"
           ],
           "properties": {
-            "state": { "const": "partial" },
+            "state": {
+              "const": "partial"
+            },
             "reason": {
               "enum": [
                 "resume-key-present",
@@ -351,7 +419,9 @@
             "reason"
           ],
           "properties": {
-            "state": { "const": "unknown" },
+            "state": {
+              "const": "unknown"
+            },
             "reason": {
               "enum": [
                 "request-scope-unproven",

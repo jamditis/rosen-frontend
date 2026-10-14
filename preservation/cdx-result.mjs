@@ -195,6 +195,11 @@ function validateMetadata(metadata) {
 
   assertExactKeys(metadata.query, ['requestUrl', 'parameters'], [], 'CDX query');
   const requestUrl = validateWebUrl(metadata.query.requestUrl, 'query requestUrl');
+  if (requestUrl.hostname !== 'web.archive.org'
+      || requestUrl.port || requestUrl.username || requestUrl.password || requestUrl.hash
+      || requestUrl.pathname !== '/cdx/search/cdx') {
+    fail('query requestUrl must identify the Internet Archive CDX endpoint');
+  }
   const parameters = validateParameters(metadata.query.parameters);
   const urlParameters = Array.from(requestUrl.searchParams, ([name, value]) => ({ name, value }));
   if (JSON.stringify(parameters) !== JSON.stringify(urlParameters)) {
@@ -364,7 +369,7 @@ function decodePageBytes(bytes) {
 
 function jsonSyntaxLocation(error, text) {
   const message = typeof error?.message === 'string' ? error.message : '';
-  const positionMatch = / in JSON at position (\d+)(?: \(line (\d+) column (\d+)\))?$/.exec(message);
+  const positionMatch = / (?:in|after) JSON at position (\d+)(?: \(line (\d+) column (\d+)\))?$/.exec(message);
   let sourcePosition = positionMatch === null ? null : Number(positionMatch[1]);
   if (sourcePosition === null && /^Unexpected end of JSON input$/.test(message)) {
     sourcePosition = text.length;
