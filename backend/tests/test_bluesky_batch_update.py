@@ -559,6 +559,7 @@ const payload = JSON.parse(await readFile(payloadPath, 'utf8'));
 assertJayGeneratedThreadEvidence(
   payload.record,
   new Map(payload.rows.map(row => [row.id, row])),
+  new Set(payload.rows.map(row => row.id)),
 );
 """
     subprocess.run(
