@@ -6,6 +6,7 @@ import { parse } from 'csv-parse/sync';
 
 import { unescapeRow } from '../data/lib/csv-unescape.js';
 import { generateAllFeeds } from '../data/lib/rss-generator.js';
+import { isPublishableRecord, processRecord } from '../data/export-archive-data.js';
 
 function assertIdSet(actual, expected, artifact) {
   assert.equal(new Set(actual).size, actual.length, `${artifact}: duplicate record IDs`);
@@ -17,12 +18,22 @@ function assertIdSet(actual, expected, artifact) {
 }
 
 function isPublishedCurated(row) {
-  const verified = ['true', 'yes'].includes(String(row.verified || '').trim().toLowerCase());
-  const title = String(row.title || 'Untitled').trim();
-  const date = String(row.publication_date || '').trim();
-  const url = String(row.url || '#').trim() || '#';
-  return verified && title !== 'Untitled' && title.length >= 5 && (date || url !== '#');
+  return isPublishableRecord(processRecord(row, 0, 'article', {}));
 }
+
+test('derived IDs use the actual exporter publication and normalization rules', () => {
+  const row = { id: 'R1', title: 'A valid title', publication_date: '2026-01-01' };
+  for (const verified of ['TRUE', 'true', 'Yes', true]) {
+    assert.equal(isPublishedCurated({ ...row, verified }), true);
+  }
+  for (const verified of ['True', 'YES', 'yes', ' TRUE', 'FALSE', false]) {
+    assert.equal(isPublishedCurated({ ...row, verified }), false);
+  }
+  assert.equal(isPublishedCurated({ ...row, verified: 'TRUE', publication_date: 'not-a-date' }), false);
+  assert.equal(isPublishedCurated({ ...row, verified: 'TRUE', publication_date: 'not-a-date', url: 'https://example.org/story' }), true);
+  assert.equal(isPublishedCurated({ ...row, verified: 'TRUE', title: '', Title: 'Alternate title' }), true);
+  assert.equal(isPublishedCurated({ ...row, verified: 'TRUE', title: '', Content: 'Alternate content title' }), true);
+});
 
 function assertGeneratedThread(record, socialIds) {
   assert.ok(record, 'Reviewed generated thread is missing from archive-data.json');

@@ -63,7 +63,8 @@ function main() {
   }
 
   const originalBytes = fs.readFileSync(filename);
-  const original = originalBytes.toString('utf8');
+  const original = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true })
+    .decode(originalBytes);
   const bom = original.startsWith('\ufeff') ? '\ufeff' : '';
   const source = original.slice(bom.length);
   const rows = parse(source, { columns: true, skip_empty_lines: true });

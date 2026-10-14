@@ -16,6 +16,25 @@ function python(code, args = []) {
   return result.stdout;
 }
 
+test('invalid UTF-8 fails before maintenance can change or back up the source', t => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'csv-invalid-utf8-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const file = path.join(dir, 'records.csv');
+  const original = Buffer.concat([
+    Buffer.from('id,body\r\nR1,untouched '), Buffer.from([0xe9]),
+    Buffer.from('\r\nR2,remove this row\r\n'),
+  ]);
+  fs.writeFileSync(file, original);
+  const result = spawnSync('python3', ['-c',
+    'import sys\nfrom csv_safe_write import write_archive_csv\nwrite_archive_csv(sys.argv[1], ["id", "body"], [{"id":"R1", "body":"untouched"}])', file,
+  ], { encoding: 'utf8', env: { ...process.env, PYTHONPATH: path.resolve('data') } });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /encoded data was not valid|encoding.*not.*valid/i);
+  assert.deepEqual(fs.readFileSync(file), original);
+  assert.equal(fs.existsSync(`${file}.bak`), false);
+  assert.equal(fs.existsSync(`${file}.tmp`), false);
+});
+
 test('Python maintenance reads bare LF as field content and preserves untouched bytes', t => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'csv-maintenance-'));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
