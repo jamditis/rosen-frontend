@@ -127,6 +127,15 @@ describe('stewardship task event contract', () => {
       () => validateTaskEvent(extra, { source: 'fixture/tasks.jsonl', line: 6 }),
       /fixture\/tasks\.jsonl:6: task event has unexpected fields: schedulerState/
     );
+
+    const undefinedSupersession = { ...lifecycle[0], supersedesEventId: undefined };
+    assert.throws(
+      () => validateTaskEvent(
+        undefinedSupersession,
+        { source: 'fixture/tasks.jsonl', line: 7 }
+      ),
+      /fixture\/tasks\.jsonl:7: supersedesEventId must use the Rosen stewardship task-event URN/
+    );
   });
 
   it('rejects duplicate event IDs across the full stream, including identical bodies', () => {

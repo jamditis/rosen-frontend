@@ -211,7 +211,7 @@ export function validateTaskEvent(value, context = { source: 'task-events.jsonl'
     fail('toolVersion must be a stable version', context);
   }
   if (
-    value.supersedesEventId !== undefined
+    Object.hasOwn(value, 'supersedesEventId')
     && (typeof value.supersedesEventId !== 'string' || !EVENT_ID.test(value.supersedesEventId))
   ) {
     fail('supersedesEventId must use the Rosen stewardship task-event URN', context);
