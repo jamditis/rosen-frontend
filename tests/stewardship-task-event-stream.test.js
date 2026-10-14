@@ -247,10 +247,6 @@ describe('stewardship task event JSONL adapter', () => {
   });
 
   it('labels a Linux directory-sync failure after the file is synced', (t) => {
-    if (process.platform !== 'linux' || process.getuid?.() === 0) {
-      t.skip('the permission-boundary check requires a non-root Linux process');
-      return;
-    }
     const directory = temporaryDirectory(t);
     const restrictedDirectory = path.join(directory, 'write-only-parent');
     const streamPath = path.join(restrictedDirectory, 'events.jsonl');
@@ -267,11 +263,15 @@ describe('stewardship task event JSONL adapter', () => {
     }
 
     assert.ok(failure instanceof TaskEventPostAppendError);
-    assert.equal(failure.stage, 'parent directory sync');
+    assert.equal(failure.source, streamPath);
+    assert.equal(failure.eventId, lifecycle[0].eventId);
+    assert.equal(failure.stage, 'parent-directory-sync');
     assert.equal(failure.recordAppended, true);
     assert.equal(failure.fileSynced, true);
     assert.equal(failure.cause?.code, 'EACCES');
-    assert.match(failure.message, /inspect the stream before retry/);
+    assert.match(failure.message, new RegExp(lifecycle[0].eventId));
+    assert.match(failure.message, /directory durability is incomplete/);
+    assert.match(failure.message, /inspect the authoritative stream before retry/);
     assert.equal(fs.readFileSync(streamPath, 'utf8'), encodeTaskEvent(lifecycle[0]));
   });
 

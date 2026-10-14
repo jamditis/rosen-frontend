@@ -52,9 +52,12 @@ the parent directory before the function returns. Directory sync errors are not
 suppressed. Other platforms retain file sync and do not claim durable directory
 entry creation. If directory sync or reopened-stream validation fails after the
 record and file are synced, the writer throws `TaskEventPostAppendError` with
-`recordAppended` and `fileSynced` set to `true` and a stable failure `stage`.
-The message tells the single writer to inspect the stream before retrying the
-same event ID. A failed pre-append validation leaves every existing byte unchanged.
+the path, event ID, underlying cause when one exists, stable failure `stage`, and
+`recordAppended` and `fileSynced` set to `true`. The message tells the single
+writer to inspect the authoritative stream before retrying the same event ID.
+The original durability or verification failure can require operator repair;
+a later append does not repair it. A failed pre-append validation leaves every
+existing byte unchanged.
 
 This is an offline, single-writer contract. It does not promise safe concurrent
 append, compare-and-swap leases, or record-level recovery after a partial write.

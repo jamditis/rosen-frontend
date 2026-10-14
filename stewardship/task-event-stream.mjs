@@ -75,13 +75,17 @@ export class TaskEventStreamError extends Error {
 }
 
 export class TaskEventPostAppendError extends Error {
-  constructor(source, stage, options = {}) {
+  constructor(source, eventId, stage, options = {}) {
+    const incomplete = stage === 'parent-directory-sync'
+      ? 'directory durability'
+      : 'reopen verification';
     super(
-      `${source}: task event appended and file synced, but ${stage} failed; inspect the stream before retry`,
+      `${source}: task event ${eventId} was appended and the file was synced, but ${incomplete} is incomplete; inspect the authoritative stream before retry`,
       options
     );
     this.name = 'TaskEventPostAppendError';
     this.source = source;
+    this.eventId = eventId;
     this.stage = stage;
     this.recordAppended = true;
     this.fileSynced = true;
@@ -330,7 +334,8 @@ export function appendTaskEvent(filePath, value) {
   const creating = !existsSync(filePath);
   const current = creating ? Object.freeze([]) : readTaskEventStream(filePath);
   const next = validateTaskEventSequence([...current, value], { source });
-  const encoded = Buffer.from(`${canonicalJson(next[next.length - 1])}\n`, 'utf8');
+  const appended = next[next.length - 1];
+  const encoded = Buffer.from(`${canonicalJson(appended)}\n`, 'utf8');
 
   let descriptor;
   try {
@@ -351,7 +356,8 @@ export function appendTaskEvent(filePath, value) {
     } catch (error) {
       throw new TaskEventPostAppendError(
         source,
-        'parent directory sync',
+        appended.eventId,
+        'parent-directory-sync',
         { cause: error }
       );
     }
@@ -361,14 +367,22 @@ export function appendTaskEvent(filePath, value) {
   try {
     reopened = readTaskEventStream(filePath);
   } catch (error) {
-    throw new TaskEventPostAppendError(source, 'reopen validation', { cause: error });
+    throw new TaskEventPostAppendError(
+      source,
+      appended.eventId,
+      'reopen-validation',
+      { cause: error }
+    );
   }
-  const appended = next[next.length - 1];
   if (
     reopened.length !== next.length
     || reopened[reopened.length - 1].eventId !== appended.eventId
   ) {
-    throw new TaskEventPostAppendError(source, 'reopen validation');
+    throw new TaskEventPostAppendError(
+      source,
+      appended.eventId,
+      'reopen-validation'
+    );
   }
   return reopened[reopened.length - 1];
 }
