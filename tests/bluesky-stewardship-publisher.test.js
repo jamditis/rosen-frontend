@@ -333,6 +333,8 @@ describe('Bluesky stewardship receipt and workflow boundary', () => {
     assert.doesNotMatch(receiptBlock, /RECEIPT_DELIVERY_OUTCOME/);
     assert.match(sendBlock, /env\.DRY_RUN != 'true'/);
     assert.match(issueBlock, /env\.DRY_RUN != 'true'/);
+    assert.match(issueBlock, /github-token: \$\{\{ github\.token \}\}/);
+    assert.doesNotMatch(issueBlock, /app-token\.outputs\.token/);
     assert.match(summaryBlock, /RECEIPT_DELIVERY_OUTCOME: \$\{\{ steps\.send_receipt\.outcome \}\}/);
     assert.match(workflow, /steps\.receipt\.outputs\.status != 'dry_run'/);
   });
