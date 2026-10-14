@@ -12,6 +12,17 @@ from scripts import bluesky_feed_backfill as backfill
 JAY_DID = backfill.ACTOR_DID
 
 
+class _HttpResponse:
+    def __init__(self, status_code=200, *, payload=None, text="", headers=None):
+        self.status_code = status_code
+        self._payload = payload
+        self.text = text
+        self.headers = headers or {}
+
+    def json(self):
+        return self._payload
+
+
 def _feed_item(
     rkey,
     created_at,
@@ -144,6 +155,7 @@ def test_batch_is_idempotent_and_preserves_existing_csv_bytes(tmp_path):
         captured_at=_captured_at(),
         fetch_page_fn=lambda _cursor: page,
         fetch_context_fn=lambda _uris: {"posts": []},
+        policy_check_fn=lambda: None,
         sleep_fn=lambda _seconds: None,
     )
 
@@ -165,6 +177,7 @@ def test_batch_is_idempotent_and_preserves_existing_csv_bytes(tmp_path):
         captured_at=_captured_at() + datetime.timedelta(minutes=1),
         fetch_page_fn=lambda _cursor: page,
         fetch_context_fn=lambda _uris: {"posts": []},
+        policy_check_fn=lambda: None,
         sleep_fn=lambda _seconds: None,
     )
 
@@ -201,6 +214,7 @@ def test_incomplete_walk_writes_neither_csv_nor_snapshots(tmp_path):
             max_pages=1,
             fetch_page_fn=lambda _cursor: page,
             fetch_context_fn=lambda _uris: {"posts": []},
+            policy_check_fn=lambda: None,
             sleep_fn=lambda _seconds: None,
         )
 
@@ -229,6 +243,7 @@ def test_bad_source_payload_writes_nothing(tmp_path):
             captured_at=_captured_at(),
             fetch_page_fn=lambda _cursor: {"feed": [bad_item], "cursor": None},
             fetch_context_fn=lambda _uris: {"posts": []},
+            policy_check_fn=lambda: None,
             sleep_fn=lambda _seconds: None,
         )
 
@@ -251,6 +266,7 @@ def test_runner_outputs_must_stay_under_runner_temp(tmp_path, monkeypatch):
             captured_at=_captured_at(),
             fetch_page_fn=lambda _cursor: pytest.fail("feed must not be fetched"),
             fetch_context_fn=lambda _uris: pytest.fail("context must not be fetched"),
+            policy_check_fn=lambda: None,
             sleep_fn=lambda _seconds: None,
         )
 
@@ -332,6 +348,7 @@ def test_admission_uses_text_taxonomy_and_public_context(tmp_path):
         captured_at=_captured_at(),
         fetch_page_fn=lambda _cursor: {"feed": items, "cursor": None},
         fetch_context_fn=fetch_context,
+        policy_check_fn=lambda: None,
         sleep_fn=lambda _seconds: None,
     )
 
@@ -372,3 +389,219 @@ def test_admission_uses_text_taxonomy_and_public_context(tmp_path):
     }
     assert result.report["input_cutoff"] == "2026-10-13T15:19:22+00:00"
     assert result.report["newest_source_time"] == "2026-10-15T15:00:00+00:00"
+
+
+@pytest.mark.parametrize(
+    "policy",
+    [
+        "User-agent: *\nDisallow: /xrpc\n",
+        "Allow: /xrpc\n",
+        "This is not a robots directive\n",
+    ],
+)
+def test_robots_policy_fails_closed_for_disallow_or_invalid_policy(policy):
+    calls = []
+
+    def request(url, **kwargs):
+        calls.append((url, kwargs))
+        return _HttpResponse(text=policy)
+
+    with pytest.raises(batch.BatchPreparationError, match="robots policy"):
+        batch.check_public_api_policy(
+            request_fn=request,
+            sleep_fn=lambda _seconds: pytest.fail("policy response must not retry"),
+        )
+
+    assert len(calls) == 1
+    assert calls[0][0] == batch.ROBOTS_URL
+    assert calls[0][1]["allow_redirects"] is False
+    assert calls[0][1]["params"] is None
+
+
+def test_robots_policy_allows_both_fixed_public_endpoints():
+    calls = []
+
+    def request(url, **kwargs):
+        calls.append((url, kwargs))
+        return _HttpResponse(text="User-agent: *\nDisallow:\n")
+
+    batch.check_public_api_policy(
+        request_fn=request,
+        sleep_fn=lambda _seconds: pytest.fail("valid policy must not retry"),
+    )
+
+    assert [url for url, _kwargs in calls] == [batch.ROBOTS_URL]
+
+
+@pytest.mark.parametrize("status", [401, 403])
+def test_robots_policy_does_not_retry_access_denials(status):
+    calls = []
+
+    def request(url, **kwargs):
+        calls.append((url, kwargs))
+        return _HttpResponse(status_code=status)
+
+    with pytest.raises(batch.BatchPreparationError, match=f"HTTP {status}"):
+        batch.check_public_api_policy(
+            request_fn=request,
+            sleep_fn=lambda _seconds: pytest.fail("access denial must not retry"),
+        )
+
+    assert [url for url, _kwargs in calls] == [batch.ROBOTS_URL]
+
+
+def test_policy_gate_precedes_feed_and_preserves_canonical_data(tmp_path):
+    csv_path = tmp_path / "social_posts.csv"
+    original = _write_canonical(csv_path)
+    snapshot_dir = tmp_path / "snapshot"
+    report_path = tmp_path / "report.json"
+
+    def deny_policy():
+        raise batch.BatchPreparationError("Public API robots policy is invalid")
+
+    with pytest.raises(batch.BatchPreparationError, match="robots policy"):
+        batch.run_batch(
+            csv_path=csv_path,
+            snapshot_dir=snapshot_dir,
+            report_path=report_path,
+            captured_at=_captured_at(),
+            policy_check_fn=deny_policy,
+            fetch_page_fn=lambda _cursor: pytest.fail("feed must not be fetched"),
+            fetch_context_fn=lambda _uris: pytest.fail("context must not be fetched"),
+            sleep_fn=lambda _seconds: None,
+        )
+
+    assert csv_path.read_bytes() == original
+    assert not snapshot_dir.exists()
+    assert not report_path.exists()
+
+
+def test_fixed_feed_get_retries_network_429_and_transient_5xx():
+    events = [
+        batch.requests.ConnectionError("temporary network failure"),
+        _HttpResponse(status_code=429, headers={"Retry-After": "7"}),
+        _HttpResponse(status_code=503),
+        _HttpResponse(payload={"feed": [], "cursor": None}),
+    ]
+    calls = []
+    delays = []
+
+    def request(url, **kwargs):
+        calls.append((url, kwargs))
+        event = events.pop(0)
+        if isinstance(event, Exception):
+            raise event
+        return event
+
+    payload = batch.fetch_feed_page(
+        "fixed-cursor",
+        request_fn=request,
+        sleep_fn=delays.append,
+    )
+
+    assert payload == {"feed": [], "cursor": None}
+    assert len(calls) == batch.MAX_REQUEST_ATTEMPTS
+    assert {url for url, _kwargs in calls} == {backfill.FEED_ENDPOINT}
+    assert all(kwargs["allow_redirects"] is False for _url, kwargs in calls)
+    assert all(kwargs["params"]["actor"] == JAY_DID for _url, kwargs in calls)
+    assert all(kwargs["params"]["cursor"] == "fixed-cursor" for _url, kwargs in calls)
+    assert delays == [1, 7, 4]
+
+
+def test_transient_failures_stop_at_the_request_bound():
+    calls = []
+    delays = []
+
+    def request(url, **kwargs):
+        calls.append((url, kwargs))
+        return _HttpResponse(status_code=503)
+
+    with pytest.raises(batch.BatchPreparationError, match="after 4 attempts"):
+        batch.fetch_feed_page(
+            None,
+            request_fn=request,
+            sleep_fn=delays.append,
+        )
+
+    assert len(calls) == batch.MAX_REQUEST_ATTEMPTS
+    assert delays == [1, 2, 4]
+
+
+def test_context_access_denial_is_not_retried():
+    uri = "at://did:plc:reader/app.bsky.feed.post/parent"
+    calls = []
+
+    def request(url, **kwargs):
+        calls.append((url, kwargs))
+        return _HttpResponse(status_code=403)
+
+    with pytest.raises(batch.BatchPreparationError, match="HTTP 403"):
+        batch.fetch_context_posts(
+            [uri],
+            request_fn=request,
+            sleep_fn=lambda _seconds: pytest.fail("403 must not retry"),
+        )
+
+    assert len(calls) == 1
+    assert calls[0][0] == batch.CONTEXT_ENDPOINT
+    assert calls[0][1]["params"] == [("uris", uri)]
+
+
+def test_network_boundary_rejects_an_alternate_host_without_requesting_it():
+    with pytest.raises(batch.BatchPreparationError, match="not allowed"):
+        batch._get_with_retry(
+            "https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed",
+            request_fn=lambda *_args, **_kwargs: pytest.fail(
+                "alternate host must not be requested"
+            ),
+            sleep_fn=lambda _seconds: None,
+        )
+
+
+@pytest.mark.parametrize(
+    ("context_mutation", "message"),
+    [
+        (lambda post: post["author"].update(did="did:plc:impostor"), "author DID"),
+        (
+            lambda post: post["record"].update(createdAt="2026-10-15T11:00:00"),
+            "timezone",
+        ),
+    ],
+)
+def test_malformed_context_aborts_without_canonical_writes(
+    tmp_path,
+    context_mutation,
+    message,
+):
+    csv_path = tmp_path / "social_posts.csv"
+    original = _write_canonical(csv_path)
+    snapshot_dir = tmp_path / "snapshot"
+    report_path = tmp_path / "report.json"
+    parent_uri = "at://did:plc:reader/app.bsky.feed.post/parent"
+    item = _feed_item(
+        "meaningful-reply",
+        "2026-10-15T14:00:00Z",
+        (
+            "This news coverage repeats false balance and the view from nowhere. "
+            "The press should explain its democratic choices."
+        ),
+        reply_parent=parent_uri,
+    )
+    context = _context_post(parent_uri)
+    context_mutation(context)
+
+    with pytest.raises(batch.BatchPreparationError, match=message):
+        batch.run_batch(
+            csv_path=csv_path,
+            snapshot_dir=snapshot_dir,
+            report_path=report_path,
+            captured_at=_captured_at(),
+            policy_check_fn=lambda: None,
+            fetch_page_fn=lambda _cursor: {"feed": [item], "cursor": None},
+            fetch_context_fn=lambda _uris: {"posts": [context]},
+            sleep_fn=lambda _seconds: None,
+        )
+
+    assert csv_path.read_bytes() == original
+    assert not snapshot_dir.exists()
+    assert not report_path.exists()

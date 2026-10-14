@@ -21,7 +21,10 @@ import re
 import shutil
 import sys
 import tempfile
+import time
+import urllib.robotparser
 from dataclasses import dataclass
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Callable, Iterable
 
@@ -36,8 +39,20 @@ from auto_categorize_records import RecordCategorizer  # noqa: E402
 
 
 DEFAULT_OVERLAP = datetime.timedelta(days=1)
+PUBLIC_API_ORIGIN = "https://public.api.bsky.app"
+ROBOTS_URL = f"{PUBLIC_API_ORIGIN}/robots.txt"
+ROBOTS_USER_AGENT = "RosenArchive-BlueskyBatch"
 CONTEXT_ENDPOINT = f"{backfill.API_BASE}/app.bsky.feed.getPosts"
 CONTEXT_BATCH_LIMIT = 25
+MAX_REQUEST_ATTEMPTS = 4
+MAX_RETRY_DELAY_SECONDS = 30.0
+TRANSIENT_HTTP_STATUSES = {429, 500, 502, 503, 504}
+ALLOWED_GET_ENDPOINTS = {
+    ROBOTS_URL,
+    backfill.FEED_ENDPOINT,
+    CONTEXT_ENDPOINT,
+}
+REQUEST_HEADERS = {"User-Agent": f"{ROBOTS_USER_AGENT}/1.0"}
 CONTEXT_ONLY_NOTE = (
     "Standalone archive admission not verified; source identity and text were "
     "confirmed, but this item remains context only."
@@ -132,7 +147,205 @@ def derive_input_cutoff(
     return newest - overlap
 
 
-def fetch_context_posts(uris: list[str]) -> dict:
+def _retry_delay(response: object | None, attempt: int) -> float:
+    headers = getattr(response, "headers", {}) if response is not None else {}
+    retry_after = headers.get("Retry-After") if hasattr(headers, "get") else None
+    if retry_after:
+        try:
+            delay = float(retry_after)
+        except (TypeError, ValueError):
+            try:
+                retry_time = parsedate_to_datetime(str(retry_after))
+                if retry_time.tzinfo is None:
+                    raise ValueError("Retry-After date has no timezone")
+                now = datetime.datetime.now(datetime.timezone.utc)
+                delay = (
+                    retry_time.astimezone(datetime.timezone.utc) - now
+                ).total_seconds()
+            except (TypeError, ValueError, OverflowError):
+                delay = 2 ** (attempt - 1)
+    else:
+        delay = 2 ** (attempt - 1)
+    return min(MAX_RETRY_DELAY_SECONDS, max(0.0, delay))
+
+
+def _get_with_retry(
+    url: str,
+    *,
+    params: object | None = None,
+    request_fn: Callable[..., object] = requests.get,
+    sleep_fn: Callable[[float], None] = time.sleep,
+) -> object:
+    if url not in ALLOWED_GET_ENDPOINTS:
+        raise BatchPreparationError(f"Public API endpoint is not allowed: {url}")
+
+    for attempt in range(1, MAX_REQUEST_ATTEMPTS + 1):
+        try:
+            response = request_fn(
+                url,
+                params=params,
+                headers=REQUEST_HEADERS,
+                timeout=30,
+                allow_redirects=False,
+            )
+        except requests.RequestException as exc:
+            if attempt == MAX_REQUEST_ATTEMPTS:
+                raise BatchPreparationError(
+                    f"Public API GET failed after {attempt} attempts: {url}"
+                ) from exc
+            sleep_fn(_retry_delay(None, attempt))
+            continue
+
+        status = getattr(response, "status_code", None)
+        if not isinstance(status, int):
+            raise BatchPreparationError(f"Public API returned no HTTP status: {url}")
+        if status in {401, 403}:
+            raise BatchPreparationError(
+                f"Public API denied the fixed GET endpoint with HTTP {status}: {url}"
+            )
+        if status in TRANSIENT_HTTP_STATUSES:
+            if attempt == MAX_REQUEST_ATTEMPTS:
+                raise BatchPreparationError(
+                    f"Public API GET failed with HTTP {status} after {attempt} attempts: {url}"
+                )
+            sleep_fn(_retry_delay(response, attempt))
+            continue
+        if status != 200:
+            raise BatchPreparationError(
+                f"Public API GET failed with HTTP {status}: {url}"
+            )
+        return response
+
+    raise AssertionError("bounded retry loop did not return or raise")
+
+
+def _get_json_with_retry(
+    url: str,
+    *,
+    params: object | None = None,
+    request_fn: Callable[..., object] = requests.get,
+    sleep_fn: Callable[[float], None] = time.sleep,
+) -> dict:
+    response = _get_with_retry(
+        url,
+        params=params,
+        request_fn=request_fn,
+        sleep_fn=sleep_fn,
+    )
+    try:
+        payload = response.json()
+    except (TypeError, ValueError) as exc:
+        raise BatchPreparationError(
+            f"Public API returned invalid JSON from {url}"
+        ) from exc
+    if not isinstance(payload, dict):
+        raise BatchPreparationError(f"Public API returned a non-object from {url}")
+    return payload
+
+
+def _robots_groups(lines: list[str]) -> list[list[str]]:
+    groups: list[list[str]] = []
+    agents: list[str] = []
+    has_rules = False
+
+    def finish_group() -> None:
+        nonlocal agents, has_rules
+        if agents:
+            groups.append(agents)
+        agents = []
+        has_rules = False
+
+    for raw_line in lines:
+        line = raw_line.split("#", 1)[0].strip()
+        if not line:
+            if has_rules:
+                finish_group()
+            continue
+        if ":" not in line:
+            raise BatchPreparationError("Public API robots policy is malformed")
+        field, value = (part.strip() for part in line.split(":", 1))
+        if not field:
+            raise BatchPreparationError("Public API robots policy is malformed")
+        field = field.lower()
+        if field == "user-agent":
+            if not value:
+                raise BatchPreparationError(
+                    "Public API robots policy has an empty user-agent"
+                )
+            if has_rules:
+                finish_group()
+            agents.append(value.lower())
+        elif field in {"allow", "disallow"}:
+            if not agents:
+                raise BatchPreparationError(
+                    "Public API robots policy has a rule without a user-agent"
+                )
+            has_rules = True
+    finish_group()
+    return groups
+
+
+def check_public_api_policy(
+    *,
+    request_fn: Callable[..., object] = requests.get,
+    sleep_fn: Callable[[float], None] = time.sleep,
+) -> None:
+    """Fail closed unless robots.txt permits both fixed public API GETs."""
+    response = _get_with_retry(
+        ROBOTS_URL,
+        request_fn=request_fn,
+        sleep_fn=sleep_fn,
+    )
+    text = getattr(response, "text", None)
+    if not isinstance(text, str) or not text.strip():
+        raise BatchPreparationError("Public API robots policy is empty or invalid")
+    lines = text.splitlines()
+    groups = _robots_groups(lines)
+    product = ROBOTS_USER_AGENT.lower()
+    if not any(
+        agent == "*" or agent in product for agents in groups for agent in agents
+    ):
+        raise BatchPreparationError(
+            "Public API robots policy has no applicable user-agent group"
+        )
+
+    parser = urllib.robotparser.RobotFileParser()
+    parser.set_url(ROBOTS_URL)
+    parser.parse(lines)
+    for endpoint in (backfill.FEED_ENDPOINT, CONTEXT_ENDPOINT):
+        if not parser.can_fetch(ROBOTS_USER_AGENT, endpoint):
+            raise BatchPreparationError(
+                f"Public API robots policy disallows the fixed GET endpoint: {endpoint}"
+            )
+
+
+def fetch_feed_page(
+    cursor: str | None,
+    *,
+    request_fn: Callable[..., object] = requests.get,
+    sleep_fn: Callable[[float], None] = time.sleep,
+) -> dict:
+    params = {
+        "actor": backfill.ACTOR_DID,
+        "filter": "posts_with_replies",
+        "limit": backfill.PAGE_LIMIT,
+    }
+    if cursor:
+        params["cursor"] = cursor
+    return _get_json_with_retry(
+        backfill.FEED_ENDPOINT,
+        params=params,
+        request_fn=request_fn,
+        sleep_fn=sleep_fn,
+    )
+
+
+def fetch_context_posts(
+    uris: list[str],
+    *,
+    request_fn: Callable[..., object] = requests.get,
+    sleep_fn: Callable[[float], None] = time.sleep,
+) -> dict:
     """Fetch at most 25 fixed public AT Protocol post URIs."""
     if not uris or len(uris) > CONTEXT_BATCH_LIMIT:
         raise ValueError("context request must contain 1 through 25 URIs")
@@ -140,14 +353,12 @@ def fetch_context_posts(uris: list[str]) -> dict:
         if not backfill.AT_POST_URI_RE.fullmatch(uri):
             raise ValueError(f"invalid context URI: {uri!r}")
 
-    response = requests.get(
+    return _get_json_with_retry(
         CONTEXT_ENDPOINT,
         params=[("uris", uri) for uri in uris],
-        headers={"User-Agent": "RosenArchive-BlueskyBatch/1.0"},
-        timeout=30,
+        request_fn=request_fn,
+        sleep_fn=sleep_fn,
     )
-    response.raise_for_status()
-    return response.json()
 
 
 def _capturing_fetcher(
@@ -324,8 +535,28 @@ def _validate_context_response(payload: dict, requested: set[str]) -> list[dict]
             raise BatchPreparationError(f"Context post {index} has no CID")
         if not isinstance(author, dict) or not isinstance(author.get("did"), str):
             raise BatchPreparationError(f"Context post {index} has no author DID")
+        uri_did = backfill.AT_POST_URI_RE.fullmatch(uri).group(1)
+        if author["did"] != uri_did:
+            raise BatchPreparationError(
+                f"Context post {index} author DID does not match its URI"
+            )
         if not isinstance(record, dict) or not isinstance(record.get("text"), str):
             raise BatchPreparationError(f"Context post {index} has no source text")
+        created_at = record.get("createdAt")
+        if not isinstance(created_at, str) or not created_at:
+            raise BatchPreparationError(f"Context post {index} has no createdAt")
+        try:
+            parsed_created_at = datetime.datetime.fromisoformat(
+                created_at.replace("Z", "+00:00")
+            )
+        except ValueError as exc:
+            raise BatchPreparationError(
+                f"Context post {index} has a malformed createdAt"
+            ) from exc
+        if parsed_created_at.tzinfo is None:
+            raise BatchPreparationError(
+                f"Context post {index} createdAt has no timezone"
+            )
         posts.append(post)
     return posts
 
@@ -607,8 +838,9 @@ def run_batch(
     captured_at: datetime.datetime | None = None,
     overlap: datetime.timedelta = DEFAULT_OVERLAP,
     max_pages: int = backfill.DEFAULT_MAX_PAGES,
-    fetch_page_fn: Callable[[str | None], dict] = backfill.fetch_page,
+    fetch_page_fn: Callable[[str | None], dict] = fetch_feed_page,
     fetch_context_fn: Callable[[list[str]], dict] = fetch_context_posts,
+    policy_check_fn: Callable[[], None] = check_public_api_policy,
     sleep_fn: Callable[[float], None] = backfill.time.sleep,
     write: bool = True,
 ) -> BatchRunResult:
@@ -626,6 +858,7 @@ def run_batch(
     canonical_before = csv_path.read_bytes()
     cutoff = derive_input_cutoff(csv_path, overlap)
     existing_urls, max_id = backfill.load_existing_urls(csv_path)
+    policy_check_fn()
     pages: list[dict] = []
     today = captured_at.astimezone(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
@@ -681,6 +914,7 @@ def run_batch(
         "input_cutoff": _utc_iso(cutoff),
         "overlap_seconds": int(overlap.total_seconds()),
         "actor_did": backfill.ACTOR_DID,
+        "robots_url": ROBOTS_URL,
         "feed_endpoint": backfill.FEED_ENDPOINT,
         "context_endpoint": CONTEXT_ENDPOINT,
         "complete": True,
