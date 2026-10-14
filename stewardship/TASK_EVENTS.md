@@ -1,8 +1,9 @@
 # Stewardship task-event stream
 
 This directory defines the offline version 1 task-event stream for issue #884.
-The stream is the authoritative input for a later rebuildable task index. This
-slice does not add that projector or connect a production scheduler.
+The stream is the authoritative input for the dependent rebuildable
+[SQLite task index](TASK_INDEX.md). Neither contract connects a production
+scheduler.
 
 `task-event.schema.json` defines one event envelope. It keeps the stable object
 identity and actor conventions from preservation issue #701. Event IDs are
@@ -69,7 +70,7 @@ authoritative stream tail before retrying.
 
 This is an offline, single-writer contract. It does not promise safe concurrent
 append, compare-and-swap leases, or record-level recovery after a partial write.
-Those guarantees belong at issue #706's atomic writer boundary. The SQLite
-projector, index replacement, lease arbitration, retry policy, scheduler, and
-source-discovery D1 migration are also outside this slice. No production task
-events are created here.
+Those guarantees belong at the later atomic writer boundary. The SQLite index
+rebuild provides crash-safe replacement for derived state only. Lease
+arbitration, retry policy, scheduling, and the source-discovery D1 migration
+remain outside this slice. No production task events are created here.
