@@ -23,6 +23,12 @@ The read-only `TaskIndex` API provides indexed queries for:
 The candidate query does not define scheduling or retry policy. Its caller
 must select the lifecycle types that are eligible for that caller's workflow.
 
+`failures()` is a history query. It returns unsuperseded failure facts in
+descending written stream order, so a newly recorded correction appears before
+older records. It can include failures from tasks that later succeeded. Use
+`nextTasks()` to select tasks by their current lifecycle state; that query uses
+effective lifecycle order and does not revive completed tasks after corrections.
+
 ## State paths and rebuilds
 
 `rebuildTaskIndex()` requires an `eventPath` and an `indexPath`. An optional
