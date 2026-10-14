@@ -218,7 +218,7 @@ describe('offline Wayback CDX result contract (#903)', () => {
     assertSchemaAccepts(exhausted, 'non-resumable custom fields');
   });
 
-  it('preserves valid scheme casing while keeping parser and schema URL validation aligned', () => {
+  it('preserves valid scheme casing and bounds the schema-only URL contract', () => {
     for (const scheme of ['HTTP', 'HTTPS', 'hTtPs']) {
       const declared = structuredClone(metadata());
       declared.query.requestUrl = declared.query.requestUrl.replace(/^https/, scheme);
@@ -227,6 +227,14 @@ describe('offline Wayback CDX result contract (#903)', () => {
       assert.equal(result.query.requestUrl, declared.query.requestUrl);
       assert.equal(result.objectMappings[0].sourceUrl, declared.objectMappings[0].sourceUrl);
       assertSchemaAccepts(result, scheme);
+    }
+    for (const sourceUrl of ['http://', 'https://archive.org:99999/']) {
+      const schemaOnly = parseCdxPage(fixture('one.json'), metadata());
+      schemaOnly.objectMappings[0].sourceUrl = sourceUrl;
+      assertSchemaAccepts(schemaOnly, 'URI syntax without WHATWG URL validation');
+      assert.throws(() => parseCdxPage(fixture('one.json'), metadata({
+        objectMappings: [{ ...defaultMappings[0], sourceUrl }],
+      })), CdxResultError);
     }
     for (const sourceUrl of ['https:archive.org', 'https://archive.org/a b', 'https://archive.org/path ', 'https://例え.テスト/']) {
       assert.throws(() => parseCdxPage(fixture('one.json'), metadata({
