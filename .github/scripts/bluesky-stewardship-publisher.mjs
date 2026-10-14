@@ -52,6 +52,10 @@ function git(root, args) {
   return text(run(root, 'git', args, { stdio: ['ignore', 'pipe', 'inherit'] }));
 }
 
+function gitRaw(root, args) {
+  return run(root, 'git', args, { stdio: ['ignore', 'pipe', 'inherit'] });
+}
+
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
@@ -185,15 +189,26 @@ function isReleaseDataPath(file) {
     || file.startsWith('data/feeds/');
 }
 
-function changedPaths(root) {
-  return git(root, ['status', '--porcelain=v1', '-z'])
-    .split('\0')
-    .filter(Boolean)
-    .map((entry) => entry.slice(3))
-    .map((entry) => entry.includes(' -> ') ? entry.split(' -> ')[1] : entry);
+export function changedPaths(root) {
+  const entries = gitRaw(root, ['status', '--porcelain=v1', '-z']).split('\0');
+  const paths = [];
+  for (let index = 0; index < entries.length; index += 1) {
+    const entry = entries[index];
+    if (!entry) continue;
+    if (entry.length < 4 || entry[2] !== ' ') {
+      throw new Error('git status returned an invalid porcelain record');
+    }
+    const status = entry.slice(0, 2);
+    const file = entry.slice(3);
+    if (status.includes('R') || status.includes('C')) {
+      throw new Error(`publication does not allow renamed or copied paths: ${file}`);
+    }
+    paths.push(file);
+  }
+  return paths;
 }
 
-function stageReleaseCommit(root, browserPaths) {
+export function stageReleaseCommit(root, browserPaths) {
   const allowed = new Set(browserPaths);
   for (const file of changedPaths(root)) {
     if (!allowed.has(file) && !isReleaseDataPath(file)) {
@@ -209,6 +224,19 @@ function stageReleaseCommit(root, browserPaths) {
   if (explicitPaths.length === 0) throw new Error('publication produced no release changes');
   run(root, 'git', ['add', '--', ...explicitPaths]);
   run(root, 'git', ['commit', '-m', 'data: publish Bluesky stewardship update']);
+}
+
+export function stageCensusCommit(root) {
+  const censusPaths = ['data/stewardship-census.json', 'data/stewardship-census.md'];
+  const changes = changedPaths(root);
+  const nonCensus = changes.filter((file) => !censusPaths.includes(file));
+  if (nonCensus.length > 0) {
+    throw new Error(`census changed an unapproved path: ${nonCensus.join(', ')}`);
+  }
+  if (changes.length > 0) {
+    run(root, 'git', ['add', '--', ...censusPaths]);
+    run(root, 'git', ['commit', '-m', 'docs: refresh stewardship census']);
+  }
 }
 
 function configureJoeIdentity(root) {
@@ -377,13 +405,7 @@ function publishChangedRelease(root, paths, state, report) {
 
   if (git(root, ['status', '--porcelain'])) throw new Error('release commit left uncommitted changes');
   run(root, 'npm', ['run', 'census:stewardship']);
-  const censusPaths = ['data/stewardship-census.json', 'data/stewardship-census.md'];
-  const nonCensus = changedPaths(root).filter((file) => !censusPaths.includes(file));
-  if (nonCensus.length > 0) throw new Error(`census changed an unapproved path: ${nonCensus.join(', ')}`);
-  if (changedPaths(root).length > 0) {
-    run(root, 'git', ['add', '--', ...censusPaths]);
-    run(root, 'git', ['commit', '-m', 'docs: refresh stewardship census']);
-  }
+  stageCensusCommit(root);
 
   run(root, 'npm', ['test']);
   if (git(root, ['status', '--porcelain'])) throw new Error('final tested tree is not clean');

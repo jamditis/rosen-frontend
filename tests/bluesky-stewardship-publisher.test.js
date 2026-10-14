@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it } from 'node:test';
@@ -6,8 +7,11 @@ import { fileURLToPath } from 'node:url';
 
 import {
   buildIngestionReceipt,
+  changedPaths,
   finalizePublication,
   runPreparation,
+  stageCensusCommit,
+  stageReleaseCommit,
   validateRecoveryRelease,
 } from '../.github/scripts/bluesky-stewardship-publisher.mjs';
 
@@ -64,6 +68,27 @@ function preparation(overrides = {}) {
     ...overrides,
   };
   return api;
+}
+
+function gitCommand(directory, args, { trim = true } = {}) {
+  const output = execFileSync('git', args, { cwd: directory, encoding: 'utf8' });
+  return trim ? output.trim() : output;
+}
+
+function gitFixture(t, files) {
+  const directory = fs.mkdtempSync(path.join(process.env.TMPDIR || '/tmp', 'rosen-publisher-git-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  gitCommand(directory, ['init', '-q']);
+  gitCommand(directory, ['config', 'user.name', 'Joe Amditis']);
+  gitCommand(directory, ['config', 'user.email', '6799804+jamditis@users.noreply.github.com']);
+  for (const [relativePath, content] of Object.entries(files)) {
+    const filePath = path.join(directory, relativePath);
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, content);
+  }
+  gitCommand(directory, ['add', '--all']);
+  gitCommand(directory, ['commit', '-q', '-m', 'fixture baseline']);
+  return directory;
 }
 
 describe('Bluesky stewardship preparation used by the CLI', () => {
@@ -168,6 +193,55 @@ describe('Bluesky stewardship preparation used by the CLI', () => {
     assert.equal(result.errorClass, 'deploy_failed');
     assert.equal(result.receipt.canonicalCommit, PUBLISHED);
     assert.deepEqual(result.receipt.records, []);
+  });
+});
+
+describe('Bluesky release staging uses raw Git porcelain records', () => {
+  it('keeps the first unstaged release path intact and commits it', (t) => {
+    const directory = gitFixture(t, { 'data/social_posts.csv': 'before\n' });
+    fs.writeFileSync(path.join(directory, 'data/social_posts.csv'), 'after\n');
+
+    assert.deepEqual(changedPaths(directory), ['data/social_posts.csv']);
+    stageReleaseCommit(directory, []);
+
+    assert.equal(gitCommand(directory, ['status', '--porcelain']), '');
+    assert.equal(
+      gitCommand(directory, ['show', '--pretty=', '--name-only', 'HEAD']),
+      'data/social_posts.csv',
+    );
+  });
+
+  it('keeps the first unstaged census path intact and commits only census output', (t) => {
+    const directory = gitFixture(t, {
+      'data/stewardship-census.json': '{"count":1}\n',
+      'data/stewardship-census.md': 'Count: 1\n',
+    });
+    fs.writeFileSync(path.join(directory, 'data/stewardship-census.json'), '{"count":2}\n');
+
+    assert.deepEqual(changedPaths(directory), ['data/stewardship-census.json']);
+    stageCensusCommit(directory);
+
+    assert.equal(gitCommand(directory, ['status', '--porcelain']), '');
+    assert.equal(
+      gitCommand(directory, ['show', '--pretty=', '--name-only', 'HEAD']),
+      'data/stewardship-census.json',
+    );
+  });
+
+  it('refuses an unapproved unstaged path before staging a release commit', (t) => {
+    const directory = gitFixture(t, { 'README.md': 'before\n' });
+    const initialHead = gitCommand(directory, ['rev-parse', 'HEAD']);
+    fs.writeFileSync(path.join(directory, 'README.md'), 'after\n');
+
+    assert.throws(() => stageReleaseCommit(directory, []), /unapproved path: README\.md/);
+    assert.equal(gitCommand(directory, ['rev-parse', 'HEAD']), initialHead);
+    assert.equal(gitCommand(directory, ['diff', '--cached', '--name-only']), '');
+  });
+
+  it('rejects a NUL-delimited rename record', (t) => {
+    const directory = gitFixture(t, { 'data/social_posts.csv': 'before\n' });
+    gitCommand(directory, ['mv', 'data/social_posts.csv', 'data/archive-data.json']);
+    assert.throws(() => changedPaths(directory), /does not allow renamed or copied paths/);
   });
 });
 
