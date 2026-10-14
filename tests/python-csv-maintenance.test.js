@@ -30,6 +30,16 @@ test('Python maintenance reports the required Node dependency setup', () => {
   python(`from unittest.mock import patch\nfrom csv_safe_write import read_archive_csv\nwith patch('csv_safe_write.subprocess.run', side_effect=FileNotFoundError()):\n    try:\n        read_archive_csv('unused.csv')\n    except RuntimeError as error:\n        assert 'Node.js' in str(error)\n        assert 'npm ci' in str(error)\n    else:\n        raise AssertionError('missing Node.js did not fail')`);
 });
 
+test('safe writer rejects a source change after rendering without replacing it', t => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'csv-concurrent-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const file = path.join(dir, 'records.csv');
+  fs.writeFileSync(file, 'id,body\nR1,original\n');
+  python(`import hashlib, sys\nfrom pathlib import Path\nfrom unittest.mock import patch\nfrom csv_safe_write import write_archive_csv\np = Path(sys.argv[1])\nsource_sha256 = hashlib.sha256(p.read_bytes()).hexdigest().encode('ascii')\ndef render_then_change(*_args, **_kwargs):\n    p.write_bytes(b'id,body\\nR1,concurrent edit\\n')\n    return source_sha256 + b'\\n' + b'id,body\\nR1,planned edit\\n'\nwith patch('csv_safe_write._archive_csv_bridge', side_effect=render_then_change):\n    try:\n        write_archive_csv(p, ['id', 'body'], [{'id': 'R1', 'body': 'planned edit'}])\n    except RuntimeError as error:\n        assert 'changed during maintenance' in str(error)\n    else:\n        raise AssertionError('concurrent change did not fail')`, [file]);
+  assert.equal(fs.readFileSync(file, 'utf8'), 'id,body\nR1,concurrent edit\n');
+  assert.equal(fs.existsSync(`${file}.bak`), false);
+});
+
 test('Python reader agrees with the exporter on current source IDs without writing', () => {
   const ids = JSON.parse(python(`import json, sys\nfrom csv_safe_write import read_archive_csv\n_, rows = read_archive_csv(sys.argv[1])\nprint(json.dumps([row['id'] for row in rows]))`, [path.resolve('data/archive_records-public.csv')]));
   const expected = parse(fs.readFileSync('data/archive_records-public.csv', 'utf8'), { columns: true, skip_empty_lines: true }).map(row => row.id);

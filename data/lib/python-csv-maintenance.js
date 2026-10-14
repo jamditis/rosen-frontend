@@ -1,4 +1,5 @@
 /** CSV bridge for Python maintenance: use the exporter's parser and retain raw rows. */
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
@@ -61,7 +62,8 @@ function main() {
     throw new Error('Expected read or render operation');
   }
 
-  const original = fs.readFileSync(filename, 'utf8');
+  const originalBytes = fs.readFileSync(filename);
+  const original = originalBytes.toString('utf8');
   const bom = original.startsWith('\ufeff') ? '\ufeff' : '';
   const source = original.slice(bom.length);
   const rows = parse(source, { columns: true, skip_empty_lines: true });
@@ -77,6 +79,7 @@ function main() {
 
   const file = loadEditableCsv(source, rows, columns);
   const [expectedColumns, expectedRows] = JSON.parse(fs.readFileSync(0, 'utf8'));
+  process.stdout.write(`${crypto.createHash('sha256').update(originalBytes).digest('hex')}\n`);
   process.stdout.write(bom + renderExpected(file, expectedColumns, expectedRows));
 }
 

@@ -105,6 +105,27 @@ test('derived ID guard retains curated and reviewed generated thread containers'
   assertDerivedIds(fixture());
 });
 
+test('derived ID guard accepts future source-backed threads after registry review', () => {
+  const input = fixture();
+  const id = 'THREAD-00012';
+  const posts = ['B5', 'B6', 'B7'];
+  input.social.push(...posts.map(postId => ({ id: postId })));
+  input.full.push({
+    id,
+    type: 'social',
+    thread_data: {
+      thread_id: posts[0],
+      posts: posts.map(postId => ({ id: postId })),
+    },
+  });
+  input.core.push({ id });
+  input.details[id] = {};
+
+  assert.throws(() => assertDerivedIds(input), /not source-backed or in generatedPublishedRecordIds/);
+  input.reviewedGeneratedIds.push(id);
+  assertDerivedIds(input);
+});
+
 test('derived ID guard rejects stale source, runtime, registry, and index states', () => {
   const mutations = [
     input => input.curated.push({ ...input.curated[0], id: 'R2' }),
@@ -153,7 +174,6 @@ test('committed artifacts match source IDs and the reviewed generated registry',
   const generatedThreadIds = reviewedGeneratedIds.filter(id => id.startsWith('THREAD-'));
   const publishedThreadIds = full.filter(record => record.id.startsWith('THREAD-')).map(record => record.id);
   assertIdSet(publishedThreadIds, [...curatedThreadIds, ...generatedThreadIds], 'published THREAD registry');
-  assert.equal(publishedThreadIds.length, 19, 'expected the 19 reviewed source-supported threads');
 
   const guids = xml => [...xml.matchAll(/<guid\b[^>]*>([^<]*)<\/guid>/g)].map(match => match[1]);
   for (const [name, expected] of Object.entries(
