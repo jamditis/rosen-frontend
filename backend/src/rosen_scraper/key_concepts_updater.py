@@ -322,13 +322,28 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
     notes_index = columns["notes"]
     changes_index = columns["colQ_changes"]
     receipt_header_exists = TASK_RECEIPT_COLUMN in columns
+
+    def populated_width(row: list[str]) -> int:
+        width = 0
+        for index, value in enumerate(row):
+            if str(value).strip():
+                width = index + 1
+        return width
+
+    data_rows = [
+        (row_number, row)
+        for row_number, row in enumerate(rows[1:], 2)
+        if populated_width(row)
+    ]
     receipt_index = (
-        columns[TASK_RECEIPT_COLUMN] if receipt_header_exists else len(headers)
+        columns[TASK_RECEIPT_COLUMN]
+        if receipt_header_exists
+        else max(populated_width(row) for row in rows)
     )
     taxonomy = schema['taxonomy']['key_concepts']
 
     seen_ids: set[str] = set()
-    for row_number, row in enumerate(rows[1:], 2):
+    for row_number, row in data_rows:
         record_id = row[id_index].strip() if len(row) > id_index else ""
         if not record_id:
             raise ValueError(f"Master sheet row {row_number} is missing stable id")
@@ -339,7 +354,7 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
         seen_ids.add(record_id)
 
     selected = []
-    for row_number, row in enumerate(rows[1:], 2):
+    for row_number, row in data_rows:
         record_id = row[id_index].strip()
         raw_text = row[raw_text_index] if len(row) > raw_text_index else ""
         concepts = (
@@ -369,6 +384,17 @@ def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
             selected.append((row_number, row))
     if limit:
         selected = selected[:limit]
+
+    if selected and not dry_run:
+        target_column_count = receipt_index + 1
+        try:
+            current_column_count = int(worksheet.col_count)
+            if current_column_count < target_column_count:
+                worksheet.add_cols(target_column_count - current_column_count)
+        except Exception as exc:
+            raise SheetWriteError(
+                f"Could not grow the Sheet grid for {TASK_RECEIPT_COLUMN}: {exc}"
+            ) from exc
 
     print(f"\n[*] Available Key Concepts: {len(taxonomy)}")
     for concept in taxonomy:

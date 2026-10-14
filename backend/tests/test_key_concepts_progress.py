@@ -40,13 +40,23 @@ def _column_number(cell: str) -> int:
 
 
 class _Worksheet:
-    def __init__(self, values, *, fail_batch=False):
+    def __init__(self, values, *, col_count=None, fail_batch=False,
+                 fail_growth=False):
         self.values = copy.deepcopy(values)
+        self.col_count = col_count or max(map(len, values), default=0)
         self.fail_batch = fail_batch
+        self.fail_growth = fail_growth
+        self.add_cols_calls = []
         self.batch_updates = []
 
     def get_all_values(self):
         return copy.deepcopy(self.values)
+
+    def add_cols(self, columns):
+        self.add_cols_calls.append(columns)
+        if self.fail_growth:
+            raise RuntimeError("grid growth failed")
+        self.col_count += columns
 
     def batch_update(self, data, raw=True):
         if self.fail_batch:
@@ -58,6 +68,7 @@ class _Worksheet:
             assert match, f"test fake only accepts single-cell ranges: {cell}"
             row = int(match.group(1))
             column = _column_number(cell)
+            assert column <= self.col_count, "write exceeds worksheet grid"
             while len(next_values) < row:
                 next_values.append([])
             while len(next_values[row - 1]) < column:
@@ -124,6 +135,7 @@ def test_small_live_runs_resume_by_receipt_after_process_restart():
     assert receipt["taskVersion"] == progress.KEY_CONCEPT_TASK_VERSION
     assert receipt["expectedConceptsHash"] == progress._sha256_text("Mindcasting")
     assert worksheet.values[1][2] == "Mindcasting"
+    assert worksheet.add_cols_calls == [1]
     assert len(worksheet.batch_updates) == 1
     assert {update["range"] for update in worksheet.batch_updates[0]} == {
         "C2", "F1", "F2",
@@ -135,6 +147,10 @@ def test_small_live_runs_resume_by_receipt_after_process_restart():
     assert len(restarted_model.prompts) == 1
     assert "b" * 200 in restarted_model.prompts[0]
 
+    complete = _run(worksheet, _Model())
+    assert complete["processed"] == 0
+    assert worksheet.add_cols_calls == [1]
+
 
 def test_dry_run_does_not_create_header_or_receipt():
     worksheet = _Worksheet([
@@ -145,12 +161,69 @@ def test_dry_run_does_not_create_header_or_receipt():
     preview = _run(worksheet, _Model(), dry_run=True)
     assert preview["processed"] == 1
     assert worksheet.batch_updates == []
+    assert worksheet.add_cols_calls == []
     assert worksheet.values[0] == _header(receipt=False)
 
     live_model = _Model()
     _run(worksheet, live_model)
     assert len(live_model.prompts) == 1
     assert worksheet.values[0][-1] == progress.TASK_RECEIPT_COLUMN
+
+
+def test_fresh_receipt_column_preserves_unlabeled_data_and_grows_full_grid():
+    worksheet = _Worksheet([
+        _header(receipt=False),
+        _row("RECORD-00001", "a")[:-1] + ["curator-private"],
+    ], col_count=6)
+
+    _run(worksheet, _Model())
+
+    assert worksheet.add_cols_calls == [1]
+    assert worksheet.col_count == 7
+    assert worksheet.values[1][5] == "curator-private"
+    assert worksheet.values[0][6] == progress.TASK_RECEIPT_COLUMN
+    assert {update["range"] for update in worksheet.batch_updates[0]} == {
+        "C2", "G1", "G2",
+    }
+
+
+def test_grid_growth_failure_stops_before_model_call():
+    worksheet = _Worksheet([
+        _header(receipt=False),
+        _row("RECORD-00001", "a")[:-1],
+    ], col_count=5, fail_growth=True)
+    model = _Model()
+
+    with pytest.raises(kc.SheetWriteError, match="grid.*grid growth failed"):
+        _run(worksheet, model)
+
+    assert model.prompts == []
+    assert worksheet.batch_updates == []
+    assert worksheet.values[0] == _header(receipt=False)
+
+
+def test_empty_spacer_rows_are_ignored_but_nonempty_rows_require_ids():
+    worksheet = _Worksheet([
+        _header(receipt=False),
+        _row("RECORD-00001", "a")[:-1],
+        ["", "", "", "", ""],
+        _row("RECORD-00002", "b")[:-1],
+    ])
+    model = _Model()
+
+    summary = _run(worksheet, model, limit=2)
+
+    assert summary["processed"] == 2
+    assert len(model.prompts) == 2
+
+    missing_id = _Worksheet([
+        _header(receipt=False),
+        ["", "nonempty source", "", "", ""],
+    ])
+    missing_id_model = _Model()
+    with pytest.raises(ValueError, match="row 2.*missing stable id"):
+        _run(missing_id, missing_id_model)
+    assert missing_id_model.prompts == []
 
 
 def test_curator_concept_edit_invalidates_matching_source_receipt():
@@ -317,19 +390,30 @@ def test_manual_cursor_mode_remains_available(monkeypatch):
     assert worksheet.batch_updates == []
 
 
-def test_task_key_matches_independent_canonical_fixture():
+@pytest.mark.parametrize((
+    "record_id", "raw_text", "current_concepts", "taxonomy", "force",
+    "expected_input_hash", "expected_task_key",
+), [
+    (
+        "RECORD-00001", "source text", "Mindcasting",
+        ["Mindcasting", "False balance"], False,
+        "502b56d028e67cf952171dc098201e27b004e5d858854621fa2e6848549fc4ed",
+        "9ad57290e1fe09a601058a3d9149c2f955b49b1de55d8637af68c9fd121e1675",
+    ),
+    (
+        "BSKY-90001", "“Press” 🗞️ 𐐀", "Mindcasting 🧠",
+        ["Mindcasting", "視点 📰"], True,
+        "fcc2822b130bcdae008e025fd149228f45991b4cbaa145a812cc04b5b592ea95",
+        "1e9a88b958de7a71b9c881443aecf1d686281df0821c4856360da867ba8bfe5b",
+    ),
+])
+def test_task_key_matches_independent_canonical_fixtures(
+    record_id, raw_text, current_concepts, taxonomy, force,
+    expected_input_hash, expected_task_key,
+):
     task = progress.key_concept_task(
-        "RECORD-00001",
-        "source text",
-        "Mindcasting",
-        ["Mindcasting", "False balance"],
-        False,
+        record_id, raw_text, current_concepts, taxonomy, force,
     )
 
-    assert task.input_hash == (
-        "502b56d028e67cf952171dc098201e27b004e5d858854621fa2e6848549fc4ed"
-    )
-    assert task.task_key == (
-        "urn:rosen-stewardship:task:"
-        "9ad57290e1fe09a601058a3d9149c2f955b49b1de55d8637af68c9fd121e1675"
-    )
+    assert task.input_hash == expected_input_hash
+    assert task.task_key == "urn:rosen-stewardship:task:" + expected_task_key
