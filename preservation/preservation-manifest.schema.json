@@ -16,7 +16,10 @@
   ],
   "properties": {
     "schemaVersion": {
-      "const": "1.0.0"
+      "enum": [
+        "1.0.0",
+        "1.1.0"
+      ]
     },
     "vocabularyVersion": {
       "const": "1.0.0"
@@ -33,6 +36,12 @@
     "description": {
       "type": "string",
       "minLength": 1
+    },
+    "fieldMappings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/fieldMappingDefinition"
+      }
     },
     "objects": {
       "type": "array",
@@ -554,13 +563,33 @@
         }
       }
     },
+    "fieldMappingDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fieldMappingId",
+        "fields"
+      ],
+      "properties": {
+        "fieldMappingId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@+-]*$"
+        },
+        "fields": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "normalizationEvidence": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "sourceLocator",
         "observations",
-        "fieldMapping",
         "normalizedObjectSha256"
       ],
       "properties": {
@@ -582,6 +611,13 @@
             "type": "string"
           }
         },
+        "fieldMappingId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@+-]*$"
+        },
+        "rawSourceSha256": {
+          "$ref": "#/$defs/sha256"
+        },
         "normalizedObjectSha256": {
           "$ref": "#/$defs/sha256"
         },
@@ -596,7 +632,15 @@
         "runtimeNetworkAccess": {
           "type": "boolean"
         }
-      }
+      },
+      "oneOf": [
+        {
+          "required": ["fieldMapping"]
+        },
+        {
+          "required": ["fieldMappingId"]
+        }
+      ]
     },
     "preservationEvent": {
       "type": "object",
@@ -647,6 +691,9 @@
           "$ref": "#/$defs/review"
         },
         "supersedesEventId": {
+          "$ref": "#/$defs/eventId"
+        },
+        "captureEventId": {
           "$ref": "#/$defs/eventId"
         },
         "retrieval": {
@@ -824,6 +871,9 @@
           "$ref": "#/$defs/objectId"
         },
         "captureEventId": {
+          "$ref": "#/$defs/eventId"
+        },
+        "creationEventId": {
           "$ref": "#/$defs/eventId"
         },
         "artifactType": {

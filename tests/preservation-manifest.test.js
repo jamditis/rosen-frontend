@@ -36,6 +36,18 @@ function example(name) {
   return JSON.parse(fs.readFileSync(path.join(examplesDir, `${name}.json`), 'utf8'));
 }
 
+function useSchema11(manifest) {
+  manifest.schemaVersion = '1.1.0';
+  for (const artifact of manifest.artifacts) {
+    const creation = manifest.events.find(event => (
+      event.eventType === 'artifact-created'
+      && event.artifactId === artifact.artifactId
+    ));
+    if (creation) artifact.creationEventId = creation.eventId;
+  }
+  return manifest;
+}
+
 function rejectsManifest(manifest, ...messageParts) {
   assert.throws(
     () => validatePreservationManifest(manifest),
@@ -85,6 +97,126 @@ describe('preservation manifest schema (#701)', () => {
     const withoutReviewState = clone(manifest);
     delete withoutReviewState.events[0].review.state;
     rejectsManifest(withoutReviewState, 'state', 'required');
+  });
+
+  it('keeps schema 1.0 manifests valid while reserving new provenance fields for schema 1.1', () => {
+    const legacy = example('successful-capture');
+    assert.equal(validatePreservationManifest(legacy), legacy);
+
+    const registryOnLegacy = example('bot-wall');
+    registryOnLegacy.fieldMappings = [{
+      fieldMappingId: 'fixture-v1',
+      fields: { title: 'observations.title' },
+    }];
+    rejectsManifest(registryOnLegacy, 'fieldMappings', 'schemaVersion 1.1.0');
+
+    const creationLinkOnLegacy = example('successful-capture');
+    creationLinkOnLegacy.artifacts[0].creationEventId = creationLinkOnLegacy.events.find(
+      event => event.eventType === 'artifact-created',
+    ).eventId;
+    rejectsManifest(creationLinkOnLegacy, 'creationEventId', 'schemaVersion 1.1.0');
+  });
+
+  it('resolves schema 1.1 field mappings and rejects missing registry references', () => {
+    const manifest = useSchema11(example('successful-capture'));
+    manifest.fieldMappings = [{
+      fieldMappingId: 'fixture-v1',
+      fields: { title: 'observations.title' },
+    }];
+    const creation = manifest.events.find(event => event.eventType === 'artifact-created');
+    creation.normalizationEvidence = {
+      sourceLocator: 'fixture.json#record-1',
+      observations: { title: 'Example successful capture' },
+      fieldMappingId: 'fixture-v1',
+      rawSourceSha256: 'a'.repeat(64),
+      normalizedObjectSha256: 'b'.repeat(64),
+      recordSource: 'fixture.json',
+      runtimeNetworkAccess: false,
+    };
+    assert.equal(validatePreservationManifest(manifest), manifest);
+
+    const missing = clone(manifest);
+    missing.events.find(event => event.eventType === 'artifact-created')
+      .normalizationEvidence.fieldMappingId = 'missing-v1';
+    rejectsManifest(missing, 'fieldMappingId', 'missing-v1', 'missing field mapping');
+
+    const duplicate = clone(manifest);
+    duplicate.fieldMappings.push(clone(duplicate.fieldMappings[0]));
+    rejectsManifest(duplicate, 'duplicate', 'fieldMappingId', 'fixture-v1');
+  });
+
+  it('links later validation events to an earlier capture of the same object', () => {
+    const manifest = useSchema11(example('successful-capture'));
+    const artifact = manifest.artifacts[0];
+    const fixity = manifest.events.find(event => event.eventType === 'fixity-check');
+    fixity.captureEventId = artifact.captureEventId;
+    assert.equal(validatePreservationManifest(manifest), manifest);
+
+    const missing = clone(manifest);
+    missing.events.find(event => event.eventType === 'fixity-check').captureEventId =
+      'urn:rosen-preservation:event:missing-capture';
+    rejectsManifest(missing, 'captureEventId', 'missing-capture', 'missing');
+
+    const wrongType = clone(manifest);
+    wrongType.events.find(event => event.eventType === 'fixity-check').captureEventId =
+      artifact.creationEventId;
+    rejectsManifest(wrongType, 'captureEventId', 'capture-attempt', 'same object');
+
+    const crossObject = clone(manifest);
+    const otherObject = clone(crossObject.objects[0]);
+    otherObject.objectId = 'urn:rosen:object:archive-record:RECORD-OTHER';
+    otherObject.sourceRecordId = 'RECORD-OTHER';
+    crossObject.objects.push(otherObject);
+    const otherCapture = crossObject.events.find(event => (
+      event.eventType === 'capture-attempt'
+      && event.eventId !== crossObject.artifacts[0].captureEventId
+    ));
+    otherCapture.objectId = otherObject.objectId;
+    crossObject.events.find(event => event.eventType === 'fixity-check').captureEventId =
+      otherCapture.eventId;
+    rejectsManifest(crossObject, 'captureEventId', 'same object');
+
+    const forwardReference = clone(manifest);
+    const linkedFixity = forwardReference.events.find(event => event.eventType === 'fixity-check');
+    forwardReference.events = [
+      linkedFixity,
+      ...forwardReference.events.filter(event => event.eventId !== linkedFixity.eventId),
+    ];
+    rejectsManifest(forwardReference, 'captureEventId', 'earlier event');
+
+    const impossibleChronology = clone(manifest);
+    impossibleChronology.events.find(event => event.eventType === 'fixity-check').occurredAt =
+      '2026-08-01T14:20:30.000Z';
+    rejectsManifest(impossibleChronology, 'cannot occur before', 'captureEventId');
+
+    const notRequested = clone(manifest);
+    const linkedCapture = notRequested.events.find(event => (
+      event.eventId === notRequested.artifacts[0].captureEventId
+    ));
+    Object.assign(linkedCapture.retrieval, {
+      httpStatus: null,
+      httpOutcome: 'not-requested',
+      mediaType: null,
+      bytesReceived: 0,
+      semanticOutcome: 'uncertain',
+    });
+    for (const field of ['observedSourceUrl', 'retrievedAt', 'finalUrl', 'redirectChain']) {
+      delete linkedCapture.retrieval[field];
+    }
+    rejectsManifest(notRequested, 'not-requested', 'capture provenance');
+  });
+
+  it('binds a schema 1.1 artifact creation back-reference to its current creation event', () => {
+    const manifest = useSchema11(example('successful-capture'));
+    assert.equal(validatePreservationManifest(manifest), manifest);
+
+    const missingLink = clone(manifest);
+    delete missingLink.artifacts[0].creationEventId;
+    rejectsManifest(missingLink, 'creationEventId', 'current artifact-created');
+
+    const wrongType = clone(manifest);
+    wrongType.artifacts[0].creationEventId = wrongType.artifacts[0].captureEventId;
+    rejectsManifest(wrongType, 'creationEventId', 'artifact-created', 'same artifact');
   });
 
   it('rejects unstable identifiers, malformed digests, and unknown vocabulary', () => {

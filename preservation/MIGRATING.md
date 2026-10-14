@@ -20,8 +20,10 @@ different purposes.
 - A vocabulary major version changes or removes the meaning of an existing
   event or state and requires a migration plan.
 
-Version 1.0.0 deliberately uses `const` values in the schema. A producer must
-not emit a different version while claiming validation against the v1 schema.
+The v1 schema accepts 1.0.0 and 1.1.0 manifests. Version 1.1.0 adds optional
+shared field mappings, explicit generated-artifact creation links, later-event
+links to earlier captures, and raw-source digests. The validator keeps the 1.0
+shape strict: a 1.0 producer must not emit 1.1-only fields.
 
 ## Compatible and incompatible changes
 
@@ -79,14 +81,15 @@ path. Because the source artifact does not record a storage URI, the migrated
 artifact has no named storage copies. A later storage-copy event can add that
 fact append-only.
 
-## Social baseline v1 import
+## Social baseline v1.1 import
 
 `import-social-baseline.mjs` is not a migration of an existing preservation
 artifact; it is the first packaging of the pre-schema `data/social_posts.csv`
 rows into schema v1. Every object, event, and artifact ID derives from the
-row's own stable archive record ID (`BSKY-*`, `TWTR-*`, `MAST-*`) and a SHA-256
-digest of the row, never from a local path or run order, so re-running the
-importer against an unchanged CSV reproduces the same IDs.
+row's own stable archive record ID (`BSKY-*`, `TWTR-*`, `MAST-*`) and SHA-256
+digests of its deterministic representations, never from a local path or run
+order, so re-running the importer against an unchanged CSV reproduces the same
+IDs.
 
 Run the check:
 
@@ -94,12 +97,15 @@ Run the check:
 node preservation/import-social-baseline.mjs --verify
 ```
 
-Because this baseline makes no live retrieval, every event uses the schema's
-`not-requested` retrieval outcome (or, for a row with no recoverable canonical
-URL, an `artifact-created` event alone) rather than claiming a capture that did
-not happen. A later stage that performs a real capture, fixity check, storage
-copy, or rights decision appends new events on top of this baseline; it does
-not edit or replace the baseline events.
+Because this baseline makes no live retrieval, every event is
+`artifact-created` rather than a capture attempt. The artifact points to that
+event with `creationEventId`. The importer separately hashes canonical JSON for
+the parsed source fields, the normalized object, and the generated metadata
+artifact. The parsed-source digest does not claim exact CSV source-byte fixity.
+A later stage that performs a real capture, fixity check, storage copy, or
+rights decision appends new events on top of this baseline; it does not edit or
+replace the baseline events. Such later events can use schema 1.1
+`captureEventId` to point to the earlier real capture they validate or enrich.
 
 ## Recovery and rollback
 
