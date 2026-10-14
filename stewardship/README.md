@@ -24,7 +24,9 @@ references. It does not reverse an earlier publication.
 Approval eligibility and release eligibility are separate pure checks. Both
 compare the proposal input hash with a current hash supplied by the caller.
 Only a proposed item is approval eligible. Only an accepted item is release
-eligible.
+eligible. A linked successor also needs the original proposal's matching
+supersession decision before it can be approved. The projection records this
+as `supersessionReady`; the checks do not infer it from the successor link alone.
 
 This slice reads no network source, calls no model, writes no canonical CSV,
 and publishes nothing. It provides no durable adapter, append operation,

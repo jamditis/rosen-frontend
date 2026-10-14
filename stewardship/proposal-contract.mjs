@@ -429,7 +429,7 @@ function finalizeSuccessors(entries, source) {
   }
 }
 
-function publicEntry(entry) {
+function publicEntry(entry, entries) {
   const output = {
     proposal: entry.proposal,
     proposalHash: proposalHash(entry.proposal),
@@ -439,6 +439,11 @@ function publicEntry(entry) {
     decisionHistory: entry.decisionHistory,
     publicationRefs: entry.publicationRefs
   };
+  if (entry.proposal.supersedesProposalId !== undefined) {
+    const original = entries.get(entry.proposal.supersedesProposalId);
+    output.supersessionReady = original.status === 'superseded'
+      && original.successorProposalId === entry.proposal.proposalId;
+  }
   for (const field of [
     'successorProposalId',
     'suppressedByProposalId',
@@ -509,7 +514,7 @@ export function replayDecisions(
   finalizeSuccessors(entries, proposalSource);
 
   const ordered = [...entries.values()]
-    .map(publicEntry)
+    .map(entry => publicEntry(entry, entries))
     .sort((left, right) => left.proposal.proposalId.localeCompare(right.proposal.proposalId));
   const result = {
     schemaVersion: '1.0.0',
@@ -527,6 +532,9 @@ function eligibility(entry, currentInputHash, requiredStatus) {
   }
   const reasons = [];
   if (entry.status !== requiredStatus) reasons.push(`status is ${entry.status}`);
+  if (entry.proposal.supersedesProposalId !== undefined && entry.supersessionReady !== true) {
+    reasons.push('supersession is pending');
+  }
   if (entry.proposal.relevantInputHash !== currentInputHash) reasons.push('relevant input changed');
   return deepFreeze({ eligible: reasons.length === 0, reasons });
 }

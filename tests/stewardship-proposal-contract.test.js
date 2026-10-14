@@ -198,6 +198,25 @@ describe('stewardship decision replay', () => {
     );
   });
 
+  it('blocks successor approval until its original has a matching supersession', () => {
+    const sample = fixture('linked-replacement.json');
+    const successorId = sample.proposals[1].proposalId;
+    const rejected = replayDecisions(sample.proposals, sample.decisions.slice(0, 1));
+    const pending = entryFor(rejected, successorId);
+    assert.deepEqual(approvalEligibility(pending, pending.proposal.relevantInputHash), {
+      eligible: false,
+      reasons: ['supersession is pending'],
+    });
+
+    const superseded = replayDecisions(sample.proposals, sample.decisions.slice(0, 2));
+    const ready = entryFor(superseded, successorId);
+    assert.deepEqual(approvalEligibility(ready, ready.proposal.relevantInputHash), {
+      eligible: true,
+      reasons: [],
+    });
+    assert.equal(replayDecisions(sample.proposals, sample.decisions).accepted.length, 1);
+  });
+
   it('allows a changed linked successor and retains the rejection history', () => {
     const sample = fixture('linked-replacement.json');
     const projection = replayDecisions(sample.proposals, sample.decisions);
