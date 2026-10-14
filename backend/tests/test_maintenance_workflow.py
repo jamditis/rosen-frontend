@@ -111,6 +111,15 @@ def test_workflow_passes_configurable_master_tab(wf):
     assert env["ROSEN_MASTER_SHEET_TAB"] == "${{ vars.ROSEN_MASTER_SHEET_TAB }}"
 
 
+def test_key_concepts_uses_durable_sheet_receipts(wf):
+    run = _run_step(wf)["run"]
+    command = next(
+        line.strip() for line in run.splitlines()
+        if "rosen_scraper.key_concepts_updater" in line
+    )
+    assert "--durable-progress" in command
+
+
 def test_referenced_scripts_exist(wf):
     step = _run_step(wf)
     run = step["run"]

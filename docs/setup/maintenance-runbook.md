@@ -101,23 +101,34 @@ PR's own CI.
 
 ---
 
-## Known limitation: progress state in CI
+## Durable key-concept progress
 
-CI runners are ephemeral, so a job's progress file does not survive between
-runs. What that means per job:
+The `key_concepts` Action stores a task receipt beside each source row in the
+master sheet. The first live eligible write adds the
+`key_concepts_task_receipt` header. It writes that header, the row output, and
+the receipt in one Google Sheets batch request. [Google Sheets applies all
+updates in a request atomically](https://developers.google.com/workspace/sheets/api/limits),
+so a failed request cannot leave an output without its receipt. A dry run logs
+the same task keys but does not add the header or write a receipt.
+
+Each receipt binds the stable record ID, source text, current curator-assigned
+concepts, ordered taxonomy, force mode, rule version, model version, and task
+version. It also records the concept state expected after the write. An
+unchanged receipt skips the row before a model call. A source, curator input,
+taxonomy, rule, or model change makes the row eligible again. Malformed
+receipts and missing or duplicate record IDs stop the run before a model call.
+
+The local `key_concepts_progress.json` cursor remains available for attended
+commands that omit `--durable-progress`. It is not imported as a receipt
+because a row number does not prove a stable record identity or a completed
+Sheet write.
+
+Progress behavior for the other jobs is unchanged:
 
 - **`dedup`** is deterministic and idempotent. Its limit counts rows that need
   changes, not the clean rows it scans. Repeated applied runs therefore advance
   through the sheet, and the normalized sheet cells are the durable completion
   state. Use `0` (no cap) when you want one full pass; it makes no AI calls.
-- **`key_concepts`** has no persistent cursor in CI, so each run starts from the
-  top of the sheet. With a small `limit` it keeps re-touching the first rows. It
-  skips filling rows that already have concepts, but it still spends a Gemini
-  "review" call on them. For the long backlog grind, use the **Codespaces track**
-  below, where the progress file persists across a session.
-
-This is a v1 limitation, not a bug. Sheet-resident progress (or committed/cached
-progress state) is a planned follow-up.
 
 ### Legacy entity-mention pass
 
@@ -134,8 +145,8 @@ schema by invoking the script directly with
 
 ## Codespaces track (interactive + break-glass)
 
-For the entity-extraction Ralph Loop, hand-tuned passes, the long `key_concepts`
-grind, or pushing data by hand when an Action is broken:
+For the entity-extraction Ralph Loop, hand-tuned passes, or pushing data by
+hand when an Action is broken:
 
 1. On the repo, **Code -> Codespaces -> Create codespace on main**. The
    devcontainer pins Node 22 + Poetry + Playwright Chromium and installs deps on
@@ -149,8 +160,9 @@ grind, or pushing data by hand when an Action is broken:
    poetry -C backend run python -m rosen_scraper.key_concepts_updater --limit 100 --dry-run
    poetry -C backend run python scripts/diagnostics/data_deduper.py --limit 0 --dry-run
    ```
-   Drop `--dry-run` to apply. The Codespace's disk keeps `key_concepts_progress.json`
-   across the session, so a `key_concepts` grind resumes where it left off.
+   Drop `--dry-run` to apply. Add `--durable-progress` to use the same Sheet
+   receipts as the Action. Without that flag, the Codespace keeps the legacy
+   `key_concepts_progress.json` cursor for manual compatibility.
 
 The free Codespaces tier (~60-120 core-hours/month) covers this volume, and the
 Codespace transfers to Jay/Hali with the repo.
@@ -171,6 +183,5 @@ Prefer the Codespace.
 - `backfill_raw_text` / `backfill_dates` jobs added to the picker.
 - Headless entity extraction via `claude -p` / `gemini -p` so the backlog grinds
   down unattended in CI.
-- Sheet-resident or cached progress state so `key_concepts` resumes in CI.
 
 These are tracked in the design doc's "Pieces to build" table (pieces 5-6).

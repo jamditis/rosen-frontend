@@ -34,8 +34,8 @@ Usage:
     python src/key_concepts_updater.py --force-reprocess
 
 Progress Tracking:
-    Progress is saved to 'key_concepts_progress.json' after each batch.
-    The script automatically resumes from where it left off on the next run.
+    Manual mode saves 'key_concepts_progress.json' after each batch.
+    --durable-progress stores source-bound completion receipts in the Sheet.
 """
 
 import os
@@ -52,6 +52,15 @@ from gspread.utils import rowcol_to_a1
 
 from rosen_scraper.gemini_json import strip_gemini_fence
 from rosen_scraper.sheets_client import get_gspread_client
+from rosen_scraper.key_concepts_progress import (
+    KEY_CONCEPT_MODEL_VERSION,
+    KEY_CONCEPT_RULE_VERSION,
+    TASK_RECEIPT_COLUMN,
+    ProgressReceiptError,
+    encode_receipt,
+    key_concept_task,
+    receipt_matches,
+)
 
 # Load environment variables
 load_dotenv()
@@ -122,7 +131,7 @@ def setup_gemini() -> genai.GenerativeModel:
     genai.configure(api_key=api_key)
 
     # Use Gemini 2.0 Flash Lite model
-    model = genai.GenerativeModel('gemini-2.0-flash-lite')
+    model = genai.GenerativeModel(KEY_CONCEPT_MODEL_VERSION)
     return model
 
 
@@ -270,10 +279,256 @@ Return format (JSON object):
         raise
 
 
+def _process_rows_durable(spreadsheet: gspread.Spreadsheet,
+                          model: genai.GenerativeModel, schema: Dict,
+                          *, limit: Optional[int], force_reprocess: bool,
+                          dry_run: bool) -> Dict:
+    """Process source-bound tasks and atomically store each Sheet receipt."""
+    sheet_name = os.getenv("ROSEN_MASTER_SHEET_TAB") or DEFAULT_SHEET_NAME
+    worksheet = spreadsheet.worksheet(sheet_name)
+    rows = worksheet.get_all_values()
+    writes_by_field = {
+        'key_concepts': 0,
+        'recommendations': 0,
+        'notes': 0,
+        'progress_receipt': 0,
+    }
+    if len(rows) < 2:
+        print("No data rows found in sheet")
+        return {'processed': 0, 'writes': 0, 'gemini_calls': 0,
+                'dry_run': dry_run, 'by_field': writes_by_field}
+
+    headers = [str(name).strip() for name in rows[0]]
+    required = ("id", "raw_text", "key_concepts", "notes", "colQ_changes")
+    duplicate_columns = [name for name in required if headers.count(name) > 1]
+    if headers.count(TASK_RECEIPT_COLUMN) > 1:
+        duplicate_columns.append(TASK_RECEIPT_COLUMN)
+    if duplicate_columns:
+        raise ValueError(
+            "Master sheet has duplicate required column(s): "
+            + ", ".join(duplicate_columns)
+        )
+    missing_columns = [name for name in required if name not in headers]
+    if missing_columns:
+        raise ValueError(
+            "Master sheet is missing required column(s): "
+            + ", ".join(missing_columns)
+        )
+
+    columns = {name: index for index, name in enumerate(headers)}
+    id_index = columns["id"]
+    raw_text_index = columns["raw_text"]
+    key_concepts_index = columns["key_concepts"]
+    notes_index = columns["notes"]
+    changes_index = columns["colQ_changes"]
+    receipt_header_exists = TASK_RECEIPT_COLUMN in columns
+    receipt_index = (
+        columns[TASK_RECEIPT_COLUMN] if receipt_header_exists else len(headers)
+    )
+    taxonomy = schema['taxonomy']['key_concepts']
+
+    seen_ids: set[str] = set()
+    for row_number, row in enumerate(rows[1:], 2):
+        record_id = row[id_index].strip() if len(row) > id_index else ""
+        if not record_id:
+            raise ValueError(f"Master sheet row {row_number} is missing stable id")
+        if record_id in seen_ids:
+            raise ValueError(
+                f"Master sheet row {row_number} has duplicate stable id {record_id}"
+            )
+        seen_ids.add(record_id)
+
+    selected = []
+    for row_number, row in enumerate(rows[1:], 2):
+        record_id = row[id_index].strip()
+        raw_text = row[raw_text_index] if len(row) > raw_text_index else ""
+        concepts = (
+            row[key_concepts_index] if len(row) > key_concepts_index else ""
+        )
+        encoded_receipt = (
+            row[receipt_index]
+            if receipt_header_exists and len(row) > receipt_index else ""
+        )
+        try:
+            complete = receipt_matches(
+                encoded_receipt,
+                record_id=record_id,
+                raw_text=raw_text,
+                current_concepts=concepts,
+                taxonomy=taxonomy,
+                force_reprocess=force_reprocess,
+                rule_version=KEY_CONCEPT_RULE_VERSION,
+                model_version=KEY_CONCEPT_MODEL_VERSION,
+            )
+        except ProgressReceiptError as exc:
+            raise ValueError(
+                f"Master sheet row {row_number} has malformed "
+                f"{TASK_RECEIPT_COLUMN}: {exc}"
+            ) from exc
+        if not complete:
+            selected.append((row_number, row))
+    if limit:
+        selected = selected[:limit]
+
+    print(f"\n[*] Available Key Concepts: {len(taxonomy)}")
+    for concept in taxonomy:
+        print(f"   - {concept}")
+    print(f"\n[*] Processing up to {len(selected)} durable tasks")
+    print(f"[*] Force reprocess: {force_reprocess}")
+    print("=" * 80)
+
+    header_planned = receipt_header_exists
+    updates_made = 0
+    reviewed = 0
+    model_calls = 0
+
+    def address(row_number: int, column_index: int) -> str:
+        return rowcol_to_a1(row_number, column_index + 1)
+
+    def commit(row_number: int, task, expected_concepts: str,
+               pending: list[dict]) -> None:
+        nonlocal header_planned
+        writes = list(pending)
+        if not header_planned:
+            writes.insert(0, {
+                'range': address(1, receipt_index),
+                'values': [[TASK_RECEIPT_COLUMN]],
+                'field': 'progress_receipt',
+            })
+        writes.append({
+            'range': address(row_number, receipt_index),
+            'values': [[encode_receipt(task, expected_concepts)]],
+            'field': 'progress_receipt',
+        })
+        if dry_run:
+            for write in writes:
+                print(f"  [DRY-RUN] would write {write['field']} -> "
+                      f"{write['range']}: {str(write['values'][0][0])[:60]}")
+                writes_by_field[write['field']] += 1
+            header_planned = True
+            return
+        try:
+            worksheet.batch_update([
+                {'range': write['range'], 'values': write['values']}
+                for write in writes
+            ], raw=True)
+        except Exception as exc:
+            raise SheetWriteError(
+                f"Could not atomically write row {row_number} and its "
+                f"progress receipt: {exc}"
+            ) from exc
+        for write in writes:
+            writes_by_field[write['field']] += 1
+        header_planned = True
+
+    def pending_write(pending: list[dict], row_number: int,
+                      column_index: int, value: str, field: str) -> None:
+        pending.append({
+            'range': address(row_number, column_index),
+            'values': [[value]],
+            'field': field,
+        })
+
+    for row_number, row in selected:
+        record_id = row[id_index].strip()
+        raw_text = row[raw_text_index] if len(row) > raw_text_index else ""
+        concepts = row[key_concepts_index] if len(row) > key_concepts_index else ""
+        notes = row[notes_index] if len(row) > notes_index else ""
+        task = key_concept_task(
+            record_id,
+            raw_text,
+            concepts,
+            taxonomy,
+            force_reprocess,
+            rule_version=KEY_CONCEPT_RULE_VERSION,
+            model_version=KEY_CONCEPT_MODEL_VERSION,
+        )
+        print(f"Row {row_number}: task {task.task_key}")
+        pending: list[dict] = []
+        try:
+            if not raw_text or len(raw_text.strip()) < 100:
+                if notes.strip():
+                    print(f"Row {row_number}: [SKIP] No raw text or too short; "
+                          "preserving existing notes")
+                else:
+                    note = "Skipped: No raw text or content too short (< 100 chars)"
+                    pending_write(
+                        pending, row_number, notes_index, note, 'notes'
+                    )
+                commit(row_number, task, concepts, pending)
+                reviewed += 1
+                time.sleep(DELAY_BETWEEN_UPDATES)
+                continue
+
+            model_calls += 1
+            analysis = analyze_key_concepts(
+                model, raw_text, taxonomy, concepts
+            )
+            if concepts and not force_reprocess:
+                recommendation = analysis.get('recommendations', '')
+                if not recommendation or recommendation == "N/A":
+                    recommendation = "N/A"
+                pending_write(
+                    pending,
+                    row_number,
+                    changes_index,
+                    recommendation,
+                    'recommendations',
+                )
+                expected_concepts = concepts
+                reviewed += 1
+            else:
+                identified = analysis.get('concepts', [])
+                expected_concepts = ", ".join(identified) if identified else ""
+                pending_write(
+                    pending,
+                    row_number,
+                    key_concepts_index,
+                    expected_concepts,
+                    'key_concepts',
+                )
+                recommendations = analysis.get('recommendations', '')
+                if recommendations:
+                    pending_write(
+                        pending,
+                        row_number,
+                        changes_index,
+                        recommendations,
+                        'recommendations',
+                    )
+            commit(row_number, task, expected_concepts, pending)
+            updates_made += 1
+            time.sleep(DELAY_BETWEEN_UPDATES)
+        except Exception as exc:
+            print(f"Row {row_number}: [ERROR] {exc}")
+            raise
+
+    total_writes = sum(writes_by_field.values())
+    print("\n" + "=" * 80)
+    print("[*] BATCH COMPLETE" + (
+        " (DRY RUN -- nothing written)" if dry_run else ""
+    ))
+    print("=" * 80)
+    print(f"Rows in this batch: {len(selected)}")
+    print(f"[OK] Key concepts filled/updated: {updates_made}")
+    print(f"[SKIP] Reviewed (had existing concepts): {reviewed}")
+    print(f"Gemini calls: {model_calls}")
+    print(f"Cells {'that would be ' if dry_run else ''}written: {total_writes} "
+          f"({writes_by_field})")
+    print("\n[*] Durable progress: Sheet row receipts")
+    return {
+        'processed': len(selected),
+        'writes': total_writes,
+        'gemini_calls': model_calls,
+        'dry_run': dry_run,
+        'by_field': writes_by_field,
+    }
+
+
 def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
                  schema: Dict, start_row: Optional[int] = None, limit: Optional[int] = None,
                  resume: bool = True, force_reprocess: bool = False,
-                 dry_run: bool = False) -> Dict:
+                 dry_run: bool = False, durable_progress: bool = False) -> Dict:
     """
     Process rows from the configured master sheet and update key concepts.
 
@@ -293,6 +548,15 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
         Callers use ``gemini_calls`` + ``writes`` to enforce the "AI ran but
         wrote nothing" guard.
     """
+    if durable_progress:
+        return _process_rows_durable(
+            spreadsheet,
+            model,
+            schema,
+            limit=limit,
+            force_reprocess=force_reprocess,
+            dry_run=dry_run,
+        )
     sheet_name = os.getenv("ROSEN_MASTER_SHEET_TAB") or DEFAULT_SHEET_NAME
     worksheet = spreadsheet.worksheet(sheet_name)
 
@@ -578,8 +842,20 @@ def main():
         action='store_true',
         help='Rehearse only: log the cells that would be written, write nothing'
     )
+    parser.add_argument(
+        '--durable-progress',
+        action='store_true',
+        help='Use stable task receipts stored atomically in the master sheet'
+    )
 
     args = parser.parse_args()
+    if args.durable_progress and (
+        args.start is not None or args.no_resume or args.reset_progress
+    ):
+        parser.error(
+            '--durable-progress cannot be combined with --start, --no-resume, '
+            'or --reset-progress'
+        )
 
     print("[*] Key Concepts Updater")
     print("=" * 80)
@@ -612,6 +888,7 @@ def main():
         resume=resume,
         force_reprocess=args.force_reprocess,
         dry_run=args.dry_run,
+        durable_progress=args.durable_progress,
     )
 
     print("\n[*] Script complete!")

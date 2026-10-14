@@ -1,0 +1,335 @@
+"""Durable key-concept progress at the Google Sheets write boundary."""
+
+from __future__ import annotations
+
+import copy
+import json
+import re
+
+import pytest
+
+from rosen_scraper import key_concepts_progress as progress
+from rosen_scraper import key_concepts_updater as kc
+
+
+class _Response:
+    def __init__(self, text: str):
+        self.text = text
+
+
+class _Model:
+    def __init__(self, concepts=None, recommendations=""):
+        self.concepts = ["Mindcasting"] if concepts is None else concepts
+        self.recommendations = recommendations
+        self.prompts = []
+
+    def generate_content(self, prompt):
+        self.prompts.append(prompt)
+        return _Response(json.dumps({
+            "concepts": self.concepts,
+            "recommendations": self.recommendations,
+        }))
+
+
+def _column_number(cell: str) -> int:
+    letters = re.fullmatch(r"([A-Z]+)[0-9]+", cell).group(1)
+    result = 0
+    for letter in letters:
+        result = result * 26 + ord(letter) - ord("A") + 1
+    return result
+
+
+class _Worksheet:
+    def __init__(self, values, *, fail_batch=False):
+        self.values = copy.deepcopy(values)
+        self.fail_batch = fail_batch
+        self.batch_updates = []
+
+    def get_all_values(self):
+        return copy.deepcopy(self.values)
+
+    def batch_update(self, data, raw=True):
+        if self.fail_batch:
+            raise RuntimeError("atomic sheet write failed")
+        next_values = copy.deepcopy(self.values)
+        for update in data:
+            cell = update["range"]
+            match = re.fullmatch(r"[A-Z]+([0-9]+)", cell)
+            assert match, f"test fake only accepts single-cell ranges: {cell}"
+            row = int(match.group(1))
+            column = _column_number(cell)
+            while len(next_values) < row:
+                next_values.append([])
+            while len(next_values[row - 1]) < column:
+                next_values[row - 1].append("")
+            next_values[row - 1][column - 1] = update["values"][0][0]
+        self.values = next_values
+        self.batch_updates.append(copy.deepcopy(data))
+        return {"totalUpdatedCells": len(data)}
+
+
+class _Spreadsheet:
+    def __init__(self, worksheet):
+        self.worksheet_value = worksheet
+
+    def worksheet(self, name):
+        assert name == "archive_records"
+        return self.worksheet_value
+
+
+def _header(*, receipt=True):
+    columns = ["id", "raw_text", "key_concepts", "notes", "colQ_changes"]
+    if receipt:
+        columns.append(progress.TASK_RECEIPT_COLUMN)
+    return columns
+
+
+def _row(record_id, marker, *, concepts="", notes="", changes="", receipt=""):
+    return [record_id, marker * 200, concepts, notes, changes, receipt]
+
+
+def _schema(*concepts):
+    return {"taxonomy": {"key_concepts": list(concepts or ("Mindcasting",))}}
+
+
+@pytest.fixture(autouse=True)
+def _no_sleep(monkeypatch):
+    monkeypatch.setattr(kc.time, "sleep", lambda seconds: None)
+
+
+def _run(worksheet, model, *, schema=None, limit=1, dry_run=False,
+         force_reprocess=False):
+    return kc.process_rows(
+        _Spreadsheet(worksheet), model=model, schema=schema or _schema(),
+        limit=limit, dry_run=dry_run, force_reprocess=force_reprocess,
+        durable_progress=True,
+    )
+
+
+def test_small_live_runs_resume_by_receipt_after_process_restart():
+    worksheet = _Worksheet([
+        _header(receipt=False),
+        _row("RECORD-00001", "a")[:-1],
+        _row("RECORD-00002", "b")[:-1],
+    ])
+
+    first_model = _Model()
+    first = _run(worksheet, first_model)
+    assert first["processed"] == 1
+    assert len(first_model.prompts) == 1
+    assert "a" * 200 in first_model.prompts[0]
+
+    assert worksheet.values[0][-1] == progress.TASK_RECEIPT_COLUMN
+    receipt = json.loads(worksheet.values[1][-1])
+    assert receipt["taskVersion"] == progress.KEY_CONCEPT_TASK_VERSION
+    assert receipt["expectedConceptsHash"] == progress._sha256_text("Mindcasting")
+    assert worksheet.values[1][2] == "Mindcasting"
+    assert len(worksheet.batch_updates) == 1
+    assert {update["range"] for update in worksheet.batch_updates[0]} == {
+        "C2", "F1", "F2",
+    }
+
+    restarted_model = _Model()
+    second = _run(worksheet, restarted_model)
+    assert second["processed"] == 1
+    assert len(restarted_model.prompts) == 1
+    assert "b" * 200 in restarted_model.prompts[0]
+
+
+def test_dry_run_does_not_create_header_or_receipt():
+    worksheet = _Worksheet([
+        _header(receipt=False),
+        _row("RECORD-00001", "a")[:-1],
+    ])
+
+    preview = _run(worksheet, _Model(), dry_run=True)
+    assert preview["processed"] == 1
+    assert worksheet.batch_updates == []
+    assert worksheet.values[0] == _header(receipt=False)
+
+    live_model = _Model()
+    _run(worksheet, live_model)
+    assert len(live_model.prompts) == 1
+    assert worksheet.values[0][-1] == progress.TASK_RECEIPT_COLUMN
+
+
+def test_curator_concept_edit_invalidates_matching_source_receipt():
+    worksheet = _Worksheet([
+        _header(),
+        _row("RECORD-00001", "a"),
+        _row("RECORD-00002", "b"),
+    ])
+    _run(worksheet, _Model())
+
+    worksheet.values[1][2] = "False balance"
+    model = _Model(concepts=["False balance"], recommendations="N/A")
+    _run(worksheet, model)
+
+    assert len(model.prompts) == 1
+    assert "a" * 200 in model.prompts[0]
+    assert "Current assigned concepts: False balance" in model.prompts[0]
+
+
+def test_taxonomy_rule_model_and_force_changes_invalidate_receipt(monkeypatch):
+    for change in ("taxonomy", "rule", "model", "force"):
+        monkeypatch.setattr(kc, "KEY_CONCEPT_RULE_VERSION", "1.0.0")
+        monkeypatch.setattr(
+            kc, "KEY_CONCEPT_MODEL_VERSION", "gemini-2.0-flash-lite"
+        )
+        worksheet = _Worksheet([
+            _header(),
+            _row("RECORD-00001", "a"),
+        ])
+        _run(worksheet, _Model())
+        model = _Model(recommendations="N/A")
+        if change == "taxonomy":
+            _run(worksheet, model, schema=_schema("Mindcasting", "False balance"))
+        elif change == "rule":
+            monkeypatch.setattr(kc, "KEY_CONCEPT_RULE_VERSION", "2.0.0")
+            _run(worksheet, model)
+        elif change == "model":
+            monkeypatch.setattr(kc, "KEY_CONCEPT_MODEL_VERSION", "gemini-next")
+            _run(worksheet, model)
+        else:
+            _run(worksheet, model, force_reprocess=True)
+        assert len(model.prompts) == 1, change
+        if change == "force":
+            restarted = _Model()
+            summary = _run(worksheet, restarted, force_reprocess=True)
+            assert summary["processed"] == 0
+            assert restarted.prompts == []
+
+
+def test_changed_source_text_invalidates_receipt():
+    worksheet = _Worksheet([
+        _header(),
+        _row("RECORD-00001", "a"),
+    ])
+    _run(worksheet, _Model())
+    worksheet.values[1][1] = "changed source " * 20
+
+    model = _Model(recommendations="N/A")
+    _run(worksheet, model)
+    assert len(model.prompts) == 1
+    assert "changed source" in model.prompts[0]
+
+
+def test_atomic_batch_failure_writes_neither_output_nor_receipt():
+    worksheet = _Worksheet([
+        _header(receipt=False),
+        _row("RECORD-00001", "a")[:-1],
+    ], fail_batch=True)
+    model = _Model()
+
+    with pytest.raises(kc.SheetWriteError, match="atomic sheet write failed"):
+        _run(worksheet, model)
+
+    assert worksheet.values[0] == _header(receipt=False)
+    assert worksheet.values[1][2] == ""
+    assert worksheet.batch_updates == []
+
+
+def test_empty_model_result_is_recorded_as_a_durable_no_concepts_result():
+    worksheet = _Worksheet([
+        _header(),
+        _row("RECORD-00001", "a"),
+        _row("RECORD-00002", "b"),
+    ])
+
+    first = _run(worksheet, _Model(concepts=[]))
+    assert first["gemini_calls"] == 1
+    assert first["by_field"]["progress_receipt"] == 1
+    assert json.loads(worksheet.values[1][-1])["expectedConceptsHash"] == (
+        progress._sha256_text("")
+    )
+
+    restarted = _Model()
+    _run(worksheet, restarted)
+    assert len(restarted.prompts) == 1
+    assert "b" * 200 in restarted.prompts[0]
+
+
+def test_malformed_receipt_and_duplicate_ids_fail_before_model_call():
+    malformed = _Worksheet([
+        _header(),
+        _row("RECORD-00001", "a", receipt="not json"),
+    ])
+    malformed_model = _Model()
+    with pytest.raises(ValueError, match="row 2.*malformed"):
+        _run(malformed, malformed_model)
+    assert malformed_model.prompts == []
+
+    invalid_hash_receipt = json.dumps({
+        "schemaVersion": progress.RECEIPT_SCHEMA_VERSION,
+        "taskKey": "urn:rosen-stewardship:task:" + "0" * 64,
+        "taskVersion": progress.KEY_CONCEPT_TASK_VERSION,
+        "ruleVersion": progress.KEY_CONCEPT_RULE_VERSION,
+        "modelVersion": progress.KEY_CONCEPT_MODEL_VERSION,
+        "inputHash": "invalid",
+        "contextHash": "0" * 64,
+        "expectedConceptsHash": "0" * 64,
+    })
+    invalid_hash = _Worksheet([
+        _header(),
+        _row("RECORD-00001", "a", receipt=invalid_hash_receipt),
+    ])
+    invalid_hash_model = _Model()
+    with pytest.raises(ValueError, match="row 2.*inputHash"):
+        _run(invalid_hash, invalid_hash_model)
+    assert invalid_hash_model.prompts == []
+
+    duplicates = _Worksheet([
+        _header(),
+        _row("RECORD-00001", "a"),
+        _row("RECORD-00001", "b"),
+    ])
+    duplicate_model = _Model()
+    with pytest.raises(ValueError, match="row 3.*duplicate.*RECORD-00001"):
+        _run(duplicates, duplicate_model)
+    assert duplicate_model.prompts == []
+
+
+def test_manual_cursor_mode_remains_available(monkeypatch):
+    worksheet = _Worksheet([
+        _header(receipt=False),
+        _row("RECORD-00001", "a")[:-1],
+    ])
+    updates = []
+
+    def update(values=None, range_name=None):
+        updates.append((range_name, values))
+
+    worksheet.update = update
+    monkeypatch.setattr(kc, "load_progress", lambda: {
+        "sheet_name": "archive_records", "last_processed_row": 1,
+        "total_processed": 0, "total_updated": 0, "last_run": None,
+    })
+    monkeypatch.setattr(kc, "save_progress", lambda progress: None)
+
+    summary = kc.process_rows(
+        _Spreadsheet(worksheet), model=_Model(), schema=_schema(),
+        start_row=2, limit=1, resume=True, dry_run=False,
+        durable_progress=False,
+    )
+
+    assert summary["processed"] == 1
+    assert updates[0][0] == "C2"
+    assert worksheet.batch_updates == []
+
+
+def test_task_key_matches_independent_canonical_fixture():
+    task = progress.key_concept_task(
+        "RECORD-00001",
+        "source text",
+        "Mindcasting",
+        ["Mindcasting", "False balance"],
+        False,
+    )
+
+    assert task.input_hash == (
+        "502b56d028e67cf952171dc098201e27b004e5d858854621fa2e6848549fc4ed"
+    )
+    assert task.task_key == (
+        "urn:rosen-stewardship:task:"
+        "9ad57290e1fe09a601058a3d9149c2f955b49b1de55d8637af68c9fd121e1675"
+    )
