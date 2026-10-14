@@ -29,3 +29,8 @@ archive and desktop archive each kept one semantic status region and unique
 control IDs. The desktop folder view kept the opt-in state with its own unique
 ID. The phone control supported Tab, Space, and Escape without losing focus.
 No browser console errors or duplicate DOM IDs appeared.
+
+The final drawer guard also passed a matched browser regression: Escape closes
+the nested help dialog first and restores focus to its visible help button. A
+second Escape closes the drawer and restores focus to Filters. The screenshots
+above remain unchanged by this keyboard-only repair.
