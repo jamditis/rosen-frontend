@@ -246,33 +246,72 @@ describe('stewardship task event JSONL adapter', () => {
     }
   });
 
-  it('labels a Linux directory-sync failure after the file is synced', (t) => {
-    const directory = temporaryDirectory(t);
-    const restrictedDirectory = path.join(directory, 'write-only-parent');
-    const streamPath = path.join(restrictedDirectory, 'events.jsonl');
-    fs.mkdirSync(restrictedDirectory);
-    fs.chmodSync(restrictedDirectory, 0o300);
-
-    let failure;
-    try {
-      appendTaskEvent(streamPath, lifecycle[0]);
-    } catch (error) {
-      failure = error;
-    } finally {
-      fs.chmodSync(restrictedDirectory, 0o700);
+  it('reports the real directory-sync boundary for each platform', (t) => {
+    if (process.platform !== 'linux') {
+      const directory = temporaryDirectory(t);
+      const streamPath = path.join(directory, 'events.jsonl');
+      assert.equal(appendTaskEvent(streamPath, lifecycle[0]).eventId, lifecycle[0].eventId);
+      assert.equal(fs.readFileSync(streamPath, 'utf8'), encodeTaskEvent(lifecycle[0]));
+      return;
     }
 
-    assert.ok(failure instanceof TaskEventPostAppendError);
-    assert.equal(failure.source, streamPath);
+    const moduleUrl = pathToFileURL(
+      path.join(repoRoot, 'stewardship', 'task-event-stream.mjs')
+    ).href;
+    const script = [
+      "import fs from 'node:fs';",
+      "import os from 'node:os';",
+      "import path from 'node:path';",
+      `import { appendTaskEvent } from ${JSON.stringify(moduleUrl)};`,
+      'const event = JSON.parse(process.argv[1]);',
+      "const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'rosen-task-event-boundary-'));",
+      "const restricted = path.join(directory, 'write-only-parent');",
+      "const stream = path.join(restricted, 'events.jsonl');",
+      'fs.mkdirSync(restricted);',
+      'fs.chmodSync(restricted, 0o300);',
+      'let result;',
+      'try {',
+      '  appendTaskEvent(stream, event);',
+      "  result = { unexpectedSuccess: true };",
+      '} catch (error) {',
+      '  result = {',
+      '    name: error.name,',
+      '    source: error.source,',
+      '    eventId: error.eventId,',
+      '    stage: error.stage,',
+      '    recordAppended: error.recordAppended,',
+      '    fileSynced: error.fileSynced,',
+      '    causeCode: error.cause?.code,',
+      '    message: error.message',
+      '  };',
+      '} finally {',
+      '  fs.chmodSync(restricted, 0o700);',
+      '}',
+      "result.content = fs.readFileSync(stream, 'utf8');",
+      'fs.rmSync(directory, { recursive: true, force: true });',
+      'process.stdout.write(JSON.stringify(result));'
+    ].join('\n');
+    const options = { encoding: 'utf8' };
+    if (process.getuid() === 0) Object.assign(options, { uid: 65534, gid: 65534 });
+    const boundary = spawnSync(
+      process.execPath,
+      ['--input-type=module', '--eval', script, JSON.stringify(lifecycle[0])],
+      options
+    );
+    assert.equal(boundary.status, 0, boundary.stderr);
+    const failure = JSON.parse(boundary.stdout);
+
+    assert.equal(failure.name, TaskEventPostAppendError.name);
+    assert.match(failure.source, /write-only-parent\/events\.jsonl$/);
     assert.equal(failure.eventId, lifecycle[0].eventId);
     assert.equal(failure.stage, 'parent-directory-sync');
     assert.equal(failure.recordAppended, true);
     assert.equal(failure.fileSynced, true);
-    assert.equal(failure.cause?.code, 'EACCES');
+    assert.equal(failure.causeCode, 'EACCES');
     assert.match(failure.message, new RegExp(lifecycle[0].eventId));
     assert.match(failure.message, /directory durability is incomplete/);
     assert.match(failure.message, /inspect the authoritative stream before retry/);
-    assert.equal(fs.readFileSync(streamPath, 'utf8'), encodeTaskEvent(lifecycle[0]));
+    assert.equal(failure.content, encodeTaskEvent(lifecycle[0]));
   });
 
   it('appends, fsyncs, closes, and reopens across fresh processes', (t) => {
