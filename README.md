@@ -8,9 +8,8 @@ This repository contains everything that powers the archive: the website, the da
 
 ## What's in the archive
 
-- **1,029 curated records** — 799 articles and essays, 137 Tumblr posts, 83 newspaper clippings, and 10 social media threads
-- **~29,700 social media posts** from Twitter/X, Bluesky, and Mastodon
-- **8,100+ named entities** (people, organizations, and concepts) and 12,500+ relationships connecting them across the collection
+- **26,865 records** — 1,030 curated records, 25,834 social posts, and the dissertation
+- **7,303 named entities** — people, organizations, and concepts connected to records across the collection
 - **The 1986 dissertation** — *The Impossible Press: American Journalism and the Decline of Public Life*, written under Neil Postman and released publicly in December 2025
 
 Every record is categorized by theme, era, and publication. Most of the curated records are also cross-linked to the people, organizations, and ideas they mention; entity extraction is still catching up on some records, and the social media posts are largely not entity-linked yet.
@@ -21,6 +20,7 @@ On the live site:
 
 - **[Start here](https://pressthink.org/j/rosen-archive/#start)** — a guided introduction for first-time visitors
 - **The archive browser** — search and filter all records by category, era, and publication
+- **[Archive desktop](https://pressthink.org/j/rosen-archive/#desktop)** — an optional alternate way to browse the archive, folders, people and ideas, and research tools. Its archive and folder views include an opt-in “Search by meaning” control alongside regular search.
 - **[Entities](https://pressthink.org/j/rosen-archive/#entities)** — browse the people, organizations, and concepts that appear across the collection
 - **[The dissertation](https://pressthink.org/j/rosen-archive/dissertation/)** — a full-text reader, a foreword, an interactive mind map, and a film analysis of *Network* (1976)
 - **[Analytics](https://pressthink.org/j/rosen-archive/#analytics)** — statistics about the collection
@@ -60,6 +60,7 @@ Then open http://localhost:8000. That's it. (`npm run preview` does the same thi
 
 - `index.html` is the entry point. It loads React, HTM, and other libraries from the `esm.sh` CDN via an import map — there is no build step.
 - `frontend/` contains the React app. Components use HTM tagged templates (`` html`...` ``) instead of JSX.
+- `frontend/desktop/` contains the optional desktop shell and its archive, folder, and research views.
 - `data/` contains the archive data as JSON files, generated from CSV source files.
 - `dissertation/` contains the dissertation reader, foreword, and network-effect pages, each a standalone page in its own subdirectory. The archive-wide FAQ lives at `faq/`.
 - `backend/` contains the Python pipeline used to scrape, analyze, and archive new content. You never need it just to browse or serve the site.
@@ -91,10 +92,10 @@ The site reads JSON files generated from four CSV source files:
 
 | Source file | What it contains |
 |-------------|-----------------|
-| `data/archive_records-public.csv` | Curated archive records (1,029 records) |
-| `data/social_posts.csv` | Twitter/X, Bluesky, and Mastodon posts (29,747) |
-| `data/extracted_entities.csv` | Named entities (8,150) |
-| `data/extracted_relationships.csv` | Entity relationships (12,556) |
+| `data/archive_records-public.csv` | Curated archive records |
+| `data/social_posts.csv` | Twitter/X, Bluesky, and Mastodon posts |
+| `data/extracted_entities.csv` | Named entities |
+| `data/extracted_relationships.csv` | Entity relationships |
 
 To regenerate the JSON after editing a CSV:
 
@@ -156,4 +157,4 @@ The site is hosted at `pressthink.org/j/rosen-archive/` and deployed by uploadin
 
 The archive is curated and maintained by Joe Amditis. Found a broken link, a missing work, or a data error? [Open an issue](https://github.com/jamditis/rosen-frontend/issues) or use the [ways to participate](https://pressthink.org/j/rosen-archive/features/participate/) page.
 
-Record and social-post counts above were verified against the data files on 2026-07-23; they drift slightly as the collection grows.
+Record and entity counts above reflect the generated data files in this repository and change as the collection grows.
