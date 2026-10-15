@@ -116,7 +116,7 @@ describe('semantic search toggle', () => {
     assert.match(app, /<\$\{SemanticSearchToggle\}/);
     assert.match(sidebar, /<\$\{SemanticSearchToggle\}/);
     assert.match(app, /inputId="archive-mobile-semantic-search"/);
-    assert.match(sidebar, /inputId=\$\{`\$\{searchInputId\}-semantic`\}/);
+    assert.match(sidebar, /inputId=\$\{semanticSearch\.inputId \|\| `\$\{searchInputId\}-semantic`\}/);
   });
 
   it('is a labelled, keyboard-operable checkbox with a described state', () => {

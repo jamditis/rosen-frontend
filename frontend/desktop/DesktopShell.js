@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.39';
+import { html } from '../html.js?v=3.8.40';
 import {
   AlertTriangle,
   Archive,
@@ -25,17 +25,17 @@ import {
   Wrench,
   X,
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.39';
-import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.8.39';
-import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.8.39';
-import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.8.39';
-import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.8.39';
-import DesktopStartPanel from './DesktopStartPanel.js?v=3.8.39';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.40';
+import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.8.40';
+import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.8.40';
+import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.8.40';
+import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.8.40';
+import DesktopStartPanel from './DesktopStartPanel.js?v=3.8.40';
 import {
   DESKTOP_TOOL_LINKS,
   getDesktopApp,
   getReadyDesktopApps,
-} from './desktopRegistry.js?v=3.8.39';
+} from './desktopRegistry.js?v=3.8.40';
 import {
   DESKTOP_LAYOUT_STORAGE_KEY,
   activateDesktopWindow,
@@ -47,7 +47,7 @@ import {
   nextVisibleDesktopWindow,
   parseDesktopLayout,
   serializeDesktopLayout,
-} from './desktopWindowState.js?v=3.8.39';
+} from './desktopWindowState.js?v=3.8.40';
 
 const ICONS = {
   archive: Archive,
@@ -177,7 +177,7 @@ const DesktopShell = ({
     const link = document.createElement('link');
     link.id = stylesheetId;
     link.rel = 'stylesheet';
-    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.8.39');
+    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.8.40');
     link.addEventListener('error', () => {
       setStatusMessage('Desktop styling could not load. All destinations remain available.');
     }, { once: true });
@@ -975,6 +975,8 @@ const DesktopShell = ({
       error=${archiveView.error}
       filters=${archiveView.filters}
       setFilters=${archiveView.setFilters}
+      semanticSearch=${archiveView.semanticSearch}
+      searchSignals=${archiveView.searchSignals}
       facets=${archiveView.facets}
       autocompleteIndex=${archiveView.autocompleteIndex}
       sortBy=${archiveView.sortBy}
@@ -1300,6 +1302,13 @@ const DesktopShell = ({
       </div>
 
       <p className="desktop-live-status" aria-live="polite" aria-atomic="true">${statusMessage}</p>
+      <p
+        className="desktop-live-status"
+        data-semantic-status
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >${archiveView.semanticStatusText}</p>
 
       ${startOpen && html`
         <div

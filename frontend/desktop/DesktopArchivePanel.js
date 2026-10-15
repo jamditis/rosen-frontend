@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.39';
+import { html } from '../html.js?v=3.8.40';
 import {
   AlertCircle,
   Filter,
@@ -7,9 +7,9 @@ import {
   LayoutGrid,
   RotateCw,
 } from 'lucide-react';
-import ArchiveResults from '../components/ArchiveResults.js?v=3.8.39';
-import Sidebar from '../components/Sidebar.js?v=3.8.39';
-import { RELEVANCE_SORT } from '../utils/searchRanking.js?v=3.8.39';
+import ArchiveResults from '../components/ArchiveResults.js?v=3.8.40';
+import Sidebar from '../components/Sidebar.js?v=3.8.40';
+import { RELEVANCE_SORT } from '../utils/searchRanking.js?v=3.8.40';
 
 const DesktopArchivePanel = ({
   viewMode,
@@ -17,6 +17,8 @@ const DesktopArchivePanel = ({
   error,
   filters,
   setFilters,
+  semanticSearch,
+  searchSignals,
   facets,
   autocompleteIndex,
   sortBy,
@@ -38,6 +40,10 @@ const DesktopArchivePanel = ({
   const resultsRef = useRef(null);
   const filterPanelRef = useRef(null);
   const filterButtonRef = useRef(null);
+  const desktopSemanticSearch = semanticSearch && {
+    ...semanticSearch,
+    inputId: `desktop-${viewMode}-archive-search-semantic`,
+  };
 
   useEffect(() => {
     setFilterOpen(false);
@@ -62,6 +68,7 @@ const DesktopArchivePanel = ({
       const drawerActive = !window.matchMedia
         || window.matchMedia('(max-width: 1100px)').matches;
       if (event.key !== 'Escape' || !drawerActive) return;
+      if (event.defaultPrevented || event.target?.closest?.('dialog[open]')) return;
       event.preventDefault();
       setFilterOpen(false);
       filterButtonRef.current?.focus();
@@ -185,6 +192,7 @@ const DesktopArchivePanel = ({
             onClose=${closeFilters}
             resetFilters=${onClearFilters}
             autocompleteIndex=${autocompleteIndex}
+            semanticSearch=${desktopSemanticSearch}
             variant="desktop"
           />
         </div>
@@ -204,6 +212,7 @@ const DesktopArchivePanel = ({
             folderGroups=${folderGroups}
             viewMode=${viewMode}
             searchTerm=${filters.search}
+            searchSignals=${searchSignals}
             currentPage=${currentPage}
             totalPages=${totalPages}
             onSelectRecord=${onSelectRecord}
