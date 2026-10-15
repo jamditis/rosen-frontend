@@ -51,6 +51,8 @@ const URL_HOST = CLIENT_HOST.includes(':') && !CLIENT_HOST.startsWith('[')
   : CLIENT_HOST;
 const BASE = `http://${URL_HOST}:${PORT}`;
 const REQUESTED_VIEWPORT = (process.env.PREVIEW_AUDIT_VIEWPORT || '').trim();
+// The captured desktop run corrected one restored position by 2 px.
+const MAX_RESTORED_POSITION_DELTA = 3;
 // Seeding mode measures layout shift and writes the values, but never fails on
 // budget. Use it to refresh the baseline in scripts/layout-shift-budgets.js.
 const LAYOUT_SHIFT_SEED_MODE = process.env.PREVIEW_AUDIT_LAYOUT_SHIFT_SEED === '1';
@@ -1966,28 +1968,62 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       activeAnalytics: document.querySelector('[data-window-id="analytics"]')
         ?.classList.contains('is-active'),
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      taskbarTop: document.querySelector('.desktop-taskbar')?.getBoundingClientRect().top
+        ?? window.innerHeight,
+      visibleTitlebars: [...document.querySelectorAll('[data-window-id]')]
+        .filter((element) => {
+          const styles = getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return styles.display !== 'none'
+            && styles.visibility !== 'hidden'
+            && rect.width > 0
+            && rect.height > 0;
+        })
+        .map((element) => {
+          const rect = element.querySelector('.desktop-window-titlebar').getBoundingClientRect();
+          return {
+            id: element.dataset.windowId,
+            left: rect.left,
+            right: rect.right,
+            top: rect.top,
+            bottom: rect.bottom,
+          };
+        }),
       savedPositions: JSON.parse(localStorage.getItem('jrda-desktop-layout'))?.windows
         ?.map(({ id, position }) => ({ id, position })) || [],
     }));
-    const restoredPositionIds = restoredWideState.savedPositions.map(({ id }) => id);
-    const expectedPositionIds = expectedWidePositions.map(({ id }) => id);
-    const hasInvalidRestoredPosition = restoredWideState.savedPositions.some(({ position }) => (
-      !Number.isFinite(position?.x) || !Number.isFinite(position?.y)
+    const positionDrift = expectedWidePositions.map(({ id, position }) => {
+      const restored = restoredWideState.savedPositions.find((entry) => entry.id === id)?.position;
+      return {
+        id,
+        x: restored?.x - position.x,
+        y: restored?.y - position.y,
+      };
+    });
+    const hasExcessivePositionDrift = positionDrift.some(({ x, y }) => (
+      !Number.isFinite(x)
+      || !Number.isFinite(y)
+      || Math.abs(x) > MAX_RESTORED_POSITION_DELTA
+      || Math.abs(y) > MAX_RESTORED_POSITION_DELTA
     ));
-    // Returning to a wide viewport runs the normal window clamp. A small
-    // viewport-boundary correction can update a saved position, so exact
-    // position equality belongs to the compact-state check above, not here.
+    const titlebarsStayInWorkArea = restoredWideState.visibleTitlebars.every((titlebar) => (
+      titlebar.left >= 0
+      && titlebar.right <= wideViewport.width
+      && titlebar.top >= 0
+      && titlebar.bottom <= restoredWideState.taskbarTop
+    ));
     if (
       restoredWideState.visibleWindowIds.join('|') !== expectedWideWindowIds.join('|')
       || !restoredWideState.activeAnalytics
       || restoredWideState.overflow > 1
-      || restoredPositionIds.join('|') !== expectedPositionIds.join('|')
-      || hasInvalidRestoredPosition
+      || hasExcessivePositionDrift
+      || !titlebarsStayInWorkArea
     ) {
       throw new Error(`Expanding after 200%-zoom lost the window stack: ${JSON.stringify({
         expectedWideWindowIds,
         expectedWidePositions,
         restoredWideState,
+        positionDrift,
       })}`);
     }
     await analyticsTitle.focus();
