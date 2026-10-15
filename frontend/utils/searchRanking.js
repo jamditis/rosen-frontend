@@ -19,7 +19,7 @@ import {
   reciprocalRankFusion,
   LABEL_LEXICAL,
   LABEL_SEMANTIC,
-} from './rrf.js?v=3.8.40';
+} from './rrf.js?v=3.8.41';
 
 /** Sort key for the fused hybrid order. Offered only while a query is active. */
 export const RELEVANCE_SORT = 'relevance';
