@@ -2000,6 +2000,8 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
         y: restored?.y - position.y,
       };
     });
+    const savedPositionIds = restoredWideState.savedPositions.map(({ id }) => id).sort();
+    const expectedPositionIds = expectedWidePositions.map(({ id }) => id).sort();
     const hasExcessivePositionDrift = positionDrift.some(({ x, y }) => (
       !Number.isFinite(x)
       || !Number.isFinite(y)
@@ -2014,6 +2016,7 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     ));
     if (
       restoredWideState.visibleWindowIds.join('|') !== expectedWideWindowIds.join('|')
+      || savedPositionIds.join('|') !== expectedPositionIds.join('|')
       || !restoredWideState.activeAnalytics
       || restoredWideState.overflow > 1
       || hasExcessivePositionDrift
