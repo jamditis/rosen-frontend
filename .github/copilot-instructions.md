@@ -11,11 +11,11 @@ These are Joe's user-level conventions from `~/.claude/CLAUDE.md`, restated here
 
 ## Project-specific bug classes to flag
 
-1. **No build step for the production frontend.** Zero-build static site loaded from `esm.sh` via import maps. Flag any PR introducing npm/webpack/vite as a production dependency. The only legitimate npm usage is `node data/export-archive-data.js` (data regen) and `npm test` (Node's built-in test runner).
+1. **No build step for the production frontend.** The zero-build static site loads its modules from `esm.sh` via import maps. Flag any PR that adds a bundler or build step to the production frontend. Repository tooling also uses npm scripts and dependencies for data export, tests, local preview, accessibility audits, and data-maintenance tasks.
 
 2. **HTM, not JSX.** Components must import `html` from the project's `frontend/html.js` using the relative path appropriate to the importing file (`./html.js` from `frontend/`, `../html.js` from `frontend/components/`, `../../html.js` from `frontend/components/shared/`). New imports must not declare their own htm template runtime. Flag any JSX syntax in `frontend/`.
 
-3. **Version-string on every JS import.** Every `.js` import must include `?v=<version>` matching `index.html` (currently `v3.3.0`). Missing or mismatched version strings cause stale-cache bugs in production. Flag bare imports and version drift across files in the same PR.
+3. **Version-string on every JS import.** Every versioned `.js` import must include `?v=<version>` matching the current release in `version.json` and `index.html`. Missing or mismatched version strings cause stale-cache bugs in production. Flag bare imports and version drift across files in the same PR.
 
 4. **Don't bypass the base-path strategy.** `frontend/App.js` resolves URLs via an `IS_LOCAL` check (relative paths locally, `/j/rosen-archive/` in production). New code that needs cross-environment URLs must reuse that detection (or extend it in one place), not inline a fresh `./` or `/j/rosen-archive/` prefix at every call site. Flag duplicated path logic, not the established prefix.
 

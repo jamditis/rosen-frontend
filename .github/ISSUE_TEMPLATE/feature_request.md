@@ -24,14 +24,15 @@ Describe any alternative solutions or features you've considered.
 
 Which part of the archive would this feature affect?
 
-- [ ] Main Archive Interface
-- [ ] Comparison Tool
-- [ ] Glossary
-- [ ] Timeline
-- [ ] FAQ / Ask the Dissertation
-- [ ] Dissertation Reader
-- [ ] Network Explorer
-- [ ] Backend Data Pipeline
+- [ ] Archive browser and search
+- [ ] Start here or folders
+- [ ] People, organizations, and ideas
+- [ ] Dissertation and its research tools
+- [ ] Analytics
+- [ ] Optional archive desktop
+- [ ] Reading and research tools
+- [ ] Backend data pipeline
+- [ ] Accessibility or responsive behavior
 - [ ] Documentation
 - [ ] Other: ___________
 
