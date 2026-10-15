@@ -8,7 +8,7 @@ This repository contains everything that powers the archive: the website, the da
 
 ## What's in the archive
 
-- **26,865 records** — 1,030 articles and essays, 25,834 social posts, and the dissertation
+- **26,865 records** — 1,030 curated records, 25,834 social posts, and the dissertation
 - **7,303 named entities** — people, organizations, and concepts connected to records across the collection
 - **The 1986 dissertation** — *The Impossible Press: American Journalism and the Decline of Public Life*, written under Neil Postman and released publicly in December 2025
 
@@ -92,10 +92,10 @@ The site reads JSON files generated from four CSV source files:
 
 | Source file | What it contains |
 |-------------|-----------------|
-| `data/archive_records-public.csv` | Curated archive records (1,029 records) |
-| `data/social_posts.csv` | Twitter/X, Bluesky, and Mastodon posts (29,747) |
-| `data/extracted_entities.csv` | Named entities (8,150) |
-| `data/extracted_relationships.csv` | Entity relationships (12,556) |
+| `data/archive_records-public.csv` | Curated archive records |
+| `data/social_posts.csv` | Twitter/X, Bluesky, and Mastodon posts |
+| `data/extracted_entities.csv` | Named entities |
+| `data/extracted_relationships.csv` | Entity relationships |
 
 To regenerate the JSON after editing a CSV:
 
