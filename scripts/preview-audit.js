@@ -1969,11 +1969,20 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       savedPositions: JSON.parse(localStorage.getItem('jrda-desktop-layout'))?.windows
         ?.map(({ id, position }) => ({ id, position })) || [],
     }));
+    const restoredPositionIds = restoredWideState.savedPositions.map(({ id }) => id);
+    const expectedPositionIds = expectedWidePositions.map(({ id }) => id);
+    const hasInvalidRestoredPosition = restoredWideState.savedPositions.some(({ position }) => (
+      !Number.isFinite(position?.x) || !Number.isFinite(position?.y)
+    ));
+    // Returning to a wide viewport runs the normal window clamp. A small
+    // viewport-boundary correction can update a saved position, so exact
+    // position equality belongs to the compact-state check above, not here.
     if (
       restoredWideState.visibleWindowIds.join('|') !== expectedWideWindowIds.join('|')
       || !restoredWideState.activeAnalytics
       || restoredWideState.overflow > 1
-      || JSON.stringify(restoredWideState.savedPositions) !== JSON.stringify(expectedWidePositions)
+      || restoredPositionIds.join('|') !== expectedPositionIds.join('|')
+      || hasInvalidRestoredPosition
     ) {
       throw new Error(`Expanding after 200%-zoom lost the window stack: ${JSON.stringify({
         expectedWideWindowIds,

@@ -1,11 +1,11 @@
-import { html } from '../html.js?v=3.8.39';
+import { html } from '../html.js?v=3.8.40';
 import { ChevronLeft, ChevronRight, FolderOpen, SearchX } from 'lucide-react';
-import { COLORS } from '../constants.js?v=3.8.39';
-import { hashString } from '../services/archiveService.js?v=3.8.39';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.39';
-import { LEXICAL_SIGNAL, presentSearchSignal } from '../utils/searchRanking.js?v=3.8.39';
-import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.39';
-import LoadingQuotes from './LoadingQuotes.js?v=3.8.39';
+import { COLORS } from '../constants.js?v=3.8.40';
+import { hashString } from '../services/archiveService.js?v=3.8.40';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.40';
+import { LEXICAL_SIGNAL, presentSearchSignal } from '../utils/searchRanking.js?v=3.8.40';
+import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.40';
+import LoadingQuotes from './LoadingQuotes.js?v=3.8.40';
 
 const Highlight = ({ text, term }) => {
   if (!term || term.length < 2) return html`<span>${text}</span>`;
