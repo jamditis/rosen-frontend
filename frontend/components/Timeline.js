@@ -1,7 +1,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.41';
-import { buildTimelineModel } from '../utils/timelineData.js?v=3.8.41';
+import { html } from '../html.js?v=3.8.42';
+import { buildTimelineModel } from '../utils/timelineData.js?v=3.8.42';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const Timeline = ({ records, selectedYear, onSelectYear }) => {
