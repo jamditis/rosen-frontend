@@ -1,14 +1,14 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.8.42';
+import { html } from '../html.js?v=3.8.43';
 import { X, Search, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   findSearchSuggestions,
   normalizeForSearch,
-} from '../utils/searchNormalize.js?v=3.8.42';
-import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.42';
-import { createRapidRepeatCounter } from '../utils/easterEggs.js?v=3.8.42';
-import SemanticSearchToggle from './SemanticSearchToggle.js?v=3.8.42';
+} from '../utils/searchNormalize.js?v=3.8.43';
+import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.43';
+import { createRapidRepeatCounter } from '../utils/easterEggs.js?v=3.8.43';
+import SemanticSearchToggle from './SemanticSearchToggle.js?v=3.8.43';
 
 const Sidebar = ({
   facets,

@@ -32,7 +32,7 @@ import {
   normalizeInPlace,
   DEFAULT_EMBEDDINGS_BIN_URL,
   DEFAULT_EMBEDDINGS_INDEX_URL,
-} from './embeddings-worker.js?v=3.8.42';
+} from './embeddings-worker.js?v=3.8.43';
 
 // The sentence-transformer that produced data/archive-embeddings.bin. A query
 // encoded by any other model lands in a different space and ranks noise.
@@ -58,9 +58,9 @@ export const TRANSFORMERS_MODULE_URL = new URL(
 // Semantic search loads this larger social store. The similar-in-theme feature
 // continues to load only the smaller edited-record store.
 export const DEFAULT_SOCIAL_EMBEDDINGS_BIN_URL =
-  '../../data/archive-social-embeddings.bin?v=3.8.42';
+  '../../data/archive-social-embeddings.bin?v=3.8.43';
 export const DEFAULT_SOCIAL_EMBEDDINGS_INDEX_URL =
-  '../../data/archive-social-embeddings.json?v=3.8.42';
+  '../../data/archive-social-embeddings.json?v=3.8.43';
 
 /** Select Safari in both window and dedicated-worker navigator shapes. */
 export function isSafariRuntime({ userAgent = '', vendor = '' } = globalThis.navigator ?? {}) {
