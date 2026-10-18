@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.43';
+import { html } from '../html.js?v=3.8.44';
 import {
   AlertTriangle,
   Archive,
@@ -25,17 +25,17 @@ import {
   Wrench,
   X,
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.43';
-import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.8.43';
-import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.8.43';
-import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.8.43';
-import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.8.43';
-import DesktopStartPanel from './DesktopStartPanel.js?v=3.8.43';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.44';
+import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.8.44';
+import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.8.44';
+import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.8.44';
+import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.8.44';
+import DesktopStartPanel from './DesktopStartPanel.js?v=3.8.44';
 import {
   DESKTOP_TOOL_LINKS,
   getDesktopApp,
   getReadyDesktopApps,
-} from './desktopRegistry.js?v=3.8.43';
+} from './desktopRegistry.js?v=3.8.44';
 import {
   DESKTOP_LAYOUT_STORAGE_KEY,
   activateDesktopWindow,
@@ -47,7 +47,7 @@ import {
   nextVisibleDesktopWindow,
   parseDesktopLayout,
   serializeDesktopLayout,
-} from './desktopWindowState.js?v=3.8.43';
+} from './desktopWindowState.js?v=3.8.44';
 
 const ICONS = {
   archive: Archive,
@@ -177,7 +177,7 @@ const DesktopShell = ({
     const link = document.createElement('link');
     link.id = stylesheetId;
     link.rel = 'stylesheet';
-    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.8.43');
+    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.8.44');
     link.addEventListener('error', () => {
       setStatusMessage('Desktop styling could not load. All destinations remain available.');
     }, { once: true });
