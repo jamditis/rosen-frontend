@@ -10,7 +10,7 @@
  * that never uses semantic search costs nothing.
  */
 const DEFAULT_WORKER_URL = new URL(
-  './semantic-search-worker.js?v=3.8.44',
+  './semantic-search-worker.js?v=3.8.45',
   import.meta.url,
 );
 

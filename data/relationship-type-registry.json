@@ -173,7 +173,7 @@
       "endpointDivergence": {
         "violatingRows": 45,
         "totalRows": 1593,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00043_REL_016",
           "RECORD-00058_REL_006",
@@ -186,7 +186,7 @@
       "directionalContradictions": {
         "pairCount": 31,
         "rowsInvolved": 73,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "examplePairs": [
           {
             "forwardId": "RECORD-00020_REL_007",
@@ -240,7 +240,7 @@
       "endpointDivergence": {
         "violatingRows": 7,
         "totalRows": 1114,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00503_REL_032",
           "RECORD-00645_REL_009",
@@ -253,7 +253,7 @@
       "directionalContradictions": {
         "pairCount": 7,
         "rowsInvolved": 19,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "examplePairs": [
           {
             "forwardId": "RECORD-00710_REL_017",
@@ -305,7 +305,7 @@
       "endpointDivergence": {
         "violatingRows": 16,
         "totalRows": 163,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00499_REL_040",
           "RECORD-00505_REL_022",
@@ -318,7 +318,7 @@
       "directionalContradictions": {
         "pairCount": 3,
         "rowsInvolved": 7,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "examplePairs": [
           {
             "forwardId": "RECORD-00098_REL_015",
@@ -372,7 +372,7 @@
       "endpointDivergence": {
         "violatingRows": 125,
         "totalRows": 2462,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00003_REL_006",
           "RECORD-00058_REL_010",
@@ -385,7 +385,7 @@
       "directionalContradictions": {
         "pairCount": 10,
         "rowsInvolved": 20,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "examplePairs": [
           {
             "forwardId": "RECORD-00054_REL_003",
@@ -435,7 +435,7 @@
       "endpointDivergence": {
         "violatingRows": 18,
         "totalRows": 187,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00061_REL_005",
           "RECORD-00104_REL_003",
@@ -448,7 +448,7 @@
       "directionalContradictions": {
         "pairCount": 2,
         "rowsInvolved": 5,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "examplePairs": [
           {
             "forwardId": "RECORD-00687_REL_010",
@@ -489,7 +489,7 @@
       "endpointDivergence": {
         "violatingRows": 707,
         "totalRows": 3157,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00003_REL_004",
           "RECORD-00020_REL_006",
@@ -502,7 +502,7 @@
       "directionalContradictions": {
         "pairCount": 55,
         "rowsInvolved": 208,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "examplePairs": [
           {
             "forwardId": "RECORD-00458_REL_005",
@@ -550,7 +550,7 @@
       "endpointDivergence": {
         "violatingRows": 114,
         "totalRows": 533,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00005_REL_002",
           "RECORD-00037_REL_002",
@@ -563,7 +563,7 @@
       "directionalContradictions": {
         "pairCount": 8,
         "rowsInvolved": 16,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "examplePairs": [
           {
             "forwardId": "RECORD-00005_REL_002",
@@ -610,7 +610,7 @@
       "endpointDivergence": {
         "violatingRows": 541,
         "totalRows": 729,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00005_REL_018",
           "RECORD-00026_REL_011",
@@ -623,7 +623,7 @@
       "directionalContradictions": {
         "pairCount": 31,
         "rowsInvolved": 109,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "examplePairs": [
           {
             "forwardId": "RECORD-00679_REL_030",
@@ -670,7 +670,7 @@
       "endpointDivergence": {
         "violatingRows": 141,
         "totalRows": 247,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00003_REL_001",
           "RECORD-00036_REL_001",
@@ -683,7 +683,7 @@
       "directionalContradictions": {
         "pairCount": 2,
         "rowsInvolved": 4,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "examplePairs": [
           {
             "forwardId": "RECORD-00079_REL_014",
@@ -729,7 +729,7 @@
       "endpointDivergence": {
         "violatingRows": 6,
         "totalRows": 289,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00001_REL_007",
           "RECORD-00681_REL_009",
@@ -742,7 +742,7 @@
       "directionalContradictions": {
         "pairCount": 8,
         "rowsInvolved": 22,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "examplePairs": [
           {
             "forwardId": "RECORD-00839_REL_023",
@@ -792,7 +792,7 @@
       "endpointDivergence": {
         "violatingRows": 3,
         "totalRows": 64,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00690_REL_001",
           "RECORD-00741_REL_011",
@@ -855,7 +855,7 @@
       "endpointDivergence": {
         "violatingRows": 41,
         "totalRows": 225,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00746_REL_005",
           "RECORD-00746_REL_006",
@@ -868,7 +868,7 @@
       "directionalContradictions": {
         "pairCount": 3,
         "rowsInvolved": 10,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "examplePairs": [
           {
             "forwardId": "RECORD-00754_REL_010",
@@ -919,7 +919,7 @@
       "endpointDivergence": {
         "violatingRows": 15,
         "totalRows": 59,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00660_REL_001",
           "RECORD-00488_REL_003",
@@ -944,7 +944,7 @@
       "endpointDivergence": {
         "violatingRows": 103,
         "totalRows": 124,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00010_REL_002",
           "RECORD-00010_REL_004",
@@ -982,7 +982,7 @@
       "directionalContradictions": {
         "pairCount": 7,
         "rowsInvolved": 30,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "examplePairs": [
           {
             "forwardId": "RECORD-00010_REL_002",
@@ -1022,7 +1022,7 @@
       "endpointDivergence": {
         "violatingRows": 1,
         "totalRows": 38,
-        "asOfDate": "2026-10-18",
+        "asOfDate": "2026-10-20",
         "exampleRelationshipIds": [
           "RECORD-00743_REL_005"
         ],
