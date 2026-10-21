@@ -63295,3 +63295,22 @@ Let @gregsargent.bsky.social instruct.","Have you seen this in action? I have. n
  
 Let @gregsargent.bsky.social instruct.",FALSE,"Bluesky autonomous batch 2026-10-20 21:55:09; decision: context_only; reason=brief_or_context_dependent_text. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3mydbzvtres2y; cid=bafyreie4tigi2simouyzippxckklgytcw7pydxtkiw5tiahp43sipjggvy; record_sha256=c7f87ac026b6c5a7d55ecf5843cb4617d08f28471b38577659d0dfc5bb38bdcd. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
 BSKY-03514,"I think it would be effective, yes...",https://bsky.app/profile/jayrosen.bsky.social/post/3myddd3wmz22n,Jay Rosen,2026-10-20 19:05:58,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,7,,"I think it would be effective, yes.",,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,1,0,0,,at://did:plc:6fyz7qukbyyfwzcchotzs6dl/app.bsky.feed.post/3mydcbv5c6k22,Jay Rosen,,,Public Post,2026-10-20 21:55:09,,,,"I think it would be effective, yes.","I think it would be effective, yes.",FALSE,"Bluesky autonomous batch 2026-10-20 21:55:09; decision: context_only; reason=brief_or_context_dependent_text. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3myddd3wmz22n; cid=bafyreidancens7ogysm46pr5d7mvgplixa54y4vb6ihaevukq5ak25vwha; record_sha256=2634082412f8462a5222a8aadce95609a7b1a39668828205ba7b1e9819e5223a. Context references: at://did:plc:6fyz7qukbyyfwzcchotzs6dl/app.bsky.feed.post/3mydcbv5c6k22; at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3my62myppy223. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
+BSKY-03515,"Not the odds, but the stakes...",https://bsky.app/profile/jayrosen.bsky.social/post/3myffqbamhk2n,Jay Rosen,2026-10-21 14:54:27,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,40,,"""Not the odds, but the stakes.""
+
+@sulliview.bsky.social is using this as her lens. Stakes stories, she says, ""are downright rare.""
+
+""The media’s inability (refusal?) to convey the big picture — the pattern — is more than disappointing. It’s outrageous.""
+
+margaretsullivan.substack.com/p/the-incred...",,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,70,21,1,,,Jay Rosen,,,Public Post,2026-10-21 22:00:15,,,,"""Not the odds, but the stakes.""
+
+@sulliview.bsky.social is using this as her lens. Stakes stories, she says, ""are downright rare.""
+
+""The media’s inability (refusal?) to convey the big picture — the pattern — is more than disappointing. It’s outrageous.""
+
+margaretsullivan.substack.com/p/the-incred...","""Not the odds, but the stakes.""
+
+@sulliview.bsky.social is using this as her lens. Stakes stories, she says, ""are downright rare.""
+
+""The media’s inability (refusal?) to convey the big picture — the pattern — is more than disappointing. It’s outrageous.""
+
+margaretsullivan.substack.com/p/the-incred...",FALSE,"Bluesky autonomous batch 2026-10-21 22:00:15; decision: context_only; reason=taxonomy_unresolved. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3myffqbamhk2n; cid=bafyreidzrl5bpsf3b7br6jqh6bdlllv67kqzb26lpid32a5wvzuqkg2fba; record_sha256=e0e6b6388ad86146d638415cc86f48955b296e6c15ebc47546e8e60728a226c6. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."

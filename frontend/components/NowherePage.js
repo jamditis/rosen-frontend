@@ -1,5 +1,5 @@
-import { html } from '../html.js?v=3.8.45';
-import { NOWHERE_LINE } from '../utils/easterEggs.js?v=3.8.45';
+import { html } from '../html.js?v=3.8.46';
+import { NOWHERE_LINE } from '../utils/easterEggs.js?v=3.8.46';
 
 /**
  * The hidden #nowhere route (#754): one line on an empty sheet of paper.
