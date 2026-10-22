@@ -9,15 +9,15 @@ import {
   fetchEntitiesData,
   fetchRecordDetails,
   loadSearchIndex,
-} from './archiveService.js?v=3.8.46';
-import { sortRecords, RECORD_SORTS } from '../utils/recordSort.js?v=3.8.46';
+} from './archiveService.js?v=3.8.47';
+import { sortRecords, RECORD_SORTS } from '../utils/recordSort.js?v=3.8.47';
 import {
   buildSearchText,
   matchesParsedSearchText,
   normalizeForSearch,
   parseSearchQuery,
   searchLoadedIndexes,
-} from '../utils/searchNormalize.js?v=3.8.46';
+} from '../utils/searchNormalize.js?v=3.8.47';
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 20;

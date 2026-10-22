@@ -7,7 +7,7 @@ import {
   PRESETS,
   RECORDS,
   TRAIL_STOPS,
-} from './data.js?v=3.8.46';
+} from './data.js?v=3.8.47';
 
 const VALID_VIEWS = new Set(['trail', 'records', 'concepts', 'connections', 'method']);
 const VALID_PRESETS = new Set(PRESETS.map(({ id }) => id));

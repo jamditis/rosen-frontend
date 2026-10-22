@@ -15,16 +15,16 @@
 // consumes it is intentionally deferred until the entity-index hook
 // conventions land (#130 / PR #180), so both hooks share one shape.
 
-import { parseWikiHash, wikiPageHref } from './wikiService.js?v=3.8.46';
+import { parseWikiHash, wikiPageHref } from './wikiService.js?v=3.8.47';
 import {
   ABOUT_PRIVACY_HASH,
   ABOUT_PRIVACY_SECTION,
-} from './privacyRoute.js?v=3.8.46';
+} from './privacyRoute.js?v=3.8.47';
 
 export {
   ABOUT_PRIVACY_HASH,
   getPrivacyDetailsHref,
-} from './privacyRoute.js?v=3.8.46';
+} from './privacyRoute.js?v=3.8.47';
 
 /** Hash route names. The default route renders with no hash at all. */
 export const ROUTES = {
