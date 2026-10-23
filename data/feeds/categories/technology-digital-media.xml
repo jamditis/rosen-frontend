@@ -5,9 +5,25 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records in the &quot;Technology &amp; Digital Media&quot; category</description>
     <language>en-us</language>
-    <lastBuildDate>Thu, 22 Oct 2026 21:57:42 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 23 Oct 2026 21:43:51 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/categories/technology-digital-media.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Thanks for those numbers...</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3myiz4p7vyk2o</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3myiz4p7vyk2o</guid>
+    <pubDate>Fri, 23 Oct 2026 00:00:00 GMT</pubDate>
+    <description>Replying to @aaronread1.bsky.social on Bluesky, Rosen writes: &quot;Thanks for those numbers. I also want to underline how many professionals are involved in this farce . Not only the fundraisers themselves, but the &quot;strategists,&quot; the pollsters, the digital copy writers, the data brokers, on and on&quot;</description>
+    <category>Technology &amp; Digital Media</category>
+  </item>
+  <item>
+    <title>In the end, barely $13 of your $100 buys real airtime or digital ads...</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3myipw7smts2q</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3myipw7smts2q</guid>
+    <pubDate>Thu, 22 Oct 2026 00:00:00 GMT</pubDate>
+    <description>Rosen writes on Bluesky: &quot;In the end, barely $13 of your $100 buys real airtime or digital ads.&quot; Incredible. Think about that next time one of those &quot;strategic consultants&quot; appears on TV because he or she really knows politics&quot;</description>
+    <category>Technology &amp; Digital Media</category>
+  </item>
   <item>
     <title>Helping the web archive itself</title>
     <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mxotyhnjks23</link>
@@ -443,24 +459,6 @@
     <category>Technology &amp; Digital Media</category>
     <category>Audience &amp; Public Engagement</category>
     <category>Journalism Theory &amp; Practice</category>
-  </item>
-  <item>
-    <title>Please understand the point Dylan Byers made here</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3m2f4fa6e7s2n</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3m2f4fa6e7s2n</guid>
-    <pubDate>Sat, 04 Oct 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-10-04. Topics: Press &amp; Media Criticism, Technology &amp; Digital Media.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>It&apos;s in the body of the first post</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3m2chjow4a22t</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3m2chjow4a22t</guid>
-    <pubDate>Fri, 03 Oct 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-10-03. Topics: Press &amp; Media Criticism, Technology &amp; Digital Media.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
   </item>
   </channel>
 </rss>

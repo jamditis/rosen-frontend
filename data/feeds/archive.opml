@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen&apos;s Internet Archive</title>
-    <dateCreated>Thu, 22 Oct 2026 21:57:42 GMT</dateCreated>
-    <dateModified>Thu, 22 Oct 2026 21:57:42 GMT</dateModified>
+    <dateCreated>Fri, 23 Oct 2026 21:43:51 GMT</dateCreated>
+    <dateModified>Fri, 23 Oct 2026 21:43:51 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -333,6 +333,8 @@
         <outline text="The plan is to have no plan" type="link" url="https://www.adbusters.org/article/the-plan-is-to-have-no-plan" created="2020-05-04"/>
       </outline>
       <outline text="Platform Transition &amp; Future Models (2021-Present)" type="category">
+        <outline text="Thanks for those numbers..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3myiz4p7vyk2o" created="2026-10-23"/>
+        <outline text="In the end, barely $13 of your $100 buys real airtime or digital ads..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3myipw7smts2q" created="2026-10-22"/>
         <outline text="Margaret Sullivan grades midterm coverage" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxtriyyquk2o" created="2026-10-14"/>
         <outline text="Exposure and accountability as different political tasks" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxttuf5qps2x" created="2026-10-14"/>
         <outline text="An emergency setting for Trump coverage" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxrotujt3s2t" created="2026-10-13"/>
@@ -383,8 +385,6 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="A media studies doctorate and a journalism teaching career" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mu3ccpg7fs2j" created="2026-08-27"/>
         <outline text="Two weeks of reading for a journalism course" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mu3juxw4zk23" created="2026-08-27"/>
         <outline text="Election coverage: The stakes beyond the polls" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mtymkmy7pk2b" created="2026-08-26"/>
-        <outline text="Karen Attiah&apos;s account of the Washington Post" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mtyntlbg3k2b" created="2026-08-26"/>
-        <outline text="A private arbitrator has ordered The Washington Post to rehire @karenattiah..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mttjttm4fk2h" created="2026-08-24"/>
       </outline>
     </outline>
     <outline text="By Category">
@@ -502,7 +502,9 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="From my latest post" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36gxcpdsk2v"/>
         <outline text="Interesting idea" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35vskmbps2j"/>
       </outline>
-      <outline text="Technology &amp; Digital Media (2907)" type="category">
+      <outline text="Technology &amp; Digital Media (2909)" type="category">
+        <outline text="Thanks for those numbers..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3myiz4p7vyk2o"/>
+        <outline text="In the end, barely $13 of your $100 buys real airtime or digital ads..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3myipw7smts2q"/>
         <outline text="Helping the web archive itself" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxotyhnjks23"/>
         <outline text="Josh Marshall on platform audiences" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mw5bvzhlvs27"/>
         <outline text="Correcting Josh Marshall&apos;s name" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mw5dxrsdqs26"/>
@@ -526,8 +528,6 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnxuigz7p223"/>
         <outline text="If you follow the mess at CBS, don&apos;t dismiss the possibility that Elli..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnkilkth722l"/>
         <outline text="It was a political hire, part 12..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mn63dw5fsc2v"/>
-        <outline text="Some 200 current and former journalists, academics, documentary filmma..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmtutpxmak2r"/>
-        <outline text="Here&apos;s the letter: &quot;We are current and former journalists, professors..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmu5wufgmc23"/>
       </outline>
       <outline text="Journalism Education (682)" type="category">
         <outline text="A media studies doctorate and a journalism teaching career" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mu3ccpg7fs2j"/>

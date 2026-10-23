@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generated": "2026-10-22T21:57:42.585Z",
+  "generated": "2026-10-23T21:43:51.993Z",
   "baseUrl": "https://pressthink.org/j/rosen-archive",
   "feeds": [
     {
@@ -12,6 +12,11 @@
       "name": "articles",
       "url": "https://pressthink.org/j/rosen-archive/data/feeds/articles.xml",
       "path": "./data/feeds/articles.xml"
+    },
+    {
+      "name": "categories - technology-digital-media",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/technology-digital-media.xml",
+      "path": "./data/feeds/categories/technology-digital-media.xml"
     },
     {
       "name": "categories - press-media-criticism",
@@ -27,11 +32,6 @@
       "name": "categories - journalism-theory-practice",
       "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-theory-practice.xml",
       "path": "./data/feeds/categories/journalism-theory-practice.xml"
-    },
-    {
-      "name": "categories - technology-digital-media",
-      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/technology-digital-media.xml",
-      "path": "./data/feeds/categories/technology-digital-media.xml"
     },
     {
       "name": "categories - audience-public-engagement",
