@@ -1,5 +1,5 @@
-import { html } from '../html.js?v=3.8.49';
-import AnalyticsDashboard from '../components/AnalyticsDashboard.js?v=3.8.49';
+import { html } from '../html.js?v=3.8.50';
+import AnalyticsDashboard from '../components/AnalyticsDashboard.js?v=3.8.50';
 
 const DesktopAnalyticsPanel = ({ onRecordResults, onOpenStandard }) => html`
   <div className="desktop-analytics-panel archive-density--compact">

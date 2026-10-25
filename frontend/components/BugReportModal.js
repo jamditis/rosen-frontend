@@ -16,12 +16,12 @@
 // decorative italics, one primary action.
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.8.49';
+import { html } from '../html.js?v=3.8.50';
 import { X, Bug, Lightbulb, Send, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
-import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.8.49';
-import { createSubmitGate } from '../utils/submitGate.js?v=3.8.49';
-import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.8.49';
-import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.49';
+import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.8.50';
+import { createSubmitGate } from '../utils/submitGate.js?v=3.8.50';
+import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.8.50';
+import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.50';
 
 const EMPTY_FIELDS = {
   whatHappened: '',
