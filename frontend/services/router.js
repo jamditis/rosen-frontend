@@ -8,8 +8,8 @@
 // viewState.js too; what remains here is the imperative, window-bound
 // navigation helpers.
 
-import { ROUTES, DEFAULT_ROUTE, parseViewState } from './viewState.js?v=3.8.50';
-import { parseRecordId, setRecordParam } from '../utils/recordDeepLink.js?v=3.8.50';
+import { ROUTES, DEFAULT_ROUTE, parseViewState } from './viewState.js?v=3.8.51';
+import { parseRecordId, setRecordParam } from '../utils/recordDeepLink.js?v=3.8.51';
 
 export { ROUTES };
 

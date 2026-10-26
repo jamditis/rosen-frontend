@@ -5,9 +5,17 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records in the &quot;Technology &amp; Digital Media&quot; category</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 25 Oct 2026 21:16:56 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 26 Oct 2026 22:55:22 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/categories/technology-digital-media.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Hmmm...</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mysoyejl722c</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3mysoyejl722c</guid>
+    <pubDate>Mon, 26 Oct 2026 00:00:00 GMT</pubDate>
+    <description>Rosen writes on Bluesky: &quot;Hmmm. “My theory is that it&apos;s actally easier for a platform full of user-generated content to professionalize than it is for a platform of professional content to expand into user-generated-ish content a la podcasts.” —@&quot;</description>
+    <category>Technology &amp; Digital Media</category>
+  </item>
   <item>
     <title>Thanks for those numbers...</title>
     <link>https://bsky.app/profile/jayrosen.bsky.social/post/3myiz4p7vyk2o</link>
@@ -448,17 +456,6 @@
     <description>A Twitter/X post by Jay Rosen from 2025-10-09. Topics: Journalism Education, Technology &amp; Digital Media.</description>
     <category>Journalism Education</category>
     <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>News Consumers are Content Creators in an AI-Driven World</title>
-    <link>https://newscreatorcorps.org/2025/10/news-consumers-content-creators/</link>
-    <guid isPermaLink="true">https://newscreatorcorps.org/2025/10/news-consumers-content-creators/</guid>
-    <pubDate>Wed, 08 Oct 2025 00:00:00 GMT</pubDate>
-    <description>The lines between news consumers and content creators are fading because of artificial intelligence. This shift began with the rise of the internet, social media, and smartphones, leading to participatory journalism and citizen reporting. AI tools now amplify this trend, providing automated content generation, media editing, and personalized curation, along with potential for fact-checking. Consumers are also curators and gatekeepers, influencing the visibility of information through their interactions. This new reality brings responsibilities, including combating misinformation, understanding AI&apos;s role, and promoting media literacy. The future of news involves active consumer participation, offering opportunities for a diverse information landscape alongside challenges in maintaining accuracy.
-</description>
-    <category>Technology &amp; Digital Media</category>
-    <category>Audience &amp; Public Engagement</category>
-    <category>Journalism Theory &amp; Practice</category>
   </item>
   </channel>
 </rss>

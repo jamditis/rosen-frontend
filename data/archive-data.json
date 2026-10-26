@@ -1,7 +1,28 @@
 {
   "version": "1.1.0",
-  "generated": "2026-10-25T21:16:54.724Z",
+  "generated": "2026-10-26T22:55:20.092Z",
   "records": [
+    {
+      "id": "BSKY-03554",
+      "title": "Hmmm...",
+      "author": "Jay Rosen",
+      "date": "2026-10-26",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mysoyejl722c",
+      "summary": "Rosen writes on Bluesky: \"Hmmm. “My theory is that it's actally easier for a platform full of user-generated content to professionalize than it is for a platform of professional content to expand into user-generated-ish content a la podcasts.” —@\"",
+      "quote": "Hmmm.\n\n“My theory is that it's actally easier for a platform full of user-generated content to professionalize than it is for a platform of professional content to expand into user-generated-ish content a la podcasts.” —@ryanhatesthis.bsky.social",
+      "categories": [
+        "Technology & Digital Media"
+      ],
+      "concepts": [],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
     {
       "id": "BSKY-03521",
       "title": "Thanks for those numbers...",
@@ -808951,6 +808972,7 @@
     "Hmmm. With that additional knowledge",
     "Hmmm. Yes. Thanks",
     "Hmmm. spent time today on GOP efforts to restrict voting under the false claim...",
+    "Hmmm...",
     "Hmmm... If it feels like it should be shifting day-to-day",
     "Hmmm... two questions. Why do you call that \"information loss?\" And why do we...",
     "Hmmm... well",

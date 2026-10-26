@@ -1,9 +1,9 @@
 import { createRoot } from 'react-dom/client';
-import { html } from './html.js?v=3.8.50';
-import App from './App.js?v=3.8.50';
-import { registerArchiveSiteTools } from './services/siteTools.js?v=3.8.50';
-import { logWatchdog } from './utils/consoleWatchdog.js?v=3.8.50';
-import { installTypewriterEgg } from './services/typewriterEgg.js?v=3.8.50';
+import { html } from './html.js?v=3.8.51';
+import App from './App.js?v=3.8.51';
+import { registerArchiveSiteTools } from './services/siteTools.js?v=3.8.51';
+import { logWatchdog } from './utils/consoleWatchdog.js?v=3.8.51';
+import { installTypewriterEgg } from './services/typewriterEgg.js?v=3.8.51';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

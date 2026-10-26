@@ -5,9 +5,17 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive of Jay Rosen&apos;s journalism scholarship, including articles, essays, social posts, and the 1986 dissertation &quot;The Impossible Press&quot;</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 25 Oct 2026 21:16:56 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 26 Oct 2026 22:55:22 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/rss.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Hmmm...</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mysoyejl722c</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3mysoyejl722c</guid>
+    <pubDate>Mon, 26 Oct 2026 00:00:00 GMT</pubDate>
+    <description>Rosen writes on Bluesky: &quot;Hmmm. “My theory is that it&apos;s actally easier for a platform full of user-generated content to professionalize than it is for a platform of professional content to expand into user-generated-ish content a la podcasts.” —@&quot;</description>
+    <category>Technology &amp; Digital Media</category>
+  </item>
   <item>
     <title>Thanks for those numbers...</title>
     <link>https://bsky.app/profile/jayrosen.bsky.social/post/3myiz4p7vyk2o</link>
@@ -853,14 +861,6 @@ This paragraph says more about &quot;both sides&quot; j...</title>
     <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3ms7hio6yv22e</guid>
     <pubDate>Mon, 03 Aug 2026 00:00:00 GMT</pubDate>
     <description>A Bluesky post by Jay Rosen from 2026-08-03.</description>
-
-  </item>
-  <item>
-    <title>&quot;Nothing Moves the Needle...</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3ms2s35g6kk26</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3ms2s35g6kk26</guid>
-    <pubDate>Sun, 02 Aug 2026 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2026-08-02.</description>
 
   </item>
   </channel>
