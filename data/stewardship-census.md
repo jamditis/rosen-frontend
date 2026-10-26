@@ -2,22 +2,22 @@
 
 Schema: `stewardship-census/1.0.0`
 
-Input commit: `9ad4cfa7bb49853486db92fd1df68046b3a40c79` (input files clean)
+Input commit: `5770e6e473318f3e39b2699be9d361e5877b2b4f` (input files clean)
 
 ## Record reconciliation
 
 | Group | Source | Published source rows | Filtered |
 | --- | --- | --- | --- |
 | Curated | 1,030 | 1,030 | 0 |
-| Social | 30,085 | 25,827 | 4,258 |
+| Social | 30,089 | 25,828 | 4,261 |
 
-Runtime total: 26,867 records, including 9 generated thread containers and 1 injected record.
+Runtime total: 26,868 records, including 9 generated thread containers and 1 injected record.
 
 ### Social source and runtime by platform
 
 | Platform | Source | Published source rows |
 | --- | --- | --- |
-| Bluesky | 3,455 | 2,839 |
+| Bluesky | 3,459 | 2,840 |
 | Mastodon | 516 | 481 |
 | Twitter/X | 26,114 | 22,507 |
 
@@ -31,20 +31,20 @@ Classification is `first_match`; every omitted source row appears in exactly one
 | social | 2 | Repost or quoted-post title | 1,715 |
 | social | 3 | Non-Rosen author | 55 |
 | social | 4 | Short generic reply | 2,206 |
-| social | 5 | Explicitly unverified | 128 |
+| social | 5 | Explicitly unverified | 131 |
 | social | 6 | Final invalid title | 4 |
 
 ## Missing field coverage
 
 | Field | Curated source | Social source | Runtime |
 | --- | --- | --- | --- |
-| url | 0 / 1,030 | 38 / 30,085 | 0 / 26,867 |
-| raw text | 14 / 1,030 | 4 / 30,085 | Not shipped by design |
-| summary | 0 / 1,030 | 30,032 / 30,085 | 0 / 26,867 |
-| tags | 313 / 1,030 | 9,868 / 30,085 | 8,682 / 26,867 |
-| concepts | 78 / 1,030 | 29,586 / 30,085 | 25,453 / 26,867 |
-| quote | 40 / 1,030 | 4,407 / 30,085 | 0 / 26,867 |
-| related ids | 317 / 1,030 | 22,013 / 30,085 | 25,986 / 26,867 |
+| url | 0 / 1,030 | 38 / 30,089 | 0 / 26,868 |
+| raw text | 14 / 1,030 | 4 / 30,089 | Not shipped by design |
+| summary | 0 / 1,030 | 30,035 / 30,089 | 0 / 26,868 |
+| tags | 313 / 1,030 | 9,872 / 30,089 | 8,683 / 26,868 |
+| concepts | 78 / 1,030 | 29,590 / 30,089 | 25,454 / 26,868 |
+| quote | 40 / 1,030 | 4,407 / 30,089 | 0 / 26,868 |
+| related ids | 317 / 1,030 | 22,017 / 30,089 | 25,987 / 26,868 |
 
 ## Graph coverage
 
@@ -53,7 +53,7 @@ Entities: 7,303 source, 7,303 runtime. Relationship assertions: 10,986.
 | Group | Source rows | Source rows with assertions | Assertions | Published rows | Published rows with assertions |
 | --- | --- | --- | --- | --- | --- |
 | Curated | 1,030 | 869 | 10,974 | 1,030 | 869 |
-| Social | 30,085 | 12 | 12 | 25,827 | 12 |
+| Social | 30,089 | 12 | 12 | 25,828 | 12 |
 
 ### Reference findings
 
@@ -70,9 +70,9 @@ Entities: 7,303 source, 7,303 runtime. Relationship assertions: 10,986.
 
 ## URL and preservation inventory
 
-Source: 31,067 unique external URLs across 122 hosts; 38 rows have no URL.
+Source: 31,071 unique external URLs across 122 hosts; 38 rows have no URL.
 
-Runtime: 26,866 unique external URLs across 122 hosts; 0 rows have no URL.
+Runtime: 26,867 unique external URLs across 122 hosts; 0 rows have no URL.
 
 Preservation link evidence appears in 6 source records. Another 91 records contain archive.org candidates only in prose fields.
 
@@ -83,12 +83,12 @@ Baseline data commit: `5d3d5351346a9712de4f54d95e69ba0f410c6efd`.
 | Metric | 2026-07-22 | Current | Delta |
 | --- | --- | --- | --- |
 | curated source | 1,029 | 1,030 | +1 |
-| social source | 29,747 | 30,085 | +338 |
+| social source | 29,747 | 30,089 | +342 |
 | published curated source | 950 | 1,030 | +80 |
-| published social source | 25,657 | 25,827 | +170 |
+| published social source | 25,657 | 25,828 | +171 |
 | generated thread containers | 8 | 9 | +1 |
 | injected records | 1 | 1 | 0 |
-| published total | 26,616 | 26,867 | +251 |
+| published total | 26,616 | 26,868 | +252 |
 | entities | 8,150 | 7,303 | -847 |
 | relationships | 12,556 | 10,986 | -1,570 |
 
