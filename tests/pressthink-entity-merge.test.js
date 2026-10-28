@@ -58,10 +58,11 @@ describe('PressThink entity dedup (#859)', () => {
     const canonical = entities.find((row) => row.entity_id === 'O0033');
     assert.ok(canonical, 'O0033 must still exist as the canonical PressThink entity');
     // O0033 carried 251 mentions and W0666 carried 1 before the merge; the
-    // combined total must equal that sum exactly.
+    // RECORD-00912 adds one source-verified PressThink mention on 2026-10-28.
+    // The current total includes the merge and that additional record.
     assert.equal(
       Number(canonical.total_mentions),
-      252,
+      253,
       `expected O0033 total_mentions to include W0666's folded-in mentions, got ${canonical.total_mentions}`,
     );
   });
@@ -84,15 +85,16 @@ describe('PressThink entity dedup (#859)', () => {
     // Two of those rows, RECORD-00846_REL_030 and RECORD-00857_REL_032, were
     // extracted from records the duplicate adjudication dropped in the same
     // release (issue #867), which takes the final total to 233. Every other
-    // reference must still be present, now all pointed at O0033.
+    // reference must still be present, now all pointed at O0033. The new
+    // RECORD-00912_REL_003 publication assertion adds one more reference.
     const relationships = await loadRelationships();
     const referencingO0033 = relationships.filter(
       (row) => row.source_entity_id === 'O0033' || row.target_entity_id === 'O0033',
     );
     assert.equal(
       referencingO0033.length,
-      233,
-      `expected exactly 233 relationship rows referencing O0033 after the merge, got ${referencingO0033.length}`,
+      234,
+      `expected exactly 234 relationship rows referencing O0033 after the merge and introduction repair, got ${referencingO0033.length}`,
     );
   });
 

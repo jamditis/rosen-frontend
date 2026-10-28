@@ -172,8 +172,8 @@
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
         "violatingRows": 45,
-        "totalRows": 1593,
-        "asOfDate": "2026-10-26",
+        "totalRows": 1594,
+        "asOfDate": "2026-10-28",
         "exampleRelationshipIds": [
           "RECORD-00043_REL_016",
           "RECORD-00058_REL_006",
@@ -181,7 +181,7 @@
           "RECORD-00089_REL_007",
           "RECORD-00126_REL_005"
         ],
-        "note": "45 of 1593 current Mentions rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 widened allowedSourceTypes to include Event and allowedTargetTypes to include Concept. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "45 of 1594 current Mentions rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 widened allowedSourceTypes to include Event and allowedTargetTypes to include Concept. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 31,
@@ -371,8 +371,8 @@
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
         "violatingRows": 125,
-        "totalRows": 2462,
-        "asOfDate": "2026-10-26",
+        "totalRows": 2463,
+        "asOfDate": "2026-10-28",
         "exampleRelationshipIds": [
           "RECORD-00003_REL_006",
           "RECORD-00058_REL_010",
@@ -380,7 +380,7 @@
           "RECORD-00071_REL_007",
           "RECORD-00082_REL_001"
         ],
-        "note": "125 of 2462 current Discusses rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes and Organization plus Person to allowedTargetTypes. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "125 of 2463 current Discusses rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes and Organization plus Person to allowedTargetTypes. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 10,
@@ -549,8 +549,8 @@
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
         "violatingRows": 114,
-        "totalRows": 533,
-        "asOfDate": "2026-10-26",
+        "totalRows": 534,
+        "asOfDate": "2026-10-28",
         "exampleRelationshipIds": [
           "RECORD-00005_REL_002",
           "RECORD-00037_REL_002",
@@ -558,12 +558,12 @@
           "RECORD-00060_REL_001",
           "RECORD-00098_REL_014"
         ],
-        "note": "114 of 533 current Published In rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Person to allowedSourceTypes (\"Jay Rosen published in PressThink\" is normal byline shorthand, not an error). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "114 of 534 current Published In rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Person to allowedSourceTypes (\"Jay Rosen published in PressThink\" is normal byline shorthand, not an error). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 8,
-        "rowsInvolved": 16,
-        "asOfDate": "2026-10-26",
+        "rowsInvolved": 17,
+        "asOfDate": "2026-10-28",
         "examplePairs": [
           {
             "forwardId": "RECORD-00005_REL_002",
@@ -584,7 +584,7 @@
             "backwardAssertion": "On the Media -> NPR"
           }
         ],
-        "note": "8 entity pairs (16 rows) currently have Published In asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "8 entity pairs (17 rows) currently have Published In asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
       "directionNote": "Two separate rulings (issue #737 curator ruling, 2026-08-27): (a) a person as the source is valid byline shorthand, now allowed; (b) an organization as the source (like \"The New York Times published in Bush Secretly Lifted...\") is the same publication fact recorded backward, not a new shape, and stays flagged for curator review."
     },

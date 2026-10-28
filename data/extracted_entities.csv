@@ -1074,7 +1074,7 @@ O0029,Organization,Newsweek,Newsweek,Magazine,,4,RECORD-00005,12,,
 O0030,Organization,Salon,Salon,Online Magazine,,4,RECORD-00005,21,,
 O0031,Organization,NPR,NPR,Radio,,4,RECORD-00005,39,,
 O0032,Organization,The New Yorker,The New Yorker,Magazine,,4,RECORD-00005,9,,
-O0033,Organization,PressThink,PressThink,Blog,,8,RECORD-00056,252,,Merged duplicate Work-typed entity W0666 into this row on 2026-08-27 (issue #859); mentions folded in and relationships re-pointed here.
+O0033,Organization,PressThink,PressThink,Blog,,8,RECORD-00056,253,,Merged duplicate Work-typed entity W0666 into this row on 2026-08-27 (issue #859); mentions folded in and relationships re-pointed here.
 O0034,Organization,The Huffington Post,The Huffington Post,News Website,,7,RECORD-00330,23,,
 O0035,Organization,Romenesko,Romenesko,Media News Website,,8,RECORD-00151,4,,
 O0036,Organization,Jezebel,Jezebel,Website,,6,RECORD-00853,1,,
@@ -2241,7 +2241,7 @@ P0001,Person,Eric Nelson,Eric Nelson,Senior Editor,John Wiley and Sons,10,RECORD
 P0002,Person,Digby,Digby,Blogger,None,7,RECORD-00002,3,,
 P0003,Person,Paul Krugman,Paul Krugman,Columnist,The New York Times,6,RECORD-00002,13,,
 P0004,Person,Kevin Drum,Kevin Drum,Blogger,None,5,RECORD-00002,4,,
-P0005,Person,Jay Rosen,Jay Rosen,"Professor, Media Critic",None,6,RECORD-00002,377,,
+P0005,Person,Jay Rosen,Jay Rosen,"Professor, Media Critic",None,6,RECORD-00002,378,,
 P0006,Person,Daniel Radosh,Daniel Radosh,Blogger,None,4,RECORD-00002,2,,
 P0007,Person,Ruy Teixiera,Ruy Teixiera,Blogger,None,4,RECORD-00002,2,,
 P0008,Person,Josh Marshall,Josh Marshall,"Editor, Blogger","Talking Points Memo, The American Prospect",7,RECORD-00002,17,,
@@ -7302,3 +7302,5 @@ C0543,Concept,New Media,New Media,,,5,RECORD-00463,5,,
 P2012,Person,Murdoch,Murdoch,Publisher,,5,RECORD-00138,1,,
 P2353,Person,Jared Kushner,Jared Kushner,,,7,TWTR-07504,1,,
 O2247,Organization,The New York Times politics desk,The New York Times politics desk,news reporting unit referred to as @nytpolitics,The New York Times,,TWTR-07504,1,,proposed (9c slice)
+P2712,Person,Joe Amditis,Joe Amditis,Developer and curator of Jay Rosen’s internet archive,,5,RECORD-00912,1,,"Primary-source verification, 2026-10-28: https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/#p6."
+C1330,Concept,Digital archive,Digital archive,"A linked collection of online work, with preservation limits",,5,RECORD-00912,1,,"Primary-source verification, 2026-10-28: https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/#p0, #p1, and #p12. The opening question and answer define the internet archive concept; p12 describes its link-based scope. This concept is distinct from the Internet Archive organization."

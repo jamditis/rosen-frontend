@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "generated": "2026-10-26T22:55:20.092Z",
+  "generated": "2026-10-28T16:28:10.517Z",
   "records": [
     {
       "id": "BSKY-03554",
@@ -3558,8 +3558,8 @@
       "era": "Platform Transition & Future Models (2021-Present)",
       "pub": "PressThink",
       "url": "https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/",
-      "summary": "Jay Rosen and Joe Amditis explain why they built a common, searchable home for Rosen’s online work. The introduction defines the archive as a link-based index, describes its scope and curation, and states its preservation limits.",
-      "quote": "A question-and-answer introduction to the archive, its scope, its search tools, and the limits of link-based preservation.",
+      "summary": "Jay Rosen introduces the archive of his online work and identifies Joe Amditis as its developer and curator. The Q&A explains what counts as a record, the limits of link-based preservation, and how readers might use the collection.",
+      "quote": "An archive is a home, not a highway.",
       "categories": [
         "Technology & Digital Media",
         "Audience & Public Engagement",
@@ -3583,7 +3583,12 @@
       "verified": true,
       "needsReview": false,
       "type": "article",
-      "relatedIds": []
+      "relatedIds": [
+        "P2712",
+        "P0005",
+        "C1330",
+        "O0033"
+      ]
     },
     {
       "id": "BSKY-03179",
@@ -728388,7 +728393,7 @@
       "affiliation": "",
       "prominence": 8,
       "firstMentionRecordId": "RECORD-00056",
-      "totalMentions": 252
+      "totalMentions": 253
     },
     {
       "id": "O0034",
@@ -741225,7 +741230,7 @@
       "affiliation": "None",
       "prominence": 6,
       "firstMentionRecordId": "RECORD-00002",
-      "totalMentions": 377
+      "totalMentions": 378
     },
     {
       "id": "P0006",
@@ -796886,6 +796891,28 @@
       "prominence": 0,
       "firstMentionRecordId": "TWTR-07504",
       "totalMentions": 1
+    },
+    {
+      "id": "P2712",
+      "type": "Person",
+      "name": "Joe Amditis",
+      "normalizedName": "Joe Amditis",
+      "role": "Developer and curator of Jay Rosen’s internet archive",
+      "affiliation": "",
+      "prominence": 5,
+      "firstMentionRecordId": "RECORD-00912",
+      "totalMentions": 1
+    },
+    {
+      "id": "C1330",
+      "type": "Concept",
+      "name": "Digital archive",
+      "normalizedName": "Digital archive",
+      "role": "A linked collection of online work, with preservation limits",
+      "affiliation": "",
+      "prominence": 5,
+      "firstMentionRecordId": "RECORD-00912",
+      "totalMentions": 1
     }
   ],
   "facets": {
@@ -805084,6 +805111,7 @@
     "Digital Tools",
     "Digital Transformation",
     "Digital ads from the immense traffic they would generate, and events they would...",
+    "Digital archive",
     "Digital archives",
     "Digital communication",
     "Digital communication challenges",

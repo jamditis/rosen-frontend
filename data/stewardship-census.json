@@ -4,13 +4,13 @@
     "compatibility": "additive changes within version 1; semantic changes require a new major version"
   },
   "input": {
-    "commit": "5770e6e473318f3e39b2699be9d361e5877b2b4f",
+    "commit": "81bacb0bef9a2d9d31cc4d0abaeea909a36c1f77",
     "dirty": false,
     "schema_version": "stewardship-census/1.0.0",
     "files": [
       {
         "path": "data/archive_records-public.csv",
-        "sha256": "947ac360c7f38f3e4387f4914eb394c9aaa408fa1d01aa3b14bc8c27b9e7369d"
+        "sha256": "be4c33539a50908dc5032e6faf46d5c0117c68e3a7e4508353aae1997a8261f2"
       },
       {
         "path": "data/social_posts.csv",
@@ -18,27 +18,27 @@
       },
       {
         "path": "data/extracted_entities.csv",
-        "sha256": "9152a4c0ec1066b40acb1678886462938e3b3625b05de3fc67a7808fe1a91e1a"
+        "sha256": "d1393a8cd7c9b8ba5c60350e2f9ec9cb8526b1f41ddf6f0a70a5416e25e7b707"
       },
       {
         "path": "data/extracted_relationships.csv",
-        "sha256": "7d95a6deb4808037e5e1ae58ef77d59145a7f75b41c96714900d6827eced76df"
+        "sha256": "b6818146ad04c9eeea55ff48583ccfb2f96367b4661d381d6b456cd26ca3c1c7"
       },
       {
         "path": "data/archive-data.json",
-        "sha256": "23cf5164c46ee1ccb28a063f0ce419fcd89fa00e7bbbfd78dd7b41ff8287185f"
+        "sha256": "74b0a0e62f25a606a0d72d3f1c7bc0e21b0cbf54c80732b7b2435f5abe8c312c"
       },
       {
         "path": "data/archive-core.json",
-        "sha256": "f9b48eafecae025ccad557ad7b2ba0b4f60ed29807d1466a2fe4ff3cc099db3a"
+        "sha256": "5cb8236ed6165fdd93c85af1fd4c9fc514e80be2cc536461474c54234b747cb0"
       },
       {
         "path": "data/archive-details.json",
-        "sha256": "5dbd9703d089e5b7d8eb44a2f8df85969f6860549719dc87653900fbaddc73c3"
+        "sha256": "4810dd92da97f1cbb16fd55a673c173eea633c3eaafe7242371488cc8dadb9a3"
       },
       {
         "path": "data/archive-entities.json",
-        "sha256": "b59f9f9941bddf3b295f202b350df4639c86cbbf51d552fae656ee871c624925"
+        "sha256": "65b9af0af6e3d1eec7e0ef21efafea8c91641fd6e22b10d4c38b9245fcda10e1"
       },
       {
         "path": "data/authored-excerpts.csv",
@@ -4551,8 +4551,8 @@
       },
       "quote": {
         "total": 1030,
-        "present": 990,
-        "missing": 40
+        "present": 991,
+        "missing": 39
       },
       "related_ids": {
         "total": 1030,
@@ -4625,8 +4625,8 @@
       },
       "related_ids": {
         "total": 26868,
-        "present": 881,
-        "missing": 25987
+        "present": 882,
+        "missing": 25986
       },
       "raw_text": {
         "total": 26868,
@@ -4638,38 +4638,38 @@
   },
   "graph": {
     "entities": {
-      "total": 7303,
+      "total": 7305,
       "by_type": {
-        "Concept": 1298,
+        "Concept": 1299,
         "Event": 465,
         "Location": 262,
         "Organization": 1640,
-        "Person": 2652,
+        "Person": 2653,
         "Work": 986
       },
       "detached_from_relationships": 1715,
       "blank_first_mention": 0,
-      "runtime_total": 7303
+      "runtime_total": 7305
     },
     "relationships": {
-      "total": 10986,
+      "total": 10989,
       "by_type": {
         "Affiliated With": 3157,
         "Cites": 163,
         "Covers": 1,
         "Created": 1,
         "Criticizes": 1114,
-        "Discusses": 2462,
+        "Discusses": 2463,
         "Expands On": 187,
         "Founded By": 124,
         "Inspired By": 59,
-        "Mentions": 1593,
+        "Mentions": 1594,
         "Occurred At": 247,
         "Originated By": 729,
         "Owned By": 38,
         "Owns": 64,
         "Pioneered": 225,
-        "Published In": 533,
+        "Published In": 534,
         "Supports": 289
       },
       "by_confidence_score": {
@@ -4690,10 +4690,10 @@
         "0.97": 6,
         "0.98": 12,
         "0.99": 39,
-        "1.0": 1736
+        "1.0": 1739
       },
       "by_confidence": {
-        "high": 10206,
+        "high": 10209,
         "medium": 780
       }
     },
@@ -4701,17 +4701,17 @@
       "curated": {
         "source": {
           "rows": 1030,
-          "rows_with_relationship_assertions": 869,
-          "relationship_assertions": 10974,
-          "rows_with_entity_links": 869,
-          "distinct_record_entity_links": 12771
+          "rows_with_relationship_assertions": 870,
+          "relationship_assertions": 10977,
+          "rows_with_entity_links": 870,
+          "distinct_record_entity_links": 12775
         },
         "published": {
           "source_backed_rows": 1030,
-          "rows_with_relationship_assertions": 869,
-          "relationship_assertions": 10974,
-          "rows_with_entity_links": 869,
-          "distinct_record_entity_links": 12771
+          "rows_with_relationship_assertions": 870,
+          "relationship_assertions": 10977,
+          "rows_with_entity_links": 870,
+          "distinct_record_entity_links": 12775
         }
       },
       "social": {
@@ -30422,14 +30422,14 @@
       {
         "metric": "entities",
         "baseline": 8150,
-        "current": 7303,
-        "delta": -847
+        "current": 7305,
+        "delta": -845
       },
       {
         "metric": "relationships",
         "baseline": 12556,
-        "current": 10986,
-        "delta": -1570
+        "current": 10989,
+        "delta": -1567
       }
     ],
     "explanation": [
