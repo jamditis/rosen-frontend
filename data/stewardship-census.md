@@ -2,7 +2,7 @@
 
 Schema: `stewardship-census/1.0.0`
 
-Input commit: `5770e6e473318f3e39b2699be9d361e5877b2b4f` (input files clean)
+Input commit: `81bacb0bef9a2d9d31cc4d0abaeea909a36c1f77` (input files clean)
 
 ## Record reconciliation
 
@@ -43,16 +43,16 @@ Classification is `first_match`; every omitted source row appears in exactly one
 | summary | 0 / 1,030 | 30,035 / 30,089 | 0 / 26,868 |
 | tags | 313 / 1,030 | 9,872 / 30,089 | 8,683 / 26,868 |
 | concepts | 78 / 1,030 | 29,590 / 30,089 | 25,454 / 26,868 |
-| quote | 40 / 1,030 | 4,407 / 30,089 | 0 / 26,868 |
-| related ids | 317 / 1,030 | 22,017 / 30,089 | 25,987 / 26,868 |
+| quote | 39 / 1,030 | 4,407 / 30,089 | 0 / 26,868 |
+| related ids | 317 / 1,030 | 22,017 / 30,089 | 25,986 / 26,868 |
 
 ## Graph coverage
 
-Entities: 7,303 source, 7,303 runtime. Relationship assertions: 10,986.
+Entities: 7,305 source, 7,305 runtime. Relationship assertions: 10,989.
 
 | Group | Source rows | Source rows with assertions | Assertions | Published rows | Published rows with assertions |
 | --- | --- | --- | --- | --- | --- |
-| Curated | 1,030 | 869 | 10,974 | 1,030 | 869 |
+| Curated | 1,030 | 870 | 10,977 | 1,030 | 870 |
 | Social | 30,089 | 12 | 12 | 25,828 | 12 |
 
 ### Reference findings
@@ -89,8 +89,8 @@ Baseline data commit: `5d3d5351346a9712de4f54d95e69ba0f410c6efd`.
 | generated thread containers | 8 | 9 | +1 |
 | injected records | 1 | 1 | 0 |
 | published total | 26,616 | 26,868 | +252 |
-| entities | 8,150 | 7,303 | -847 |
-| relationships | 12,556 | 10,986 | -1,570 |
+| entities | 8,150 | 7,305 | -845 |
+| relationships | 12,556 | 10,989 | -1,567 |
 
 - PR #751 verified the previously held curated batch and regenerated the runtime corpus.
 - PR #751 also reconciled filtered social rows, first mentions, orphan entities, and relationship mappings, so graph totals intentionally differ from the baseline.
