@@ -16,7 +16,8 @@ Identify the destination before deciding whether a release is complete:
 | --- | --- | --- |
 | [GitHub Pages](https://jamditis.github.io/rosen-frontend/) | Automatic Pages deployment after a push or merge to `main` | Successful Pages deployment and the expected public `version.json` |
 | [PressThink archive](https://pressthink.org/j/rosen-archive/) | `deploy.yml`: Weekly Friday at 09:17 UTC, or manual dispatch against reviewed `main` | Successful FTPS transfer, successful live verification, and the expected public `version.json` |
-| PressThink data publication | Submission and Bluesky stewardship publisher workflows | Successful publication and its accepted receipt; for stewardship, healthy ingestion status |
+| PressThink record submission | Submission workflows | Successful workflow, published record live, and sheet writeback complete |
+| PressThink Bluesky publication | Bluesky stewardship publisher workflow | Successful publication, accepted receipt, and healthy ingestion status |
 
 The current `deploy.yml` does not have a push trigger. The
 `post-merge.yml` dashboard notification runs only when
