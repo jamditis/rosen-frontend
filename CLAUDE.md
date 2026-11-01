@@ -344,6 +344,10 @@ npm run test:frontend      # Version consistency + frontend structure
 
 ## Deployment
 
+Read the [release procedure](DEPLOYMENT.md#release-procedure) before a release
+or deployment diagnosis. Merges to `main` deploy GitHub Pages automatically;
+the established PressThink workflow has its own trigger and live verification.
+
 The site is hosted at `pressthink.org/j/rosen-archive/`. Deploy through the
 certificate-verified FTPS workflow, which is pinned to `j/rosen-archive/`.
 The complete file-by-file deploy manifest (what to upload, what to exclude)
