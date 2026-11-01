@@ -2,6 +2,7 @@ import csv
 import datetime
 import io
 import json
+import shutil
 import subprocess
 
 import pytest
@@ -229,6 +230,94 @@ def test_incomplete_walk_writes_neither_csv_nor_snapshots(tmp_path):
     assert csv_path.read_bytes() == original
     assert not snapshot_dir.exists()
     assert not report_path.exists()
+
+
+@pytest.mark.parametrize("source_text", ["", " \n\t"])
+def test_empty_text_source_stays_context_only_and_passes_csv_gate(
+    tmp_path, source_text
+):
+    csv_path = tmp_path / "social_posts.csv"
+    original = _write_canonical(csv_path)
+    item = _feed_item(
+        "3mz44e52rfc2c",
+        "2026-10-30T15:37:50.575Z",
+        source_text,
+        cid="bafyreibfzc7rncvhcxi5pmkjwiuckktkturxfh3ke5c6sm5hcbkn4iblzi",
+        reply_parent="at://did:plc:reader/app.bsky.feed.post/parent",
+    )
+    item["post"]["record"]["embed"] = {
+        "$type": "app.bsky.embed.images",
+        "images": [{"alt": "", "image": {"ref": {"$link": "bafkreitestimage"}}}],
+    }
+    result = batch.run_batch(
+        csv_path=csv_path,
+        snapshot_dir=tmp_path / "snapshot",
+        report_path=tmp_path / "report.json",
+        captured_at=_captured_at(),
+        fetch_page_fn=lambda _cursor: {"feed": [item], "cursor": None},
+        policy_check_fn=lambda: None,
+        sleep_fn=lambda _seconds: None,
+    )
+    assert csv_path.read_bytes().startswith(original)
+    row = _read_rows(csv_path)[-1]
+    assert row["raw_text"] == row["summary"] == row["thematic_categories"] == ""
+    assert row["verified"] == "FALSE"
+    assert "Source has no text; non-text content not verified" in row["notes"]
+    assert "source identity and text were confirmed" not in row["notes"]
+    assert result.report["decisions"][0]["reason"] == "empty_source_text"
+    assert result.report["counts"] == {
+        "captured": 1,
+        "admitted": 0,
+        "context_only": 1,
+    }
+    snapshot = json.loads((result.snapshot_dir / "feed-pages.json").read_text())
+    assert snapshot["pages"][0]["response"]["feed"] == [item]
+
+    # Run the actual publisher quality gate against this generated row.
+    gate_root = tmp_path / "quality-gate"
+    (gate_root / "tests").mkdir(parents=True)
+    (gate_root / "data").mkdir()
+    (gate_root / "package.json").write_text('{"type":"module"}')
+    (gate_root / "node_modules").symlink_to(batch.REPO_ROOT / "node_modules")
+    shutil.copy(batch.REPO_ROOT / "tests/csv-quality.test.js", gate_root / "tests")
+    for name in (
+        "archive_records-public",
+        "extracted_entities",
+        "extracted_relationships",
+    ):
+        (gate_root / "data" / f"{name}.csv").write_text("id\n")
+
+    def run_gate(candidate):
+        with (gate_root / "data/social_posts.csv").open("w", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=backfill.SCHEMA_FIELDS)
+            writer.writeheader()
+            writer.writerow(candidate)
+        return subprocess.run(
+            [
+                "node",
+                "--test",
+                "--test-name-pattern",
+                "all social posts retain source content",
+                "tests/csv-quality.test.js",
+            ],
+            cwd=gate_root,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+
+    accepted = run_gate(row)
+    assert accepted.returncode == 0, accepted.stdout + accepted.stderr
+    for invalid in (
+        {**row, "notes": "Source text is missing."},
+        {**row, "notes": row["notes"].replace("cid=", "missing_cid=")},
+        {**row, "notes": row["notes"].replace("record_sha256=", "missing_hash=")},
+        {**row, "verified": "TRUE"},
+        {**row, "summary": "Unsupported standalone summary."},
+    ):
+        rejected = run_gate(invalid)
+        assert rejected.returncode != 0
+        assert "neither raw_text nor a documented non-text exception" in rejected.stdout
 
 
 @pytest.mark.parametrize("kind", ["foreign", "repost", "malformed_repost"])
