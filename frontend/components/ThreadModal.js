@@ -1,7 +1,7 @@
-import { html } from '../html.js?v=3.8.53';
+import { html } from '../html.js?v=3.8.54';
 import { ExternalLink, MessageSquare } from 'lucide-react';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.8.53';
-import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.8.53';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.8.54';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.8.54';
 
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
