@@ -2268,10 +2268,20 @@ describe('social_posts.csv', () => {
   it('all social posts retain source content or document a non-text exception', () => {
     const missing = socialPosts
       .filter(post => !post.raw_text?.trim())
-      .filter(post => !(
-        /Source has no text; image-only post verified/i.test(post.notes || '') &&
-        /\bcid=[a-z0-9]+\b/i.test(post.notes || '')
-      ))
+      .filter(post => {
+        const notes = post.notes || '';
+        const reviewedImageOnly = /Source has no text; image-only post verified/i.test(notes) &&
+          /\bcid=[a-z0-9]+\b/i.test(notes);
+        const unverifiedEmptySource = post.platform === 'Bluesky' &&
+          /^BSKY-\d+$/.test(post.id) && post.verified === 'FALSE' && post.word_count === '0' &&
+          ![post.summary, post.excerpt, post.pull_quote, post.thematic_categories]
+            .some(value => value?.trim()) &&
+          /Source has no text; non-text content not verified; retained as context only\./.test(notes) &&
+          /decision: context_only; reason=empty_source_text\./.test(notes) &&
+          /\buri=at:\/\/did:plc:3t37x6vfigdzzp2gjcfnzlz4\/app\.bsky\.feed\.post\/[a-zA-Z0-9._~:-]+;/.test(notes) &&
+          /\bcid=[a-z0-9]+;/.test(notes) && /\brecord_sha256=[a-f0-9]{64}\./.test(notes);
+        return !reviewedImageOnly && !unverifiedEmptySource;
+      })
       .map(post => post.id);
     assert.strictEqual(
       missing.length,

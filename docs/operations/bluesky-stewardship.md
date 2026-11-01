@@ -39,6 +39,11 @@ They cannot become standalone records. This path uses no remote language-model A
 and does not invent entities or graph assertions. Manual batches can add reviewed
 editorial summaries and literal entity mentions separately.
 
+Posts with empty source text also remain context-only. Their notes record the
+empty-text reason, source URI, CID, and source-record hash. They keep empty text,
+summary, and taxonomy fields with `verified: FALSE`. The source payload stays in
+the batch snapshot; this does not verify or preserve the attached media bytes.
+
 The 90-day window also repairs older omissions found in the discovery ledger. The
 October 14 audit found 43 Jay source posts from July 22 through August 18 that were
 still absent from canonical data. Other authors' reposts in the discovery ledger

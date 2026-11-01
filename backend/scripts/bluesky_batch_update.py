@@ -57,6 +57,10 @@ CONTEXT_ONLY_NOTE = (
     "Standalone archive admission not verified; source identity and text were "
     "confirmed, but this item remains context only."
 )
+EMPTY_TEXT_CONTEXT_ONLY_NOTE = (
+    "Source has no text; non-text content not verified; retained as context only. "
+    "Standalone archive admission not verified."
+)
 
 URL_DISPLAY_RE = re.compile(
     r"(?:https?://|www\.)\S+|\b(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}(?:/\S*)?",
@@ -627,7 +631,7 @@ def _decision_rows(
         record_hash = _source_record_hash(record)
         meaningful = _meaningful_text(text, post_type)
 
-        reason = "brief_or_context_dependent_text"
+        reason = "brief_or_context_dependent_text" if text else "empty_source_text"
         admitted = False
         title = backfill.derive_title(_display_text(text))
         summary = ""
@@ -685,6 +689,9 @@ def _decision_rows(
             )
             decision = "admit"
         else:
+            context_only_note = (
+                CONTEXT_ONLY_NOTE if text else EMPTY_TEXT_CONTEXT_ONLY_NOTE
+            )
             row.update(
                 {
                     "summary": "",
@@ -693,7 +700,7 @@ def _decision_rows(
                     "notes": (
                         f"Bluesky autonomous batch {capture_label}; decision: "
                         f"context_only; reason={reason}. {evidence}{context_note} "
-                        f"{CONTEXT_ONLY_NOTE}"
+                        f"{context_only_note}"
                     ),
                 }
             )
