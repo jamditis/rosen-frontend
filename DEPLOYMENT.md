@@ -5,65 +5,8 @@ This is an internal guide for the archive's maintainers. If you're just explorin
 The archive is hosted at `pressthink.org/j/rosen-archive/`. Automated deploys
 use certificate-verified explicit FTPS to the chrooted path
 `j/rosen-archive/`; the code rejects broader FTPS roots before connecting.
-
-## Release procedure
-
-The archive has an established deployment path. Maintainers do not need access
-to the hosting control panel or ownership of the hosting account to use it.
-Identify the destination before deciding whether a release is complete:
-
-| Destination | Trigger | Completion evidence |
-| --- | --- | --- |
-| [GitHub Pages](https://jamditis.github.io/rosen-frontend/) | Automatic Pages deployment after a push or merge to `main` | Successful Pages deployment and the expected public `version.json` |
-| [PressThink archive](https://pressthink.org/j/rosen-archive/) | `deploy.yml`: Weekly Friday at 09:17 UTC, or manual dispatch against reviewed `main` | Successful FTPS transfer, successful live verification, and the expected public `version.json` |
-| PressThink record submission | `submit-record.yml` (also re-dispatched by `sweep-stuck-rows.yml`) | Successful workflow, published record live on `pressthink.org/j/rosen-archive/`, and sheet writeback complete |
-| PressThink Bluesky publication | Bluesky stewardship publisher workflow | Successful publication, accepted receipt, and healthy ingestion status |
-
-The current `deploy.yml` does not have a push trigger. The
-`post-merge.yml` dashboard notification runs only when
-`DASHBOARD_WEBHOOK_URL` is configured; it is not the full-site FTPS deploy.
-Check the live workflow definitions and repository settings when diagnosing
-automation. A successful automatic Pages release establishes that destination's
-status; check PressThink separately.
-
-For an authorized full-site PressThink release:
-
-1. Confirm that the intended PR is merged, its actionable review threads are
-   resolved, and GitHub CI is green for the release head. This is a public
-   repository: Run CI on GitHub-hosted runners and reserve fleet CI for private
-   repositories.
-2. Dispatch the existing workflow. It joins the release queue, refreshes
-   `main`, materializes current Git LFS files, runs checks, uploads through
-   FTPS, and verifies the public site:
-
-   ```sh
-   gh workflow run deploy.yml --repo jamditis/rosen-frontend --ref main -f dry_run=false
-   gh run list --repo jamditis/rosen-frontend --workflow deploy.yml --limit 5
-   gh run view RUN_ID --repo jamditis/rosen-frontend --log-failed
-   ```
-
-3. Read back `https://pressthink.org/j/rosen-archive/version.json` and compare
-   both release markers with the workflow's checked-out release. A dispatch
-   acknowledgement or a merged PR alone does not establish completion.
-4. For a source-discovery incident, also check the stewardship receipt and
-   ingestion health. Close the incident only after that path has recovered.
-
-### Transfer failures
-
-Classify a failure at the step that failed. Record the workflow, run ID,
-destination, server response, and completed-file count. A transfer error does
-not invalidate the deployment pathway or establish the status of another
-destination. If an alternate path was used, check the canonical `deploy.yml`
-path once before classifying its result.
-
-For example, FTP response `452 Transfer aborted. No space left on device`
-means that this upload was refused by the server. It does not establish
-whether the cause is an account quota, filesystem capacity, or another hosting
-constraint. The deploy writes a temporary file before renaming it. Check the
-completed-file count and public version before claiming that files changed.
-Do not repeat the same failing transfer without changed evidence, delete
-hosting data, or change quotas as an incidental deployment step. Preserve
-failed publisher receipts; a healthy receipt requires a successful release.
+Read the [release procedure](#release-procedure) for destinations, triggers, and
+completion evidence.
 
 Production Actions must set `ROSEN_TRANSFER_PROTOCOL=ftps`, port 21,
 `ROSEN_SFTP_SITE_PATH=j/rosen-archive`, and
@@ -177,6 +120,65 @@ tools/                              # Deployed standalone tools
 
 ADDING-RECORDS.md                   # Instructions for adding new records
 ```
+
+## Release procedure
+
+The archive has an established deployment path. Maintainers do not need access
+to the hosting control panel or ownership of the hosting account to use it.
+Identify the destination before deciding whether a release is complete:
+
+| Destination | Trigger | Completion evidence |
+| --- | --- | --- |
+| [GitHub Pages](https://jamditis.github.io/rosen-frontend/) | Automatic Pages deployment after a push or merge to `main` | Successful Pages deployment and the expected public `version.json` |
+| [PressThink archive](https://pressthink.org/j/rosen-archive/) | `deploy.yml`: Weekly Friday at 09:17 UTC, or manual dispatch against reviewed `main` | Successful FTPS transfer, successful live verification, and the expected public `version.json` |
+| PressThink record submission | `submit-record.yml` (also re-dispatched by `sweep-stuck-rows.yml`) | Successful workflow, published record live on `pressthink.org/j/rosen-archive/`, and sheet writeback complete |
+| PressThink Bluesky publication | Bluesky stewardship publisher workflow | Successful publication, accepted receipt, and healthy ingestion status |
+
+The current `deploy.yml` does not have a push trigger. The
+`post-merge.yml` dashboard notification runs only when
+`DASHBOARD_WEBHOOK_URL` is configured; it is not the full-site FTPS deploy.
+Check the live workflow definitions and repository settings when diagnosing
+automation. A successful automatic Pages release establishes that destination's
+status; check PressThink separately.
+
+For an authorized full-site PressThink release:
+
+1. Confirm that the intended PR is merged, its actionable review threads are
+   resolved, and GitHub CI is green for the release head. This is a public
+   repository: Run CI on GitHub-hosted runners and reserve fleet CI for private
+   repositories.
+2. Dispatch the existing workflow. It joins the release queue, refreshes
+   `main`, materializes current Git LFS files, runs checks, uploads through
+   FTPS, and verifies the public site:
+
+   ```sh
+   gh workflow run deploy.yml --repo jamditis/rosen-frontend --ref main -f dry_run=false
+   gh run list --repo jamditis/rosen-frontend --workflow deploy.yml --limit 5
+   gh run view RUN_ID --repo jamditis/rosen-frontend --log-failed
+   ```
+
+3. Read back `https://pressthink.org/j/rosen-archive/version.json` and compare
+   both release markers with the workflow's checked-out release. A dispatch
+   acknowledgement or a merged PR alone does not establish completion.
+4. For a source-discovery incident, also check the stewardship receipt and
+   ingestion health. Close the incident only after that path has recovered.
+
+### Transfer failures
+
+Classify a failure at the step that failed. Record the workflow, run ID,
+destination, server response, and completed-file count. A transfer error does
+not invalidate the deployment pathway or establish the status of another
+destination. If an alternate path was used, check the canonical `deploy.yml`
+path once before classifying its result.
+
+For example, FTP response `452 Transfer aborted. No space left on device`
+means that this upload was refused by the server. It does not establish
+whether the cause is an account quota, filesystem capacity, or another hosting
+constraint. The deploy writes a temporary file before renaming it. Check the
+completed-file count and public version before claiming that files changed.
+Do not repeat the same failing transfer without changed evidence, delete
+hosting data, or change quotas as an incidental deployment step. Preserve
+failed publisher receipts; a healthy receipt requires a successful release.
 
 The dissertation PDF and semantic `.onnx` and `.wasm` binaries are stored
 through Git LFS. The Actions deploy checkout materializes the current tree
