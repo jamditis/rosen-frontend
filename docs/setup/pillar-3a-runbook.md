@@ -1,5 +1,25 @@
 # Pillar 3a setup runbook
 
+## Current transfer route
+
+Use [DEPLOYMENT.md](../../DEPLOYMENT.md#release-procedure) for current full-site
+release commands, triggers, destination checks, and recovery steps. Use
+[Deploy and hosting](../../wiki/systems/deploy-and-hosting.md) for the transfer
+protocol and archive path. Blocks 0-3 below remain the submission-pipeline
+installation and smoke-test procedure; this transfer correction does not claim
+that App, sheet, or submission setup is complete.
+
+The archive has configured FTPS deployment credentials. The preferred full-site
+path is `deploy.yml`, using certificate-verified explicit FTPS on port 21 and
+`j/rosen-archive`. Deployment does not require control of the hosting account.
+The older Bluehost and port 22/SFTP instructions are historical references.
+
+Fleet operators use pass entry `claude/rosen/pressthink-ftps` on houseofjawn.
+Its companion `claude/rosen/pressthink-sftp-notes` names `deploy.yml` as the
+preferred path and WordPress File Manager as the manual fallback. The WordPress
+collaborator credential is for that fallback; do not use it in deploy automation.
+Retrieve credentials only when needed. Never copy their values into docs or logs.
+
 Operator-facing setup doc for the Pillar 3a free auto-deploy pipeline (`submit-record.yml` + `sweep-stuck-rows.yml`).
 
 Until both blocks below are done, both workflows are inert — a sweep tick or a manual `submit-record` dispatch will fail visibly in the Actions tab but cause no damage to the live archive.
@@ -12,7 +32,7 @@ Design source of truth: `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.
 
 ## Pre-flight: verified value sources
 
-Values were verified on houseofjawn 2026-05-28 (wake-20260528T0805-d0b994). Use the corrected sources below — the original issue body's assertions about pass entries were stale.
+Transfer sources were checked on houseofjawn on November 1, 2026. Other initialization sources below were recorded on May 28, 2026; verify the existing setup before provisioning it again.
 
 | Secret | Verified source | Notes |
 |---|---|---|
@@ -22,21 +42,25 @@ Values were verified on houseofjawn 2026-05-28 (wake-20260528T0805-d0b994). Use 
 | `ROSEN_SHEETS_SA_KEY_JSON` | `pass show claude/google/rosen-service-account-full` | One-line JSON; paste verbatim. Note: NOT `claude/rosen/...` or `claude/api/...` — older docs are stale |
 | `ROSEN_QUEUE_SHEET_ID` | Created by Block 0 below | New sheet for the Pillar 3a queue |
 | `ROSEN_QUEUE_SHEET_TAB` | `Sheet1` | Set only if you rename the tab |
-| `ROSEN_SFTP_HOST` | Bluehost cPanel → FTP accounts | Not in `pass`. See "SFTP credentials" below |
-| `ROSEN_SFTP_USER` | Bluehost cPanel | Same |
-| `ROSEN_SFTP_PASSWORD` | Bluehost cPanel | Same |
-| `ROSEN_SFTP_REMOTE_PATH` | See "SFTP remote path" below | Two candidates in existing docs — verify against current manual deploy practice |
-| `ROSEN_SFTP_KNOWN_HOSTS` | `ssh-keyscan` output, captured after Block 1 | Pins host key; rejects MITM. Paste all of the inline `ssh-keyscan` output (every host-key line), not just one — the code accepts inline contents or a path (#408); see "Capturing the host key" below |
+| `ROSEN_TRANSFER_PROTOCOL` | Current transfer configuration | `ftps` |
+| `ROSEN_SFTP_HOST` | `claude/rosen/pressthink-ftps` | Current FTPS host |
+| `ROSEN_SFTP_USER` | Same credential entry | Transfer username |
+| `ROSEN_SFTP_PASSWORD` | Same credential entry | Retrieve privately |
+| `ROSEN_SFTP_REMOTE_PATH` | Same credential entry, Data path | `j/rosen-archive/data` for submission artifacts |
+| `ROSEN_SFTP_KNOWN_HOSTS` | Only for an explicitly selected SFTP endpoint | FTPS verifies the TLS certificate; it does not use SSH host keys |
 
-Optional (only if switching from password to key auth — see "Enabling key-based auth" below):
+Protocol port and optional SFTP-only key settings:
 
 | Secret | When needed |
 |---|---|
-| `ROSEN_SFTP_PORT` | Bluehost defaults to 22; set only if non-standard |
+| `ROSEN_SFTP_PORT` | `21` for the current explicit FTPS endpoint |
 | `ROSEN_SFTP_KEY_CONTENT` | The **body** of the deploy private key. Setting it switches the push to key auth; the workflow writes it to a runner-temp file and exports `ROSEN_SFTP_KEY_PATH` itself — do not set a key-path secret |
 | `ROSEN_SFTP_KEY_PASSPHRASE` | Only if the key is encrypted |
 
-**Total: 11 required secrets + 3 optional**, all consumed by `submit-record.yml` or `sweep-stuck-rows.yml`. Sources verified via `grep -oE 'secrets\.ROSEN_[A-Z_]+|secrets\.GEMINI_[A-Z_]+' .github/workflows/{submit-record,sweep-stuck-rows}.yml`.
+The workflow consumes these settings by their existing `ROSEN_SFTP_*` names even when FTPS is selected. Confirm the selected protocol before applying any optional key settings.
+
+<details>
+<summary>Historical SFTP credential and host-key reference; not the current FTPS route</summary>
 
 ### SFTP credentials
 
@@ -100,6 +124,8 @@ Before Smoke 3, sanity-check that the secret holds **all** of the `ssh-keyscan` 
 
 ---
 
+</details>
+
 ## Block 0 — Create the queue sheet
 
 The sweep workflow needs a Google Sheet to read submission rows from. The submit workflow writes status back to that same sheet.
@@ -146,9 +172,14 @@ Settings → Secrets and variables → Actions → "New repository secret" for e
 1. `ROSEN_GH_APP_ID` and `ROSEN_GH_APP_PRIVATE_KEY` first (smoke-testable independently — the workflow's first step mints the token, so a misconfigured App fails fast at step 1).
 2. `GEMINI_API_KEY` and `ROSEN_SHEETS_SA_KEY_JSON` next (both are paste-from-pass).
 3. `ROSEN_QUEUE_SHEET_ID` (and optionally `ROSEN_QUEUE_SHEET_TAB`) next.
-4. `ROSEN_SFTP_*` last (requires the cPanel side trip — see "SFTP credentials" above).
+4. Current transfer settings last: `ROSEN_TRANSFER_PROTOCOL=ftps`, the existing FTPS credential, port 21, and the data path from the Pre-flight table. No cPanel side trip is required.
 
-### Enabling key-based auth (plumbing is in place)
+<details>
+<summary>Optional SFTP-only key authentication reference</summary>
+
+These steps apply only to a separately verified SFTP endpoint. They do not apply to the current FTPS service. Do not remove its password or change its protocol as part of a release recovery.
+
+### Enabling key-based auth (SFTP only)
 
 The workflow plumbing now exists. `submit-record.yml` has a "Materialize SFTP private key" step that, when the `ROSEN_SFTP_KEY_CONTENT` secret is set, writes the key body to a runner-temp file (`chmod 600`) and exports `ROSEN_SFTP_KEY_PATH` before the push; `sftp_push.py` prefers the key over the password whenever a key path is present. The step is a no-op while the secret is unset, so password auth stays the working default and nothing changes until the cutover below is done.
 
@@ -164,6 +195,8 @@ To cut over from password to key auth:
 Do not set a `ROSEN_SFTP_KEY_PATH` secret: the workflow exports that path itself, and a step-level secret of the same name would shadow it and silently fall back to password auth.
 
 ---
+
+</details>
 
 ## Block 3 — End-to-end smoke test
 
@@ -206,10 +239,10 @@ Use a URL on the RFC 6761 `.invalid` TLD — DNS resolution always fails, so `is
 
 ### Smoke 3 — new URL, full pipeline
 
-7. Confirm `ROSEN_SFTP_KNOWN_HOSTS` carries all of the host's `ssh-keyscan` output — every host-key line (inline is fine — handled in code, #408); a missing, partial, or wrong key fails the push under `RejectPolicy`.
+7. Confirm `ROSEN_TRANSFER_PROTOCOL=ftps`, the existing credential, port 21, and the data path. The FTPS client verifies the TLS certificate. SSH host keys are required only for a separately selected SFTP endpoint; they are not an FTPS prerequisite.
 8. Pick a real PressThink URL NOT in the archive (`pressthink.org/[year]/...` from a recent post).
 9. Same dispatch flow.
-10. **Expected**: full pipeline runs, new `RECORD-NNNNN` commit appears on `main` from `rosen-archive-bot[bot]`, `post-merge.yml` fires, archive JSONs deploy via SFTP, live site updates within a minute of the workflow finishing.
+10. **Expected**: full pipeline runs, a new `RECORD-NNNNN` commit appears on `main` from `rosen-archive-bot[bot]`, and archive JSONs deploy via FTPS. Verify the live artifacts against the committed release. The separately gated `post-merge.yml` notification is not deployment proof.
 
 After Smoke 3 passes, the system is live. The Apps Script piece (Pillar 3a piece 1, separate PR) is what then makes this fire from Jay's sheet edit instead of from a manual Actions UI dispatch.
 
@@ -231,7 +264,8 @@ Public-repo standard runners stay unmetered through the [March 2026 GHA pricing 
 
 - **"Bad credentials" on App-token mint step**: `ROSEN_GH_APP_ID` is wrong (should be integer, not the App's slug) or `ROSEN_GH_APP_PRIVATE_KEY` was pasted without the `-----BEGIN`/`-----END` lines.
 - **Push to `main` rejected**: bot not added to branch-protection bypass (Block 1 final substep).
-- **SFTP fails with "Host key not in known_hosts"**: re-run `ssh-keyscan` after Bluehost reinstall; update `ROSEN_SFTP_KNOWN_HOSTS`.
+- **FTPS transfer fails**: Follow [Transfer failures](../../DEPLOYMENT.md#transfer-failures). Preserve the exact error and completed-file count; do not infer success from a merge or notification.
+- **SFTP-only "Host key not in known_hosts"**: For a separately verified SFTP endpoint, verify its current host key before updating `ROSEN_SFTP_KNOWN_HOSTS`. This does not apply to FTPS.
 - **Sheet writeback fails with 403**: service-account email wasn't added as Editor to the queue sheet (Block 0 step 4).
 
 ### Related issues + PRs
