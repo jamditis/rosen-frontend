@@ -1,4 +1,29 @@
-# Pillar 3a setup runbook
+# Pillar 3a setup reference
+
+## Current deployment route
+
+This page records the May 2026 initialization of the submission pipeline.
+Use [DEPLOYMENT.md](../../DEPLOYMENT.md#archive-release-runbook) for current
+release commands, triggers, destination checks, and recovery steps. Use
+[Deploy and hosting](../../wiki/systems/deploy-and-hosting.md) for the transfer
+protocol and archive path.
+
+The archive now has configured FTPS deployment credentials. The preferred
+full-site path is the existing `deploy.yml` workflow. It uses certificate-verified
+explicit FTPS on port 21 and the transfer account's `j/rosen-archive` path.
+Do not follow the historical Bluehost, missing-credential, port-22, or SFTP
+key-setup instructions below to recover a current release. Deployment does not
+require control of the hosting account or a new account.
+
+Fleet operators can find the current FTPS credential in the documented pass
+entry `claude/rosen/pressthink-ftps` on houseofjawn. Its companion
+`claude/rosen/pressthink-sftp-notes` names `deploy.yml` as the preferred path and
+WordPress File Manager as the manual fallback. The WordPress collaborator
+credential is for that fallback; do not use it in deploy automation. Retrieve
+credentials only when needed and never copy their values into docs or logs.
+
+<details>
+<summary>Historical May 2026 initialization instructions</summary>
 
 Operator-facing setup doc for the Pillar 3a free auto-deploy pipeline (`submit-record.yml` + `sweep-stuck-rows.yml`).
 
@@ -244,3 +269,5 @@ Public-repo standard runners stay unmetered through the [March 2026 GHA pricing 
 - Next: Pillar 3a piece 1 (Apps Script v2) — separate PR after this setup is verified end-to-end
 
 Receipt token: wake-20260528T0805-d0b994
+
+</details>
