@@ -131,6 +131,10 @@ test, copy the tracked `data/urls_to_scrape.csv` and
 
 ## Deployment notes
 
+Read the [release procedure](DEPLOYMENT.md#release-procedure) before a release
+or deployment diagnosis. Merges to `main` deploy GitHub Pages automatically;
+the established PressThink workflow has its own trigger and live verification.
+
 Production deploys by certificate-verified FTPS to
 `pressthink.org/j/rosen-archive/`.
 
