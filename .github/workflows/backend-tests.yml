@@ -21,7 +21,8 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # The pinned Python Playwright release supports Ubuntu 24.04.
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     
