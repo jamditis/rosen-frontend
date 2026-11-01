@@ -121,6 +121,30 @@ tools/                              # Deployed standalone tools
 ADDING-RECORDS.md                   # Instructions for adding new records
 ```
 
+The dissertation PDF and semantic `.onnx` and `.wasm` binaries are stored
+through Git LFS. The Actions deploy checkout materializes the current tree
+before upload. Before a manual FTP deploy, run
+`git lfs pull --include="dissertation/reader/*.pdf,frontend/vendor/semantic/v1/**"`.
+Confirm the reader PDF is 18,500,765 bytes and run
+`node --test tests/semantic-self-host.test.js`; never upload LFS pointer files.
+
+The full-site deploy uploads every standalone `index.html` under its deployed
+directories only after all walked assets and the shared data manifest. This
+keeps dissertation, FAQ, feature, and tool entry points on the previous release
+until their JavaScript, CSS, and data dependencies are live. Generated
+`r/*.html` record shells follow all frontend and data dependencies. The root
+`index.html`, implementation worker, root-scope worker bridge, and
+`version.json` then retain their final four release flips.
+
+`backend/scripts/deploy_full_site.py` rebuilds `r/*.html` from the committed
+`index.html` and `data/archive-data.json` before collecting the upload. These
+small generated shells replace only the page metadata; Apache serves them
+internally for valid `?record=ID` requests while the browser keeps the public
+deep-link URL and loads the same React app. After every upload succeeds, the
+deploy also removes safe `r/ID.html` files that no longer correspond to a
+generated non-social record. Unrelated files and directories under `r/` are
+left untouched.
+
 ## Release procedure
 
 The archive has an established deployment path. Maintainers do not need access
@@ -179,30 +203,6 @@ completed-file count and public version before claiming that files changed.
 Do not repeat the same failing transfer without changed evidence, delete
 hosting data, or change quotas as an incidental deployment step. Preserve
 failed publisher receipts; a healthy receipt requires a successful release.
-
-The dissertation PDF and semantic `.onnx` and `.wasm` binaries are stored
-through Git LFS. The Actions deploy checkout materializes the current tree
-before upload. Before a manual FTP deploy, run
-`git lfs pull --include="dissertation/reader/*.pdf,frontend/vendor/semantic/v1/**"`.
-Confirm the reader PDF is 18,500,765 bytes and run
-`node --test tests/semantic-self-host.test.js`; never upload LFS pointer files.
-
-The full-site deploy uploads every standalone `index.html` under its deployed
-directories only after all walked assets and the shared data manifest. This
-keeps dissertation, FAQ, feature, and tool entry points on the previous release
-until their JavaScript, CSS, and data dependencies are live. Generated
-`r/*.html` record shells follow all frontend and data dependencies. The root
-`index.html`, implementation worker, root-scope worker bridge, and
-`version.json` then retain their final four release flips.
-
-`backend/scripts/deploy_full_site.py` rebuilds `r/*.html` from the committed
-`index.html` and `data/archive-data.json` before collecting the upload. These
-small generated shells replace only the page metadata; Apache serves them
-internally for valid `?record=ID` requests while the browser keeps the public
-deep-link URL and loads the same React app. After every upload succeeds, the
-deploy also removes safe `r/ID.html` files that no longer correspond to a
-generated non-social record. Unrelated files and directories under `r/` are
-left untouched.
 
 ## Retired routes and files removed by a full deploy
 
