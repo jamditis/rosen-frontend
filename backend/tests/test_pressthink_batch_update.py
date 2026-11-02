@@ -19,7 +19,7 @@ def post(post_id=10903, *, body="<p>Journalism should show its work.</p>"):
         "type": "post",
         "date_gmt": "2017-12-01T14:00:00",
         "modified_gmt": "2017-12-02T14:00:00",
-        "title": {"rendered": "Show work &amp; trust"},
+        "title": {"rendered": f"Show work &amp; trust {post_id}"},
         "content": {"rendered": body, "protected": False},
         "yoast_head_json": {"author": "Jay Rosen"},
     }
@@ -85,7 +85,7 @@ def test_source_text_is_literal_and_active_markup_is_removed():
     source = batch.source_post(
         post(body="<p>A &amp; B.</p><script>alert(1)</script><p>C.</p>")
     )
-    assert source["title"] == "Show work & trust"
+    assert source["title"] == "Show work & trust 10903"
     assert source["text"] == "A & B.\nC."
     assert "<script>" in source["html"]  # Preserve the original separately.
 
@@ -170,3 +170,60 @@ def test_corrupt_history_aborts_before_csv_changes(tmp_path):
     with pytest.raises(ValueError, match="hash mismatch"):
         batch.run_batch(posts=[post(1), post(2)], **kwargs)
     assert csv_path.read_bytes() == before
+
+
+def test_inline_markup_keeps_punctuation_and_words_intact():
+    assert batch.plain_text(
+        "<p>(<em>Times</em>), <strong>J</strong>ournalism <a>link</a>, and more.</p>"
+    ) == "(Times), Journalism link, and more."
+
+
+def test_unicode_line_separators_round_trip_in_source_history(tmp_path):
+    csv_path, history = canonical_fixture(tmp_path)
+    item = post(2, body="<p>Before\u2028middle\u2029after\u0085end.</p>")
+    kwargs = {"csv_path": csv_path, "history_path": history}
+    batch.run_batch(posts=[post(1), item], **kwargs)
+    entries, _heads = batch.load_history(history)
+    assert entries[-1]["source"]["html"] == item["content"]["rendered"]
+    assert not batch.run_batch(posts=[post(1), item], **kwargs)["changed"]
+
+
+def test_day_path_alias_reuses_existing_id_and_title_match_requires_review(tmp_path):
+    csv_path, history = canonical_fixture(tmp_path)
+    columns, rows = batch.read_archive_csv(csv_path)
+    rows[0]["url"] = "https://pressthink.org/2017/12/01/article-1/"
+    batch.write_archive_csv(csv_path, columns, rows)
+    duplicate = post(2)
+    duplicate["title"] = post(1)["title"]
+    result = batch.run_batch(
+        posts=[post(1), duplicate], csv_path=csv_path, history_path=history
+    )
+    assert result["added"] == 0
+    assert result["excluded"][0]["candidate_record_ids"] == ["RECORD-00001"]
+    entries, _heads = batch.load_history(history)
+    assert entries[0]["record_id"] == "RECORD-00001"
+    assert entries[1]["state"] == "review"
+
+
+def test_curator_removal_retires_identity_without_stopping_other_updates(tmp_path):
+    csv_path, history = canonical_fixture(tmp_path)
+    kwargs = {"csv_path": csv_path, "history_path": history}
+    batch.run_batch(posts=[post(1), post(2)], **kwargs)
+    columns, rows = batch.read_archive_csv(csv_path)
+    batch.write_archive_csv(csv_path, columns, rows[1:])
+    changed = post(2, body="<p>Another source revision.</p>")
+    result = batch.run_batch(posts=[post(1), changed], **kwargs)
+    assert result["added"] == 0
+    assert result["updated"] == 1
+    assert result["retired_record_ids"] == ["RECORD-00001"]
+    _, rows = batch.read_archive_csv(csv_path)
+    assert [r["id"] for r in rows] == ["RECORD-00002"]
+    assert rows[0]["raw_text"] == "Another source revision."
+    assert not batch.run_batch(posts=[post(1), changed], **kwargs)["changed"]
+
+
+def test_unclassified_source_keeps_the_low_confidence_flag():
+    source = batch.source_post(post(body="<p>Something unrelated.</p>"))
+    fields = batch.source_fields(source, "2026-11-02")
+    assert fields["thematic_categories"] == "uncategorized"
+    assert fields["low_confidence"] == "TRUE"

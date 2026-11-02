@@ -133,7 +133,7 @@ def plain_text(markup):
         node.decompose()
     for node in soup.select("p,div,li,h1,h2,h3,h4,blockquote,br"):
         node.insert_before("\n")
-    text = soup.get_text(" ")
+    text = soup.get_text()
     text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", " ", text)
     return "\n".join(" ".join(line.split()) for line in text.splitlines()).strip()
 
@@ -141,7 +141,15 @@ def plain_text(markup):
 def url_identity(url):
     parsed = urlsplit(url)
     host = (parsed.hostname or "").lower().removeprefix("www.")
-    return host, unquote(parsed.path).rstrip("/")
+    path = unquote(parsed.path).rstrip("/")
+    if host == "pressthink.org":
+        path = re.sub(r"^(/\d{4}/\d{2})/\d{2}/([^/]+)$", r"\1/\2", path)
+    return host, path
+
+
+def title_identity(title):
+    title = re.sub(r"^PressThink:\s*", "", title, flags=re.IGNORECASE)
+    return " ".join(re.findall(r"\w+", plain_text(title).casefold()))
 
 
 def source_post(post):
@@ -169,7 +177,9 @@ def source_post(post):
     text = plain_text(html)
     author = post.get("yoast_head_json", {}).get("author", "").strip()
     if len(title) < 5 or not text or not author:
-        raise ValueError("PressThink source lacks title, text, or public authorship")
+        raise ValueError(
+            f"PressThink post {post['id']} lacks title, text, or public authorship"
+        )
     return {
         "id": post["id"],
         "url": post["link"],
@@ -192,7 +202,11 @@ def load_history(path):
     heads = {}
     if not path.exists():
         return [], heads
-    entries = [json.loads(line) for line in path.read_text().splitlines() if line]
+    entries = [
+        json.loads(line)
+        for line in path.read_text(encoding="utf-8").split("\n")
+        if line
+    ]
     for entry in entries:
         identity = str(entry["source"]["id"])
         if entry["previous"] != heads.get(identity):
@@ -224,15 +238,34 @@ def source_fields(source, captured_at):
         "word_count": str(len(source["text"].split())),
         "excerpt": excerpt,
         "summary": "Source excerpt: " + excerpt,
-        "thematic_categories": ", ".join(categories),
+        "thematic_categories": ", ".join(categories) if categories else "uncategorized",
         "raw_text": source["text"],
         "date_processed": captured_at,
         "verified": "TRUE",
-        "low_confidence": "FALSE",
+        "low_confidence": "FALSE" if categories else "TRUE",
         "needs_review": "TRUE",
         "permissions": "Public website; original source rights apply",
         "notes": MANAGED_NOTE + str(source["id"]),
     }
+
+
+def source_association(source, old, by_id, by_url, by_title):
+    """Resolve an existing identity or retain a review/retirement boundary."""
+    matches = by_url.get(url_identity(source["url"]), [])
+    record_id = (old or {}).get("record_id")
+    if record_id not in by_id and len(matches) == 1:
+        record_id = matches[0]
+    row = by_id.get(record_id)
+    if record_id and not row:
+        return record_id, "retired", []
+    title_matches = by_title.get(
+        (title_identity(source["title"]), source["published_gmt"][:4]), []
+    )
+    possible_duplicates = matches if len(matches) > 1 else title_matches
+    state = "review" if not record_id and possible_duplicates else "linked"
+    if row and source["author"] != "Jay Rosen":
+        state = "review"
+    return record_id, state, possible_duplicates
 
 
 def reconcile(posts, columns, rows, entries, *, captured_at):
@@ -242,7 +275,11 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
         raise ValueError("Duplicate PressThink source identities")
     if len({url_identity(s["url"]) for s in sources}) != len(sources):
         raise ValueError("Duplicate PressThink canonical URLs")
-    by_url = {url_identity(row["url"]): row for row in rows}
+    by_url, by_title = {}, {}
+    for row in rows:
+        by_url.setdefault(url_identity(row["url"]), []).append(row["id"])
+        title_key = (title_identity(row["title"]), row["publication_date"][:4])
+        by_title.setdefault(title_key, []).append(row["id"])
     previous = {str(entry["source"]["id"]): entry for entry in entries}
     successor = [dict(row) for row in rows]
     by_id = {row["id"]: row for row in successor}
@@ -254,17 +291,33 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
         ),
         default=0,
     )
-    added, updated, versions, excluded = 0, 0, [], []
+    added, updated, versions, excluded, proposed, retired = 0, 0, [], [], [], []
     for source in sources:
         identity = str(source["id"])
         old = previous.get(identity)
-        row = by_url.get(url_identity(source["url"]))
-        record_id = (old or {}).get("record_id") or (row or {}).get("id")
+        record_id, state, possible_duplicates = source_association(
+            source, old, by_id, by_url, by_title
+        )
         row = by_id.get(record_id)
-        if record_id and not row:
-            raise ValueError("Preserved PressThink record identity is missing")
+        if state == "retired":
+            retired.append(record_id)
+        if not record_id and possible_duplicates:
+            state = "review"
+            excluded.append(
+                {
+                    "source_id": source["id"],
+                    "reason": "Possible existing record",
+                    "candidate_record_ids": possible_duplicates,
+                    "url": source["url"],
+                    "title": source["title"],
+                }
+            )
         changed = old is None or old["source"] != source
-        if not record_id and source["author"] == "Jay Rosen":
+        if (
+            not record_id
+            and not possible_duplicates
+            and source["author"] == "Jay Rosen"
+        ):
             next_id += 1
             record_id = f"RECORD-{next_id:05d}"
             row = {column: "" for column in columns}
@@ -272,7 +325,16 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
             successor.append(row)
             by_id[record_id] = row
             added += 1
-        elif row and changed and old and row.get("notes") == MANAGED_NOTE + identity:
+            proposed.append(
+                {"record_id": record_id, "url": source["url"], "title": source["title"]}
+            )
+        elif (
+            row
+            and state == "linked"
+            and changed
+            and old
+            and row.get("notes") == MANAGED_NOTE + identity
+        ):
             before_fields = source_fields(old["source"], old["captured_at"])
             after_fields = source_fields(source, captured_at)
             changed_fields = {
@@ -282,12 +344,21 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
             }
             row.update(changed_fields)
             updated += bool(changed_fields)
-        if not record_id:
+        if not record_id and not possible_duplicates:
+            state = "review"
             excluded.append({"source_id": source["id"], "reason": "Author requires review"})
-        if changed:
+        elif row and source["author"] != "Jay Rosen":
+            excluded.append(
+                {"source_id": source["id"], "reason": "Author requires review"}
+            )
+        association_changed = old and (
+            old.get("state", "linked") != state or old.get("record_id") != record_id
+        )
+        if changed or association_changed:
             entry = {
                 "source": source,
                 "record_id": record_id,
+                "state": state,
                 "captured_at": captured_at,
                 "previous": old["sha256"] if old else None,
             }
@@ -301,6 +372,8 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
         "versions_added": len(versions),
         "missing_source_ids": missing,
         "excluded": excluded,
+        "proposed_additions": proposed,
+        "retired_record_ids": retired,
         "changed": bool(added or updated or versions),
     }
 

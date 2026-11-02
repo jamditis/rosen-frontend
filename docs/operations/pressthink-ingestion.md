@@ -18,6 +18,11 @@ called. Existing canonical URLs retain their IDs. A later change updates a
 field only when the row belongs to this adapter and that field still matches
 the prior captured value. Curator changes survive. Existing curated records
 receive source-version evidence without automatic metadata replacement.
+Day-bearing WordPress URL aliases retain the existing ID. Ambiguous URL matches
+or an existing title from the same year go to review without creating a second
+record. The report lists proposed additions and possible matches. A curator's
+removed row is recorded as retired and is not recreated; unrelated intake can
+continue. Uncategorized records carry the low-confidence flag.
 
 `preservation/pressthink/versions.jsonl` retains public source versions in an
 append-only chain with a SHA-256 and previous-version hash for each WordPress
