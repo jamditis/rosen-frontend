@@ -17,7 +17,7 @@ import {
   TYPEWRITER_SEQUENCE,
   createSequenceMatcher,
   isTypingTarget,
-} from '../utils/easterEggs.js?v=3.8.57';
+} from '../utils/easterEggs.js?v=3.8.58';
 
 export const TYPEWRITER_CLASS = 'archive-typewriter-egg';
 

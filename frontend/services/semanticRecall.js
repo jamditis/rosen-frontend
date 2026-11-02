@@ -1,5 +1,5 @@
 const DEFAULT_WORKER_URL = new URL(
-  './embeddings-worker.js?v=3.8.57',
+  './embeddings-worker.js?v=3.8.58',
   import.meta.url,
 );
 
