@@ -92,10 +92,13 @@ failure creates or updates one GitHub issue with the run link and a safe error c
 
 ## Health and recovery
 
-Live health requires recent successful Bluesky discovery and a successful
-`published` or verified `no_change` receipt within 36 hours. PressThink keeps its
-168-hour source-check interval plus the same grace period. A missing heartbeat,
-failed publication, ledger failure, or stale source check returns HTTP 503.
+Live health requires successful discovery and a `published` or verified
+`no_change` receipt within 36 hours for Bluesky and each article consumer:
+PressThink, CJR search, CJR author, and Common Dreams author. PressThink discovery
+keeps its 168-hour backstop interval plus the same grace period; the independent
+article publisher still runs daily. A missing or failed receipt, ledger failure,
+or stale source check returns HTTP 503. The [article recovery guide](pressthink-ingestion.md)
+describes per-source checks, historical holds, and the authenticated discovery operator.
 An independent hourly user timer on officejawn checks this endpoint. Two consecutive
 failed checks send one Telegram alert through the supported notification route;
 recovery sends one resolution. Officejawn downtime delays this watch, while Actions

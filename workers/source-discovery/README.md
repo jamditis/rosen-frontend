@@ -49,8 +49,8 @@ Migration `0004_candidate_history_index.sql` adds the bounded Bluesky history lo
 
 Migration `0006_source_ingestion_runs.sql` adds source-specific PressThink receipts
 without changing the legacy Bluesky table. Apply it before deploying this Worker.
-Run the reviewed PressThink publisher after activation; until the first verified
-receipt, aggregate health is degraded. PressThink receipt freshness is 36 hours;
+Run the reviewed PressThink publisher and all three publisher-feed consumers after activation; until every first verified
+receipt and discovery check, aggregate health is degraded. All four article sources use receipt freshness of 36 hours;
 its discovery backstop retains the weekly allowance. Blog edit age is evidence,
 not publisher freshness.
 

@@ -111,6 +111,8 @@ jobs:
 
       - name: Capture, test, commit, and push update
         id: prepare
+        env:
+          ROSEN_INGESTION_RECEIPT_TOKEN: ${{ secrets.ROSEN_INGESTION_RECEIPT_TOKEN }}
         continue-on-error: true
         working-directory: backend
         run: poetry run node ../.github/scripts/bluesky-stewardship-publisher.mjs prepare

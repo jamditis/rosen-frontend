@@ -59,12 +59,14 @@ function text(value) {
   return value == null ? '' : String(value).trim();
 }
 
-function run(root, command, args, options = {}) {
+export function run(root, command, args, options = {}) {
+  const childEnvironment = { ...process.env };
+  delete childEnvironment.ROSEN_INGESTION_RECEIPT_TOKEN;
   return execFileSync(command, args, {
     cwd: root,
     encoding: options.encoding ?? 'utf8',
     stdio: options.stdio ?? 'inherit',
-    env: options.env ?? process.env,
+    env: options.env ?? childEnvironment,
     maxBuffer: 64 * 1024 * 1024,
   });
 }
@@ -211,14 +213,12 @@ export function buildSourceIngestionReceipt(options) {
   const records = failed ? [] : associations.filter(item => published.has(item.record_id))
     .map(item => ({ uri: item.uri, recordId: item.record_id, decision: 'accepted' }));
   const uris = new Set();
-  const ids = new Set();
   for (const record of records) {
     if (!isArticleSourceUrl(sourceId, record.uri)
-      || !/^RECORD-\d{5,}$/.test(record.recordId || '') || uris.has(record.uri) || ids.has(record.recordId)) {
+      || !/^RECORD-\d{5,}$/.test(record.recordId || '') || uris.has(record.uri)) {
       throw new Error('PressThink receipt association is invalid');
     }
     uris.add(record.uri);
-    ids.add(record.recordId);
   }
   const captured = report?.captured || 0;
   if (records.length > captured) throw new Error('PressThink receipt counts are inconsistent');
@@ -490,9 +490,11 @@ function captureBatch(root, paths, dryRun) {
     '--report', paths.reportPath,
     '--snapshot-dir', paths.snapshotDir,
     '--overlap-hours', '2160',
+    '--pending-ledger',
   ];
   if (dryRun) adapterArgs.push('--dry-run');
-  run(root, 'python', adapterArgs);
+  // Only the authenticated candidate reader receives the receipt token.
+  run(root, 'python', adapterArgs, { env: process.env });
   return readJson(paths.reportPath);
 }
 

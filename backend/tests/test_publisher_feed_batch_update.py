@@ -3,6 +3,7 @@
 import csv
 import io
 import json
+import subprocess
 from xml.sax.saxutils import escape
 
 import pytest
@@ -199,6 +200,88 @@ def test_dry_run_and_interrupted_transaction_use_existing_recovery(
     assert not feed.archive.transaction.journal_path(history).exists()
 
 
+def test_absent_feed_metadata_can_resolve_a_former_hold_without_refetching_body(
+    tmp_path,
+):
+    csv_path, history, sources = fixture(tmp_path)
+    first = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=sources
+    )
+    columns, rows = feed.archive.read_archive_csv(csv_path)
+    old = {
+        **sources[0],
+        "id": CJR + ":https://www.cjr.org/analysis/older.php",
+        "url": "https://www.cjr.org/analysis/older.php",
+    }
+    held = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=[sources[0], old]
+    )
+    assert held["added"] == 0
+    assert held["excluded"]
+    # A curator resolves the syndication identity between two feed observations.
+    rows[0]["url"] = old["url"]
+    feed.archive.write_archive_csv(csv_path, columns, rows)
+    current = [
+        {
+            **sources[0],
+            "id": CJR + ":https://www.cjr.org/analysis/newer.php",
+            "url": "https://www.cjr.org/analysis/newer.php",
+            "title": "A different current feed article",
+            "modified_gmt": "2024-01-01T00:00:00",
+        }
+    ]
+    replay = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=current
+    )
+    assert replay["historical_reconsidered"] == 2
+    assert old["id"] in replay["missing_source_ids"]
+    assert {
+        "uri": old["url"],
+        "record_id": first["associations"][0]["record_id"],
+    } in replay["associations"]
+    assert replay["current_feed_items"] == 1
+    assert replay["captured"] == 3
+    assert replay["newest_source_time"] == "2024-01-01T00:00:00Z"
+    published_ids = [row["id"] for row in feed.archive.read_archive_csv(csv_path)[1]]
+    program = """
+import fs from 'node:fs';
+import { buildSourceIngestionReceipt } from './.github/scripts/bluesky-stewardship-publisher.mjs';
+console.log(JSON.stringify(buildSourceIngestionReceipt(JSON.parse(fs.readFileSync(0, 'utf8')))));
+"""
+    receipt = json.loads(
+        subprocess.run(
+            ["node", "--input-type=module", "-e", program],
+            cwd=feed.ROOT,
+            input=json.dumps(
+                {
+                    "sourceId": CJR,
+                    "runId": "history_fixture",
+                    "status": "published",
+                    "checkedAt": "2026-11-02T12:00:00Z",
+                    "canonicalCommit": "a" * 40,
+                    "releaseVersion": "3.8.58",
+                    "publishedRecordIds": published_ids,
+                    "report": {"article": replay},
+                }
+            ),
+            text=True,
+            capture_output=True,
+            check=True,
+        ).stdout
+    )
+    assert len(receipt["records"]) == len(replay["associations"])
+    assert receipt["captured"] == 3
+    assert receipt["sourceLatestAt"] == "2024-01-01T00:00:00.000Z"
+    assert receipt["contextOnly"] == 3 - len(receipt["records"])
+    assert (
+        sum(
+            record["recordId"] == first["associations"][0]["record_id"]
+            for record in receipt["records"]
+        )
+        == 2
+    )
+
+
 def test_managed_publisher_relevance_changes_use_neutral_metadata_and_recover(tmp_path):
     csv_path, history, sources = fixture(tmp_path)
     first = feed.run_batch(
@@ -222,3 +305,82 @@ def test_managed_publisher_relevance_changes_use_neutral_metadata_and_recover(tm
     assert restored["updated"] == 1
     assert restored["associations"][0]["record_id"] == record_id
     assert feed.archive.read_archive_csv(csv_path)[1][0]["author"] == "Jay Rosen"
+
+
+def test_normalized_url_alias_retains_identity_and_legacy_heads_do_not_wedge(tmp_path):
+    csv_path, history, _sources = fixture(tmp_path)
+    original_url = "https://www.cjr.org/analysis/alias"
+    original = feed.parse_feed(CJR, rss(url=original_url))
+    first = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=original
+    )
+    record_id = first["associations"][0]["record_id"]
+    entry = json.loads(history.read_text().splitlines()[0])
+    legacy_alias = {
+        **entry,
+        "source": {
+            **entry["source"],
+            "id": CJR + ":" + original_url + "/",
+            "url": original_url + "/",
+        },
+        "previous": None,
+    }
+    legacy_alias["sha256"] = feed.archive.digest(
+        {key: value for key, value in legacy_alias.items() if key != "sha256"}
+    )
+    with history.open("a") as stream:
+        stream.write(json.dumps(legacy_alias) + "\n")
+    aliased = feed.parse_feed(CJR, rss(url=original_url + "/"))
+    result = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=aliased
+    )
+    assert result["added"] == 0
+    assert result["associations"] == [
+        {"uri": original_url + "/", "record_id": record_id}
+    ]
+    assert result["superseded_history_identities"] == [legacy_alias["source"]["id"]]
+    assert feed.archive.read_archive_csv(csv_path)[1][0]["url"] == original_url + "/"
+    again = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=aliased
+    )
+    assert not again["changed"]
+    feed.archive.load_history(history)
+
+
+def test_historical_syndication_hold_cannot_create_after_curator_retitles_candidate(
+    tmp_path,
+):
+    csv_path, history, sources = fixture(tmp_path)
+    columns, _rows = feed.archive.read_archive_csv(csv_path)
+    candidate = {"id": "RECORD-00001", **feed.metadata_fields(sources[0], "2026-01-01")}
+    candidate["notes"] = "Curator-reviewed record with no publisher journal association"
+    feed.archive.write_archive_csv(csv_path, columns, [candidate])
+    feed.archive.record_id_sequence.advance(csv_path, 1)
+    held_source = {
+        **sources[0],
+        "id": CJR + ":https://www.cjr.org/analysis/syndicated.php",
+        "url": "https://www.cjr.org/analysis/syndicated.php",
+    }
+    held = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=[held_source]
+    )
+    assert held["added"] == 0
+    assert held["excluded"][0]["candidate_record_ids"] == ["RECORD-00001"]
+    candidate["title"] = "Curator's corrected title"
+    feed.archive.write_archive_csv(csv_path, columns, [candidate])
+    current = feed.parse_feed(
+        CJR,
+        rss(
+            title="A different current article",
+            url="https://www.cjr.org/analysis/current.php",
+        ),
+    )
+    result = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=current
+    )
+    assert result["added"] == 1
+    assert result["historical_reconsidered"] == 1
+    assert any(item["source_id"] == held_source["id"] for item in result["excluded"])
+    assert held_source["url"] not in {
+        row["url"] for row in feed.archive.read_archive_csv(csv_path)[1]
+    }

@@ -497,3 +497,71 @@ def test_supported_telegram_command_uses_no_shell_or_copied_credentials(monkeypa
     ]
     assert calls[0][1]["check"] is True
     assert calls[0][1]["timeout"] == 20
+
+
+def test_article_failure_identifies_source_even_when_bluesky_is_healthy():
+    payload = _health_payload(healthy=False)
+    payload["sourceIngestion"] = [
+        {
+            "sourceId": "cjr-jay-rosen-author",
+            "healthy": False,
+            "status": "receipt_stale",
+            "errorClass": "publication_receipt_stale",
+            "checkedAt": "2026-10-12T10:00:00Z",
+            "canonicalCommit": "a" * 40,
+            "releaseVersion": "3.8.57",
+        }
+    ]
+    parsed = watcher._parse_operational_health(payload)
+    assert parsed.healthy is False
+    assert parsed.affected_sources == ("cjr-jay-rosen-author",)
+    assert parsed.affected_components == ("article publication",)
+    assert parsed.error_class == "publication_receipt_stale"
+    payload["healthy"] = True
+    assert watcher._parse_operational_health(payload).healthy is False
+    payload["sourceIngestion"].append(dict(payload["sourceIngestion"][0]))
+    assert watcher._parse_operational_health(payload) is None
+
+
+def test_article_alert_links_to_its_workflow_and_recovery_guide():
+    probe = watcher.ProbeResult(
+        health="degraded",
+        affected_components=("article publication",),
+        affected_sources=("cjr-jay-rosen-author",),
+        ingestion_status="receipt_stale",
+        error_class="publication_receipt_stale",
+    )
+    message = watcher._notification_message("outage", probe, 2)
+    assert (
+        "https://github.com/jamditis/rosen-frontend/actions/workflows/publisher-feeds-stewardship.yml"
+        in message
+    )
+    assert "docs/operations/pressthink-ingestion.md" in message
+    assert (
+        "https://github.com/jamditis/rosen-frontend/actions/workflows/bluesky-stewardship.yml"
+        not in message
+    )
+    wordpress = watcher.ProbeResult(
+        health="degraded",
+        affected_components=("archive discovery",),
+        affected_sources=("pressthink-wordpress-posts",),
+    )
+    assert watcher.ARTICLE_ACTIONS_URL in watcher._notification_message(
+        "outage", wordpress, 2
+    )
+
+
+def test_mixed_alert_preserves_each_workflow_and_runbook():
+    probe = watcher.ProbeResult(
+        health="degraded",
+        affected_components=("archive publication", "article publication"),
+        affected_sources=("cjr-jay-rosen-author", "jay-rosen-bluesky"),
+    )
+    message = watcher._notification_message("outage", probe, 2)
+    for expected in (
+        "https://github.com/jamditis/rosen-frontend/actions/workflows/publisher-feeds-stewardship.yml",
+        "https://github.com/jamditis/rosen-frontend/actions/workflows/bluesky-stewardship.yml",
+        "docs/operations/pressthink-ingestion.md",
+        "docs/operations/bluesky-stewardship.md",
+    ):
+        assert expected in message

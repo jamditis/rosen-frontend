@@ -24,6 +24,13 @@ ACTIONS_URL = (
     "bluesky-stewardship.yml"
 )
 RUNBOOK_PATH = "docs/operations/bluesky-stewardship.md"
+ARTICLE_ACTIONS_URL = ACTIONS_URL.replace(
+    "bluesky-stewardship.yml", "pressthink-stewardship.yml"
+)
+FEED_ACTIONS_URL = ACTIONS_URL.replace(
+    "bluesky-stewardship.yml", "publisher-feeds-stewardship.yml"
+)
+ARTICLE_RUNBOOK_PATH = "docs/operations/pressthink-ingestion.md"
 REQUEST_TIMEOUT_SECONDS = 10
 MAX_RESPONSE_BYTES = 64 * 1024
 FAILURES_BEFORE_ALERT = 2
@@ -177,17 +184,50 @@ def _parse_operational_health(payload: object) -> OperationalHealth | None:
     if discovery is None or ingestion is None:
         return None
 
+    article_sources = []
+    if "sourceIngestion" in payload:
+        values = payload["sourceIngestion"]
+        if not isinstance(values, list) or not values:
+            return None
+        seen = set()
+        for value in values:
+            source_id = value.get("sourceId") if isinstance(value, dict) else None
+            parsed = _parse_ingestion(value)
+            if not _safe_value(source_id) or source_id in seen or parsed is None:
+                return None
+            seen.add(source_id)
+            article_sources.append((source_id, *parsed))
+    failed_articles = [
+        (source_id, status, error)
+        for source_id, healthy, status, error in article_sources
+        if not healthy
+    ]
     ingestion_healthy, ingestion_status, error_class = ingestion
     discovery_healthy = all(healthy for _source_id, healthy in discovery)
-    healthy = payload["healthy"] and discovery_healthy and ingestion_healthy
-    affected_sources = tuple(
+    healthy = (
+        payload["healthy"]
+        and discovery_healthy
+        and ingestion_healthy
+        and not failed_articles
+    )
+    failed_discovery = [
         source_id for source_id, source_healthy in discovery if not source_healthy
+    ]
+    affected_sources = tuple(
+        dict.fromkeys(
+            failed_discovery
+            + [source_id for source_id, _status, _error in failed_articles]
+        )
     )
     affected_components: list[str] = []
-    if affected_sources:
+    if failed_discovery:
         affected_components.append("archive discovery")
     if not ingestion_healthy:
         affected_components.append("archive publication")
+    if failed_articles:
+        affected_components.append("article publication")
+        if ingestion_healthy:
+            _source_id, ingestion_status, error_class = failed_articles[0]
     if not healthy and not affected_components:
         affected_components.extend(("archive discovery", "archive publication"))
     return OperationalHealth(
@@ -382,10 +422,31 @@ def _notification_message(event: str, probe: ProbeResult, failures: int) -> str:
         if probe.ingestion_status
         else ""
     )
+    action_urls = [ACTIONS_URL]
+    runbook = RUNBOOK_PATH
+    article_sources = [
+        source for source in probe.affected_sources if source != "jay-rosen-bluesky"
+    ]
+    if "article publication" in probe.affected_components or article_sources:
+        action_urls = []
+        if "pressthink-wordpress-posts" in article_sources:
+            action_urls.append(ARTICLE_ACTIONS_URL)
+        if any(source != "pressthink-wordpress-posts" for source in article_sources):
+            action_urls.append(FEED_ACTIONS_URL)
+        if not action_urls:
+            action_urls.extend([ARTICLE_ACTIONS_URL, FEED_ACTIONS_URL])
+        if (
+            "archive publication" in probe.affected_components
+            or "jay-rosen-bluesky" in probe.affected_sources
+        ):
+            action_urls.append(ACTIONS_URL)
+            runbook = ARTICLE_RUNBOOK_PATH + " and " + RUNBOOK_PATH
+        else:
+            runbook = ARTICLE_RUNBOOK_PATH
     return (
         f"Rosen archive health alert. Affected: {affected}.{sources}"
         f"{ingestion_status}{error_class} Consecutive failures: {failures}. "
-        f"Action: inspect {ACTIONS_URL} and follow {RUNBOOK_PATH}."
+        f"Action: Inspect {', '.join(action_urls)} and follow {runbook}."
     )
 
 

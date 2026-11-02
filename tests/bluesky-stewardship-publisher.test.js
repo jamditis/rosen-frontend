@@ -11,6 +11,7 @@ import {
   changedPaths,
   finalizePublication,
   postFailedReceipt,
+  run,
   runPreparation,
   stageCensusCommit,
   stageReleaseCommit,
@@ -479,7 +480,10 @@ describe('Bluesky stewardship receipt and workflow boundary', () => {
     assert.equal((workflow.match(/git lfs pull/g) || []).length, 2);
     assert.match(workflow, /steps\.prepare\.outputs\.needs_deploy == 'true'/);
     assert.equal((workflow.match(/ROSEN_SFTP_PASSWORD:/g) || []).length, 1);
-    assert.equal((workflow.match(/ROSEN_INGESTION_RECEIPT_TOKEN:/g) || []).length, 1);
+    const tokenConsumers = workflow.split(/\n      - name: /)
+      .filter(step => step.includes('ROSEN_INGESTION_RECEIPT_TOKEN:'))
+      .map(step => step.split('\n')[0]);
+    assert.deepEqual(tokenConsumers, ['Capture, test, commit, and push update', 'Send final receipt']);
     assert.doesNotMatch(workflow, /git (?:push|pull).*--force|git rebase/);
     assert.doesNotMatch(workflow, /git add -A/);
 
@@ -570,4 +574,33 @@ it('records publisher metadata associations only for the configured source origi
   const workflow = fs.readFileSync(new URL('../.github/workflows/publisher-feeds-stewardship.yml', import.meta.url), 'utf8');
   assert.match(workflow, /max-parallel: 1/);
   assert.match(workflow, /fail-fast: false/);
+});
+
+
+it('strips the receipt token from ordinary release children and forwards it only explicitly', () => {
+  const original = process.env.ROSEN_INGESTION_RECEIPT_TOKEN;
+  process.env.ROSEN_INGESTION_RECEIPT_TOKEN = 'example-fixture-token';
+  const args = ['-e', 'console.log(Boolean(process.env.ROSEN_INGESTION_RECEIPT_TOKEN))'];
+  try {
+    assert.equal(run(root, process.execPath, args, { stdio: ['ignore', 'pipe', 'pipe'] }).trim(), 'false');
+    assert.equal(run(root, process.execPath, args, { stdio: ['ignore', 'pipe', 'pipe'], env: process.env }).trim(), 'true');
+  } finally {
+    if (original === undefined) delete process.env.ROSEN_INGESTION_RECEIPT_TOKEN;
+    else process.env.ROSEN_INGESTION_RECEIPT_TOKEN = original;
+  }
+});
+
+it('settles distinct historical source aliases associated with one published record', () => {
+  const receipt = buildSourceIngestionReceipt({
+    sourceId: 'cjr-jay-rosen-author', runId: 'aliases_1', status: 'published',
+    checkedAt: NOW, canonicalCommit: START, releaseVersion: '3.8.58',
+    publishedRecordIds: ['RECORD-01102'],
+    report: { article: { source_id: 'cjr-jay-rosen-author', captured: 2, added: 0,
+      updated: 0, versions_added: 1, associations: [
+        { uri: 'https://www.cjr.org/older.php', record_id: 'RECORD-01102' },
+        { uri: 'https://www.cjr.org/corrected.php', record_id: 'RECORD-01102' },
+      ] } },
+  });
+  assert.equal(receipt.admitted, 2);
+  assert.equal(receipt.records.length, 2);
 });
