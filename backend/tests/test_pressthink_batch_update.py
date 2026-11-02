@@ -234,6 +234,29 @@ def test_unclassified_source_keeps_the_low_confidence_flag():
     fields = batch.source_fields(source, "2026-11-02")
     assert fields["thematic_categories"] == ""
     assert fields["low_confidence"] == "TRUE"
+
+
+def test_assigned_categories_use_canonical_names():
+    source = batch.source_post(
+        post(body="<p>NYU teaching, curriculum, journalism education and students.</p>")
+    )
+    fields = batch.source_fields(source, "2026-11-02")
     taxonomy = json.loads((batch.ROOT / "backend/schema.json").read_text())
     assigned = {c.strip() for c in fields["thematic_categories"].split(",") if c.strip()}
-    assert assigned <= set(taxonomy["taxonomy"]["thematic_categories"])
+    assert "Journalism Education" in assigned
+    assert assigned <= {c["name"] for c in taxonomy["taxonomy"]["thematic_categories"]}
+
+
+def test_retired_highest_id_is_never_reallocated_to_another_source(tmp_path):
+    csv_path, history = canonical_fixture(tmp_path)
+    kwargs = {"csv_path": csv_path, "history_path": history}
+    batch.run_batch(posts=[post(1), post(2)], **kwargs)
+    columns, rows = batch.read_archive_csv(csv_path)
+    batch.write_archive_csv(csv_path, columns, rows[:1])
+    result = batch.run_batch(posts=[post(1), post(2), post(3)], **kwargs)
+    assert result["retired_record_ids"] == ["RECORD-00002"]
+    _, rows = batch.read_archive_csv(csv_path)
+    assert [row["id"] for row in rows] == ["RECORD-00001", "RECORD-00003"]
+    replay = batch.run_batch(posts=[post(1), post(2), post(3)], **kwargs)
+    assert replay["retired_record_ids"] == ["RECORD-00002"]
+    assert not replay["changed"]

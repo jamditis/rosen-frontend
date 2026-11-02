@@ -286,11 +286,14 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
     previous = {str(entry["source"]["id"]): entry for entry in entries}
     successor = [dict(row) for row in rows]
     by_id = {row["id"]: row for row in successor}
+    reserved_ids = set(by_id) | {
+        entry["record_id"] for entry in entries if entry.get("record_id")
+    }
     next_id = max(
         (
-            int(row["id"].split("-")[1])
-            for row in rows
-            if re.fullmatch(r"RECORD-\d+", row["id"])
+            int(record_id.split("-")[1])
+            for record_id in reserved_ids
+            if re.fullmatch(r"RECORD-\d+", record_id)
         ),
         default=0,
     )
