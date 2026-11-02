@@ -174,6 +174,11 @@ def metadata_fields(source, captured_at):
     relation = (
         "by Jay Rosen" if source["admission_basis"] == "by_jay" else "about Jay Rosen"
     )
+    summary = (
+        f"Bibliographic metadata: {source['publisher']} lists this article {relation}, titled {source['title']}, credited to {source['author']}, dated {source['published_local'][:10]}. Article text has not been captured."
+        if source["admission_basis"] in {"by_jay", "about_jay"}
+        else f"Bibliographic metadata from {source['publisher']}'s Jay Rosen RSS feed: {source['title']}. Listed author: {source['author']}. Publication date: {source['published_local'][:10]}. Relevance requires review. Article text has not been captured."
+    )
     return {
         "title": source["title"],
         "url": source["url"],
@@ -184,7 +189,7 @@ def metadata_fields(source, captured_at):
         "platform": source["publisher"],
         "content_type": "Article",
         "format": "Article",
-        "summary": f"Bibliographic metadata: {source['publisher']} lists this article {relation}, titled {source['title']}, credited to {source['author']}, dated {source['published_local'][:10]}. Article text has not been captured.",
+        "summary": summary,
         "raw_text": "",
         "excerpt": "",
         "word_count": "",

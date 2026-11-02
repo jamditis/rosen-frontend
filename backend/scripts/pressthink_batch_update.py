@@ -396,10 +396,19 @@ def reconcile_sources(
                     "reason": "Source relevance requires review",
                 }
             )
+        if row and not can_create(source) and state != "retired":
+            state = "review"
+            excluded.append(
+                {
+                    "source_id": source["id"],
+                    "record_id": record_id,
+                    "reason": "Source relevance requires review",
+                }
+            )
         association_changed = old and (
             old.get("state", "linked") != state or old.get("record_id") != record_id
         )
-        if row and state != "retired":
+        if row and state == "linked":
             associations.append({"uri": source["url"], "record_id": record_id})
         if changed or association_changed:
             entry = {
