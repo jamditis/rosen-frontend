@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "generated": "2026-11-02T20:56:29.376Z",
+  "generated": "2026-11-02T21:10:47.766Z",
   "records": [
     {
       "id": "BSKY-03554",
@@ -678722,6 +678722,25 @@
       ]
     },
     {
+      "id": "RECORD-01106",
+      "title": "Notes and Comments on CJR's Investigation into Rolling Stone's 'A Rape on Campus.'",
+      "author": "Jay Rosen",
+      "date": "2015-04-06",
+      "year": "2015",
+      "era": "Social Media & Financial Crisis (2010-2015)",
+      "pub": "Common Dreams",
+      "url": "https://www.commondreams.org/views/2015/04/06/notes-and-comments-cjrs-investigation-rolling-stones-rape-campus",
+      "summary": "Bibliographic metadata: Common Dreams lists this article by Jay Rosen, titled Notes and Comments on CJR's Investigation into Rolling Stone's 'A Rape on Campus.', credited to Jay Rosen, dated 2015-04-06. Article text has not been captured.",
+      "quote": "",
+      "categories": [],
+      "concepts": [],
+      "tags": [],
+      "verified": true,
+      "needsReview": true,
+      "type": "article",
+      "relatedIds": []
+    },
+    {
       "id": "RECORD-01034",
       "title": "Journalists have to decide what to do about candidates who are climate change denialists",
       "author": "Jay Rosen",
@@ -679867,6 +679886,25 @@
         "P0005",
         "W1172"
       ]
+    },
+    {
+      "id": "RECORD-01105",
+      "title": "Pulitzer Does Not Fully Express Power of Collaborative Snowden Reporting",
+      "author": "Jay Rosen",
+      "date": "2014-04-14",
+      "year": "2014",
+      "era": "Social Media & Financial Crisis (2010-2015)",
+      "pub": "Common Dreams",
+      "url": "https://www.commondreams.org/views/2014/04/14/pulitzer-does-not-fully-express-power-collaborative-snowden-reporting",
+      "summary": "Bibliographic metadata: Common Dreams lists this article by Jay Rosen, titled Pulitzer Does Not Fully Express Power of Collaborative Snowden Reporting, credited to Jay Rosen, dated 2014-04-14. Article text has not been captured.",
+      "quote": "",
+      "categories": [],
+      "concepts": [],
+      "tags": [],
+      "verified": true,
+      "needsReview": true,
+      "type": "article",
+      "relatedIds": []
     },
     {
       "id": "RECORD-01009",
@@ -681264,6 +681302,25 @@
         "P0005",
         "W1140"
       ]
+    },
+    {
+      "id": "RECORD-01104",
+      "title": "\"Politics: Some\" and \"Politics: None,\" Two Ways to Excel in Political Journalism",
+      "author": "Jay Rosen",
+      "date": "2013-06-14",
+      "year": "2013",
+      "era": "Social Media & Financial Crisis (2010-2015)",
+      "pub": "Common Dreams",
+      "url": "https://www.commondreams.org/views/2013/06/14/politics-some-and-politics-none-two-ways-excel-political-journalism",
+      "summary": "Bibliographic metadata: Common Dreams lists this article by Jay Rosen, titled \"Politics: Some\" and \"Politics: None,\" Two Ways to Excel in Political Journalism, credited to Jay Rosen, dated 2013-06-14. Article text has not been captured.",
+      "quote": "",
+      "categories": [],
+      "concepts": [],
+      "tags": [],
+      "verified": true,
+      "needsReview": true,
+      "type": "article",
+      "relatedIds": []
     },
     {
       "id": "RECORD-00977",
@@ -684094,6 +684151,25 @@
         "C0822",
         "P2389"
       ]
+    },
+    {
+      "id": "RECORD-01103",
+      "title": "Phone Hacking Crisis Shows News Corp is No Ordinary News Company",
+      "author": "Jay Rosen",
+      "date": "2011-07-20",
+      "year": "2011",
+      "era": "Social Media & Financial Crisis (2010-2015)",
+      "pub": "Common Dreams",
+      "url": "https://www.commondreams.org/views/2011/07/20/phone-hacking-crisis-shows-news-corp-no-ordinary-news-company",
+      "summary": "Bibliographic metadata: Common Dreams lists this article by Jay Rosen, titled Phone Hacking Crisis Shows News Corp is No Ordinary News Company, credited to Jay Rosen, dated 2011-07-20. Article text has not been captured.",
+      "quote": "",
+      "categories": [],
+      "concepts": [],
+      "tags": [],
+      "verified": true,
+      "needsReview": true,
+      "type": "article",
+      "relatedIds": []
     },
     {
       "id": "RECORD-00944",
@@ -803353,6 +803429,7 @@
       "Columbia Journalism Review",
       "Columbia Missourian",
       "Committee to Protect Journalists",
+      "Common Dreams",
       "Common Dreams (syndicated from PressThink)",
       "Concord Monitor",
       "Connecticut Post",
@@ -804431,6 +804508,7 @@
     "\"Polarization becomes a way to talk about politics without talking about...",
     "\"Political journalists walked out of No 10 Downing Street this afternoon in...",
     "\"Politicians are not pressed hard enough on the implications of facts that BBC...",
+    "\"Politics: Some\" and \"Politics: None,\" Two Ways to Excel in Political Journalism",
     "\"Pollsters want voters to tell them who they will vote for next November;...",
     "\"Post-truth is pre-fascism, and Trump has been our post-truth president.\"",
     "\"Power providers can reap rewards by supplying electricity to Texas customers",
@@ -810150,6 +810228,7 @@
     "Committee To Protect Journalists",
     "Committee of Concerned Journalists",
     "Committee to Protect Journalists",
+    "Common Dreams",
     "Common Dreams (syndicated from PressThink)",
     "Common Sense",
     "Common Sense Journalism",
@@ -826765,6 +826844,7 @@
     "Noted. Thanks.",
     "Noted: I'm wrong",
     "Notes and Comment on BlogHer ‘05",
+    "Notes and Comments on CJR's Investigation into Rolling Stone's 'A Rape on Campus.'",
     "Notes on Membership",
     "Notes on Times gets Trump's tax returns Thank you for a vital public service",
     "Notes on the Creature Called Fox",
@@ -828271,6 +828351,7 @@
     "Philly Future",
     "Philly Inquirer",
     "Philly.com",
+    "Phone Hacking Crisis Shows News Corp is No Ordinary News Company",
     "Photo Essay",
     "Photography",
     "Photos from \"Building A Better Explainer\" Presentation",
@@ -829567,6 +829648,7 @@
     "Puck News",
     "Pulitizer Prize-winning reporter now getting a PhD:",
     "Pulitzer Center",
+    "Pulitzer Does Not Fully Express Power of Collaborative Snowden Reporting",
     "Pulitzer Prize",
     "Pulitzer Prize journalists",
     "Pulitzer Prize winners",

@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen&apos;s Internet Archive</title>
-    <dateCreated>Mon, 02 Nov 2026 20:56:31 GMT</dateCreated>
-    <dateModified>Mon, 02 Nov 2026 20:56:31 GMT</dateModified>
+    <dateCreated>Mon, 02 Nov 2026 21:10:50 GMT</dateCreated>
+    <dateModified>Mon, 02 Nov 2026 21:10:50 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -184,6 +184,7 @@
         <outline text="“It’s not that we control NewsFeed, you control NewsFeed…” Facebook: please stop with this." type="link" url="https://pressthink.org/2015/04/its-not-that-we-control-newsfeed-you-control-newsfeed-facebook-please-stop-with-this/" created="2015-04-21"/>
         <outline text="Good Old Fashioned Shoe Leather Reporting" type="link" url="https://pressthink.org/2015/04/good-old-fashioned-shoe-leather-reporting/" created="2015-04-16"/>
         <outline text="Rolling Stone’s ‘A Rape on Campus.’ Notes and comment on Columbia J-school’s investigation." type="link" url="https://pressthink.org/2015/04/rolling-stones-a-rape-on-campus-notes-and-comment-on-columbia-j-schools-investigation/" created="2015-04-06"/>
+        <outline text="Notes and Comments on CJR&apos;s Investigation into Rolling Stone&apos;s &apos;A Rape on Campus.&apos;" type="link" url="https://www.commondreams.org/views/2015/04/06/notes-and-comments-cjrs-investigation-rolling-stones-rape-campus" created="2015-04-06"/>
         <outline text="Journalists have to decide what to do about candidates who are climate change denialists" type="link" url="https://pressthink.org/2015/03/journalists-have-to-decide-what-to-do-about-candidates-who-are-climate-change-denialists/" created="2015-03-23"/>
         <outline text="Full stack credibility" type="link" url="https://pressthink.org/2015/03/full-stack-credibility/" created="2015-03-16"/>
         <outline text="NBC would be insane to let Brian Williams return" type="link" url="https://pressthink.org/2015/03/nbc-would-be-insane-to-let-brian-williams-return/" created="2015-03-14"/>
@@ -215,7 +216,6 @@
         <outline text="First Look Media shifts direction some" type="link" url="https://pressthink.org/2014/07/first-look-media-shifts-direction-some/" created="2014-07-28"/>
         <outline text="NPR downgrades and disables its ombudsman" type="link" url="https://pressthink.org/2014/07/npr-downgrades-and-disables-its-ombudsman/" created="2014-07-14"/>
         <outline text="‘Democrats argue. Republicans contend. We have no idea.’ A he said, she said at the Times." type="link" url="https://pressthink.org/2014/05/democrats-argue-republicans-contend-we-have-no-idea/" created="2014-05-11"/>
-        <outline text="This is just a stub for a PressThink post" type="link" url="https://publicnotebook.wordpress.com/2014/05/10/this-is-just-a-stub-for-a-pressthink-post/" created="2014-05-10"/>
       </outline>
       <outline text="View from Nowhere (10s)" type="category">
         <outline text="A call for radically different campaign coverage" type="link" url="https://medium.com/we-are-hearken/a-call-for-radically-different-campaign-coverage-85e62401d0c6" created="2019-06-12"/>
