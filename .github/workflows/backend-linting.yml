@@ -7,7 +7,7 @@ on:
       - 'backend/**'
       - '.github/workflows/backend-linting.yml'
   pull_request:
-    branches: [ main ]
+    branches: [ main, 'recovery/**' ]
     paths:
       - 'backend/**'
       - '.github/workflows/backend-linting.yml'

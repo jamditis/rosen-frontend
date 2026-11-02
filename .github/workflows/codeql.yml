@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
+    branches: [main, master, 'recovery/**']
   schedule:
     - cron: '0 8 * * 1'  # Weekly Monday 8am
 

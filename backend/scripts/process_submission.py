@@ -420,7 +420,7 @@ def _retry_publication(
             else sftp_push.push_to_production(record_ids=(record_id,))
         )
     except Exception as exc:  # noqa: BLE001 — keep the row recoverable
-        push = {"ok": False, "error": f"Publication retry failed: {exc}"}
+        push = {"ok": False, "error": str(exc)}
 
     if push.get("skipped"):
         status, note = "committed", "Live push not configured on this runner"

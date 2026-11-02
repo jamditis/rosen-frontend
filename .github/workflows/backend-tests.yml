@@ -10,7 +10,7 @@ on:
       - 'backend/**'
       - '.github/workflows/backend-tests.yml'
   pull_request:
-    branches: [ main ]
+    branches: [ main, 'recovery/**' ]
     paths:
       - 'backend/**'
       - '.github/workflows/backend-tests.yml'

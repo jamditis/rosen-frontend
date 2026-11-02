@@ -994,6 +994,7 @@ class TestSubmissionRegressions:
 
         assert result["status"] == "archived"
         assert result["exit_code"] != 0
+        assert result["error"].count("Publication retry failed:") == 1
         transfer.assert_not_called()
         assert sheets.call_args.kwargs["record_id"] == "RECORD-00042"
 
