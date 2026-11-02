@@ -102,14 +102,14 @@ const registry = JSON.parse(fs.readFileSync(process.argv[3],'utf8'));
 const result = await validateGraphDataset({
  policy:{entityTypes:Object.keys(schema.entity_types),acceptedRelationshipTypes:Object.keys(schema.relationship_types),relationshipTypeHolds:[],generatedPublishedRecordIds:[],relationshipTypeRegistry:registry.types},
  sourceRecords:input.records.map(r=>({id:r.id})),
- publishedRecords:[{id:'RECORD-00002',relatedIds:ids}],
+ publishedRecords:[{id:'RECORD-00001',relatedIds:['P0005']},{id:'RECORD-00002',relatedIds:ids}],
  sourceEntities:entities,publishedEntities:entities,mapEntities:entities,
  relationships:input.relationships.map(r=>({id:r.relationship_id,sourceRecordId:r.source_record_id,sourceEntityId:r.source_entity_id,sourceEntityName:r.source_entity_name,type:r.relationship_type,targetEntityId:r.target_entity_id,targetEntityName:r.target_entity_name,confidence:Number(r.confidence_score)})),
- recordEntityMap:{'RECORD-00002':ids}
+ recordEntityMap:{'RECORD-00001':['P0005'],'RECORD-00002':ids}
 });
 if(result.relationships!==1) throw new Error('Authorship graph did not survive validation');
 """
-    subprocess.run(
+    result = subprocess.run(
         [
             "node",
             "--input-type=module",
@@ -123,9 +123,9 @@ if(result.relationships!==1) throw new Error('Authorship graph did not survive v
             {"records": records, "entities": entities, "relationships": relationships}
         ),
         text=True,
-        check=True,
         capture_output=True,
     )
+    assert result.returncode == 0, result.stderr
 
 
 def test_conflicting_relationship_identity_is_not_overwritten():
