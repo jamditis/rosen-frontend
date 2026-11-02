@@ -13,6 +13,7 @@ import hashlib
 import json
 import re
 import sys
+import tempfile
 import time
 import urllib.robotparser
 from pathlib import Path
@@ -26,6 +27,7 @@ sys.path.insert(0, str(ROOT / "data"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from csv_safe_write import read_archive_csv, write_archive_csv
 from auto_categorize_records import RecordCategorizer
+import pressthink_transaction as transaction
 
 ORIGIN = "https://pressthink.org"
 ENDPOINT = ORIGIN + "/wp-json/wp/v2/posts"
@@ -328,6 +330,9 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
             row.update({"id": record_id, **source_fields(source, captured_at)})
             successor.append(row)
             by_id[record_id] = row
+            by_url.setdefault(url_identity(source["url"]), []).append(record_id)
+            title_key = (title_identity(source["title"]), source["published_gmt"][:4])
+            by_title.setdefault(title_key, []).append(record_id)
             added += 1
             proposed.append(
                 {"record_id": record_id, "url": source["url"], "title": source["title"]}
@@ -381,7 +386,14 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
 def run_batch(*, dry_run=False, csv_path=None, history_path=None, posts=None):
     csv_path = csv_path or ROOT / "data/archive_records-public.csv"
     history_path = history_path or ROOT / "preservation/pressthink/versions.jsonl"
+    if csv_path.is_symlink() or history_path.is_symlink():
+        raise ValueError("Preservation outputs must not be symlinks")
+    if dry_run and transaction.journal_path(history_path).exists():
+        raise ValueError("A pending PressThink write requires normal recovery")
+    if not dry_run:
+        transaction.recover(csv_path, history_path)
     before = csv_path.read_bytes()
+    history_before = history_path.read_bytes() if history_path.exists() else None
     columns, rows = read_archive_csv(csv_path)
     entries, _heads = load_history(history_path)
     posts = capture_posts() if posts is None else posts
@@ -392,13 +404,25 @@ def run_batch(*, dry_run=False, csv_path=None, history_path=None, posts=None):
     if not dry_run and report["changed"]:
         if csv_path.read_bytes() != before:
             raise ValueError("Canonical CSV changed during PressThink capture")
-        write_archive_csv(csv_path, columns, successor)
-        history_path.parent.mkdir(parents=True, exist_ok=True)
-        old = history_path.read_bytes() if history_path.exists() else b""
+        old = history_before or b""
         new = "".join(json.dumps(v, ensure_ascii=False) + "\n" for v in versions)
-        temp = history_path.with_suffix(".tmp")
-        temp.write_bytes(old + new.encode("utf-8"))
-        temp.replace(history_path)
+        separator = b"\n" if old and not old.endswith(b"\n") else b""
+        history_after = old + separator + new.encode("utf-8")
+        with tempfile.TemporaryDirectory(prefix="pressthink-prepare-") as directory:
+            staged_csv = Path(directory) / "archive.csv"
+            staged_csv.write_bytes(before)
+            write_archive_csv(staged_csv, columns, successor)
+            staged_history = Path(directory) / "history.jsonl"
+            staged_history.write_bytes(history_after)
+            load_history(staged_history)
+            transaction.commit(
+                csv_path,
+                history_path,
+                csv_before=before,
+                history_before=history_before,
+                csv_after=staged_csv.read_bytes(),
+                history_after=history_after,
+            )
     return report
 
 

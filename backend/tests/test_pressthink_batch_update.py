@@ -3,10 +3,12 @@
 import csv
 import io
 import json
+from pathlib import Path
 
 import pytest
 
 from scripts import pressthink_batch_update as batch
+from scripts import pressthink_transaction as transaction
 
 
 def post(post_id=10903, *, body="<p>Journalism should show its work.</p>"):
@@ -263,3 +265,80 @@ def test_retired_highest_id_is_never_reallocated_to_another_source(tmp_path):
     replay = batch.run_batch(posts=[post(1), post(2), post(3)], **kwargs)
     assert replay["retired_record_ids"] == ["RECORD-00002"]
     assert not replay["changed"]
+
+
+def test_new_rows_participate_in_same_batch_duplicate_matching(tmp_path):
+    csv_path, history = canonical_fixture(tmp_path)
+    duplicate = post(3)
+    duplicate["title"] = post(2)["title"]
+    kwargs = {"csv_path": csv_path, "history_path": history}
+    result = batch.run_batch(posts=[post(1), post(2), duplicate], **kwargs)
+    assert result["added"] == 1
+    assert result["excluded"][0]["candidate_record_ids"] == ["RECORD-00002"]
+    _, rows = batch.read_archive_csv(csv_path)
+    assert [r["id"] for r in rows] == ["RECORD-00001", "RECORD-00002"]
+    assert not batch.run_batch(posts=[post(1), post(2), duplicate], **kwargs)["changed"]
+
+
+def test_unterminated_valid_history_gets_a_separating_newline(tmp_path):
+    csv_path, history = canonical_fixture(tmp_path)
+    kwargs = {"csv_path": csv_path, "history_path": history}
+    batch.run_batch(posts=[post(1)], **kwargs)
+    original = history.read_bytes().rstrip(b"\n")
+    history.write_bytes(original)
+    batch.run_batch(posts=[post(1), post(2)], **kwargs)
+    assert history.read_bytes().startswith(original + b"\n")
+    entries, _heads = batch.load_history(history)
+    assert [e["source"]["id"] for e in entries] == [1, 2]
+
+
+@pytest.fixture
+def pending_write(tmp_path, monkeypatch):
+    csv_path, history = canonical_fixture(tmp_path)
+    original_replace = transaction.os.replace
+
+    def replace(source, destination):
+        if Path(destination) == history:
+            raise OSError("Synthetic history replacement failure")
+        return original_replace(source, destination)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(transaction.os, "replace", replace)
+        with pytest.raises(OSError, match="Synthetic history"):
+            batch.run_batch(
+                posts=[post(1), post(2)], csv_path=csv_path, history_path=history
+            )
+    assert transaction.journal_path(history).exists()
+    return csv_path, history
+
+
+def test_partial_write_recovers_baseline_before_a_changed_source_retry(pending_write):
+    csv_path, history = pending_write
+    kwargs = {"csv_path": csv_path, "history_path": history}
+    before = csv_path.read_bytes()
+    with pytest.raises(ValueError, match="requires normal recovery"):
+        batch.run_batch(posts=[post(1), post(2)], dry_run=True, **kwargs)
+    assert csv_path.read_bytes() == before
+    assert not history.exists()
+
+    result = batch.run_batch(
+        posts=[post(1), post(2, body="<p>A later revision after interruption.</p>")],
+        **kwargs,
+    )
+    assert result["added"] == 0
+    assert result["updated"] == 1
+    _, rows = batch.read_archive_csv(csv_path)
+    assert rows[1]["raw_text"] == "A later revision after interruption."
+    entries, _heads = batch.load_history(history)
+    assert len(entries) == 3
+    assert entries[1]["source"]["text"] == "Journalism should show its work."
+    assert not transaction.journal_path(history).exists()
+
+
+def test_pending_recovery_preserves_an_unexpected_external_edit(pending_write):
+    csv_path, history = pending_write
+    csv_path.write_bytes(b"A separate curator edit must survive.")
+    with pytest.raises(ValueError, match="outside the pending transaction"):
+        transaction.recover(csv_path, history)
+    assert csv_path.read_bytes() == b"A separate curator edit must survive."
+    assert not history.exists()
