@@ -72,7 +72,7 @@ def test_pending_transaction_and_lost_race_fail_without_advancing(tmp_path):
     pending = tmp_path / "preservation/pressthink/versions.jsonl.pending.json"
     pending.parent.mkdir(parents=True)
     pending.write_text("pending")
-    with pytest.raises(ValueError, match="pending PressThink"):
+    with pytest.raises(ValueError, match="pending source"):
         sequence.reserve(path, set())
     assert sequence.high_water(path) == 2
     pending.unlink()

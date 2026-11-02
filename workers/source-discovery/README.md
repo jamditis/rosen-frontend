@@ -71,3 +71,15 @@ Keep `pressthink.org` unconfigured. This personal account does not control that 
 To stop the pilot, remove the cron trigger or deploy with `DISCOVERY_MODE` set to `disabled`. Delete the Worker and its dedicated D1 database only after exporting any reviewer-needed candidate ledger.
 
 The existing pipeline remains responsible for SSRF protection, full scraping, browser rendering, extraction, entity and relationship proposals, canonical CSV writes, tests, pull-request review, and certificate-verified FTPS publication. The external hosting owner provides the transfer account; this project does not administer the domain or hosting server. The account can list the broader PressThink document root, so the deployment client's path checks enforce the archive scope.
+
+Reviewed publisher feed intake uses three independent metadata consumers. The
+serial matrix continues after one source fails. Public health includes each
+source's discovery and successful publication receipt, rather than inferring
+publication from a recent feed request. RSS publication dates do not measure
+fetch freshness. These finite feed views do not prove full historical coverage.
+
+An authorized maintainer can POST `/discovery-run` with the existing ingestion
+receipt bearer token while discovery is live. No source URLs or configuration
+are accepted. Public unauthenticated requests cannot trigger discovery. Use this
+bounded operator to verify new sources after a reviewed deployment. The existing
+cron remains the recurring backstop.

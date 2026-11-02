@@ -36,6 +36,7 @@ describe('release workflow queue', () => {
       [
         '.github/workflows/bluesky-stewardship.yml',
         '.github/workflows/pressthink-stewardship.yml',
+        '.github/workflows/publisher-feeds-stewardship.yml',
         '.github/workflows/deploy.yml',
         '.github/workflows/submit-record.yml',
         '.github/workflows/submit-prototype.yml',

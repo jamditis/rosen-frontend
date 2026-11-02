@@ -1,5 +1,5 @@
 import { readBoundedText } from "./discovery.js";
-import { SOURCE_MANIFEST } from "./source-manifest.js";
+import { SOURCE_MANIFEST, ARTICLE_SOURCE_IDS, isArticleSourceUrl } from "./source-manifest.js";
 
 const MAX_RECEIPT_BYTES = 100_000;
 const MAX_RECORD_DECISIONS = 40;
@@ -7,8 +7,6 @@ const FRESHNESS_MS = 36 * 60 * 60 * 1_000;
 const ACTOR_POST = /^at:\/\/did:plc:3t37x6vfigdzzp2gjcfnzlz4\/app\.bsky\.feed\.post\/[A-Za-z0-9._~:-]{1,128}$/;
 const ACTOR_POST_PREFIX = "at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/";
 const SUCCESS = new Set(["candidates_found", "no_candidates", "not_modified", "skipped_interval"]);
-const PRESSTHINK_SOURCE = "pressthink-wordpress-posts";
-const ARTICLE_URI = /^https:\/\/pressthink\.org\/\d{4}\/\d{2}\/[^/?#]+\/$/;
 
 function fresh(timestamp, now, maximumAge = FRESHNESS_MS) {
   const time = Date.parse(timestamp || "");
@@ -37,12 +35,13 @@ export async function readArchiveHealth(database, now = Date.now()) {
   ).bind().first();
   const ingestionFresh = Boolean(ingestion && fresh(ingestion.checked_at, now));
   const ingestionHealthy = Boolean(ingestionFresh && ingestion.status !== "failed");
+  const sourceIngestion = await Promise.all(ARTICLE_SOURCE_IDS.map(async sourceId => {
   const articleRun = await database.prepare(
     "SELECT * FROM source_ingestion_runs WHERE source_id = ? ORDER BY checked_at DESC LIMIT 1",
-  ).bind(PRESSTHINK_SOURCE).first();
+  ).bind(sourceId).first();
   const articleFresh = Boolean(articleRun && fresh(articleRun.checked_at, now));
-  const sourceIngestion = [{
-    sourceId: PRESSTHINK_SOURCE,
+  return {
+    sourceId,
     runId: articleRun?.run_id || null,
     checkedAt: articleRun?.checked_at || null,
     status: !articleRun ? "never_run" : articleFresh ? articleRun.status : "receipt_stale",
@@ -58,7 +57,8 @@ export async function readArchiveHealth(database, now = Date.now()) {
     sourceLatestAt: articleRun?.source_latest_at || null,
     errorClass: !articleRun ? "publication_receipt_missing" : !articleFresh ? "publication_receipt_stale" : articleRun.error_class,
     healthy: Boolean(articleFresh && articleRun.status !== "failed"),
-  }];
+  };
+  }));
   return {
     healthy: discovery.every(source => source.healthy) && ingestionHealthy && sourceIngestion.every(source => source.healthy),
     discovery,
@@ -80,7 +80,7 @@ export async function readArchiveHealth(database, now = Date.now()) {
   };
 }
 
-async function authorized(request, expected) {
+export async function authorized(request, expected) {
   if (typeof expected !== "string" || expected.length < 32) return false;
   const supplied = request.headers.get("Authorization")?.match(/^Bearer (\S{32,256})$/)?.[1];
   if (!supplied) return false;
@@ -118,8 +118,8 @@ export async function readPendingIngestionCandidates(request, env) {
 export function validateIngestionReceipt(value, now = Date.now()) {
   if (!value || typeof value !== "object" || Array.isArray(value) || value.version !== 1) throw new Error("invalid_receipt");
   const sourceId = value.sourceId ?? "jay-rosen-bluesky";
-  if (!["jay-rosen-bluesky", PRESSTHINK_SOURCE].includes(sourceId)) throw new Error("invalid_source_id");
-  const article = sourceId === PRESSTHINK_SOURCE;
+  if (!["jay-rosen-bluesky", ...ARTICLE_SOURCE_IDS].includes(sourceId)) throw new Error("invalid_source_id");
+  const article = ARTICLE_SOURCE_IDS.includes(sourceId);
   if (!/^[A-Za-z0-9_-]{1,64}$/.test(value.runId || "")) throw new Error("invalid_run_id");
   if (!["published", "no_change", "failed"].includes(value.status)) throw new Error("invalid_status");
   if (!fresh(value.checkedAt, now, 24 * 3_600_000)) throw new Error("invalid_check_time");
@@ -139,7 +139,7 @@ export function validateIngestionReceipt(value, now = Date.now()) {
   if (!Array.isArray(value.records) || value.records.length > MAX_RECORD_DECISIONS) throw new Error("invalid_records");
   const uris = new Set();
   for (const record of value.records) {
-    if (!record || !(article ? ARTICLE_URI : ACTOR_POST).test(record.uri || "") || uris.has(record.uri)) throw new Error("invalid_record_uri");
+    if (!record || !(article ? isArticleSourceUrl(sourceId, record.uri) : ACTOR_POST.test(record.uri || "")) || uris.has(record.uri)) throw new Error("invalid_record_uri");
     if (article) {
       if (record.decision !== "accepted" || !/^RECORD-\d{5,}$/.test(record.recordId || "")) throw new Error("invalid_record_decision");
     } else if (!["accepted", "rejected"].includes(record.decision) || !/^BSKY-\d{5,}$/.test(record.recordId || "")) throw new Error("invalid_record_decision");
@@ -164,7 +164,7 @@ export async function receiveIngestionReceipt(request, env, now = Date.now()) {
   } catch {
     return { status: 400, body: { error: "invalid_receipt" } };
   }
-  if (receipt.sourceId === PRESSTHINK_SOURCE) return recordArticleReceipt(receipt, env);
+  if (ARTICLE_SOURCE_IDS.includes(receipt.sourceId)) return recordArticleReceipt(receipt, env);
   const statements = [env.DISCOVERY_LEDGER.prepare(`
     INSERT INTO archive_ingestion_runs (run_id, checked_at, status, canonical_commit, release_version, captured_count, admitted_count, context_only_count, source_latest_at, error_class)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

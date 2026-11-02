@@ -102,3 +102,39 @@ aggregate health. Run the first real publisher immediately after Worker activati
 Never manufacture a receipt to clear health.
 
 All repository tests, builds, lint, and validation run on GitHub-hosted CI.
+
+## Reviewed publisher feeds
+
+The separate `publisher-feeds-stewardship.yml` job checks the verified CJR search,
+CJR Jay Rosen author and Common Dreams Jay Rosen author RSS feeds daily at
+20:47 UTC. Its serial matrix has `max-parallel: 1` and `fail-fast: false`: One
+failed feed does not suppress the next attempt, and sibling jobs cannot race
+inside the same release-queue run. Each feed has its own receipt and health.
+
+The adapter checks robots, refuses redirects and bounds reads to 256 KiB and
+100 items. These are finite current feed views, with no proven pagination or
+exhaustive historical coverage. Only an exact Jay Rosen creator in author feeds,
+or a clear Jay Rosen title in the CJR search feed, can create metadata records.
+Other search hits remain review evidence. The publisher item link is identity;
+GUID is provenance. Source dates retain their written calendar day and offset.
+Fetch success time is separate from article publication time.
+
+The version journal `preservation/publisher-feeds/versions.jsonl` contains only
+bibliographic metadata. Descriptions and article bodies are neither captured nor
+republished. Public records explicitly label metadata-only coverage, leave body
+and word count absent, and retain review flags. They do not claim full-text
+preservation or completed entity extraction. Existing author credits and curator
+edits survive. In particular, about-Jay articles retain their real authors.
+
+Both article adapters use the same native CSV, durable transaction and shared ID
+reservation helpers. Cross-feed URL matches retain one canonical record; title
+and year matches with a different URL remain syndication-review holds. Removed
+IDs and prior feed associations are retained. Other writers stop while either
+journal has an incomplete transaction. Disappearing feed items are reported,
+never deleted from the archive or its history.
+
+The Worker exposes `POST /discovery-run` only with the existing ingestion receipt
+bearer authorization and live mode. It accepts no source URL or configuration.
+This bounded operator permits supervised activation checks without waiting for
+the next daily discovery tick. Its public health endpoint still triggers no
+fetch. Use only the documented credential pointer, never a token in arguments.

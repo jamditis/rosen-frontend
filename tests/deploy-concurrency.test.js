@@ -13,7 +13,7 @@ describe('deployment workflow queue', () => {
   it('uses the lossless release queue in every workflow that writes main or production', () => {
     for (const filename of [
       'bluesky-stewardship.yml',
-      'pressthink-stewardship.yml',
+      'pressthink-stewardship.yml', 'publisher-feeds-stewardship.yml',
       'deploy.yml',
       'submit-record.yml',
       'submit-prototype.yml',
@@ -29,7 +29,7 @@ describe('deployment workflow queue', () => {
       assert.match(source, /^\s+timeout-minutes: 360$/m);
     }
 
-    for (const filename of ['bluesky-stewardship.yml', 'pressthink-stewardship.yml', 'submit-record.yml', 'submit-prototype.yml']) {
+    for (const filename of ['bluesky-stewardship.yml', 'pressthink-stewardship.yml', 'publisher-feeds-stewardship.yml', 'submit-record.yml', 'submit-prototype.yml']) {
       const source = workflowSource(filename);
       assert.ok(
         source.indexOf('- name: Wait for release turn') <

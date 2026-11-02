@@ -17,6 +17,7 @@ import {
 } from "../src/discovery.js";
 import {
   SOURCE_MANIFEST,
+  PUBLIC_SOURCE_MANIFEST,
   SOURCE_MANIFEST_VERSION,
 } from "../src/source-manifest.js";
 
@@ -201,20 +202,7 @@ test("the health endpoint exposes no fetch trigger or source URL", async () => {
     status: "ok",
     mode: "disabled",
     manifestVersion: SOURCE_MANIFEST_VERSION,
-    sources: [
-      {
-        id: "jay-rosen-bluesky",
-        label: "Jay Rosen Bluesky activity",
-        kind: "atproto-author-feed",
-        maxCandidates: 100,
-      },
-      {
-        id: "pressthink-wordpress-posts",
-        label: "PressThink recent posts",
-        kind: "wordpress-api",
-        maxCandidates: 25,
-      },
-    ],
+    sources: PUBLIC_SOURCE_MANIFEST,
   });
   const missing = await worker.fetch(
     new Request("https://rosen-source-discovery.workers.dev/run"),
@@ -1592,4 +1580,23 @@ test("a failed run completion preserves the original error and logs the completi
     console.error = originalError;
     database.raw.close();
   }
+});
+
+
+test("reviewed feed candidates require exact byline or clear about-Jay title", () => {
+  const item = (title, author, link) => `<item><title>${title}</title><dc:creator><![CDATA[${author}]]></dc:creator><link>${link}</link></item>`;
+  const body = `<rss><channel>${item("Jay Rosen on journalism", "Emily Bell", "https://www.cjr.org/kicker/about.php")}${item("Unrelated journalism", "Other Author", "https://www.cjr.org/analysis/unrelated.php")}</channel></rss>`;
+  const search = SOURCE_MANIFEST.find(source => source.id === "cjr-jay-rosen-search");
+  assert.deepEqual(extractCandidateUrls(search, body), ["https://www.cjr.org/kicker/about.php"]);
+  const author = SOURCE_MANIFEST.find(source => source.id === "cjr-jay-rosen-author");
+  assert.deepEqual(extractCandidateUrls(author, body), []);
+  assert.deepEqual(extractCandidateUrls(author, `<rss>${item("Public title", "Jay Rosen", "https://www.cjr.org/analysis/by.php")}</rss>`), ["https://www.cjr.org/analysis/by.php"]);
+});
+
+test("manual discovery requires the existing receipt authorization and live mode", async () => {
+  const url = "https://rosen-source-discovery.workers.dev/discovery-run";
+  assert.equal((await worker.fetch(new Request(url, { method: "POST" }), { DISCOVERY_MODE: "live" })).status, 401);
+  const token = "example-test-token-with-no-real-authority";
+  const result = await worker.fetch(new Request(url, { method: "POST", headers: { Authorization: `Bearer ${token}` } }), { DISCOVERY_MODE: "disabled", INGESTION_RECEIPT_TOKEN: token });
+  assert.equal(result.status, 409);
 });

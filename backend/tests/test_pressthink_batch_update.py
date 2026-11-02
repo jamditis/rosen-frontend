@@ -155,7 +155,9 @@ def test_dry_run_missing_source_and_other_author_preserve_canonical_rows(tmp_pat
     assert not history.exists()
     assert csv_path.read_bytes() == before
     assert result["added"] == 0
-    assert result["excluded"] == [{"source_id": 3, "reason": "Author requires review"}]
+    assert result["excluded"] == [
+        {"source_id": 3, "reason": "Source relevance requires review"}
+    ]
     batch.run_batch(posts=[post(1)], **kwargs)
     result = batch.run_batch(posts=[other], **kwargs)
     assert result["missing_source_ids"] == ["1"]

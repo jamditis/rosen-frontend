@@ -36,13 +36,14 @@ def high_water(csv_path, existing_ids=()):
 
 
 def assert_no_pending_capture(csv_path):
-    pending = (
-        Path(csv_path).parent.parent
-        / "preservation/pressthink/versions.jsonl.pending.json"
-    )
-    if pending.exists():
+    preservation = Path(csv_path).parent.parent / "preservation"
+    pending = [
+        preservation / name / "versions.jsonl.pending.json"
+        for name in ("pressthink", "publisher-feeds")
+    ]
+    if any(path.exists() for path in pending):
         raise ValueError(
-            "Recover the pending PressThink transaction before other CSV writes"
+            "Recover the pending source transaction before other CSV writes"
         )
 
 

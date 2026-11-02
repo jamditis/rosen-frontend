@@ -5,6 +5,8 @@ import initSqlJs from "sql.js";
 import worker from "../src/index.js";
 import { readArchiveHealth, readPendingIngestionCandidates, receiveIngestionReceipt, validateIngestionReceipt } from "../src/ingestion-health.js";
 
+import { ARTICLE_SOURCE_IDS } from "../src/source-manifest.js";
+
 const TOKEN = "example-test-receipt-token-with-no-real-authority";
 const NOW = Date.parse("2026-10-14T18:00:00Z");
 const URI = "at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/example1";
@@ -155,6 +157,10 @@ test("health needs both recent discovery and verified ingestion, with a weekly P
   assert.equal(missingArticle.healthy, false);
   assert.equal(missingArticle.sourceIngestion[0].errorClass, "publication_receipt_missing");
   await receiveIngestionReceipt(request(articleReceipt()), { DISCOVERY_LEDGER: db, INGESTION_RECEIPT_TOKEN: TOKEN }, NOW);
+  for (const sourceId of ARTICLE_SOURCE_IDS.filter(id => id !== "pressthink-wordpress-posts")) {
+    db.raw.run("INSERT INTO discovery_source_state VALUES (?,?,?,?,?,?)", [sourceId, null, null, "2026-10-14T09:17:00Z", "2026-10-14T09:17:00Z", "candidates_found"]);
+    await receiveIngestionReceipt(request(articleReceipt({ sourceId, captured: 0, admitted: 0, contextOnly: 0, records: [], added: 0, versions: 0 })), { DISCOVERY_LEDGER: db, INGESTION_RECEIPT_TOKEN: TOKEN }, NOW);
+  }
   assert.equal((await readArchiveHealth(db, NOW)).healthy, true);
   const stale = await readArchiveHealth(db, NOW + 37 * 3_600_000);
   assert.equal(stale.healthy, false);
@@ -216,5 +222,21 @@ test("PressThink receipt validation and batch rollback leave legacy storage unto
   await assert.rejects(receiveIngestionReceipt(request(articleReceipt()), { DISCOVERY_LEDGER: db, INGESTION_RECEIPT_TOKEN: TOKEN }, NOW));
   assert.equal(db.raw.exec("SELECT count(*) FROM source_ingestion_runs")[0].values[0][0], 0);
   assert.equal(db.raw.exec("SELECT count(*) FROM archive_ingestion_runs")[0].values[0][0], 0);
+  db.raw.close();
+});
+
+
+test("publisher receipts retain source scope and refuse cross-publisher URLs", async () => {
+  const db = await database();
+  const env = { DISCOVERY_LEDGER: db, INGESTION_RECEIPT_TOKEN: TOKEN };
+  const sourceId = "cjr-jay-rosen-author";
+  const value = articleReceipt({ sourceId, records: [{ uri: "https://www.cjr.org/analysis/example.php", decision: "accepted", recordId: "RECORD-01102" }] });
+  assert.equal((await receiveIngestionReceipt(request(value), env, NOW)).status, 200);
+  assert.equal((await receiveIngestionReceipt(request({ ...value, sourceId: "common-dreams-jay-rosen-author" }), env, NOW)).status, 400);
+  const health = await readArchiveHealth(db, NOW);
+  assert.equal(health.sourceIngestion.find(source => source.sourceId === sourceId).healthy, true);
+  assert.equal(health.sourceIngestion.find(source => source.sourceId === "cjr-jay-rosen-search").healthy, false);
+  assert.equal(health.healthy, false);
+  assert.equal(db.raw.exec("SELECT source_id FROM source_ingestion_runs")[0].values[0][0], sourceId);
   db.raw.close();
 });

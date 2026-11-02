@@ -238,7 +238,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── screenshots/                 # PNGs referenced from other docs
 │   └── (top-level audits: DATA_QUALITY_AUDIT_*, ENTITY_EXTRACTION_PIPELINE, HANDOFF, JAY_ADDING_RECORDS, JAY_ROSEN_HANDOFF_GOAL_PROGRESS, LAUNCH_VALIDATION_REPORT, QUESTIONS_FOR_ROSEN_CALL, issue-210-duplicate-findings)
 │
-├── .github/workflows/               # CI/CD (16 workflows)
+├── .github/workflows/               # CI/CD (17 workflows)
 │   ├── frontend-validation.yml      # HTML/JS syntax, CDN link checks
 │   ├── backend-tests.yml            # pytest
 │   ├── backend-linting.yml          # ruff, black, mypy
@@ -248,6 +248,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── submit-record.yml            # Pillar 3a — submit record
 │   ├── bluesky-stewardship.yml      # Daily Bluesky data stewardship publisher
 │   ├── pressthink-stewardship.yml   # Daily PressThink article stewardship publisher
+│   ├── publisher-feeds-stewardship.yml # Serial, independent reviewed publisher metadata intake
 │   ├── sweep-stuck-rows.yml         # Pillar 3a — sweep stuck submission rows
 │   ├── submit-prototype.yml         # Pillar 3b — submit prototype record
 │   ├── deploy.yml                   # Pillar 3c — full-site deploy to pressthink.org

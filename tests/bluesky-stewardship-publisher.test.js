@@ -552,3 +552,22 @@ describe('PressThink source receipts', () => {
       status: 'published', canonicalCommit: PUBLISHED, releaseVersion: '3.8.57', report: {} }), /missing/);
   });
 });
+
+it('records publisher metadata associations only for the configured source origin', () => {
+  const options = {
+    sourceId: 'cjr-jay-rosen-search', runId: 'publisher_run_1', status: 'published',
+    checkedAt: '2026-11-02T19:00:00Z', canonicalCommit: START, releaseVersion: '3.8.57',
+    publishedRecordIds: ['RECORD-01102'],
+    report: { article: { source_id: 'cjr-jay-rosen-search', captured: 2, added: 1,
+      updated: 0, versions_added: 2, newest_source_time: '2025-12-29T14:00:00Z',
+      associations: [{ uri: 'https://www.cjr.org/kicker/example.php', record_id: 'RECORD-01102' }] } },
+  };
+  const receipt = buildSourceIngestionReceipt(options);
+  assert.equal(receipt.sourceId, options.sourceId);
+  assert.equal(receipt.admitted, 1);
+  assert.equal(receipt.contextOnly, 1);
+  assert.throws(() => buildSourceIngestionReceipt({ ...options, sourceId: 'common-dreams-jay-rosen-author' }));
+  const workflow = fs.readFileSync(new URL('../.github/workflows/publisher-feeds-stewardship.yml', import.meta.url), 'utf8');
+  assert.match(workflow, /max-parallel: 1/);
+  assert.match(workflow, /fail-fast: false/);
+});
