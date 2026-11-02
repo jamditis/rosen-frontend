@@ -4,13 +4,13 @@
     "compatibility": "additive changes within version 1; semantic changes require a new major version"
   },
   "input": {
-    "commit": "4e3adf29d83cbe6b422999032274f98020b73ecc",
+    "commit": "e055349dc8401d66cd1a68cae4a3878207cc551b",
     "dirty": false,
     "schema_version": "stewardship-census/1.0.0",
     "files": [
       {
         "path": "data/archive_records-public.csv",
-        "sha256": "ec4376542be1f8e533a7830678846a38207853babb147e3960cbdf36ce51d03a"
+        "sha256": "afa06c61c7e0ddd297d89731d6d9d83f2d77a0888d70c95d11e04c0fe47f24e3"
       },
       {
         "path": "data/social_posts.csv",
@@ -26,19 +26,19 @@
       },
       {
         "path": "data/archive-data.json",
-        "sha256": "f2bea5a4cb18564e813f4bc122223468ff7524757575358e97c208a612f78203"
+        "sha256": "4dca04bf1ac0a40b8bcd424f9aac1a471ae69cba488ca1d45d1db2d82163c3e2"
       },
       {
         "path": "data/archive-core.json",
-        "sha256": "501e8eee8730e45f362285babedbb5821f935bd92fcdfd4dd082842461ca2dbf"
+        "sha256": "36954b140d82956f9655f9cbc095429b6b021e5a86745c31aea441c179f9d9b5"
       },
       {
         "path": "data/archive-details.json",
-        "sha256": "6196433d485ea8677b22dae203e523ce4b97206c5ab2595aa9e3fa09ddaed1b6"
+        "sha256": "2ff0147d634fad493523df10a566a642e618ec4a1dcdbe70b492153fb782a8fe"
       },
       {
         "path": "data/archive-entities.json",
-        "sha256": "e15f0dcb8a2b6395a6659e5d13de32a2496c0c844a0d29cb7f4336e1e0289c2a"
+        "sha256": "14a397b1817d5981354be75806067f72cd726735306704e468b80501eff08086"
       },
       {
         "path": "data/authored-excerpts.csv",
@@ -48,11 +48,11 @@
   },
   "records": {
     "source": {
-      "total": 31319,
+      "total": 31320,
       "curated": {
-        "total": 1213,
+        "total": 1214,
         "by_record_type": {
-          "Article": 1082,
+          "Article": 1083,
           "Book Chapter": 2,
           "Interview (Audio/Video)": 86,
           "Newspaper Clipping": 26,
@@ -63,7 +63,7 @@
           "Video": 3
         },
         "verification": {
-          "verified": 1213,
+          "verified": 1214,
           "unverified": 0,
           "blank": 0
         }
@@ -86,17 +86,17 @@
       }
     },
     "runtime": {
-      "total": 27051,
+      "total": 27052,
       "by_type": {
         "Dissertation": 1,
-        "article": 1213,
+        "article": 1214,
         "social": 25837
       },
       "source_backed": {
-        "total": 27041,
-        "curated": 1213,
+        "total": 27042,
+        "curated": 1214,
         "curated_by_record_type": {
-          "Article": 1082,
+          "Article": 1083,
           "Book Chapter": 2,
           "Interview (Audio/Video)": 86,
           "Newspaper Clipping": 26,
@@ -135,15 +135,15 @@
         ]
       },
       "verification": {
-        "verified": 27051,
+        "verified": 27052,
         "unverified": 0,
         "blank": 0
       }
     },
     "reconciliation": {
       "curated": {
-        "source": 1213,
-        "published": 1213,
+        "source": 1214,
+        "published": 1214,
         "filtered": 0
       },
       "social": {
@@ -4542,39 +4542,39 @@
   "fields": {
     "curated_source": {
       "url": {
-        "total": 1213,
-        "present": 1213,
+        "total": 1214,
+        "present": 1214,
         "missing": 0
       },
       "raw_text": {
-        "total": 1213,
+        "total": 1214,
         "present": 1199,
-        "missing": 14
+        "missing": 15
       },
       "summary": {
-        "total": 1213,
-        "present": 1213,
+        "total": 1214,
+        "present": 1214,
         "missing": 0
       },
       "tags": {
-        "total": 1213,
+        "total": 1214,
         "present": 717,
-        "missing": 496
+        "missing": 497
       },
       "concepts": {
-        "total": 1213,
+        "total": 1214,
         "present": 952,
-        "missing": 261
+        "missing": 262
       },
       "quote": {
-        "total": 1213,
+        "total": 1214,
         "present": 991,
-        "missing": 222
+        "missing": 223
       },
       "related_ids": {
-        "total": 1213,
+        "total": 1214,
         "present": 713,
-        "missing": 500
+        "missing": 501
       }
     },
     "social_source": {
@@ -4616,37 +4616,37 @@
     },
     "runtime": {
       "url": {
-        "total": 27051,
-        "present": 27051,
+        "total": 27052,
+        "present": 27052,
         "missing": 0
       },
       "summary": {
-        "total": 27051,
-        "present": 27051,
+        "total": 27052,
+        "present": 27052,
         "missing": 0
       },
       "tags": {
-        "total": 27051,
+        "total": 27052,
         "present": 18185,
-        "missing": 8866
+        "missing": 8867
       },
       "concepts": {
-        "total": 27051,
+        "total": 27052,
         "present": 1414,
-        "missing": 25637
+        "missing": 25638
       },
       "quote": {
-        "total": 27051,
+        "total": 27052,
         "present": 27051,
-        "missing": 0
+        "missing": 1
       },
       "related_ids": {
-        "total": 27051,
+        "total": 27052,
         "present": 1065,
-        "missing": 25986
+        "missing": 25987
       },
       "raw_text": {
-        "total": 27051,
+        "total": 27052,
         "present": null,
         "missing": null,
         "status": "not_shipped_by_design"
@@ -4718,14 +4718,14 @@
     "coverage": {
       "curated": {
         "source": {
-          "rows": 1213,
+          "rows": 1214,
           "rows_with_relationship_assertions": 1053,
           "relationship_assertions": 11160,
           "rows_with_entity_links": 1053,
           "distinct_record_entity_links": 13141
         },
         "published": {
-          "source_backed_rows": 1213,
+          "source_backed_rows": 1214,
           "rows_with_relationship_assertions": 1053,
           "relationship_assertions": 11160,
           "rows_with_entity_links": 1053,
@@ -4875,10 +4875,10 @@
   },
   "urls": {
     "source": {
-      "total_rows": 31319,
+      "total_rows": 31320,
       "missing": 38,
-      "external_values": 31281,
-      "unique_external_urls": 31271,
+      "external_values": 31282,
+      "unique_external_urls": 31272,
       "duplicate_external_values": 10,
       "internal_values": 0,
       "malformed_values": 0,
@@ -4902,7 +4902,7 @@
         "buzzmachine.com": 1,
         "bylinesupplement.com": 1,
         "cascadiadaily.com": 1,
-        "cjr.org": 4,
+        "cjr.org": 5,
         "cnet.com": 1,
         "cnn.com": 2,
         "commondreams.org": 1,
@@ -5010,10 +5010,10 @@
       }
     },
     "runtime": {
-      "total_rows": 27051,
+      "total_rows": 27052,
       "missing": 0,
-      "external_values": 27050,
-      "unique_external_urls": 27050,
+      "external_values": 27051,
+      "unique_external_urls": 27051,
       "duplicate_external_values": 0,
       "internal_values": 1,
       "malformed_values": 0,
@@ -5037,7 +5037,7 @@
         "buzzmachine.com": 1,
         "bylinesupplement.com": 1,
         "cascadiadaily.com": 1,
-        "cjr.org": 4,
+        "cjr.org": 5,
         "cnet.com": 1,
         "cnn.com": 2,
         "commondreams.org": 1,
@@ -30398,8 +30398,8 @@
       {
         "metric": "curated_source",
         "baseline": 1029,
-        "current": 1213,
-        "delta": 184
+        "current": 1214,
+        "delta": 185
       },
       {
         "metric": "social_source",
@@ -30410,8 +30410,8 @@
       {
         "metric": "published_curated_source",
         "baseline": 950,
-        "current": 1213,
-        "delta": 263
+        "current": 1214,
+        "delta": 264
       },
       {
         "metric": "published_social_source",
@@ -30434,8 +30434,8 @@
       {
         "metric": "published_total",
         "baseline": 26616,
-        "current": 27051,
-        "delta": 435
+        "current": 27052,
+        "delta": 436
       },
       {
         "metric": "entities",
