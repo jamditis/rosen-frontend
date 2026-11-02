@@ -177,17 +177,47 @@ def _parse_operational_health(payload: object) -> OperationalHealth | None:
     if discovery is None or ingestion is None:
         return None
 
+    article_sources = []
+    if "sourceIngestion" in payload:
+        values = payload["sourceIngestion"]
+        if not isinstance(values, list) or not values:
+            return None
+        seen = set()
+        for value in values:
+            source_id = value.get("sourceId") if isinstance(value, dict) else None
+            parsed = _parse_ingestion(value)
+            if not _safe_value(source_id) or source_id in seen or parsed is None:
+                return None
+            seen.add(source_id)
+            article_sources.append((source_id, *parsed))
+    failed_articles = [
+        (source_id, status, error)
+        for source_id, healthy, status, error in article_sources
+        if not healthy
+    ]
     ingestion_healthy, ingestion_status, error_class = ingestion
     discovery_healthy = all(healthy for _source_id, healthy in discovery)
-    healthy = payload["healthy"] and discovery_healthy and ingestion_healthy
+    healthy = (
+        payload["healthy"]
+        and discovery_healthy
+        and ingestion_healthy
+        and not failed_articles
+    )
     affected_sources = tuple(
-        source_id for source_id, source_healthy in discovery if not source_healthy
+        dict.fromkeys(
+            [source_id for source_id, source_healthy in discovery if not source_healthy]
+            + [source_id for source_id, _status, _error in failed_articles]
+        )
     )
     affected_components: list[str] = []
     if affected_sources:
         affected_components.append("archive discovery")
     if not ingestion_healthy:
         affected_components.append("archive publication")
+    if failed_articles:
+        affected_components.append("article publication")
+        if ingestion_healthy:
+            _source_id, ingestion_status, error_class = failed_articles[0]
     if not healthy and not affected_components:
         affected_components.extend(("archive discovery", "archive publication"))
     return OperationalHealth(

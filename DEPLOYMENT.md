@@ -157,6 +157,8 @@ Identify the destination before deciding whether a release is complete:
 | [PressThink archive](https://pressthink.org/j/rosen-archive/) | `deploy.yml`: Weekly Friday at 09:17 UTC, or manual dispatch against reviewed `main` | Successful FTPS transfer, successful live verification, and the expected public `version.json` |
 | PressThink record submission | `submit-record.yml` (also re-dispatched by `sweep-stuck-rows.yml`) | Successful workflow, published record live on `pressthink.org/j/rosen-archive/`, and sheet writeback complete |
 | PressThink Bluesky publication | Bluesky stewardship publisher workflow | Successful publication, accepted receipt, and healthy ingestion status |
+| PressThink article intake | `pressthink-stewardship.yml`, daily 19:47 UTC | Full publication, public byte verification and a healthy WordPress source receipt |
+| Reviewed publisher feeds | `publisher-feeds-stewardship.yml`, daily 20:47 UTC | All three serial jobs succeed, with each source receipt and discovery status verified |
 
 The current `deploy.yml` does not have a push trigger. The
 `post-merge.yml` dashboard notification runs only when
@@ -345,3 +347,40 @@ approved.
 
 Production uses the repository's encrypted Actions secrets. Never commit or
 paste credentials into workflow files, logs, issues, or pull requests.
+
+## Article-source activation and recovery
+
+After merge, require successful checks for the current main revision. Preserve
+D1 and repository/LFS/source journals first, then apply required migrations and
+deploy the reviewed native Worker with `wrangler deploy --no-bundle`. No local or
+fleet repository CI is part of this procedure.
+
+Dispatch `pressthink-stewardship.yml` and `publisher-feeds-stewardship.yml` against
+main with `dry_run=false`. The shared queue refreshes main before each writer.
+Wait for full transfer, public-byte verification and receipt delivery. For the
+serial feed matrix, inspect all three jobs; success of one job proves only that
+source. A dry run is source evidence and does not prove publication.
+
+Use the authenticated fixed-source `POST /discovery-run` operator for the initial
+discovery check. Use the existing receipt credential pointer through an in-memory
+client; never put a token in command arguments or logs. Inspect each returned
+source status. `candidates_found`, `no_candidates`, `not_modified` and a valid
+weekly `skipped_interval` are successful outcomes. A refused or invalid source
+stays degraded; do not bypass robots or access controls.
+
+Read `https://rosen-source-discovery.jamditis.workers.dev/health`. Require healthy
+legacy Bluesky ingestion plus four healthy article-source receipts: WordPress,
+CJR search, CJR author and Common Dreams author. Each source also needs current
+successful discovery. Compare receipt commits/versions with verified publication,
+not merely a green schedule or a recent fetch. Run the installed hourly health
+check after real recovery, then refresh the Legion repository/journal and public
+archive preservation copies.
+
+On failure, keep the prior backup and source histories. Inspect the failed job
+and its source-scoped receipt. A capture or pre-push gate failure leaves remote
+canonical data and the website unchanged. A transfer or receipt failure can follow
+a successful canonical push: Dispatch the same source again. A no-change run
+verifies live bytes and uses the existing full-release recovery path when needed;
+only verified publication can settle candidates. Never manufacture a receipt or
+clear a hold to make health green. See [article intake](docs/operations/pressthink-ingestion.md)
+for transaction recovery and finite feed coverage limits.

@@ -44,6 +44,7 @@ ROBOTS_URL = f"{PUBLIC_API_ORIGIN}/robots.txt"
 ROBOTS_USER_AGENT = "RosenArchive-BlueskyBatch"
 CONTEXT_ENDPOINT = f"{backfill.API_BASE}/app.bsky.feed.getPosts"
 CONTEXT_BATCH_LIMIT = 25
+MAX_PENDING_RECOVERY = 200
 MAX_REQUEST_ATTEMPTS = 4
 MAX_RETRY_DELAY_SECONDS = 30.0
 TRANSIENT_HTTP_STATUSES = {429, 500, 502, 503, 504}
@@ -598,6 +599,58 @@ def _fetch_context_batches(
     return context_by_uri, snapshots
 
 
+def _recover_pending_rows(
+    pending_uris, existing_urls, collected_rows, max_id, today, fetch_context_fn
+):
+    """Read older missing Jay posts by stable URI, within a fixed recovery bound."""
+    if (
+        not isinstance(pending_uris, list)
+        or any(not isinstance(uri, str) for uri in pending_uris)
+        or len(pending_uris) != len(set(pending_uris))
+    ):
+        raise BatchPreparationError("Pending recovery requires unique Jay URIs")
+    prefix = f"at://{backfill.ACTOR_DID}/app.bsky.feed.post/"
+    for uri in pending_uris:
+        if (
+            not isinstance(uri, str)
+            or not uri.startswith(prefix)
+            or not backfill.AT_POST_URI_RE.fullmatch(uri)
+        ):
+            raise BatchPreparationError("Pending recovery contains an invalid Jay URI")
+    known = backfill._existing_post_identities(
+        existing_urls | {row["url"] for row in collected_rows}
+    )
+    missing = [
+        uri
+        for uri in pending_uris
+        if (backfill.ACTOR_DID, uri.rsplit("/", 1)[1]) not in known
+    ]
+    if len(missing) > MAX_PENDING_RECOVERY:
+        raise BatchPreparationError(
+            "Pending recovery exceeds 200 missing posts; review the backlog before raising the bound"
+        )
+    posts, snapshots = _fetch_context_batches(missing, fetch_context_fn)
+    items = [{"post": posts[uri]} for uri in missing if uri in posts]
+    rows = [
+        backfill.post_to_row(item, max_id + len(collected_rows) + offset, today)
+        for offset, item in enumerate(items, start=1)
+    ]
+    observations, by_url = _validated_observations([{"response": {"feed": items}}])
+    return (
+        rows,
+        observations,
+        by_url,
+        snapshots,
+        {
+            "pending": len(pending_uris),
+            "requested": len(missing),
+            "recovered": len(items),
+            "unavailable_uris": [uri for uri in missing if uri not in posts],
+            "recovered_uris": [item["post"]["uri"] for item in items],
+        },
+    )
+
+
 def _categorize(row: dict) -> list[str]:
     categorizer = RecordCategorizer(confidence_threshold=0.6)
     categories, _confidence, _reason = categorizer.categorize_record(row)
@@ -609,6 +662,8 @@ def _decision_rows(
     item_by_url: dict[str, dict],
     context_by_uri: dict[str, dict],
     captured_at: datetime.datetime,
+    *,
+    endpoint_by_uri=None,
 ) -> tuple[list[dict], list[dict]]:
     rows: list[dict] = []
     decisions: list[dict] = []
@@ -670,7 +725,7 @@ def _decision_rows(
             context_note = " Context references: " + "; ".join(context_uris) + "."
         evidence = (
             f"Public source evidence from the public API endpoint "
-            f"{backfill.FEED_ENDPOINT}: uri={uri}; cid={cid}; "
+            f"{(endpoint_by_uri or {}).get(uri, backfill.FEED_ENDPOINT)}: uri={uri}; cid={cid}; "
             f"record_sha256={record_hash}."
         )
         if admitted:
@@ -855,6 +910,7 @@ def run_batch(
     fetch_page_fn: Callable[[str | None], dict] = fetch_feed_page,
     fetch_context_fn: Callable[[list[str]], dict] = fetch_context_posts,
     policy_check_fn: Callable[[], None] = check_public_api_policy,
+    fetch_pending_fn: Callable[[], list[str]] | None = None,
     sleep_fn: Callable[[float], None] = backfill.time.sleep,
     write: bool = True,
 ) -> BatchRunResult:
@@ -891,6 +947,23 @@ def run_batch(
         )
 
     observations, item_by_url = _validated_observations(pages)
+    (
+        pending_rows,
+        pending_observations,
+        pending_items,
+        pending_snapshots,
+        pending_report,
+    ) = _recover_pending_rows(
+        fetch_pending_fn() if fetch_pending_fn else [],
+        existing_urls,
+        collection.rows,
+        max_id,
+        today,
+        fetch_context_fn,
+    )
+    collection.rows.extend(pending_rows)
+    observations.extend(pending_observations)
+    item_by_url.update(pending_items)
     preliminary_context: list[str] = []
     for row in collection.rows:
         item = item_by_url.get(row["url"])
@@ -911,7 +984,11 @@ def run_batch(
         item_by_url,
         context_by_uri,
         captured_at,
+        endpoint_by_uri={
+            uri: CONTEXT_ENDPOINT for uri in pending_report["recovered_uris"]
+        },
     )
+    context_snapshots = pending_snapshots + context_snapshots
 
     admitted = sum(item["decision"] == "admit" for item in decisions)
     context_only = len(decisions) - admitted
@@ -954,6 +1031,7 @@ def run_batch(
             "rows_appended": len(prepared_rows),
         },
         "observed_sources": observations,
+        "pending_recovery": pending_report,
         "decisions": decisions,
     }
 
@@ -1007,6 +1085,11 @@ def _parse_args() -> argparse.Namespace:
         help="Fail without writing if the feed still has a cursor at this bound",
     )
     parser.add_argument(
+        "--pending-ledger",
+        action="store_true",
+        help="Recover bounded older Jay candidates with the existing receipt token",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Write snapshots and the report without changing canonical data",
@@ -1021,6 +1104,14 @@ def main() -> None:
     if args.max_pages < 1:
         raise SystemExit("--max-pages must be at least 1")
 
+    fetch_pending = None
+    if args.pending_ledger:
+        import post_ingestion_receipt as sender
+
+        token = os.environ.get("ROSEN_INGESTION_RECEIPT_TOKEN", "")
+        if not token:
+            raise SystemExit("Pending recovery requires the existing receipt token")
+        fetch_pending = lambda: sender.fetch_pending_candidate_uris(token)
     result = run_batch(
         csv_path=args.csv,
         snapshot_dir=args.snapshot_dir,
@@ -1028,6 +1119,7 @@ def main() -> None:
         overlap=datetime.timedelta(hours=args.overlap_hours),
         max_pages=args.max_pages,
         write=not args.dry_run,
+        fetch_pending_fn=fetch_pending,
     )
     print(
         json.dumps(
@@ -1036,6 +1128,7 @@ def main() -> None:
                 "input_cutoff": result.report["input_cutoff"],
                 "newest_source_time": result.report["newest_source_time"],
                 "counts": result.report["counts"],
+                "pending_recovery": result.report["pending_recovery"],
             },
             sort_keys=True,
         )

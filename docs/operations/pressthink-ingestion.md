@@ -138,3 +138,25 @@ bearer authorization and live mode. It accepts no source URL or configuration.
 This bounded operator permits supervised activation checks without waiting for
 the next daily discovery tick. Its public health endpoint still triggers no
 fetch. Use only the documented credential pointer, never a token in arguments.
+
+Older captured feed metadata is reconsidered from verified journal heads even
+when it is absent from the current finite RSS view. The report separates current
+feed items, historical reconsideration and missing current identities. Replayed
+versions retain `source_observed_at` and use `historical_reconciliation`; they do
+not claim a new source observation. At most 2,000 current plus historical items
+per feed are reconsidered. Retirements and unresolved syndication holds stay in
+place. This recovers earlier captured associations, not unknown historical works.
+
+The Bluesky publisher also reads the authenticated pending Jay URI ledger before
+publication. It fetches at most 200 missing older posts with the fixed public
+`getPosts` endpoint, independent of the normal moving cutoff. Those posts use the
+same deterministic admission/context rules and source-provenance checks as recent
+posts. Already canonical identities are not duplicated. Missing/deleted sources
+remain explicitly unavailable and pending; they are never fabricated or treated
+as an accepted record. A larger backlog fails before writes and requires reviewed
+operator intervention. The existing robots and access boundaries apply.
+
+The hourly notification-only watcher reads source-specific article health and
+names the affected source and receipt error. It does not repair, publish, dispatch
+or back up automatically. The separate PressThink root monitor remains every two
+hours and notification-only.

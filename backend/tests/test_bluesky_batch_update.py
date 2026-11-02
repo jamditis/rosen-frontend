@@ -934,3 +934,80 @@ def test_malformed_context_aborts_without_canonical_writes(
     assert csv_path.read_bytes() == original
     assert not snapshot_dir.exists()
     assert not report_path.exists()
+
+
+def test_pending_recovery_captures_old_missing_post_and_keeps_provenance(tmp_path):
+    csv_path = tmp_path / "social_posts.csv"
+    original = _write_canonical(csv_path)
+    old = _feed_item(
+        "older-than-window",
+        "2020-01-01T12:00:00Z",
+        "Journalists should explain how news coverage serves democracy and the public. False balance and the view from nowhere undermine trust in journalism.",
+    )
+    uri = old["post"]["uri"]
+    requested = []
+
+    def get_posts(uris):
+        requested.extend(uris)
+        return {"posts": [old["post"]]}
+
+    result = batch.run_batch(
+        csv_path=csv_path,
+        snapshot_dir=tmp_path / "pending-snapshot",
+        report_path=tmp_path / "pending-report.json",
+        captured_at=_captured_at(),
+        fetch_page_fn=lambda _: {"feed": [], "cursor": None},
+        fetch_pending_fn=lambda: [uri],
+        fetch_context_fn=get_posts,
+        policy_check_fn=lambda: None,
+        sleep_fn=lambda _: None,
+    )
+    assert requested == [uri]
+    assert result.report["pending_recovery"]["recovered"] == 1
+    assert result.report["pending_recovery"]["unavailable_uris"] == []
+    assert csv_path.read_bytes().startswith(original)
+    rows = _read_rows(csv_path)
+    assert len(rows) == 2
+    assert rows[1]["publication_date"] == "2020-01-01 12:00:00"
+    assert "app.bsky.feed.getPosts" in rows[1]["notes"]
+    assert "app.bsky.feed.getAuthorFeed" not in rows[1]["notes"]
+    second = batch.run_batch(
+        csv_path=csv_path,
+        snapshot_dir=tmp_path / "pending-again",
+        report_path=tmp_path / "pending-again.json",
+        captured_at=_captured_at(),
+        fetch_page_fn=lambda _: {"feed": [], "cursor": None},
+        fetch_pending_fn=lambda: [uri],
+        fetch_context_fn=lambda _: pytest.fail("already canonical post was fetched"),
+        policy_check_fn=lambda: None,
+        sleep_fn=lambda _: None,
+    )
+    assert second.report["counts"]["captured"] == 0
+    assert len(_read_rows(csv_path)) == 2
+
+
+def test_pending_recovery_holds_unavailable_source_and_refuses_wrong_author():
+    uri = f"at://{JAY_DID}/app.bsky.feed.post/unavailable"
+    result = batch._recover_pending_rows(
+        [uri], set(), [], 1, "2026-11-02", lambda _: {"posts": []}
+    )
+    assert result[-1]["unavailable_uris"] == [uri]
+    assert result[0] == []
+    with pytest.raises(batch.BatchPreparationError, match="invalid Jay"):
+        batch._recover_pending_rows(
+            ["at://did:plc:someoneelse/app.bsky.feed.post/id"],
+            set(),
+            [],
+            1,
+            "2026-11-02",
+            lambda _: pytest.fail("out-of-scope read"),
+        )
+    with pytest.raises(batch.BatchPreparationError, match="exceeds 200"):
+        batch._recover_pending_rows(
+            [f"at://{JAY_DID}/app.bsky.feed.post/id{i}" for i in range(201)],
+            set(),
+            [],
+            1,
+            "2026-11-02",
+            lambda _: pytest.fail("over-bound read"),
+        )

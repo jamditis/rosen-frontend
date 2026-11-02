@@ -497,3 +497,27 @@ def test_supported_telegram_command_uses_no_shell_or_copied_credentials(monkeypa
     ]
     assert calls[0][1]["check"] is True
     assert calls[0][1]["timeout"] == 20
+
+
+def test_article_failure_identifies_source_even_when_bluesky_is_healthy():
+    payload = _health_payload(healthy=False)
+    payload["sourceIngestion"] = [
+        {
+            "sourceId": "cjr-jay-rosen-author",
+            "healthy": False,
+            "status": "receipt_stale",
+            "errorClass": "publication_receipt_stale",
+            "checkedAt": "2026-10-12T10:00:00Z",
+            "canonicalCommit": "a" * 40,
+            "releaseVersion": "3.8.57",
+        }
+    ]
+    parsed = watcher._parse_operational_health(payload)
+    assert parsed.healthy is False
+    assert parsed.affected_sources == ("cjr-jay-rosen-author",)
+    assert parsed.affected_components == ("article publication",)
+    assert parsed.error_class == "publication_receipt_stale"
+    payload["healthy"] = True
+    assert watcher._parse_operational_health(payload).healthy is False
+    payload["sourceIngestion"].append(dict(payload["sourceIngestion"][0]))
+    assert watcher._parse_operational_health(payload) is None

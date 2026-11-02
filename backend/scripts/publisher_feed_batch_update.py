@@ -203,11 +203,38 @@ def run_batch(
     if source_id not in FEEDS:
         raise ValueError("Unknown reviewed publisher source")
 
+    replay_counts = {}
+
     def reconcile(captured, columns, rows, entries, **kwargs):
         if any(source.get("feed_id") != source_id for source in captured):
             raise ValueError("Mixed publisher capture identities")
-        return archive.reconcile_sources(
-            captured,
+        current_ids = {source["id"] for source in captured}
+        heads = {entry["source"]["id"]: entry["source"] for entry in entries}
+        older = [
+            source
+            for identity, source in heads.items()
+            if source.get("feed_id") == source_id and identity not in current_ids
+        ]
+        if len(captured) + len(older) > 2000:
+            raise ValueError("Preserved feed catch-up exceeds 2000 metadata items")
+        for source in older:
+            parsed = urlsplit(source["url"])
+            if (
+                source["id"] != source_id + ":" + source["url"]
+                or parsed.scheme != "https"
+                or parsed.netloc != urlsplit(FEEDS[source_id]["url"]).netloc
+                or parsed.query
+                or parsed.fragment
+                or parsed.username
+            ):
+                raise ValueError("Invalid preserved publisher identity")
+        replay_counts.update(
+            current_feed_items=len(captured),
+            historical_reconsidered=len(older),
+            absent_from_current_feed=[source["id"] for source in older],
+        )
+        successor, versions, report = archive.reconcile_sources(
+            sorted(captured + older, key=lambda source: source["id"]),
             columns,
             rows,
             entries,
@@ -217,6 +244,23 @@ def run_batch(
             can_create=lambda source: source["admission_basis"]
             in {"by_jay", "about_jay"},
         )
+        old_entries = {entry["source"]["id"]: entry for entry in entries}
+        for entry in versions:
+            identity = entry["source"]["id"]
+            historical = identity not in current_ids
+            old = old_entries.get(identity, {})
+            entry["capture_kind"] = (
+                "historical_reconciliation" if historical else "live_feed"
+            )
+            entry["source_observed_at"] = (
+                old.get("source_observed_at", old.get("captured_at"))
+                if historical
+                else entry["captured_at"]
+            )
+            entry["sha256"] = archive.digest(
+                {key: value for key, value in entry.items() if key != "sha256"}
+            )
+        return successor, versions, report
 
     result = archive.run_capture(
         dry_run=dry_run,
@@ -226,13 +270,10 @@ def run_batch(
         capture=lambda: capture_feed(source_id) if sources is None else sources,
         reconcile_capture=reconcile,
     )
-    result["missing_source_ids"] = [
-        identity
-        for identity in result["missing_source_ids"]
-        if identity.startswith(source_id + ":")
-    ]
+    result["missing_source_ids"] = replay_counts["absent_from_current_feed"]
     return {
         **result,
+        **replay_counts,
         "source_id": source_id,
         "coverage": "Finite current RSS view; no exhaustive historical claim",
     }

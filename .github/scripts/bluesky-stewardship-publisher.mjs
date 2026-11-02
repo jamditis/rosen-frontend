@@ -490,6 +490,7 @@ function captureBatch(root, paths, dryRun) {
     '--report', paths.reportPath,
     '--snapshot-dir', paths.snapshotDir,
     '--overlap-hours', '2160',
+    '--pending-ledger',
   ];
   if (dryRun) adapterArgs.push('--dry-run');
   run(root, 'python', adapterArgs);

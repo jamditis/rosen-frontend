@@ -197,3 +197,44 @@ def test_dry_run_and_interrupted_transaction_use_existing_recovery(
     assert recovered["added"] == 0
     assert len(feed.archive.read_archive_csv(csv_path)[1]) == 1
     assert not feed.archive.transaction.journal_path(history).exists()
+
+
+def test_absent_feed_metadata_can_resolve_a_former_hold_without_refetching_body(
+    tmp_path,
+):
+    csv_path, history, sources = fixture(tmp_path)
+    first = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=sources
+    )
+    columns, rows = feed.archive.read_archive_csv(csv_path)
+    old = {
+        **sources[0],
+        "id": CJR + ":https://www.cjr.org/analysis/older.php",
+        "url": "https://www.cjr.org/analysis/older.php",
+    }
+    held = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=[sources[0], old]
+    )
+    assert held["added"] == 0
+    assert held["excluded"]
+    # A curator resolves the syndication identity between two feed observations.
+    rows[0]["url"] = old["url"]
+    feed.archive.write_archive_csv(csv_path, columns, rows)
+    current = [
+        {
+            **sources[0],
+            "id": CJR + ":https://www.cjr.org/analysis/newer.php",
+            "url": "https://www.cjr.org/analysis/newer.php",
+            "title": "A different current feed article",
+        }
+    ]
+    replay = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=current
+    )
+    assert replay["historical_reconsidered"] == 2
+    assert old["id"] in replay["missing_source_ids"]
+    assert {
+        "uri": old["url"],
+        "record_id": first["associations"][0]["record_id"],
+    } in replay["associations"]
+    assert replay["current_feed_items"] == 1
