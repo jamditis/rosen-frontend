@@ -150,7 +150,15 @@ def test_submission_append_preserves_existing_csv_bytes_and_native_records(
 
 
 @pytest.mark.parametrize(
-    "initial", [None, b"", b"id,word_count,verified,tags,notes\r\n"]
+    "initial",
+    [
+        None,
+        b"",
+        b"id,word_count,verified,tags,notes\r\n",
+        b"id,word_count,verified,tags,notes\n",
+        b"id,word_count,verified,tags,notes",
+        b"\xef\xbb\xbfid,word_count,verified,tags,notes\r\n",
+    ],
 )
 def test_append_keeps_first_file_and_python_cell_coercion_contract(tmp_path, initial):
     path = tmp_path / "new.csv"
