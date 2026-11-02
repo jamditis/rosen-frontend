@@ -453,7 +453,7 @@ describe('Bluesky stewardship receipt and workflow boundary', () => {
   it('keeps the workflow on protected main and secrets at their final consumers', () => {
     const workflow = fs.readFileSync(path.join(root, '.github/workflows/bluesky-stewardship.yml'), 'utf8');
     const publisher = fs.readFileSync(path.join(root, '.github/scripts/bluesky-stewardship-publisher.mjs'), 'utf8');
-    assert.match(workflow, /cron: '47 18 \* \* \*'/);
+    assert.match(workflow, /cron: '47 18 \* \* 0-6'/);
     assert.match(workflow, /type: boolean\n\s+default: true/);
     assert.match(workflow, /if: github\.ref == 'refs\/heads\/main'/);
     assert.match(workflow, /npm ci --ignore-scripts/);

@@ -101,6 +101,14 @@ the most recent blog edit. A missing, failed or stale PressThink receipt degrade
 aggregate health. Run the first real publisher immediately after Worker activation.
 Never manufacture a receipt to clear health.
 
+An enabled workflow and a successful manual dispatch do not prove that its
+schedule is running. Read recent Actions runs with `event=schedule`, then verify
+the run, receipt and public bytes for the source. If scheduled runs stop while
+manual runs succeed, check the default branch, workflow state and cron syntax.
+A reviewed cron change re-registers the schedule. Keep its next automatic run
+as a separate acceptance check. See the
+[GitHub scheduler troubleshooting guide](https://docs.github.com/en/actions/how-tos/troubleshoot-workflows#scheduled-workflow-stopped-running).
+
 All repository tests, builds, lint, and validation run on GitHub-hosted CI.
 
 ## Reviewed publisher feeds

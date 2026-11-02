@@ -2,7 +2,7 @@ name: Reviewed publisher feeds
 
 on:
   schedule:
-    - cron: '47 20 * * *'
+    - cron: '47 20 * * 0-6'
   workflow_dispatch:
     inputs:
       dry_run:

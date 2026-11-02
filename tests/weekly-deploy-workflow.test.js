@@ -22,7 +22,7 @@ const workflow = fs.readFileSync(
 describe('weekly reviewed-main deployment', () => {
   it('runs Friday at 09:17 UTC and can still run by hand', () => {
     assert.match(workflow, /^\s{2}schedule:\s*$/m);
-    assert.match(workflow, /^\s{4}- cron: '17 9 \* \* 5'$/m);
+    assert.match(workflow, /^\s{4}- cron: '17 9 \* \* FRI'$/m);
     assert.match(workflow, /^\s{2}workflow_dispatch:\s*$/m);
   });
 
