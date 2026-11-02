@@ -4,6 +4,12 @@ on:
   # Manual trigger so a runner pass can be observed before this gates real PRs
   # again (it was disabled_manually after the Dec 2025 failures — #444).
   workflow_dispatch:
+    inputs:
+      pressthink_source_check:
+        description: 'Also run the bounded read-only PressThink source dry run'
+        required: false
+        type: boolean
+        default: false
   push:
     branches: [ main ]
     paths:
@@ -80,3 +86,8 @@ jobs:
           poetry run pytest -v --tb=short
         env:
           CI: true
+
+      - name: Read-only PressThink source check
+        if: github.event_name == 'workflow_dispatch' && inputs.pressthink_source_check
+        working-directory: backend
+        run: poetry run python scripts/pressthink_batch_update.py --dry-run --report "$RUNNER_TEMP/pressthink-dry-run.json"
