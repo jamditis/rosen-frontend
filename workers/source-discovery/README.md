@@ -10,7 +10,7 @@ It is a read-only candidate-discovery control plane. It is not the archive scrap
 - The Worker has one dedicated D1 database: `rosen-source-discovery-ledger`.
 - D1 stores source validators, run state, candidate locations, content IDs, post types, root and parent identifiers, review status, and compact publication receipts.
 - D1 never stores feed bodies, item titles, article text, credentials, archive CSV data, or review notes.
-- The configuration has no KV, R2, Queue, AI, Vectorize, or route binding. The one receipt secret grants permission to record operational metadata only.
+- The configuration has no KV, R2, Queue, AI, Vectorize, or route binding. The existing receipt secret authorizes bounded operational metadata writes and the fixed-source discovery operator.
 - `GET /health` reads recent successful discovery and verified publication receipts. A missing, failed, or stale receipt returns HTTP 503.
 - `POST /ingestion-receipt` accepts authenticated, bounded receipts from the GitHub publisher. It cannot start discovery, fetch a supplied URL, write archive CSVs, or publish the site.
 - `GET /ingestion-candidates` authenticates with the same token and returns a bounded page of pending Jay source URIs. The publisher uses canonical rows to settle earlier successful captures after upload or receipt recovery.
@@ -38,11 +38,11 @@ runners. Do not run repository CI on the local machine or fleet.
 
 ## Deployment and rollback
 
-Apply migrations before deploying:
+Apply migrations before deploying the reviewed native ES modules. The configuration disables local bundling; all repository checks run on hosted CI:
 
 ```bash
 wrangler d1 migrations apply rosen-source-discovery-ledger --remote --config wrangler.jsonc
-wrangler deploy --config wrangler.jsonc
+wrangler deploy --no-bundle --config wrangler.jsonc
 ```
 
 Migration `0004_candidate_history_index.sql` adds the bounded Bluesky history lookup index. Candidate writes use batches that stay below D1's 100-parameter statement limit.

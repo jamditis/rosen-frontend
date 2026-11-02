@@ -368,7 +368,7 @@ describe('Bluesky stewardship receipt and workflow boundary', () => {
   it('delivers an early failed receipt without Python, Poetry or installed packages', (t) => {
     const isolated = fs.mkdtempSync('/tmp/rosen-failure-receipt-');
     t.after(() => fs.rmSync(isolated, { recursive: true, force: true }));
-    for (const file of ['.github/scripts/bluesky-stewardship-publisher.mjs', 'scripts/bump-version.mjs']) {
+    for (const file of ['.github/scripts/bluesky-stewardship-publisher.mjs', 'scripts/bump-version.mjs', 'workers/source-discovery/src/source-manifest.js']) {
       fs.mkdirSync(path.dirname(path.join(isolated, file)), { recursive: true });
       fs.copyFileSync(path.join(root, file), path.join(isolated, file));
     }

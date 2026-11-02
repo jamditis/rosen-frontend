@@ -36,28 +36,28 @@ export async function readArchiveHealth(database, now = Date.now()) {
   const ingestionFresh = Boolean(ingestion && fresh(ingestion.checked_at, now));
   const ingestionHealthy = Boolean(ingestionFresh && ingestion.status !== "failed");
   const sourceIngestion = await Promise.all(ARTICLE_SOURCE_IDS.map(async sourceId => {
-  const articleRun = await database.prepare(
-    "SELECT * FROM source_ingestion_runs WHERE source_id = ? ORDER BY checked_at DESC LIMIT 1",
-  ).bind(sourceId).first();
-  const articleFresh = Boolean(articleRun && fresh(articleRun.checked_at, now));
-  return {
-    sourceId,
-    runId: articleRun?.run_id || null,
-    checkedAt: articleRun?.checked_at || null,
-    status: !articleRun ? "never_run" : articleFresh ? articleRun.status : "receipt_stale",
-    lastReceiptStatus: articleRun?.status || null,
-    canonicalCommit: articleRun?.canonical_commit || null,
-    releaseVersion: articleRun?.release_version || null,
-    captured: articleRun?.captured_count || 0,
-    admitted: articleRun?.admitted_count || 0,
-    held: articleRun?.context_only_count || 0,
-    added: articleRun?.added_count || 0,
-    updated: articleRun?.updated_count || 0,
-    versions: articleRun?.version_count || 0,
-    sourceLatestAt: articleRun?.source_latest_at || null,
-    errorClass: !articleRun ? "publication_receipt_missing" : !articleFresh ? "publication_receipt_stale" : articleRun.error_class,
-    healthy: Boolean(articleFresh && articleRun.status !== "failed"),
-  };
+    const articleRun = await database.prepare(
+      "SELECT * FROM source_ingestion_runs WHERE source_id = ? ORDER BY checked_at DESC LIMIT 1",
+    ).bind(sourceId).first();
+    const articleFresh = Boolean(articleRun && fresh(articleRun.checked_at, now));
+    return {
+      sourceId,
+      runId: articleRun?.run_id || null,
+      checkedAt: articleRun?.checked_at || null,
+      status: !articleRun ? "never_run" : articleFresh ? articleRun.status : "receipt_stale",
+      lastReceiptStatus: articleRun?.status || null,
+      canonicalCommit: articleRun?.canonical_commit || null,
+      releaseVersion: articleRun?.release_version || null,
+      captured: articleRun?.captured_count || 0,
+      admitted: articleRun?.admitted_count || 0,
+      held: articleRun?.context_only_count || 0,
+      added: articleRun?.added_count || 0,
+      updated: articleRun?.updated_count || 0,
+      versions: articleRun?.version_count || 0,
+      sourceLatestAt: articleRun?.source_latest_at || null,
+      errorClass: !articleRun ? "publication_receipt_missing" : !articleFresh ? "publication_receipt_stale" : articleRun.error_class,
+      healthy: Boolean(articleFresh && articleRun.status !== "failed"),
+    };
   }));
   return {
     healthy: discovery.every(source => source.healthy) && ingestionHealthy && sourceIngestion.every(source => source.healthy),

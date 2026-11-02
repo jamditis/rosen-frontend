@@ -8,7 +8,9 @@
     "head_sampling_rate": 1
   },
   "triggers": {
-    "crons": ["17 9 * * *"]
+    "crons": [
+      "17 9 * * *"
+    ]
   },
   "d1_databases": [
     {
@@ -19,5 +21,17 @@
   ],
   "vars": {
     "DISCOVERY_MODE": "live"
-  }
+  },
+  "no_bundle": true,
+  "find_additional_modules": true,
+  "preserve_file_names": true,
+  "rules": [
+    {
+      "type": "ESModule",
+      "globs": [
+        "**/*.js"
+      ],
+      "fallthrough": false
+    }
+  ]
 }
