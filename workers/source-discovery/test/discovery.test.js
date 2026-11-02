@@ -203,7 +203,16 @@ test("the health endpoint exposes no fetch trigger or source URL", async () => {
     mode: "disabled",
     manifestVersion: SOURCE_MANIFEST_VERSION,
     sources: PUBLIC_SOURCE_MANIFEST,
+
   });
+  assert.deepEqual(body.sources.map(source => source.id), [
+    "jay-rosen-bluesky", "pressthink-wordpress-posts", "cjr-jay-rosen-search",
+    "cjr-jay-rosen-author", "common-dreams-jay-rosen-author",
+  ]);
+  for (const source of body.sources) {
+    assert.deepEqual(Object.keys(source).sort(), ["id", "kind", "label", "maxCandidates"]);
+  }
+  assert.doesNotMatch(JSON.stringify(body), /https?:|robotsUrl|fetchOrigins|candidateOrigins|endpoint/);
   const missing = await worker.fetch(
     new Request("https://rosen-source-discovery.workers.dev/run"),
     {},
