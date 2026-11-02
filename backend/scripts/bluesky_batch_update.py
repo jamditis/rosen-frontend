@@ -1111,7 +1111,10 @@ def main() -> None:
         token = os.environ.get("ROSEN_INGESTION_RECEIPT_TOKEN", "")
         if not token:
             raise SystemExit("Pending recovery requires the existing receipt token")
-        fetch_pending = lambda: sender.fetch_pending_candidate_uris(token)
+
+        def fetch_pending():
+            return sender.fetch_pending_candidate_uris(token)
+
     result = run_batch(
         csv_path=args.csv,
         snapshot_dir=args.snapshot_dir,
