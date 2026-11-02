@@ -81,8 +81,7 @@ class TestSuccessfulWriteback:
                 build.return_value.spreadsheets.return_value.values.return_value.batchUpdate
             )
             updates = {
-                d["range"]: d["values"]
-                for d in batch.call_args.kwargs["body"]["data"]
+                d["range"]: d["values"] for d in batch.call_args.kwargs["body"]["data"]
             }
         assert updates["'Queue'!F42"] == [["processing"]]
         assert ("'Queue'!G42" in updates) is (record_id is not None)

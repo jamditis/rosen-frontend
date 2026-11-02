@@ -66,4 +66,3 @@ def test_skip_path_writes_committed_error_path_keeps_archived():
     # A genuine push failure still writes/keeps archived so it is retried.
     assert "status='archived'" in src
     assert "'status': 'archived'" in src
-
