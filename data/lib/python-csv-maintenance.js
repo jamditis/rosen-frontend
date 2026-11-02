@@ -49,6 +49,14 @@ function renderExpected(file, columns, expected) {
     return file.lf
       ? stringify([record], { columns, header: false, record_delimiter: '\n' })
       : serializeRecord(record, columns);
+  }).map((raw, index) => {
+    // A valid final row may have no delimiter. It needs one if another row
+    // follows. CRLF source slices carry CR while renderCsv supplies LF.
+    if (index < expected.length - 1) {
+      const ending = file.lf ? '\n' : '\r';
+      return raw.endsWith(ending) ? raw : raw + ending;
+    }
+    return !file.lf && !file.trailer && raw.endsWith('\r') ? raw.slice(0, -1) : raw;
   });
   const header = file.header.endsWith('\n') ? file.header : file.header + '\n';
   const result = !expected.length ? file.header
