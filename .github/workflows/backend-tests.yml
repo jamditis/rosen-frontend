@@ -87,6 +87,10 @@ jobs:
         env:
           CI: true
 
+      - name: Check source publication integration on hosted runner
+        if: github.event_name == 'workflow_dispatch' && inputs.pressthink_source_check
+        run: npm test
+
       - name: Read-only PressThink source check
         if: github.event_name == 'workflow_dispatch' && inputs.pressthink_source_check
         working-directory: backend
