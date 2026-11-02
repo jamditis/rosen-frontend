@@ -378,13 +378,7 @@ def reconcile_sources(
             proposed.append(
                 {"record_id": record_id, "url": source["url"], "title": source["title"]}
             )
-        elif (
-            row
-            and changed
-            and old
-            and can_create(source)
-            and row.get("notes") == managed_note + identity
-        ):
+        elif row and changed and old and row.get("notes") == managed_note + identity:
             before_fields = fields(old["source"], old["captured_at"])
             after_fields = fields(source, captured_at)
             changed_fields = {

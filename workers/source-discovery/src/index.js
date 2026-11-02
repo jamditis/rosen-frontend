@@ -51,7 +51,12 @@ export default {
         const report = await runLiveDiscovery({ database: env.DISCOVERY_LEDGER });
         logRun(report);
         return json({ runId: report.runId, sources: report.sources.map(({ sourceId, status, candidateCount = 0 }) => ({ sourceId, status, candidateCount })) });
-      } catch { return json({ error: "discovery_failed" }, 503); }
+      } catch (error) {
+        console.error(JSON.stringify({ event: "rosen_source_discovery_error",
+          error: error instanceof Error ? error.name : "unknown_error",
+          message: error instanceof Error && error.message ? error.message.slice(0, 256) : "unknown_error" }));
+        return json({ error: "discovery_failed" }, 503);
+      }
     }
     if (request.method === "GET" && url.pathname === "/ingestion-candidates") {
       try {
