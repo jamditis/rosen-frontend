@@ -19,8 +19,9 @@ marks a record whose data is appended but whose live push (SFTP) is not
 configured on this runner -- retrying it would never make it live (#414).
 
 The dedup check in ``submit-record.yml`` step 2 guarantees the sweep is
-idempotent — a re-dispatched ``submitted`` row whose Action eventually did
-run will short-circuit as ``duplicate``.
+idempotent: An existing canonical record is published again without scraping,
+appending, or allocating another ID. It becomes ``duplicate`` only after a
+successful transfer; a transfer failure stays ``archived`` for a later retry.
 
 Required env:
     GITHUB_TOKEN              — App installation token with actions:write

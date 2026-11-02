@@ -8,8 +8,8 @@ name: Pillar 3a — sweep stuck submission rows
 # are never touched regardless of age.
 #
 # The dedup check inside process_submission.py guarantees re-dispatches
-# are safe — a row whose Action eventually did finish will short-circuit
-# as "duplicate" on retry.
+# are safe: Existing canonical records skip scraping and append, then reconcile
+# publication. A successful transfer ends as duplicate; a failure stays archived.
 #
 # Design: docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md
 #         section "Stuck-row sweeper".

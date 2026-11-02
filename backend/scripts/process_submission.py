@@ -396,7 +396,9 @@ def _final_writeback(sheet_id, sheet_tab, sheet_row, status, record_id, error=""
     return False
 
 
-def _retry_publication(record_id, sheet_id, sheet_tab, sheet_row, prototype_mode=False):
+def _retry_publication(
+    record_id, sheet_id, sheet_tab, sheet_row, prototype_mode=False, *, duplicate=False
+):
     """Publish an existing canonical record without scraping or appending it."""
     try:
         # Always regenerate: a leftover staging tree may predate the CSV commit.
@@ -419,7 +421,12 @@ def _retry_publication(record_id, sheet_id, sheet_tab, sheet_row, prototype_mode
     if push.get("skipped"):
         status, note = "committed", "Live push not configured on this runner"
     elif push.get("ok"):
-        status, note = "live", "Recovered existing record via publication retry"
+        status = "duplicate" if duplicate else "live"
+        note = (
+            "URL already in archive; publication confirmed"
+            if duplicate
+            else "Recovered via publication retry"
+        )
     else:
         note = f"Publication retry failed: {push.get('error', 'unknown')}"
         _safe_writeback(
@@ -782,7 +789,7 @@ def process_one(
         # A previous worker may have stopped after git push, before transfer or
         # sheet writeback. Canonical presence alone does not prove delivery.
         return _retry_publication(
-            existing_id, sheet_id, sheet_tab, sheet_row, prototype_mode
+            existing_id, sheet_id, sheet_tab, sheet_row, prototype_mode, duplicate=True
         )
 
     # --- Step 2b: SSRF guard. ---------------------------------------------

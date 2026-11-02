@@ -322,7 +322,7 @@ class TestDedup:
             monkeypatch, csv_with_existing_url, url="https://example.com/already"
         )
 
-        assert result["status"] == "live"
+        assert result["status"] == "duplicate"
         assert result["record_id"] == "PRESSTH-00099"
         dispatch_mock.assert_not_called()
         # No git commit on dup
@@ -334,7 +334,7 @@ class TestDedup:
         assert git_calls == []
         # Re-publish the existing identity before confirming live delivery
         final = sheets_mock.call_args_list[-1].kwargs
-        assert final["status"] == "live"
+        assert final["status"] == "duplicate"
         assert final["record_id"] == "PRESSTH-00099"
         sftp_mock.assert_called_once_with(record_ids=("PRESSTH-00099",))
 
@@ -906,6 +906,25 @@ class TestSheetWritebackResilience:
 
 class TestSubmissionRegressions:
     """Regressions for bugs surfaced during the initial PR review."""
+
+    def test_skipped_sentinel_is_committed_and_keeps_identity(
+        self, monkeypatch, csv_with_headers
+    ):
+        sheets = _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch, {"ok": True, "skipped": True})
+        _stub_subprocess(monkeypatch)
+
+        result = _run(
+            monkeypatch,
+            csv_with_headers,
+            url="https://example.com/sweep-noop-1748147200",
+            retry_record_id="RECORD-00042",
+        )
+
+        assert result["status"] == "committed"
+        assert result["record_id"] == "RECORD-00042"
+        assert sheets.call_args.kwargs["status"] == "committed"
+        assert sheets.call_args.kwargs["record_id"] == "RECORD-00042"
 
     @pytest.mark.parametrize("skipped", [False, True])
     def test_retry_terminal_writeback_keeps_identity_and_reports_failure(
@@ -1533,7 +1552,7 @@ class TestSsrfGuard:
 
         result = _run(monkeypatch, csv_path, url=unsafe_dup)
 
-        assert result["status"] == "live"
+        assert result["status"] == "duplicate"
         assert result["record_id"] == "PRESSTH-00042"
         dispatch_mock.assert_not_called()
 

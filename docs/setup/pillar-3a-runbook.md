@@ -235,7 +235,7 @@ Use a URL on the RFC 6761 `.invalid` TLD — DNS resolution always fails, so `is
    Or open the CSV in a spreadsheet and copy a URL from the `url` column.
 
 5. Same dispatch flow with that URL.
-6. **Expected**: dedup short-circuits, no commit, sheet writeback records `status='duplicate'`, Action goes green.
+6. **Expected**: No scrape, append, new ID, or commit. The existing record is published again before sheet writeback records `status='duplicate'` and the Action goes green. A transfer failure retains `archived` for retry. A runner without transfer configuration reports `committed` instead of claiming publication.
 
 ### Smoke 3 — new URL, full pipeline
 
