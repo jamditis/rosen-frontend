@@ -27,6 +27,8 @@ const RELEASE_DATA_PATHS = new Set([
   'data/archive-embeddings.bin',
   'data/archive-embeddings.json',
   'data/archive_records-public.csv',
+  'data/extracted_entities.csv',
+  'data/extracted_relationships.csv',
   'data/archive-social-embeddings.bin',
   'data/archive-social-embeddings-build.json',
   'data/archive-social-embeddings.json',
@@ -420,6 +422,9 @@ function captureBatch(root, paths, dryRun) {
   ];
   if (dryRun) pressThinkArgs.push('--dry-run');
   run(root, 'python', pressThinkArgs);
+  if (!dryRun) {
+    run(root, 'python', ['backend/scripts/pressthink_authorship.py', paths.pressThinkReportPath]);
+  }
   const report = { ...readJson(paths.reportPath), pressthink: readJson(paths.pressThinkReportPath) };
   writeJson(paths.reportPath, report);
   return report;
