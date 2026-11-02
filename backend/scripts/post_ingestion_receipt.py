@@ -261,7 +261,13 @@ def deliver_receipt(payload: dict[str, Any], token: str, canonical_csv: Path) ->
     """Reconcile pending decisions, then deliver every bounded receipt batch."""
     reconciled = (
         payload
-        if payload.get("sourceId") == "pressthink-wordpress-posts"
+        if payload.get("sourceId")
+        in {
+            "pressthink-wordpress-posts",
+            "cjr-jay-rosen-search",
+            "cjr-jay-rosen-author",
+            "common-dreams-jay-rosen-author",
+        }
         else append_pending_decisions(payload, token, canonical_csv)
     )
     batches = list(receipt_batches(reconciled))

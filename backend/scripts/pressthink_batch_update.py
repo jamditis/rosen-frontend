@@ -257,12 +257,18 @@ def source_fields(source, captured_at):
     }
 
 
-def source_association(source, old, by_id, by_url, by_title):
+def source_association(source, old, by_id, by_url, by_title, retired_urls=None):
     """Resolve an existing identity or retain a review/retirement boundary."""
     matches = by_url.get(url_identity(source["url"]), [])
     record_id = (old or {}).get("record_id")
     if record_id not in by_id and len(matches) == 1:
         record_id = matches[0]
+    if not record_id:
+        retired = (retired_urls or {}).get(url_identity(source["url"]), set())
+        if len(retired) == 1:
+            record_id = next(iter(retired))
+        elif retired:
+            return None, "review", sorted(retired)
     row = by_id.get(record_id)
     if record_id and not row:
         return record_id, "retired", []
@@ -275,18 +281,50 @@ def source_association(source, old, by_id, by_url, by_title):
 
 
 def reconcile(posts, columns, rows, entries, *, captured_at, high_water=0):
-    """Preserve IDs and curator edits; only managed source rows are refreshed."""
     sources = sorted((source_post(post) for post in posts), key=lambda s: s["id"])
-    if len({s["id"] for s in sources}) != len(sources):
-        raise ValueError("Duplicate PressThink source identities")
+    return reconcile_sources(
+        sources,
+        columns,
+        rows,
+        entries,
+        captured_at=captured_at,
+        high_water=high_water,
+        fields=source_fields,
+        managed_note=MANAGED_NOTE,
+        can_create=lambda source: source["author"] == "Jay Rosen",
+    )
+
+
+def reconcile_sources(
+    sources,
+    columns,
+    rows,
+    entries,
+    *,
+    captured_at,
+    high_water,
+    fields,
+    managed_note,
+    can_create,
+):
+    """Reconcile validated source metadata while retaining curator-owned values."""
+    if len({str(s["id"]) for s in sources}) != len(sources):
+        raise ValueError("Duplicate source identities")
     if len({url_identity(s["url"]) for s in sources}) != len(sources):
-        raise ValueError("Duplicate PressThink canonical URLs")
+        raise ValueError("Duplicate source canonical URLs")
     by_url, by_title = {}, {}
     for row in rows:
         by_url.setdefault(url_identity(row["url"]), []).append(row["id"])
         title_key = (title_identity(row["title"]), row["publication_date"][:4])
         by_title.setdefault(title_key, []).append(row["id"])
     previous = {str(entry["source"]["id"]): entry for entry in entries}
+    retired_urls = {}
+    live_ids = {row["id"] for row in rows}
+    for entry in previous.values():
+        if entry.get("record_id") and entry["record_id"] not in live_ids:
+            retired_urls.setdefault(url_identity(entry["source"]["url"]), set()).add(
+                entry["record_id"]
+            )
     successor = [dict(row) for row in rows]
     by_id = {row["id"]: row for row in successor}
     reserved_ids = set(by_id) | {
@@ -309,7 +347,7 @@ def reconcile(posts, columns, rows, entries, *, captured_at, high_water=0):
         identity = str(source["id"])
         old = previous.get(identity)
         record_id, state, possible_duplicates = source_association(
-            source, old, by_id, by_url, by_title
+            source, old, by_id, by_url, by_title, retired_urls
         )
         row = by_id.get(record_id)
         if state == "retired":
@@ -326,15 +364,11 @@ def reconcile(posts, columns, rows, entries, *, captured_at, high_water=0):
                 }
             )
         changed = old is None or old["source"] != source
-        if (
-            not record_id
-            and not possible_duplicates
-            and source["author"] == "Jay Rosen"
-        ):
+        if not record_id and not possible_duplicates and can_create(source):
             next_id += 1
             record_id = f"RECORD-{next_id:05d}"
             row = {column: "" for column in columns}
-            row.update({"id": record_id, **source_fields(source, captured_at)})
+            row.update({"id": record_id, **fields(source, captured_at)})
             successor.append(row)
             by_id[record_id] = row
             by_url.setdefault(url_identity(source["url"]), []).append(record_id)
@@ -344,9 +378,9 @@ def reconcile(posts, columns, rows, entries, *, captured_at, high_water=0):
             proposed.append(
                 {"record_id": record_id, "url": source["url"], "title": source["title"]}
             )
-        elif row and changed and old and row.get("notes") == MANAGED_NOTE + identity:
-            before_fields = source_fields(old["source"], old["captured_at"])
-            after_fields = source_fields(source, captured_at)
+        elif row and changed and old and row.get("notes") == managed_note + identity:
+            before_fields = fields(old["source"], old["captured_at"])
+            after_fields = fields(source, captured_at)
             changed_fields = {
                 key: value
                 for key, value in after_fields.items()
@@ -357,12 +391,24 @@ def reconcile(posts, columns, rows, entries, *, captured_at, high_water=0):
         if not record_id and not possible_duplicates:
             state = "review"
             excluded.append(
-                {"source_id": source["id"], "reason": "Author requires review"}
+                {
+                    "source_id": source["id"],
+                    "reason": "Source relevance requires review",
+                }
+            )
+        if row and not can_create(source) and state != "retired":
+            state = "review"
+            excluded.append(
+                {
+                    "source_id": source["id"],
+                    "record_id": record_id,
+                    "reason": "Source relevance requires review",
+                }
             )
         association_changed = old and (
             old.get("state", "linked") != state or old.get("record_id") != record_id
         )
-        if row and state != "retired":
+        if row and state == "linked":
             associations.append({"uri": source["url"], "record_id": record_id})
         if changed or association_changed:
             entry = {
@@ -400,22 +446,32 @@ def reconcile(posts, columns, rows, entries, *, captured_at, high_water=0):
 
 
 def run_batch(*, dry_run=False, csv_path=None, history_path=None, posts=None):
-    csv_path = csv_path or ROOT / "data/archive_records-public.csv"
-    history_path = history_path or ROOT / "preservation/pressthink/versions.jsonl"
+    return run_capture(
+        dry_run=dry_run,
+        csv_path=csv_path or ROOT / "data/archive_records-public.csv",
+        history_path=history_path or ROOT / "preservation/pressthink/versions.jsonl",
+        capture=lambda: capture_posts() if posts is None else posts,
+        reconcile_capture=reconcile,
+    )
+
+
+def run_capture(*, dry_run, csv_path, history_path, capture, reconcile_capture):
+    """Use one durable CSV/history and monotonic ID path for both article adapters."""
     if csv_path.is_symlink() or history_path.is_symlink():
         raise ValueError("Preservation outputs must not be symlinks")
     if dry_run and transaction.journal_path(history_path).exists():
         raise ValueError("A pending PressThink write requires normal recovery")
     if not dry_run:
         transaction.recover(csv_path, history_path)
+    record_id_sequence.assert_no_pending_capture(csv_path)
     before = csv_path.read_bytes()
     history_before = history_path.read_bytes() if history_path.exists() else None
     columns, rows = read_archive_csv(csv_path)
     entries, _heads = load_history(history_path)
     sequence_before = record_id_sequence.high_water(csv_path)
-    posts = capture_posts() if posts is None else posts
+    posts = capture()
     captured_at = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
-    successor, versions, report = reconcile(
+    successor, versions, report = reconcile_capture(
         posts,
         columns,
         rows,

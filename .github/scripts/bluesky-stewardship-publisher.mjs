@@ -7,6 +7,7 @@ import process from 'node:process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { applyVersion } from '../../scripts/bump-version.mjs';
+import { ARTICLE_SOURCE_IDS, isArticleSourceUrl } from '../../workers/source-discovery/src/source-manifest.js';
 
 const RECEIPT_STATUSES = new Set(['published', 'no_change', 'failed']);
 const ERROR_CLASS = /^[a-z0-9]+(?:_[a-z0-9]+)*$/;
@@ -22,7 +23,7 @@ const PRESSTHINK_SOURCE = 'pressthink-wordpress-posts';
 
 function configuredSource() {
   const source = process.env.STEWARDSHIP_SOURCE || BLUESKY_SOURCE;
-  if (![BLUESKY_SOURCE, PRESSTHINK_SOURCE].includes(source)) {
+  if (![BLUESKY_SOURCE, ...ARTICLE_SOURCE_IDS].includes(source)) {
     throw new Error('Unrecognized stewardship source');
   }
   return source;
@@ -51,6 +52,7 @@ const RELEASE_DATA_PATHS = new Set([
   'data/social-search-index.json',
   'data/social_posts.csv',
   'preservation/pressthink/versions.jsonl',
+  'preservation/publisher-feeds/versions.jsonl',
 ]);
 
 function text(value) {
@@ -93,6 +95,8 @@ function safeIso(value, fallback) {
   return new Date(timestamp).toISOString();
 }
 
+function articleReport(report) { return report?.pressthink || report?.article; }
+
 function validateReport(report) {
   if (!report || report.schema_version !== 1 || !report.counts || !report.canonical) {
     throw new Error('Bluesky batch report does not match schema version 1');
@@ -118,8 +122,8 @@ function validateReport(report) {
   if (report.decisions.some((decision) => !['admit', 'context_only'].includes(decision.decision))) {
     throw new Error('Bluesky batch report has an invalid decision');
   }
-  if (report.pressthink) {
-    const source = report.pressthink;
+  if (articleReport(report)) {
+    const source = articleReport(report);
     for (const name of ['captured', 'added', 'updated', 'versions_added']) {
       if (!Number.isSafeInteger(source[name]) || source[name] < 0 || source[name] > 2_000) {
         throw new Error(`PressThink batch report has invalid ${name}`);
@@ -190,7 +194,10 @@ export function buildIngestionReceipt({
 export function buildSourceIngestionReceipt(options) {
   // Reuse the established envelope validation without changing legacy output.
   const receipt = buildIngestionReceipt({ ...options, report: emptyReport(options.checkedAt) });
-  const report = options.report?.pressthink;
+  const sourceId = options.sourceId || PRESSTHINK_SOURCE;
+  if (!ARTICLE_SOURCE_IDS.includes(sourceId)) throw new Error('Unrecognized article source');
+  const report = articleReport(options.report);
+  if (report?.source_id && report.source_id !== sourceId) throw new Error('Article report source mismatch');
   const failed = options.status === 'failed';
   if (!report && !failed) throw new Error('PressThink capture report is missing');
   for (const name of ['captured', 'added', 'updated', 'versions_added']) {
@@ -206,7 +213,7 @@ export function buildSourceIngestionReceipt(options) {
   const uris = new Set();
   const ids = new Set();
   for (const record of records) {
-    if (!/^https:\/\/pressthink\.org\/\d{4}\/\d{2}\/[^/?#]+\/$/.test(record.uri || '')
+    if (!isArticleSourceUrl(sourceId, record.uri)
       || !/^RECORD-\d{5,}$/.test(record.recordId || '') || uris.has(record.uri) || ids.has(record.recordId)) {
       throw new Error('PressThink receipt association is invalid');
     }
@@ -215,7 +222,7 @@ export function buildSourceIngestionReceipt(options) {
   }
   const captured = report?.captured || 0;
   if (records.length > captured) throw new Error('PressThink receipt counts are inconsistent');
-  return { ...receipt, sourceId: PRESSTHINK_SOURCE, captured, admitted: records.length,
+  return { ...receipt, sourceId, captured, admitted: records.length,
     contextOnly: captured - records.length, added: report?.added || 0,
     updated: report?.updated || 0, versions: report?.versions_added || 0,
     sourceLatestAt: report?.newest_source_time ? safeIso(report.newest_source_time) : null,
@@ -429,7 +436,7 @@ export function runPreparation({
       verifyLive();
       state.phase = 'dry_run';
       state.liveVerified = true;
-    } else if (report.canonical.rows_appended === 0 && !report.pressthink?.changed) {
+    } else if (report.canonical.rows_appended === 0 && !articleReport(report)?.changed) {
       try {
         verifyLive();
         state.phase = 'no_change';
@@ -463,14 +470,18 @@ export function runPreparation({
 function captureBatch(root, paths, dryRun) {
   if (git(root, ['status', '--porcelain'])) throw new Error('starting checkout is not clean');
   fs.copyFileSync(path.join(root, 'data/archive-data.json'), paths.baselinePath);
-  if (configuredSource() === PRESSTHINK_SOURCE) {
-    const args = ['backend/scripts/pressthink_batch_update.py', '--report', paths.pressThinkReportPath];
+  const sourceId = configuredSource();
+  if (ARTICLE_SOURCE_IDS.includes(sourceId)) {
+    const args = sourceId === PRESSTHINK_SOURCE
+      ? ['backend/scripts/pressthink_batch_update.py', '--report', paths.pressThinkReportPath]
+      : ['backend/scripts/publisher_feed_batch_update.py', '--source', sourceId, '--report', paths.pressThinkReportPath];
     if (dryRun) args.push('--dry-run');
     run(root, 'python', args);
-    if (!dryRun) {
+    if (!dryRun && sourceId === PRESSTHINK_SOURCE) {
       run(root, 'python', ['backend/scripts/pressthink_authorship.py', paths.pressThinkReportPath]);
     }
-    const report = { ...emptyReport(new Date().toISOString()), pressthink: readJson(paths.pressThinkReportPath) };
+    const key = sourceId === PRESSTHINK_SOURCE ? 'pressthink' : 'article';
+    const report = { ...emptyReport(new Date().toISOString()), [key]: readJson(paths.pressThinkReportPath) };
     writeJson(paths.reportPath, report);
     return report;
   }
@@ -514,7 +525,7 @@ export function prepareChangedRelease(root, paths, report, { rebuildArticles = f
     'run', 'refresh:social-release', '--', '--as-of', asOf,
     '--report', paths.reportPath,
   ]);
-  if (rebuildArticles || report.pressthink?.added || report.pressthink?.updated) {
+  if (rebuildArticles || articleReport(report)?.added || articleReport(report)?.updated) {
     run(root, 'npm', ['run', 'build-embeddings']);
   }
   run(root, 'npm', [
@@ -565,9 +576,9 @@ function prepare(root) {
     persist: (nextState) => writeJson(paths.statePath, nextState),
     emit: output,
   });
-  if (state.sourceId === PRESSTHINK_SOURCE && !dryRun) {
+  if (ARTICLE_SOURCE_IDS.includes(state.sourceId) && !dryRun) {
     const published = new Set(readJson(path.join(root, 'data/archive-data.json')).records.map(record => record.id));
-    state.publishedRecordIds = (state.report.pressthink?.associations || [])
+    state.publishedRecordIds = (articleReport(state.report)?.associations || [])
       .map(item => item.record_id).filter(id => published.has(id));
     writeJson(paths.statePath, state);
   }
@@ -605,8 +616,9 @@ export function finalizePublication(state, {
     errorClass = deployOutcome === 'success' ? 'live_verification_failed' : 'deploy_failed';
   }
 
-  const builder = state.sourceId === PRESSTHINK_SOURCE ? buildSourceIngestionReceipt : buildIngestionReceipt;
+  const builder = ARTICLE_SOURCE_IDS.includes(state.sourceId) ? buildSourceIngestionReceipt : buildIngestionReceipt;
   const receipt = builder({
+    sourceId: state.sourceId,
     runId,
     status,
     checkedAt,

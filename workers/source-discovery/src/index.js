@@ -1,6 +1,6 @@
 import { DISCOVERY_MODE, runDiscovery } from "./discovery.js";
 import { runLiveDiscovery } from "./ledger.js";
-import { readArchiveHealth, readPendingIngestionCandidates, receiveIngestionReceipt } from "./ingestion-health.js";
+import { authorized, readArchiveHealth, readPendingIngestionCandidates, receiveIngestionReceipt } from "./ingestion-health.js";
 import {
   PUBLIC_SOURCE_MANIFEST,
   SOURCE_MANIFEST_VERSION,
@@ -44,6 +44,20 @@ function logRun(report) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (request.method === "POST" && url.pathname === "/discovery-run") {
+      if (!await authorized(request, env.INGESTION_RECEIPT_TOKEN)) return json({ error: "unauthorized" }, 401);
+      if (configuredMode(env.DISCOVERY_MODE) !== DISCOVERY_MODE.LIVE) return json({ error: "discovery_disabled" }, 409);
+      try {
+        const report = await runLiveDiscovery({ database: env.DISCOVERY_LEDGER });
+        logRun(report);
+        return json({ runId: report.runId, sources: report.sources.map(({ sourceId, status, candidateCount = 0 }) => ({ sourceId, status, candidateCount })) });
+      } catch (error) {
+        console.error(JSON.stringify({ event: "rosen_source_discovery_error",
+          error: error instanceof Error ? error.name : "unknown_error",
+          message: error instanceof Error && error.message ? error.message.slice(0, 256) : "unknown_error" }));
+        return json({ error: "discovery_failed" }, 503);
+      }
+    }
     if (request.method === "GET" && url.pathname === "/ingestion-candidates") {
       try {
         const result = await readPendingIngestionCandidates(request, env);

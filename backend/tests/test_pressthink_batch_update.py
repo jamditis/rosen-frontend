@@ -155,7 +155,9 @@ def test_dry_run_missing_source_and_other_author_preserve_canonical_rows(tmp_pat
     assert not history.exists()
     assert csv_path.read_bytes() == before
     assert result["added"] == 0
-    assert result["excluded"] == [{"source_id": 3, "reason": "Author requires review"}]
+    assert result["excluded"] == [
+        {"source_id": 3, "reason": "Source relevance requires review"}
+    ]
     batch.run_batch(posts=[post(1)], **kwargs)
     result = batch.run_batch(posts=[other], **kwargs)
     assert result["missing_source_ids"] == ["1"]
@@ -488,3 +490,30 @@ def test_reservation_only_repair_is_reported_and_preserves_source_bytes(tmp_path
     assert repaired["added"] == repaired["updated"] == repaired["versions_added"] == 0
     assert (path.read_bytes(), history.read_bytes()) == before
     assert json.loads(sequence.read_text())["high_water"] == 1
+
+
+def test_managed_author_correction_and_later_source_updates_are_applied(tmp_path):
+    csv_path, history_path = canonical_fixture(tmp_path)
+    item = post(2)
+    first = batch.run_batch(csv_path=csv_path, history_path=history_path, posts=[item])
+    record_id = first["proposed_additions"][0]["record_id"]
+    item["yoast_head_json"]["author"] = "Corrected public byline"
+    item["title"]["rendered"] = "A corrected public title"
+    corrected = batch.run_batch(
+        csv_path=csv_path, history_path=history_path, posts=[item]
+    )
+    assert corrected["updated"] == 1
+    row = next(
+        row for row in batch.read_archive_csv(csv_path)[1] if row["id"] == record_id
+    )
+    assert row["author"] == "Corrected public byline"
+    assert row["title"] == "A corrected public title"
+    item["yoast_head_json"]["author"] = "Jay Rosen"
+    item["title"]["rendered"] = "Later source title"
+    later = batch.run_batch(csv_path=csv_path, history_path=history_path, posts=[item])
+    assert later["updated"] == 1
+    row = next(
+        row for row in batch.read_archive_csv(csv_path)[1] if row["id"] == record_id
+    )
+    assert row["author"] == "Jay Rosen"
+    assert row["title"] == "Later source title"

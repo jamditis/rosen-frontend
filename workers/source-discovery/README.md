@@ -10,7 +10,7 @@ It is a read-only candidate-discovery control plane. It is not the archive scrap
 - The Worker has one dedicated D1 database: `rosen-source-discovery-ledger`.
 - D1 stores source validators, run state, candidate locations, content IDs, post types, root and parent identifiers, review status, and compact publication receipts.
 - D1 never stores feed bodies, item titles, article text, credentials, archive CSV data, or review notes.
-- The configuration has no KV, R2, Queue, AI, Vectorize, or route binding. The one receipt secret grants permission to record operational metadata only.
+- The configuration has no KV, R2, Queue, AI, Vectorize, or route binding. The existing receipt secret authorizes bounded operational metadata writes and the fixed-source discovery operator.
 - `GET /health` reads recent successful discovery and verified publication receipts. A missing, failed, or stale receipt returns HTTP 503.
 - `POST /ingestion-receipt` accepts authenticated, bounded receipts from the GitHub publisher. It cannot start discovery, fetch a supplied URL, write archive CSVs, or publish the site.
 - `GET /ingestion-candidates` authenticates with the same token and returns a bounded page of pending Jay source URIs. The publisher uses canonical rows to settle earlier successful captures after upload or receipt recovery.
@@ -38,11 +38,11 @@ runners. Do not run repository CI on the local machine or fleet.
 
 ## Deployment and rollback
 
-Apply migrations before deploying:
+Apply migrations before deploying the reviewed native ES modules. The configuration disables local bundling; all repository checks run on hosted CI:
 
 ```bash
 wrangler d1 migrations apply rosen-source-discovery-ledger --remote --config wrangler.jsonc
-wrangler deploy --config wrangler.jsonc
+wrangler deploy --no-bundle --config wrangler.jsonc
 ```
 
 Migration `0004_candidate_history_index.sql` adds the bounded Bluesky history lookup index. Candidate writes use batches that stay below D1's 100-parameter statement limit.
@@ -71,3 +71,15 @@ Keep `pressthink.org` unconfigured. This personal account does not control that 
 To stop the pilot, remove the cron trigger or deploy with `DISCOVERY_MODE` set to `disabled`. Delete the Worker and its dedicated D1 database only after exporting any reviewer-needed candidate ledger.
 
 The existing pipeline remains responsible for SSRF protection, full scraping, browser rendering, extraction, entity and relationship proposals, canonical CSV writes, tests, pull-request review, and certificate-verified FTPS publication. The external hosting owner provides the transfer account; this project does not administer the domain or hosting server. The account can list the broader PressThink document root, so the deployment client's path checks enforce the archive scope.
+
+Reviewed publisher feed intake uses three independent metadata consumers. The
+serial matrix continues after one source fails. Public health includes each
+source's discovery and successful publication receipt, rather than inferring
+publication from a recent feed request. RSS publication dates do not measure
+fetch freshness. These finite feed views do not prove full historical coverage.
+
+An authorized maintainer can POST `/discovery-run` with the existing ingestion
+receipt bearer token while discovery is live. No source URLs or configuration
+are accepted. Public unauthenticated requests cannot trigger discovery. Use this
+bounded operator to verify new sources after a reviewed deployment. The existing
+cron remains the recurring backstop.

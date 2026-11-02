@@ -110,3 +110,21 @@ jobs:
           path: ${{ runner.temp }}/pressthink-dry-run.json
           if-no-files-found: error
           retention-days: 14
+
+      - name: Read-only publisher feed checks
+        if: github.event_name == 'workflow_dispatch' && inputs.pressthink_source_check
+        working-directory: backend
+        run: |
+          mkdir -p "$RUNNER_TEMP/publisher-feeds"
+          for source in cjr-jay-rosen-search cjr-jay-rosen-author common-dreams-jay-rosen-author; do
+            poetry run python scripts/publisher_feed_batch_update.py --source "$source" --dry-run --report "$RUNNER_TEMP/publisher-feeds/$source.json"
+          done
+
+      - name: Retain publisher feed rehearsals
+        if: github.event_name == 'workflow_dispatch' && inputs.pressthink_source_check
+        uses: actions/upload-artifact@v6
+        with:
+          name: publisher-feed-rehearsals
+          path: ${{ runner.temp }}/publisher-feeds/*.json
+          if-no-files-found: error
+          retention-days: 14

@@ -671,6 +671,12 @@ function rawCandidateValues(source, text) {
   }
   if (source.kind === "wordpress-api") return wordPressPostValues(text);
   if (source.kind === "sitemap") return valuesInTag(text, "loc");
+  if (source.relevance) return valuesInContainers(text, "item", item => {
+    const title = valuesInTag(item, "title")[0] || "";
+    const creator = valuesInTag(item, "dc:creator")[0] || "";
+    const relevant = source.relevance === "by_jay" ? creator === "Jay Rosen" : /\bJay\s+Rosen\b/i.test(title);
+    return relevant ? valuesInTag(item, "link") : [];
+  });
   return [
     ...valuesInContainers(text, "item", (item) => valuesInTag(item, "link")),
     ...valuesInContainers(text, "entry", (entry) => [
