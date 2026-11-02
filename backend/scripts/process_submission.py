@@ -66,6 +66,7 @@ for _candidate in (_BACKEND, _BACKEND / "src", _BACKEND.parent / "data"):
         sys.path.insert(0, str(_candidate))
 
 from csv_safe_write import read_archive_csv, write_archive_csv  # noqa: E402
+from scripts import record_id_sequence  # noqa: E402
 
 # Re-exported so tests can monkeypatch a single import surface per module.
 from rosen_scraper.dispatcher import dispatch_url as _dispatch_url  # noqa: E402
@@ -297,6 +298,7 @@ def _atomic_append_row(
     csv_path: pathlib.Path, row: Dict[str, Any], headers: list
 ) -> None:
     """Append through the canonical parser without rewriting untouched rows."""
+    record_id_sequence.assert_no_pending_capture(csv_path)
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     sanitized = _sanitize_record(row)
     projected = {
@@ -480,6 +482,7 @@ def _git_commit_and_push(
             relative_csv_path,
             "data/extracted_entities.csv",
             "data/extracted_relationships.csv",
+            "data/record-id-sequence.json",
         ]
         + [f"data/{f}" for f in _STAGED_JSON_FILES]
         + ["data/feeds"]
@@ -644,7 +647,9 @@ def _replay_record_onto_main(
         # A concurrent identical submission landed on main; this is now a dup.
         raise _ReplayDuplicate(url_to_id.get(url, ""))
 
-    if record_id in existing_ids:
+    if record_id.startswith("RECORD-"):
+        record_id = record_id_sequence.reserve(csv_path, existing_ids, record_id)
+    elif record_id in existing_ids:
         prefix = record_id.rsplit("-", 1)[0] or "RECORD"
         new_id = _next_record_id(existing_ids, prefix=prefix)
         logger.warning(
@@ -942,7 +947,17 @@ def process_one(
             f"using {deduped!r} to avoid a duplicate id."
         )
         processor_id = deduped
-    record_id = processor_id or _next_record_id(existing_ids)
+    if not processor_id or processor_id.startswith("RECORD-"):
+        try:
+            record_id = record_id_sequence.reserve(csv_path, existing_ids, processor_id)
+        except Exception as exc:
+            msg = f"Record ID reservation failed: {exc}"
+            _safe_writeback(
+                sheet_id, sheet_tab, sheet_row or 0, status="error", error=msg
+            )
+            return {"status": "error", "record_id": "", "error": msg, "exit_code": 1}
+    else:
+        record_id = processor_id
     scrape["id"] = record_id
     scrape["url"] = url
 

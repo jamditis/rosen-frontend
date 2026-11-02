@@ -73,6 +73,7 @@ data/*.backup
 data/*_backup_*.csv
 
 # Atomic-write artifacts from data/csv_safe_write.py (see issue #145)
+data/record-id-sequence.json.lock
 data/*.csv.bak
 data/*.csv.bak*
 data/*.csv.tmp

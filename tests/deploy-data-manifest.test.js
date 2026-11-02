@@ -96,6 +96,8 @@ function deploymentMdDataFiles() {
 // (verify before adding); if deployed code links or fetches it, deploy it
 // instead — a referenced-but-undeployed file is exactly the #527 404 class.
 const KNOWN_NOT_DEPLOYED = new Map([
+  ['data/record-id-sequence.json',
+    'Backend record_id_sequence.py reservation state. Tracked for identity preservation; no deployed page reads it.'],
   ['data/source-identity-quality-policy.json',
     'versioned rules for the offline source-quality evaluator; no deployed page reads them'],
   ['data/source-identity-quality-evidence.json',
