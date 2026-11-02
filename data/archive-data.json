@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "generated": "2026-11-02T20:33:59.888Z",
+  "generated": "2026-11-02T20:56:29.376Z",
   "records": [
     {
       "id": "BSKY-03554",
@@ -699297,6 +699297,25 @@
       ]
     },
     {
+      "id": "RECORD-01102",
+      "title": "The Democrat: James W. Carey",
+      "author": "Jay Rosen",
+      "date": "2006-07-01",
+      "year": "2006",
+      "era": "Peak Blogging & Citizen Journalism (2005-2009)",
+      "pub": "Columbia Journalism Review",
+      "url": "https://www.cjr.org/magazine-archive/the-democrat-james-w-carey-2.php",
+      "summary": "Bibliographic metadata: Columbia Journalism Review lists this article by Jay Rosen, titled The Democrat: James W. Carey, credited to Jay Rosen, dated 2006-07-01. Article text has not been captured.",
+      "quote": "",
+      "categories": [],
+      "concepts": [],
+      "tags": [],
+      "verified": true,
+      "needsReview": true,
+      "type": "article",
+      "relatedIds": []
+    },
+    {
       "id": "RECORD-00070",
       "title": "The People Formerly Known as the Audience",
       "author": "Jay Rosen",
@@ -835942,6 +835961,7 @@
     "The Death of Truth",
     "The Debates and The Spin Doctors",
     "The Deferential Spirit",
+    "The Democrat: James W. Carey",
     "The Democratic Party in one way, the press corps in another have to rebuild for...",
     "The Devil Strip",
     "The Digital Edge",
