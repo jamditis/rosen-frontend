@@ -28,10 +28,11 @@ test('real preparation CLI and publisher preserve reports, versions and final Gi
   }).trim();
   const git = (args, cwd = root) => execute('git', args, cwd);
   const starting = git(['rev-parse', 'HEAD'], repository);
-  git(['clone', '--quiet', '--bare', '--shared', repository, remote], repository);
+  // Independent object stores keep local push verification self-contained.
+  git(['clone', '--quiet', '--bare', '--no-local', repository, remote], repository);
   git(['update-ref', 'refs/heads/main', starting], remote);
   git(['symbolic-ref', 'HEAD', 'refs/heads/main'], remote);
-  git(['clone', '--quiet', '--shared', remote, root], repository);
+  git(['clone', '--quiet', '--no-local', remote, root], repository);
   git(['config', 'user.name', 'Joe Amditis']);
   git(['config', 'user.email', '6799804+jamditis@users.noreply.github.com']);
   fs.symlinkSync(path.join(repository, 'node_modules'), path.join(root, 'node_modules'), 'dir');
