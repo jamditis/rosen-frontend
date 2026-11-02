@@ -314,7 +314,7 @@ export function changedPaths(root) {
   return paths;
 }
 
-export function stageReleaseCommit(root, browserPaths) {
+export function releasePaths(root, browserPaths) {
   const allowed = new Set(browserPaths);
   for (const file of changedPaths(root)) {
     if (!allowed.has(file) && !isReleaseDataPath(file)) {
@@ -328,6 +328,11 @@ export function stageReleaseCommit(root, browserPaths) {
   const adjacencyPaths = changedPaths(root).filter((file) => /^data\/relationship-adjacency-[0-9a-f]\.json$/.test(file));
   const explicitPaths = [...new Set([...toStage, ...feedPaths, ...adjacencyPaths])].sort();
   if (explicitPaths.length === 0) throw new Error('publication produced no release changes');
+  return explicitPaths;
+}
+
+export function stageReleaseCommit(root, browserPaths) {
+  const explicitPaths = releasePaths(root, browserPaths);
   run(root, 'git', ['add', '--', ...explicitPaths]);
   run(root, 'git', ['commit', '-m', 'data: publish source stewardship update']);
 }
@@ -503,13 +508,13 @@ export function validateRecoveryRelease(root, state, {
   assertRemoteHeadUnchanged(root, state.startCommit, gitCommand);
 }
 
-function publishChangedRelease(root, paths, state, report) {
+export function prepareChangedRelease(root, paths, report, { rebuildArticles = false } = {}) {
   const asOf = safeIso(report.captured_at).slice(0, 10);
   run(root, 'npm', [
     'run', 'refresh:social-release', '--', '--as-of', asOf,
     '--report', paths.reportPath,
   ]);
-  if (report.pressthink?.added || report.pressthink?.updated) {
+  if (rebuildArticles || report.pressthink?.added || report.pressthink?.updated) {
     run(root, 'npm', ['run', 'build-embeddings']);
   }
   run(root, 'npm', [
@@ -524,7 +529,11 @@ function publishChangedRelease(root, paths, state, report) {
     verify: () => run(root, process.execPath, ['--test', 'tests/version-consistency.test.js']),
   });
   const browserPaths = [...stamped.changedFiles, ...incrementDataCache(root)];
+  return browserPaths;
+}
 
+function publishChangedRelease(root, paths, state, report) {
+  const browserPaths = prepareChangedRelease(root, paths, report);
   configureJoeIdentity(root);
   stageReleaseCommit(root, browserPaths);
 
@@ -635,6 +644,17 @@ function finalize(root) {
 async function main() {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
   const command = process.argv[2];
+  if (command === 'prepare-record-release') {
+    const reportPath = process.argv[3];
+    if (!reportPath || !path.isAbsolute(reportPath) || reportPath.startsWith(root + path.sep)) {
+      throw new Error('Release preparation report must be outside the repository');
+    }
+    const paths = statePaths();
+    fs.copyFileSync(path.join(root, 'data/archive-data.json'), paths.baselinePath);
+    const browserPaths = prepareChangedRelease(root, paths, emptyReport(new Date().toISOString()), { rebuildArticles: true });
+    writeJson(reportPath, { paths: releasePaths(root, browserPaths) });
+    return;
+  }
   if (command === 'init') {
     const { statePath } = statePaths();
     writeJson(statePath, initialState(root));

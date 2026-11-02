@@ -25,9 +25,9 @@ Behavior (12-step pipeline from the design's "Architecture" diagram):
     6.  enrich_data() + _sanitize_cell()            (mimic Pillar 3; flag review)
     7.  Append to data/archive_records-public.csv   (atomic tmp+rename)
     8.  node data/export-archive-data.js            (regen JSONs)
-    9.  npm test                                    (abort commit on fail)
-   10.  commit data, regenerate/commit census, push (App-token identity)
-   11.  SFTP push JSONs + affected metadata shell   (sftp_push.py)
+    9.  Prepare graph, vectors and cache versions
+   10.  Commit inputs/census, run full suite, then push (replay uses same gate)
+   11.  Full release with pair rollback and public byte verification
    12.  Sheet writeback F='live', G=RECORD-NNNNN   (retry once, then exit-non-0)
 
 Status outcomes: ``live | committed | archived | duplicate | error | noop``.
@@ -81,6 +81,7 @@ from rosen_scraper import entity_resolver  # noqa: E402
 from rosen_scraper.url_safety import is_safe_public_url  # noqa: E402
 from rosen_scraper.workflow import enrich_data  # noqa: E402
 from submission_runtime import sftp_push, sheets_callback  # noqa: E402
+from submission_runtime.release_preparation import prepare_release  # noqa: E402
 from submission_runtime.artifacts import (
     DATA_DEPLOY_JSON_FILES,
     data_deploy_files,
@@ -418,7 +419,7 @@ def _retry_publication(
         push = (
             {"ok": True}
             if prototype_mode
-            else sftp_push.push_to_production(record_ids=(record_id,))
+            else sftp_push.push_full_release(record_ids=(record_id,))
         )
     except Exception as exc:  # noqa: BLE001 — keep the row recoverable
         push = {"ok": False, "error": str(exc)}
@@ -490,6 +491,7 @@ def _git_commit_and_push(
     short = _short_title(title) or "auto-submit"
     message = f"data: add {record_id} via auto-submit ({short})"
     try:
+        paths += prepare_release()
         # Configure bot identity for the commit. The Action sets GIT_AUTHOR_*
         # env vars too, but a direct configure keeps the script portable.
         subprocess.run(
@@ -587,6 +589,10 @@ def _git_commit_and_push(
             ok=False,
             non_ff=non_ff,
             error=f"commit/push pipeline failed: " f"{diagnostics or exc}",
+        )
+    except (ValueError, OSError) as exc:
+        return _PushResult(
+            ok=False, non_ff=False, error=f"release preparation failed: {exc}"
         )
 
 
@@ -1208,7 +1214,7 @@ def process_one(
     else:
         try:
             _stage_for_ftp()
-            push = sftp_push.push_to_production(record_ids=(record_id,))
+            push = sftp_push.push_full_release(record_ids=(record_id,))
         except Exception as exc:  # noqa: BLE001 — preserve the committed identity
             push = {"ok": False, "error": f"Publication staging failed: {exc}"}
         if not (push.get('ok') and not push.get('skipped')):  # fmt: skip

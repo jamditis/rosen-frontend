@@ -36,6 +36,18 @@ def _load_module():
 sync = _load_module()
 
 
+@pytest.fixture(autouse=True)
+def stub_release_preparation(monkeypatch):
+    monkeypatch.setattr(
+        sync,
+        "prepare_release",
+        lambda: [
+            "data/archive-embeddings.bin",
+            "data/archive-embeddings.json",
+        ],
+    )
+
+
 def test_maintenance_preserves_untouched_mixed_newline_records(tmp_path):
     path = tmp_path / "archive.csv"
     untouched = b"R1,,First paragraph\nSecond paragraph,keep\r\n"

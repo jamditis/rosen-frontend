@@ -46,7 +46,9 @@ Transfer sources were checked on houseofjawn on November 1, 2026. Other initiali
 | `ROSEN_SFTP_HOST` | `claude/rosen/pressthink-ftps` | Current FTPS host |
 | `ROSEN_SFTP_USER` | Same credential entry | Transfer username |
 | `ROSEN_SFTP_PASSWORD` | Same credential entry | Retrieve privately |
-| `ROSEN_SFTP_REMOTE_PATH` | Same credential entry, Data path | `j/rosen-archive/data` for submission artifacts |
+| `ROSEN_SFTP_REMOTE_PATH` | Same credential entry, Data path | Legacy data-path configuration |
+| `ROSEN_SFTP_SITE_PATH` | Same credential entry, Site path | `j/rosen-archive` for the full release |
+| `ROSEN_SFTP_TRANSACTION_PATH` | Current deploy configuration | Private rollback directory used by the existing embedding-pair deployer |
 | `ROSEN_SFTP_KNOWN_HOSTS` | Only for an explicitly selected SFTP endpoint | FTPS verifies the TLS certificate; it does not use SSH host keys |
 
 Protocol port and optional SFTP-only key settings:
@@ -88,7 +90,7 @@ pass insert claude/rosen/sftp
 
 Verify the remote directory against the current manual deploy path in
 `DEPLOYMENT.md` before populating the secret. `ROSEN_SFTP_REMOTE_PATH` must be
-the data directory that directly contains the six generated JSON artifacts in
+the legacy data directory containing the generated JSON artifacts in
 `submission_runtime.artifacts.DATA_DEPLOY_JSON_FILES`.
 
 To verify before pasting:
@@ -242,7 +244,7 @@ Use a URL on the RFC 6761 `.invalid` TLD — DNS resolution always fails, so `is
 7. Confirm `ROSEN_TRANSFER_PROTOCOL=ftps`, the existing credential, port 21, and the data path. The FTPS client verifies the TLS certificate. SSH host keys are required only for a separately selected SFTP endpoint; they are not an FTPS prerequisite.
 8. Pick a real PressThink URL NOT in the archive (`pressthink.org/[year]/...` from a recent post).
 9. Same dispatch flow.
-10. **Expected**: full pipeline runs, a new `RECORD-NNNNN` commit appears on `main` from `rosen-archive-bot[bot]`, and archive JSONs deploy via FTPS. Verify the live artifacts against the committed release. The separately gated `post-merge.yml` notification is not deployment proof.
+10. **Expected**: full pipeline runs, a new `RECORD-NNNNN` commit appears on `main` from `rosen-archive-bot[bot]`, and the complete release deploys via FTPS with public byte verification. Verify the live artifacts against the committed release. The separately gated `post-merge.yml` notification is not deployment proof.
 
 After Smoke 3 passes, the system is live. The Apps Script piece (Pillar 3a piece 1, separate PR) is what then makes this fire from Jay's sheet edit instead of from a manual Actions UI dispatch.
 
@@ -278,3 +280,20 @@ Public-repo standard runners stay unmetered through the [March 2026 GHA pricing 
 - Next: Pillar 3a piece 1 (Apps Script v2) — separate PR after this setup is verified end-to-end
 
 Receipt token: wake-20260528T0805-d0b994
+
+
+### Complete release contract
+
+Submission and sheet synchronization use the scheduled publisher's release
+preparation. It refreshes graph reports, article and social vectors, version and
+cache markers, and the exact allowed path manifest. Each initial or replay attempt
+commits inputs, generates and commits the census, then runs the full suite before
+any push. A failed check leaves remote main and production unchanged.
+
+Submission and publication retries use the existing full-site deployer, including
+its embedding-pair rollback. The runner materializes current-tree LFS binaries
+and PDFs before transfer. Final sheet `live` status requires public byte
+verification. Prototype mode skips transfer. Sheet maintenance still opens a
+review PR; deploy it through `deploy.yml` only after its approved merge.
+
+All tests, builds, lint and validation run on GitHub-hosted runners.

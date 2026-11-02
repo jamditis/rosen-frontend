@@ -43,8 +43,16 @@ _REAL_SUBPROCESS_RUN = subprocess.run
 
 
 @pytest.fixture(autouse=True)
-def record_sequence(tmp_path):
+def record_sequence(tmp_path, monkeypatch):
     (tmp_path / "record-id-sequence.json").write_text('{"version":1,"high_water":0}')
+    monkeypatch.setattr(
+        process_submission,
+        "prepare_release",
+        lambda: [
+            "data/archive-embeddings.bin",
+            "data/archive-embeddings.json",
+        ],
+    )
 
 
 def _is_native_csv_bridge(cmd):
@@ -272,7 +280,7 @@ def _stub_sftp(monkeypatch, result=None):
             result or {"ok": True, "skipped": False, "files_pushed": 4, "error": None}
         )
     )
-    monkeypatch.setattr(process_submission.sftp_push, "push_to_production", mock)
+    monkeypatch.setattr(process_submission.sftp_push, "push_full_release", mock)
     return mock
 
 
@@ -852,7 +860,7 @@ class TestPushRaceRetry:
                 return _REAL_SUBPROCESS_RUN(cmd, *args, **kwargs)
             if cmd[:2] == ["npm", "test"]:
                 state["npm_tests"] += 1
-                # Step 9 passes against the old checkout; the post-replay run
+                # The first committed snapshot passes; the replay's final run
                 # against the advanced main fails a newly-added invariant.
                 if state["npm_tests"] >= 2:
                     raise subprocess.CalledProcessError(
