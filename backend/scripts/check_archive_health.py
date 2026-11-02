@@ -210,7 +210,7 @@ def _parse_operational_health(payload: object) -> OperationalHealth | None:
         )
     )
     affected_components: list[str] = []
-    if affected_sources:
+    if failed_discovery:
         affected_components.append("archive discovery")
     if not ingestion_healthy:
         affected_components.append("archive publication")

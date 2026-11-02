@@ -257,7 +257,9 @@ def source_fields(source, captured_at):
     }
 
 
-def source_association(source, old, by_id, by_url, by_title, retired_urls=None):
+def source_association(
+    source, old, by_id, by_url, by_title, retired_urls=None, retired_titles=None
+):
     """Resolve an existing identity or retain a review/retirement boundary."""
     matches = by_url.get(url_identity(source["url"]), [])
     record_id = (old or {}).get("record_id")
@@ -272,8 +274,9 @@ def source_association(source, old, by_id, by_url, by_title, retired_urls=None):
     row = by_id.get(record_id)
     if record_id and not row:
         return record_id, "retired", []
-    title_matches = by_title.get(
-        (title_identity(source["title"]), source["published_local"][:4]), []
+    title_key = (title_identity(source["title"]), source["published_local"][:4])
+    title_matches = sorted(
+        set(by_title.get(title_key, [])) | (retired_titles or {}).get(title_key, set())
     )
     possible_duplicates = matches if len(matches) > 1 else title_matches
     state = "review" if not record_id and possible_duplicates else "linked"
@@ -318,13 +321,18 @@ def reconcile_sources(
         title_key = (title_identity(row["title"]), row["publication_date"][:4])
         by_title.setdefault(title_key, []).append(row["id"])
     previous = {str(entry["source"]["id"]): entry for entry in entries}
-    retired_urls = {}
+    retired_urls, retired_titles = {}, {}
     live_ids = {row["id"] for row in rows}
-    for entry in previous.values():
+    for entry in entries:
         if entry.get("record_id") and entry["record_id"] not in live_ids:
             retired_urls.setdefault(url_identity(entry["source"]["url"]), set()).add(
                 entry["record_id"]
             )
+            title_key = (
+                title_identity(entry["source"]["title"]),
+                entry["source"]["published_local"][:4],
+            )
+            retired_titles.setdefault(title_key, set()).add(entry["record_id"])
     successor = [dict(row) for row in rows]
     by_id = {row["id"]: row for row in successor}
     reserved_ids = set(by_id) | {
@@ -347,7 +355,7 @@ def reconcile_sources(
         identity = str(source["id"])
         old = previous.get(identity)
         record_id, state, possible_duplicates = source_association(
-            source, old, by_id, by_url, by_title, retired_urls
+            source, old, by_id, by_url, by_title, retired_urls, retired_titles
         )
         row = by_id.get(record_id)
         if state == "retired":
