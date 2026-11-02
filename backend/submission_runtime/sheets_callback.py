@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from rosen_scraper.sheets_a1 import quote_tab
 from rosen_scraper.sheets_credentials import resolve_service_account_source
@@ -50,10 +50,10 @@ def update_row(
     sheet_tab: str,
     row: int,
     status: str,
-    record_id: str = "",
+    record_id: Optional[str] = None,
     error: str = "",
 ) -> Dict[str, Any]:
-    """Write status, record_id, and error to a single row of the queue sheet."""
+    """Write queue status and error; preserve identity when record_id is omitted."""
     if not sheet_id or not row:
         return {"ok": False, "skipped": True, "error": "missing sheet_id or row"}
 
@@ -77,10 +77,13 @@ def update_row(
         "valueInputOption": "RAW",
         "data": [
             {"range": f"{tab}!{_COL_STATUS}{row}", "values": [[status]]},
-            {"range": f"{tab}!{_COL_RECORD_ID}{row}", "values": [[record_id]]},
             {"range": f"{tab}!{_COL_ERROR}{row}", "values": [[error]]},
         ],
     }
+    if record_id is not None:
+        body["data"].insert(
+            1, {"range": f"{tab}!{_COL_RECORD_ID}{row}", "values": [[record_id]]}
+        )
 
     try:
         service = build("sheets", "v4", credentials=creds, cache_discovery=False)
