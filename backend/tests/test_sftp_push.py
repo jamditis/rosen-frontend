@@ -231,6 +231,48 @@ class TestTransferConfig:
 class TestSuccessfulPush:
     """Happy-path push uses atomic rename and reports the count."""
 
+    @pytest.mark.parametrize("protocol", ["sftp", "ftps"])
+    def test_creates_new_feed_directories_within_archive_boundary(
+        self, staging_dir, monkeypatch, protocol
+    ):
+        import errno
+
+        remote_path = (
+            "j/rosen-archive/data"
+            if protocol == "ftps"
+            else "/home/rosen/public_html/j/rosen-archive/data"
+        )
+        _set_env(
+            monkeypatch,
+            ROSEN_TRANSFER_PROTOCOL=protocol,
+            ROSEN_SFTP_REMOTE_PATH=remote_path,
+        )
+        category = staging_dir / "feeds/categories/new.xml"
+        category.parent.mkdir()
+        category.write_text("<rss/>")
+        existing = {remote_path}
+        remote = MagicMock()
+
+        def stat(path):
+            if path not in existing:
+                raise FileNotFoundError(errno.ENOENT, "missing")
+
+        def mkdir(path):
+            assert pathlib.PurePosixPath(path).parent.as_posix() in existing
+            existing.add(path)
+
+        remote.stat.side_effect = stat
+        remote.mkdir.side_effect = mkdir
+        monkeypatch.setattr(
+            sftp_push.remote_transfer, "connect_remote", MagicMock(return_value=remote)
+        )
+
+        assert sftp_push.push_to_production(staging_dir)["ok"] is True
+        assert [call.args[0] for call in remote.mkdir.call_args_list] == [
+            remote_path + "/feeds",
+            remote_path + "/feeds/categories",
+        ]
+
     def test_uploads_and_verifies_generated_category_feeds(
         self, staging_dir, monkeypatch
     ):
