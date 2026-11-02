@@ -78,8 +78,11 @@ own schedule.
 Newly admitted articles receive a Work entity and an `Authored By` link to Jay's
 existing Person entity, supported by the public author metadata. This is the
 minimum graph coverage for a captured article. It does not claim that every
-person, organization or idea in the body has been extracted. Existing graph rows
-are preserved. A conflicting relationship identity fails before publication.
+body entity or relationship has been extracted. Work labels retain the title
+captured at admission as a stable bibliographic label. Later source titles appear
+in the canonical record and preserved source versions; they do not rename those
+graph labels automatically. Existing curated entity and relationship rows are
+preserved. A conflicting relationship identity fails before publication.
 
 The source journal is committed as an exact allowed path. It is not a public
 website asset. The website content backup and the repository serve different

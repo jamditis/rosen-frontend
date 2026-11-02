@@ -423,7 +423,8 @@ def run_batch(*, dry_run=False, csv_path=None, history_path=None, posts=None):
         captured_at=captured_at,
         high_water=sequence_before,
     )
-    report["changed"] |= report["record_id_high_water"] > sequence_before
+    report["reservations_advanced"] = report["record_id_high_water"] > sequence_before
+    report["changed"] |= report["reservations_advanced"]
     if not dry_run and report["changed"]:
         if csv_path.read_bytes() != before:
             raise ValueError("Canonical CSV changed during PressThink capture")

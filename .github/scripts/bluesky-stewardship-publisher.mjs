@@ -125,7 +125,10 @@ function validateReport(report) {
         throw new Error(`PressThink batch report has invalid ${name}`);
       }
     }
-    if (source.changed !== Boolean(source.added || source.updated || source.versions_added)) {
+    if (source.reservations_advanced !== undefined && typeof source.reservations_advanced !== 'boolean') {
+      throw new Error('PressThink reservation change state is invalid');
+    }
+    if (source.changed !== Boolean(source.added || source.updated || source.versions_added || source.reservations_advanced)) {
       throw new Error('PressThink batch report change state is inconsistent');
     }
   }
