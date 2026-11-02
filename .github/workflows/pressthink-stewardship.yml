@@ -2,7 +2,7 @@ name: PressThink stewardship publisher
 
 on:
   schedule:
-    - cron: '47 19 * * *'
+    - cron: '47 19 * * 0-6'
   workflow_dispatch:
     inputs:
       dry_run:

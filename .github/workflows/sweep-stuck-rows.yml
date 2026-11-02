@@ -18,7 +18,7 @@ on:
   schedule:
     # Every 30 minutes. UTC. GitHub Actions cron drift can be 5-15 min
     # under load — sweep thresholds are tolerant of that.
-    - cron: '*/30 * * * *'
+    - cron: '0,30 * * * *'
   workflow_dispatch: {}
 
 # A long-running sweep getting overtaken by the next tick is fine — the

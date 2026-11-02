@@ -19,7 +19,7 @@ name: Pillar 3c — deploy full site to pressthink.org
 
 on:
   schedule:
-    - cron: '17 9 * * 5'
+    - cron: '17 9 * * FRI'
   workflow_dispatch:
     inputs:
       dry_run:
