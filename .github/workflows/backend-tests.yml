@@ -35,6 +35,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Materialize source publication assets
+        if: github.event_name == 'workflow_dispatch' && inputs.pressthink_source_check
+        run: git lfs pull --include="frontend/vendor/semantic/v1/**"
 
       - name: Set up Node for the source-to-thread integration test
         uses: actions/setup-node@v6
