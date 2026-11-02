@@ -15,13 +15,18 @@ no ROSEN_SFTP_KEY_PATH secret to look for.
 from __future__ import annotations
 
 import errno
+import hashlib
 import logging
 import os
 import tempfile
+import time
+import uuid
 from pathlib import Path, PurePosixPath
 from typing import Any, Dict, Iterable, Optional, Tuple
 
-from .artifacts import DATA_DEPLOY_JSON_FILES
+import requests
+
+from .artifacts import DATA_DEPLOY_JSON_FILES, data_deploy_files
 from .config import FTP_STAGING_DIR
 from .record_pages import render_record_pages, validate_record_id
 from . import remote_transfer
@@ -29,6 +34,47 @@ from . import remote_transfer
 logger = logging.getLogger("submission_runtime.sftp_push")
 
 _PUSH_FILES = DATA_DEPLOY_JSON_FILES
+_LIVE_SITE_ROOT = "https://pressthink.org/j/rosen-archive/"
+
+
+def _verify_live(artifacts):
+    """Require exact public bytes before a submission can be marked live."""
+    # Match the full-site verifier's bounded allowance for origin/edge lag.
+    for relative_path, expected in artifacts.items():
+        for attempt in range(6):
+            try:
+                _verify_public_artifact(relative_path, expected)
+                break
+            except (requests.RequestException, RuntimeError):
+                if attempt == 5:
+                    raise
+                time.sleep(15)
+
+
+def _verify_public_artifact(relative_path, expected):
+    url = _LIVE_SITE_ROOT + relative_path
+    with requests.get(
+        url,
+        params={"deploy_verify": uuid.uuid4().hex},
+        headers={"Cache-Control": "no-cache", "Accept-Encoding": "identity"},
+        timeout=(10, 30),
+        allow_redirects=False,
+        stream=True,
+    ) as response:
+        if response.status_code != 200:
+            raise RuntimeError(f"{relative_path}: HTTP {response.status_code}")
+        digest = hashlib.sha256()
+        size = 0
+        for block in response.iter_content(256 * 1024):
+            size += len(block)
+            if size > len(expected):
+                raise RuntimeError(f"{relative_path}: public response is larger")
+            digest.update(block)
+        if (
+            size != len(expected)
+            or digest.digest() != hashlib.sha256(expected).digest()
+        ):
+            raise RuntimeError(f"{relative_path}: public bytes differ")
 
 
 class TransferConfigurationError(ValueError):
@@ -141,13 +187,14 @@ def push_to_production(
             "error": f"Staging dir does not exist: {src_dir}",
         }
 
-    missing = [f for f in _PUSH_FILES if not (src_dir / f).exists()]
-    if missing:
+    try:
+        push_files = data_deploy_files(src_dir)
+    except ValueError as exc:
         return {
             "ok": False,
             "skipped": False,
             "files_pushed": 0,
-            "error": f"Staged files missing: {missing}",
+            "error": str(exc),
         }
 
     try:
@@ -191,6 +238,7 @@ def push_to_production(
     rendered_shells: Dict[str, str] = {}
     completed = False
     remote = None
+    live_artifacts = {}
 
     try:
         try:
@@ -208,12 +256,26 @@ def push_to_production(
                 selected_ids,
             )
 
-        for filename in _PUSH_FILES:
+        for filename in push_files:
             local = src_dir / filename
             remote_final = remote_transfer.scoped_archive_child(
                 cfg["remote_path"], filename
             )
+            parent = PurePosixPath(remote_final).parent
+            missing_parents = []
+            while parent.as_posix() != cfg["remote_path"]:
+                try:
+                    remote.stat(parent.as_posix())
+                    break
+                except IOError as exc:
+                    if exc.errno != errno.ENOENT:
+                        raise
+                    missing_parents.append(parent.as_posix())
+                    parent = parent.parent
+            for directory in reversed(missing_parents):
+                remote.mkdir(directory)
             _atomic_upload(remote, local, remote_final)
+            live_artifacts["data/" + filename] = local.read_bytes()
             pushed += 1
             logger.info(f"Pushed {filename} to {cfg['host']}:{remote_final}")
 
@@ -249,6 +311,7 @@ def push_to_production(
                         handle.write(source)
                         local_tmp = Path(handle.name)
                     _atomic_upload(remote, local_tmp, remote_final)
+                    live_artifacts[f"r/{record_id}.html"] = source.encode("utf-8")
                     pushed += 1
                     logger.info(
                         f"Pushed record shell {record_id} to "
@@ -273,6 +336,12 @@ def push_to_production(
     finally:
         if remote is not None:
             remote.close()
+
+    if completed and error is None:
+        try:
+            _verify_live(live_artifacts)
+        except Exception as exc:
+            error = f"Live verification failed: {exc}"
 
     return {
         "ok": error is None and completed,

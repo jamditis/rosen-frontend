@@ -291,7 +291,7 @@ def _changed_paths(csv_path: pathlib.Path) -> List[str]:
         rel_csv = str(csv_path.resolve().relative_to(PROJECT_ROOT.resolve()))
     except ValueError:
         rel_csv = str(csv_path)
-    return [rel_csv] + [f"data/{f}" for f in _DEPLOY_JSON_FILES]
+    return [rel_csv] + [f"data/{f}" for f in _DEPLOY_JSON_FILES] + ["data/feeds"]
 
 
 def _branch_name() -> str:

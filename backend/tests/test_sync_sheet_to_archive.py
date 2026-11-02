@@ -500,3 +500,7 @@ def test_nothing_to_sync_when_sheet_matches(tmp_path, monkeypatch):
     result = sync.run(dry_run=False, csv_path=csv_path)
     assert result["status"] == "nothing_to_sync"
     assert result["exit_code"] == 0
+
+
+def test_sync_commit_includes_generated_feeds(tmp_path):
+    assert "data/feeds" in sync._changed_paths(tmp_path / "archive.csv")
