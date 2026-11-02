@@ -131,11 +131,18 @@ def plain_text(markup):
     soup = BeautifulSoup(markup, "html.parser")
     for node in soup.select("script,style,noscript"):
         node.decompose()
-    for node in soup.select("p,div,li,h1,h2,h3,h4,blockquote,br"):
+    blocks = (
+        "address,article,aside,blockquote,caption,dd,div,dl,dt,fieldset,"
+        "figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hr,li,"
+        "main,nav,ol,p,pre,section,table,tbody,td,tfoot,th,thead,tr,ul,br"
+    )
+    for node in soup.select(blocks):
         node.insert_before("\n")
+        node.insert_after("\n")
     text = soup.get_text()
     text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", " ", text)
-    return "\n".join(" ".join(line.split()) for line in text.splitlines()).strip()
+    lines = (" ".join(line.split()) for line in text.splitlines())
+    return "\n".join(line for line in lines if line)
 
 
 def url_identity(url):
@@ -177,9 +184,7 @@ def source_post(post):
     text = plain_text(html)
     author = post.get("yoast_head_json", {}).get("author", "").strip()
     if len(title) < 5 or not text or not author:
-        raise ValueError(
-            f"PressThink post {post['id']} lacks title, text, or public authorship"
-        )
+        raise ValueError("PressThink source lacks title, text, or public authorship")
     return {
         "id": post["id"],
         "url": post["link"],
@@ -238,7 +243,7 @@ def source_fields(source, captured_at):
         "word_count": str(len(source["text"].split())),
         "excerpt": excerpt,
         "summary": "Source excerpt: " + excerpt,
-        "thematic_categories": ", ".join(categories) if categories else "uncategorized",
+        "thematic_categories": ", ".join(categories),
         "raw_text": source["text"],
         "date_processed": captured_at,
         "verified": "TRUE",
@@ -263,8 +268,6 @@ def source_association(source, old, by_id, by_url, by_title):
     )
     possible_duplicates = matches if len(matches) > 1 else title_matches
     state = "review" if not record_id and possible_duplicates else "linked"
-    if row and source["author"] != "Jay Rosen":
-        state = "review"
     return record_id, state, possible_duplicates
 
 
@@ -330,7 +333,6 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
             )
         elif (
             row
-            and state == "linked"
             and changed
             and old
             and row.get("notes") == MANAGED_NOTE + identity
@@ -347,10 +349,6 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
         if not record_id and not possible_duplicates:
             state = "review"
             excluded.append({"source_id": source["id"], "reason": "Author requires review"})
-        elif row and source["author"] != "Jay Rosen":
-            excluded.append(
-                {"source_id": source["id"], "reason": "Author requires review"}
-            )
         association_changed = old and (
             old.get("state", "linked") != state or old.get("record_id") != record_id
         )

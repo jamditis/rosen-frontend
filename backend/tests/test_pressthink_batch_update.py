@@ -178,6 +178,13 @@ def test_inline_markup_keeps_punctuation_and_words_intact():
     ) == "(Times), Journalism link, and more."
 
 
+def test_table_definition_list_and_text_after_blocks_keep_word_boundaries():
+    table = "<table><tr><td>one</td><td>two</td></tr></table>"
+    assert batch.plain_text(table) == "one\ntwo"
+    assert batch.plain_text("<dl><dt>Term</dt><dd>Text</dd></dl>") == "Term\nText"
+    assert batch.plain_text("<h2>Heading</h2>Text") == "Heading\nText"
+
+
 def test_unicode_line_separators_round_trip_in_source_history(tmp_path):
     csv_path, history = canonical_fixture(tmp_path)
     item = post(2, body="<p>Before\u2028middle\u2029after\u0085end.</p>")
@@ -225,5 +232,8 @@ def test_curator_removal_retires_identity_without_stopping_other_updates(tmp_pat
 def test_unclassified_source_keeps_the_low_confidence_flag():
     source = batch.source_post(post(body="<p>Something unrelated.</p>"))
     fields = batch.source_fields(source, "2026-11-02")
-    assert fields["thematic_categories"] == "uncategorized"
+    assert fields["thematic_categories"] == ""
     assert fields["low_confidence"] == "TRUE"
+    taxonomy = json.loads((batch.ROOT / "backend/schema.json").read_text())
+    assigned = {c.strip() for c in fields["thematic_categories"].split(",") if c.strip()}
+    assert assigned <= set(taxonomy["taxonomy"]["thematic_categories"])
