@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.60';
+import { html } from '../html.js?v=3.8.61';
 import {
   AlertCircle,
   Filter,
@@ -7,9 +7,9 @@ import {
   LayoutGrid,
   RotateCw,
 } from 'lucide-react';
-import ArchiveResults from '../components/ArchiveResults.js?v=3.8.60';
-import Sidebar from '../components/Sidebar.js?v=3.8.60';
-import { RELEVANCE_SORT } from '../utils/searchRanking.js?v=3.8.60';
+import ArchiveResults from '../components/ArchiveResults.js?v=3.8.61';
+import Sidebar from '../components/Sidebar.js?v=3.8.61';
+import { RELEVANCE_SORT } from '../utils/searchRanking.js?v=3.8.61';
 
 const DesktopArchivePanel = ({
   viewMode,

@@ -1,11 +1,11 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { html } from '../html.js?v=3.8.60';
+import { html } from '../html.js?v=3.8.61';
 import { Users, Building2, Lightbulb, BookOpen, MapPin, Calendar, Search, ArrowUpDown, ChevronDown, ChevronRight, X, ExternalLink, AlertTriangle, RotateCw } from 'lucide-react';
-import { fetchEntitiesData, getRecordsByEntity } from '../services/archiveService.js?v=3.8.60';
-import { getEntityScope } from '../services/queryComposition.js?v=3.8.60';
-import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.8.60';
-import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.8.60';
+import { fetchEntitiesData, getRecordsByEntity } from '../services/archiveService.js?v=3.8.61';
+import { getEntityScope } from '../services/queryComposition.js?v=3.8.61';
+import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.8.61';
+import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.8.61';
 
 // Add icons to shared config
 const TYPE_ICONS = {

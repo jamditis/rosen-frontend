@@ -1,15 +1,15 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.60';
+import { html } from '../html.js?v=3.8.61';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2, AlertTriangle, RefreshCw, Sparkles } from 'lucide-react';
-import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.8.60';
-import { ThreadModal } from './ThreadModal.js?v=3.8.60';
-import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.8.60';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.8.60';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.60';
-import { canonicalRecordUrl, shareRecordUrl } from '../utils/recordDeepLink.js?v=3.8.60';
-import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.60';
-import { requestSemanticNeighbors, selectSemanticRecords } from '../services/semanticRecall.js?v=3.8.60';
+import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.8.61';
+import { ThreadModal } from './ThreadModal.js?v=3.8.61';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.8.61';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.8.61';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.61';
+import { canonicalRecordUrl, shareRecordUrl } from '../utils/recordDeepLink.js?v=3.8.61';
+import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.61';
+import { requestSemanticNeighbors, selectSemanticRecords } from '../services/semanticRecall.js?v=3.8.61';
 
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
