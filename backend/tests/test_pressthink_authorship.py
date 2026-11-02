@@ -23,6 +23,7 @@ def write_csv(path, name, rows):
 def test_new_long_article_has_source_supported_authorship_and_stable_graph_ids(
     tmp_path,
 ):
+    (tmp_path / "record-id-sequence.json").write_text('{"version":1,"high_water":0}')
     write_csv(
         tmp_path,
         "archive_records-public.csv",

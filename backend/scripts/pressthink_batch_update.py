@@ -29,6 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from csv_safe_write import read_archive_csv, write_archive_csv
 from auto_categorize_records import RecordCategorizer
 import pressthink_transaction as transaction
+import record_id_sequence
 
 ORIGIN = "https://pressthink.org"
 ENDPOINT = ORIGIN + "/wp-json/wp/v2/posts"
@@ -273,7 +274,7 @@ def source_association(source, old, by_id, by_url, by_title):
     return record_id, state, possible_duplicates
 
 
-def reconcile(posts, columns, rows, entries, *, captured_at):
+def reconcile(posts, columns, rows, entries, *, captured_at, high_water=0):
     """Preserve IDs and curator edits; only managed source rows are refreshed."""
     sources = sorted((source_post(post) for post in posts), key=lambda s: s["id"])
     if len({s["id"] for s in sources}) != len(sources):
@@ -292,12 +293,15 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
         entry["record_id"] for entry in entries if entry.get("record_id")
     }
     next_id = max(
-        (
-            int(record_id.split("-")[1])
-            for record_id in reserved_ids
-            if re.fullmatch(r"RECORD-\d+", record_id)
+        high_water,
+        max(
+            (
+                int(record_id.split("-")[1])
+                for record_id in reserved_ids
+                if re.fullmatch(r"RECORD-\d+", record_id)
+            ),
+            default=0,
         ),
-        default=0,
     )
     added, updated, versions, excluded, proposed, retired = 0, 0, [], [], [], []
     associations = []
@@ -376,6 +380,7 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
         versions,
         {
             "captured": len(sources),
+            "record_id_high_water": next_id,
             "added": added,
             "updated": updated,
             "versions_added": len(versions),
@@ -407,11 +412,18 @@ def run_batch(*, dry_run=False, csv_path=None, history_path=None, posts=None):
     history_before = history_path.read_bytes() if history_path.exists() else None
     columns, rows = read_archive_csv(csv_path)
     entries, _heads = load_history(history_path)
+    sequence_before = record_id_sequence.high_water(csv_path)
     posts = capture_posts() if posts is None else posts
     captured_at = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
     successor, versions, report = reconcile(
-        posts, columns, rows, entries, captured_at=captured_at
+        posts,
+        columns,
+        rows,
+        entries,
+        captured_at=captured_at,
+        high_water=sequence_before,
     )
+    report["changed"] |= report["record_id_high_water"] > sequence_before
     if not dry_run and report["changed"]:
         if csv_path.read_bytes() != before:
             raise ValueError("Canonical CSV changed during PressThink capture")
@@ -426,6 +438,9 @@ def run_batch(*, dry_run=False, csv_path=None, history_path=None, posts=None):
             staged_history = Path(directory) / "history.jsonl"
             staged_history.write_bytes(history_after)
             load_history(staged_history)
+            record_id_sequence.advance(
+                csv_path, report["record_id_high_water"], expected=sequence_before
+            )
             transaction.commit(
                 csv_path,
                 history_path,

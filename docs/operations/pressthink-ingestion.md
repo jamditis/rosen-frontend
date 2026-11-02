@@ -46,6 +46,13 @@ transactions fail before live replacement and require a reviewed storage change.
 The canonical CSV retains its usual one-level backup. Completed journals are
 removed; source history is retained.
 
+Article IDs share `data/record-id-sequence.json` with manual submissions. Its
+high-water mark advances before CSV/history replacement and is committed with
+canonical data. Removed rows never free an ID. A failed write can leave a harmless
+gap. Missing or invalid state stops intake; restore verified state and compare
+current and historical IDs before resuming. Never reset the mark to surviving rows.
+Other CSV writers stop while a PressThink transaction is pending.
+
 The checkout has one writer. A lost race detected before journaling leaves no
 pending write. If recovery stops on an unexpected edit, pause the writer and
 preserve the journal and both targets before investigation. Compare target hashes

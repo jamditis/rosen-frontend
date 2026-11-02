@@ -104,6 +104,7 @@ def canonical_fixture(tmp_path):
     writer.writeheader()
     writer.writerow(row)
     path = tmp_path / "archive.csv"
+    (tmp_path / "record-id-sequence.json").write_text('{"version":1,"high_water":0}')
     path.write_bytes(output.getvalue().encode())
     return path, tmp_path / "versions.jsonl"
 
@@ -439,3 +440,32 @@ def test_no_change_report_retains_source_associations(tmp_path):
         ]
     )
     assert again["newest_source_time"] == "2017-12-02T14:00:00Z"
+
+
+def test_wordpress_and_manual_writers_share_retirement_reservations(tmp_path):
+    from scripts import process_submission, record_id_sequence
+
+    path, history = canonical_fixture(tmp_path)
+    kwargs = {"csv_path": path, "history_path": history}
+    batch.run_batch(posts=[post(1), post(2)], **kwargs)
+    columns, rows = batch.read_archive_csv(path)
+    batch.write_archive_csv(path, columns, rows[:1])
+    manual_id = record_id_sequence.reserve(path, {"RECORD-00001"})
+    assert manual_id == "RECORD-00003"
+    process_submission._atomic_append_row(
+        path,
+        {
+            "id": manual_id,
+            "url": "https://example.test/manual",
+            "title": "Manual article",
+        },
+        columns,
+    )
+    # Retire the manual row too; neither writer may reuse either identity.
+    columns, rows = batch.read_archive_csv(path)
+    batch.write_archive_csv(path, columns, rows[:1])
+    result = batch.run_batch(posts=[post(1), post(2), post(4)], **kwargs)
+    assert result["retired_record_ids"] == ["RECORD-00002"]
+    assert result["proposed_additions"][0]["record_id"] == "RECORD-00004"
+    assert record_id_sequence.high_water(path) == 4
+    assert not batch.run_batch(posts=[post(1), post(2), post(4)], **kwargs)["changed"]
