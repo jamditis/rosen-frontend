@@ -49,11 +49,13 @@ removed; source history is retained.
 The checkout has one writer. A lost race detected before journaling leaves no
 pending write. If recovery stops on an unexpected edit, pause the writer and
 preserve the journal and both targets before investigation. Compare target hashes
-with the journal's before/after hashes. If no changed target matches its after hash,
-no replacement occurred; retain a copy and remove only the pending journal before
-retrying from the current files. If one target already matches its after hash,
-reconcile the interruption and the external edit before clearing the journal.
-Never replace an unexpected edit automatically.
+with the journal's before/after hashes. A target matching neither hash is
+indeterminate: It might contain a partial transaction plus a later edit. Compare
+its fields with the decoded before and after payloads, then reconcile the source
+associations, proposed additions and any intentional removals before clearing the
+journal. Retain the original journal and targets as recovery evidence. A hash
+mismatch alone never proves that no replacement occurred. Never replace an
+unexpected edit or discard a pending transaction automatically.
 
 The adapter prepares data only. Scheduling, public publication, receipt delivery,
 and per-source health must be verified separately when its publisher integration
