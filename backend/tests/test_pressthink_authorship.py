@@ -20,7 +20,9 @@ def write_csv(path, name, rows):
             writer.writerow({column: values.get(column, "") for column in columns})
 
 
-def test_new_long_article_has_source_supported_authorship_and_stable_graph_ids(tmp_path):
+def test_new_long_article_has_source_supported_authorship_and_stable_graph_ids(
+    tmp_path,
+):
     write_csv(
         tmp_path,
         "archive_records-public.csv",
@@ -72,8 +74,8 @@ def test_new_long_article_has_source_supported_authorship_and_stable_graph_ids(t
     _, records = graph.read_archive_csv(tmp_path / "archive_records-public.csv")
     _, entities = graph.read_archive_csv(tmp_path / "extracted_entities.csv")
     _, relationships = graph.read_archive_csv(tmp_path / "extracted_relationships.csv")
-    assert (tmp_path / "extracted_entities.csv").read_bytes().startswith(
-        entities_before
+    assert (
+        (tmp_path / "extracted_entities.csv").read_bytes().startswith(entities_before)
     )
     assert len(records[-1]["raw_text"]) >= 500
     assert relationships[0]["source_record_id"] == records[-1]["id"] == "RECORD-00002"

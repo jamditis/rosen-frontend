@@ -46,7 +46,9 @@ def add_authorship(
             or row["title"] != addition["title"]
             or not row["notes"].startswith("PressThink API managed source; post id: ")
         ):
-            raise ValueError("PressThink authorship proposal does not match its source row")
+            raise ValueError(
+                "PressThink authorship proposal does not match its source row"
+            )
         relationship_id = row["id"] + "_REL_001"
         existing = [
             r for r in output_relationships if r["relationship_id"] == relationship_id
@@ -84,7 +86,8 @@ def add_authorship(
             relationship_type="Authored By",
             target_entity_id=author["entity_id"],
             target_entity_name=author["entity_name"],
-            context_snippet="Public PressThink author metadata: Jay Rosen. " + row["url"],
+            context_snippet="Public PressThink author metadata: Jay Rosen. "
+            + row["url"],
             confidence_score="1",
             extracted_date=dt.date.today().isoformat(),
         )
@@ -100,7 +103,9 @@ def run(report, *, data_dir=None):
         return
     _, records = read_archive_csv(data_dir / "archive_records-public.csv")
     entity_columns, entities = read_archive_csv(data_dir / "extracted_entities.csv")
-    rel_columns, relationships = read_archive_csv(data_dir / "extracted_relationships.csv")
+    rel_columns, relationships = read_archive_csv(
+        data_dir / "extracted_relationships.csv"
+    )
     new_entities, new_relationships = add_authorship(
         additions, records, entities, relationships, entity_columns, rel_columns
     )
