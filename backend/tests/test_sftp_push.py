@@ -23,6 +23,7 @@ pytest.importorskip("paramiko")
 import paramiko  # noqa: E402
 
 from submission_runtime import sftp_push  # noqa: E402
+from submission_runtime.artifacts import REQUIRED_FEED_FILES  # noqa: E402
 
 
 _REQUIRED_ENV = {
@@ -56,10 +57,12 @@ def _set_env(monkeypatch, **overrides):
 
 
 @pytest.fixture
-def staging_dir(tmp_path):
+def staging_dir(tmp_path, monkeypatch):
     """A staging dir with all canonical JSON artifacts."""
-    for filename in sftp_push._PUSH_FILES:
+    for filename in (*sftp_push._PUSH_FILES, *REQUIRED_FEED_FILES):
+        (tmp_path / filename).parent.mkdir(parents=True, exist_ok=True)
         (tmp_path / filename).write_text("{}")
+    monkeypatch.setattr(sftp_push, "_verify_live", MagicMock())
     return tmp_path
 
 
@@ -142,6 +145,15 @@ class TestMissingConfig:
 class TestStagingPreflight:
     """Staging dir state is validated before we open any SSH connection."""
 
+    def test_missing_feed_fails_before_transfer(self, staging_dir, monkeypatch):
+        _set_env(monkeypatch)
+        (staging_dir / "feeds/rss.xml").unlink()
+        with patch.object(sftp_push.remote_transfer, "connect_remote") as connect:
+            result = sftp_push.push_to_production(staging_dir)
+        assert result["ok"] is False
+        assert "feeds/rss.xml" in result["error"]
+        connect.assert_not_called()
+
     def test_missing_staging_dir_fails(self, tmp_path, monkeypatch):
         _set_env(monkeypatch)
         missing = tmp_path / "nope"
@@ -219,6 +231,37 @@ class TestTransferConfig:
 class TestSuccessfulPush:
     """Happy-path push uses atomic rename and reports the count."""
 
+    def test_uploads_and_verifies_generated_category_feeds(
+        self, staging_dir, monkeypatch
+    ):
+        _set_env(monkeypatch)
+        category = staging_dir / "feeds/categories/press.xml"
+        category.parent.mkdir()
+        category.write_bytes(b"<rss>new record</rss>")
+        with patch.object(sftp_push.remote_transfer, "connect_remote") as connect:
+            result = sftp_push.push_to_production(staging_dir)
+        assert result["ok"] is True
+        destinations = [
+            call.args[1] for call in connect.return_value.put.call_args_list
+        ]
+        assert any(
+            path.endswith("/feeds/categories/press.xml.tmp") for path in destinations
+        )
+        artifacts = sftp_push._verify_live.call_args.args[0]
+        assert artifacts["data/feeds/categories/press.xml"] == category.read_bytes()
+        assert "data/archive-data.json" in artifacts
+
+    def test_unverified_public_bytes_fail_after_successful_transfer(
+        self, staging_dir, monkeypatch
+    ):
+        _set_env(monkeypatch)
+        sftp_push._verify_live.side_effect = RuntimeError("public bytes differ")
+        with patch.object(sftp_push.remote_transfer, "connect_remote"):
+            result = sftp_push.push_to_production(staging_dir)
+        assert result["files_pushed"] > 0
+        assert result["ok"] is False
+        assert "Live verification failed" in result["error"]
+
     def test_uses_posix_rename_per_file(self, staging_dir, monkeypatch):
         _set_env(monkeypatch)
         with patch("paramiko.SSHClient") as mock_client_cls:
@@ -230,11 +273,17 @@ class TestSuccessfulPush:
             result = sftp_push.push_to_production(staging_dir)
 
         assert result["ok"] is True
-        assert result["files_pushed"] == len(sftp_push._PUSH_FILES)
+        assert result["files_pushed"] == (
+            len(sftp_push._PUSH_FILES) + len(REQUIRED_FEED_FILES)
+        )
         assert result["error"] is None
         # Every file uploaded under .tmp and atomically renamed.
-        assert mock_sftp.put.call_count == len(sftp_push._PUSH_FILES)
-        assert mock_sftp.posix_rename.call_count == len(sftp_push._PUSH_FILES)
+        assert mock_sftp.put.call_count == (
+            len(sftp_push._PUSH_FILES) + len(REQUIRED_FEED_FILES)
+        )
+        assert mock_sftp.posix_rename.call_count == (
+            len(sftp_push._PUSH_FILES) + len(REQUIRED_FEED_FILES)
+        )
         # The destination of every upload ends in .tmp — atomic write hinge.
         for call in mock_sftp.put.call_args_list:
             args = call.args
@@ -255,7 +304,9 @@ class TestSuccessfulPush:
             result = sftp_push.push_to_production(staging_dir)
 
         assert result["ok"] is True
-        assert mock_sftp.rename.call_count == len(sftp_push._PUSH_FILES)
+        assert mock_sftp.rename.call_count == (
+            len(sftp_push._PUSH_FILES) + len(REQUIRED_FEED_FILES)
+        )
 
 
 class TestRecordShellPush:
@@ -547,3 +598,36 @@ class TestKnownHostsInputShape:
         # Strict checking is still in force — keys are loaded, not trusted blind.
         policy = mock_client.set_missing_host_key_policy.call_args.args[0]
         assert isinstance(policy, paramiko.RejectPolicy)
+
+
+class TestPublicVerification:
+    @pytest.mark.parametrize(
+        "status,body,accepted",
+        [
+            (200, b"expected", True),
+            (200, b"stale", False),
+            (200, b"expected plus extra", False),
+            (302, b"", False),
+            (404, b"", False),
+        ],
+    )
+    def test_public_response_must_match_exact_artifact(
+        self, monkeypatch, status, body, accepted
+    ):
+        response = MagicMock()
+        response.status_code = status
+        response.iter_content.return_value = [body]
+        response.__enter__.return_value = response
+        get = MagicMock(return_value=response)
+        monkeypatch.setattr(sftp_push.requests, "get", get)
+        if accepted:
+            sftp_push._verify_live({"data/feeds/rss.xml": b"expected"})
+        else:
+            with pytest.raises(RuntimeError):
+                sftp_push._verify_live({"data/feeds/rss.xml": b"expected"})
+        assert (
+            get.call_args.args[0]
+            == "https://pressthink.org/j/rosen-archive/data/feeds/rss.xml"
+        )
+        assert get.call_args.kwargs["allow_redirects"] is False
+        assert get.call_args.kwargs["params"]["deploy_verify"]

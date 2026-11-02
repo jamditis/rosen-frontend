@@ -78,7 +78,10 @@ from rosen_scraper import entity_resolver  # noqa: E402
 from rosen_scraper.url_safety import is_safe_public_url  # noqa: E402
 from rosen_scraper.workflow import enrich_data  # noqa: E402
 from submission_runtime import sftp_push, sheets_callback  # noqa: E402
-from submission_runtime.artifacts import DATA_DEPLOY_JSON_FILES  # noqa: E402
+from submission_runtime.artifacts import (
+    DATA_DEPLOY_JSON_FILES,
+    data_deploy_files,
+)  # noqa: E402
 from submission_runtime.config import (  # noqa: E402
     CSV_FILE as _DEFAULT_CSV_FILE,
     DATA_DIR,
@@ -328,9 +331,10 @@ def _stage_for_ftp() -> bool:
 
     FTP_STAGING_DIR.mkdir(parents=True, exist_ok=True)
     copied = 0
-    for fname in _STAGED_JSON_FILES:
+    for fname in data_deploy_files(DATA_DIR):
         src = DATA_DIR / fname
         dst = FTP_STAGING_DIR / fname
+        dst.parent.mkdir(parents=True, exist_ok=True)
         if src.exists():
             shutil.copy2(str(src), str(dst))
             copied += 1
@@ -472,11 +476,15 @@ def _git_commit_and_push(
     The separate report commit preserves the census's truthful input-commit
     stamp; the push happens only after both commits and the freshness check.
     """
-    paths = [
-        relative_csv_path,
-        "data/extracted_entities.csv",
-        "data/extracted_relationships.csv",
-    ] + [f"data/{f}" for f in _STAGED_JSON_FILES]
+    paths = (
+        [
+            relative_csv_path,
+            "data/extracted_entities.csv",
+            "data/extracted_relationships.csv",
+        ]
+        + [f"data/{f}" for f in _STAGED_JSON_FILES]
+        + ["data/feeds"]
+    )
     short = _short_title(title) or "auto-submit"
     message = f"data: add {record_id} via auto-submit ({short})"
     try:
