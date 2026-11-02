@@ -4,6 +4,12 @@ on:
   # Manual trigger so a runner pass can be observed before this gates real PRs
   # again (it was disabled_manually after the Dec 2025 failures — #444).
   workflow_dispatch:
+    inputs:
+      pressthink_source_check:
+        description: 'Also run the bounded read-only PressThink source dry run'
+        required: false
+        type: boolean
+        default: false
   push:
     branches: [ main ]
     paths:
@@ -29,6 +35,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Materialize source publication assets
+        if: github.event_name == 'workflow_dispatch' && inputs.pressthink_source_check
+        run: git lfs pull --include="frontend/vendor/semantic/v1/**"
 
       - name: Set up Node for the source-to-thread integration test
         uses: actions/setup-node@v6
@@ -80,3 +92,21 @@ jobs:
           poetry run pytest -v --tb=short
         env:
           CI: true
+
+      - name: Check source publication integration on hosted runner
+        if: github.event_name == 'workflow_dispatch' && inputs.pressthink_source_check
+        run: npm test
+
+      - name: Read-only PressThink source check
+        if: github.event_name == 'workflow_dispatch' && inputs.pressthink_source_check
+        working-directory: backend
+        run: poetry run python scripts/pressthink_batch_update.py --dry-run --report "$RUNNER_TEMP/pressthink-dry-run.json"
+
+      - name: Retain the source rehearsal report
+        if: github.event_name == 'workflow_dispatch' && inputs.pressthink_source_check
+        uses: actions/upload-artifact@v6
+        with:
+          name: pressthink-source-rehearsal
+          path: ${{ runner.temp }}/pressthink-dry-run.json
+          if-no-files-found: error
+          retention-days: 14

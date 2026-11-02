@@ -10,8 +10,8 @@ Google Sheet. Nothing carries that work into ``data/archive_records-public.csv``
 so it never reaches the live site. This job closes that tail:
 
     read the sheet -> merge enriched columns into the CSV by ``id``
-    -> regen JSONs -> npm test -> commit data -> regenerate/commit census
-    -> open review PR
+    -> prepare graph, vectors and cache versions -> commit inputs
+    -> regenerate/commit census -> full tests -> push and open review PR
     -> Pillar 3c full-site deploy after merge
 
 The merge is ADDITIVE and never destructive:
@@ -68,6 +68,7 @@ from csv_safe_write import read_archive_csv, write_archive_csv  # noqa: E402
 from scripts.record_id_sequence import assert_no_pending_capture  # noqa: E402
 from rosen_scraper.csv_safety import sanitize_csv_value  # noqa: E402
 from submission_runtime.artifacts import DATA_DEPLOY_JSON_FILES  # noqa: E402
+from submission_runtime.release_preparation import prepare_release  # noqa: E402
 from submission_runtime.config import (  # noqa: E402
     CSV_FILE as _DEFAULT_CSV_FILE,
     DATA_DIR,
@@ -345,6 +346,7 @@ def open_sync_pr(
         f"Design: `docs/plans/2026-05-29-batch-maintenance-runner-design.md`"
     )
     try:
+        paths += prepare_release()
         subprocess.run(
             [
                 "git",
@@ -420,6 +422,9 @@ def open_sync_pr(
             capture_output=True,
             text=True,
         )
+        ok, out = run_node_tests()
+        if not ok:
+            return None, f"Tests failed; PR not opened. {out}"
         subprocess.run(
             ["git", "push", "origin", branch],
             cwd=str(PROJECT_ROOT),
@@ -454,6 +459,8 @@ def open_sync_pr(
             if part.strip()
         )
         return None, f"commit/PR pipeline failed: {diagnostics or exc}"
+    except (ValueError, OSError) as exc:
+        return None, f"release preparation failed: {exc}"
 
 
 # ---------- Orchestration ---------------------------------------------------
@@ -537,7 +544,7 @@ def run(
             "error": "",
         }
 
-    # --- Write CSV + regenerate + test, then open a PR. ---
+    # Prepare and commit inputs/census; test before pushing the review PR.
     write_csv_atomic(csv_path, fieldnames, rows)
     logger.info(f"Wrote {stats['rows_changed']} merged record(s) to {csv_path}")
 
@@ -548,15 +555,6 @@ def run(
             "rows_changed": stats["rows_changed"],
             "exit_code": 1,
             "error": f"JSON regen failed: {out}",
-        }
-
-    ok, out = run_node_tests()
-    if not ok:
-        return {
-            "status": "error",
-            "rows_changed": stats["rows_changed"],
-            "exit_code": 1,
-            "error": f"Tests failed; PR not opened. {out}",
         }
 
     branch, msg = open_sync_pr(csv_path, stats)

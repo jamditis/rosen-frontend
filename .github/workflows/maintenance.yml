@@ -7,7 +7,8 @@ name: Batch maintenance runner
 #   key_concepts    Gemini key-concept tagging on the master sheet
 #   dedup           deterministic multi-value normalization on the master sheet
 #   sync_to_archive merge enriched sheet columns into the repo CSV, regenerate
-#                   JSON, run npm test, then open a PR (no direct push to main)
+#                   release artifacts, commit inputs/census, test, then open a PR
+#                   (no direct push to main)
 #
 # Safety rails (docs/narrative/data-pipeline.md):
 #   * dry_run defaults TRUE  -- the first run of any job is a no-write rehearsal.

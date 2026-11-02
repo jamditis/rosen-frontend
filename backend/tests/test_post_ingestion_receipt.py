@@ -216,3 +216,39 @@ def test_candidate_fetch_failure_stops_before_any_receipt_post(tmp_path):
             tmp_path / "not-read.csv",
         )
     post.assert_not_called()
+
+
+def test_pressthink_sender_keeps_source_batches_separate(tmp_path):
+    payload = {
+        **_receipt(85),
+        "sourceId": "pressthink-wordpress-posts",
+        "added": 2,
+        "updated": 1,
+        "versions": 3,
+    }
+    payload["records"] = [
+        {
+            "uri": f"https://pressthink.org/2026/11/post-{i}/",
+            "recordId": f"RECORD-{i+1:05d}",
+            "decision": "accepted",
+        }
+        for i in range(85)
+    ]
+    with patch.object(
+        sender,
+        "append_pending_decisions",
+        side_effect=AssertionError("Bluesky reconciliation called"),
+    ):
+        with patch.object(sender, "post_batch") as post:
+            assert (
+                sender.deliver_receipt(
+                    payload, "example-token", tmp_path / "unused.csv"
+                )
+                == 3
+            )
+    assert [len(call.args[0]["records"]) for call in post.call_args_list] == [40, 40, 5]
+    assert all(
+        call.args[0]["sourceId"] == "pressthink-wordpress-posts"
+        and call.args[0]["versions"] == 3
+        for call in post.call_args_list
+    )

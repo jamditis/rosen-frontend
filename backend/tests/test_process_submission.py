@@ -43,8 +43,16 @@ _REAL_SUBPROCESS_RUN = subprocess.run
 
 
 @pytest.fixture(autouse=True)
-def record_sequence(tmp_path):
+def record_sequence(tmp_path, monkeypatch):
     (tmp_path / "record-id-sequence.json").write_text('{"version":1,"high_water":0}')
+    monkeypatch.setattr(
+        process_submission,
+        "prepare_release",
+        lambda: [
+            "data/archive-embeddings.bin",
+            "data/archive-embeddings.json",
+        ],
+    )
 
 
 def _is_native_csv_bridge(cmd):
@@ -272,7 +280,7 @@ def _stub_sftp(monkeypatch, result=None):
             result or {"ok": True, "skipped": False, "files_pushed": 4, "error": None}
         )
     )
-    monkeypatch.setattr(process_submission.sftp_push, "push_to_production", mock)
+    monkeypatch.setattr(process_submission.sftp_push, "push_full_release", mock)
     return mock
 
 
@@ -535,7 +543,7 @@ class TestCategorizeDegrades:
 
 class TestTestSuiteFailure:
 
-    def test_test_suite_failure_aborts_commit(self, monkeypatch, csv_with_headers):
+    def test_test_suite_failure_aborts_push(self, monkeypatch, csv_with_headers):
         _stub_schema(monkeypatch)
         _stub_dispatcher_ok(monkeypatch)
         sheets_mock = _stub_sheets(monkeypatch)
@@ -557,13 +565,14 @@ class TestTestSuiteFailure:
 
         assert result["status"] == "error"
         assert "test" in result["error"].lower()
-        # No git commit ever fired.
-        git_calls = [
-            c
-            for c in process_submission.subprocess.run.call_args_list
-            if c.args[0][:2] == ["git", "commit"]
-        ]
-        assert git_calls == []
+        commands = [c.args[0] for c in process_submission.subprocess.run.call_args_list]
+        # Local commits make census provenance possible. Neither commit may
+        # leave the runner until the complete committed snapshot passes.
+        assert len([cmd for cmd in commands if cmd[:2] == ["git", "commit"]]) == 2
+        assert not any(cmd[:2] == ["git", "push"] for cmd in commands)
+        census_index = commands.index(["npm", "run", "census:stewardship"])
+        test_index = commands.index(["npm", "test"])
+        assert census_index < test_index
         # No SFTP either.
         sftp_mock.assert_not_called()
         final = sheets_mock.call_args_list[-1].kwargs
@@ -851,7 +860,7 @@ class TestPushRaceRetry:
                 return _REAL_SUBPROCESS_RUN(cmd, *args, **kwargs)
             if cmd[:2] == ["npm", "test"]:
                 state["npm_tests"] += 1
-                # Step 9 passes against the old checkout; the post-replay run
+                # The first committed snapshot passes; the replay's final run
                 # against the advanced main fails a newly-added invariant.
                 if state["npm_tests"] >= 2:
                     raise subprocess.CalledProcessError(

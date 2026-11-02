@@ -16,8 +16,10 @@ from __future__ import annotations
 
 import errno
 import hashlib
+import json
 import logging
 import os
+import subprocess
 import tempfile
 import time
 import uuid
@@ -27,7 +29,7 @@ from typing import Any, Dict, Iterable, Optional, Tuple
 import requests
 
 from .artifacts import DATA_DEPLOY_JSON_FILES, data_deploy_files
-from .config import FTP_STAGING_DIR
+from .config import FTP_STAGING_DIR, PROJECT_ROOT
 from .record_pages import render_record_pages, validate_record_id
 from . import remote_transfer
 
@@ -35,6 +37,63 @@ logger = logging.getLogger("submission_runtime.sftp_push")
 
 _PUSH_FILES = DATA_DEPLOY_JSON_FILES
 _LIVE_SITE_ROOT = "https://pressthink.org/j/rosen-archive/"
+
+
+def push_full_release(record_ids=()):
+    """Publish the tested release with existing pair rollback, then verify it."""
+    from scripts import deploy_full_site as deploy
+
+    record_ids = tuple(record_ids)
+    for record_id in record_ids:
+        validate_record_id(record_id)
+    completed = 0
+    try:
+        if record_ids:
+            with (PROJECT_ROOT / "data/archive-data.json").open(
+                encoding="utf-8"
+            ) as source:
+                published = {record["id"] for record in json.load(source)["records"]}
+            missing = set(record_ids) - published
+            if missing:
+                return {
+                    "ok": False,
+                    "skipped": False,
+                    "files_pushed": 0,
+                    "error": "Requested records are absent from the public export: "
+                    + ", ".join(sorted(missing)),
+                }
+        cfg = deploy._read_env()
+        if cfg is None:
+            return {"ok": True, "skipped": True, "files_pushed": 0, "error": None}
+        pages = deploy.generate_record_pages(PROJECT_ROOT)
+        files = deploy.collect_local_files(PROJECT_ROOT)
+        result = deploy.push_files(files, PROJECT_ROOT, cfg, record_shells=pages)
+        completed = result.get("files_pushed", 0)
+        result["skipped"] = False
+        if not result["ok"]:
+            return result
+        subprocess.run(
+            ["node", str(PROJECT_ROOT / ".github/scripts/verify-live-deploy.mjs")],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        return result
+    except Exception as exc:
+        logger.error("Full release publication failed: %s", exc)
+        diagnostics = ""
+        if isinstance(exc, subprocess.CalledProcessError):
+            diagnostics = ((exc.stderr or "") + (exc.stdout or ""))[-2000:].strip()
+            if diagnostics:
+                logger.error("Public byte verification details: %s", diagnostics)
+        return {
+            "ok": False,
+            "skipped": False,
+            "files_pushed": completed,
+            "error": "Full release transfer or public byte verification failed"
+            + (": " + diagnostics[-400:] if diagnostics else ""),
+        }
 
 
 def _verify_live(artifacts):

@@ -422,6 +422,26 @@ def test_cli_rejects_an_unwritable_report_location_before_network(
         batch.main(["--dry-run", "--report", str(blocked / "report.json")])
 
 
+def test_no_change_report_retains_source_associations(tmp_path):
+    path, history = canonical_fixture(tmp_path)
+    first = batch.run_batch(
+        csv_path=path, history_path=history, posts=[post(1), post(2)]
+    )
+    again = batch.run_batch(
+        csv_path=path, history_path=history, posts=[post(1), post(2)]
+    )
+    assert again["changed"] is False
+    assert (
+        again["associations"]
+        == first["associations"]
+        == [
+            {"uri": post(1)["link"], "record_id": "RECORD-00001"},
+            {"uri": post(2)["link"], "record_id": "RECORD-00002"},
+        ]
+    )
+    assert again["newest_source_time"] == "2017-12-02T14:00:00Z"
+
+
 def test_wordpress_and_manual_writers_share_retirement_reservations(tmp_path):
     from scripts import process_submission, record_id_sequence
 
@@ -449,3 +469,22 @@ def test_wordpress_and_manual_writers_share_retirement_reservations(tmp_path):
     assert result["proposed_additions"][0]["record_id"] == "RECORD-00004"
     assert record_id_sequence.high_water(path) == 4
     assert not batch.run_batch(posts=[post(1), post(2), post(4)], **kwargs)["changed"]
+
+
+def test_reservation_only_repair_is_reported_and_preserves_source_bytes(tmp_path):
+    path, history = canonical_fixture(tmp_path)
+    kwargs = {"csv_path": path, "history_path": history, "posts": [post(1)]}
+    batch.run_batch(**kwargs)
+    before = (path.read_bytes(), history.read_bytes())
+    sequence = tmp_path / "record-id-sequence.json"
+    sequence.write_text('{"version":1,"high_water":0}')
+    sequence_before = sequence.read_bytes()
+    dry = batch.run_batch(dry_run=True, **kwargs)
+    assert dry["reservations_advanced"] is True
+    assert sequence.read_bytes() == sequence_before
+    repaired = batch.run_batch(**kwargs)
+    assert repaired["changed"] is True
+    assert repaired["reservations_advanced"] is True
+    assert repaired["added"] == repaired["updated"] == repaired["versions_added"] == 0
+    assert (path.read_bytes(), history.read_bytes()) == before
+    assert json.loads(sequence.read_text())["high_water"] == 1

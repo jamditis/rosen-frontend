@@ -17,6 +17,16 @@ const RECORD_ID = /^BSKY-\d{5,}$/;
 const JAY_POST_URI = /^at:\/\/did:plc:3t37x6vfigdzzp2gjcfnzlz4\/app\.bsky\.feed\.post\/[A-Za-z0-9._~:-]+$/;
 const MAX_REPORT_RECORDS = 1_000;
 const RECEIPT_ENDPOINT = 'https://rosen-source-discovery.jamditis.workers.dev/ingestion-receipt';
+const BLUESKY_SOURCE = 'jay-rosen-bluesky';
+const PRESSTHINK_SOURCE = 'pressthink-wordpress-posts';
+
+function configuredSource() {
+  const source = process.env.STEWARDSHIP_SOURCE || BLUESKY_SOURCE;
+  if (![BLUESKY_SOURCE, PRESSTHINK_SOURCE].includes(source)) {
+    throw new Error('Unrecognized stewardship source');
+  }
+  return source;
+}
 
 const RELEASE_DATA_PATHS = new Set([
   'data/archive-analytics.json',
@@ -24,6 +34,12 @@ const RELEASE_DATA_PATHS = new Set([
   'data/archive-data.json',
   'data/archive-details.json',
   'data/archive-entities.json',
+  'data/archive-embeddings.bin',
+  'data/archive-embeddings.json',
+  'data/archive_records-public.csv',
+  'data/record-id-sequence.json',
+  'data/extracted_entities.csv',
+  'data/extracted_relationships.csv',
   'data/archive-social-embeddings.bin',
   'data/archive-social-embeddings-build.json',
   'data/archive-social-embeddings.json',
@@ -34,6 +50,7 @@ const RELEASE_DATA_PATHS = new Set([
   'data/search-index.json',
   'data/social-search-index.json',
   'data/social_posts.csv',
+  'preservation/pressthink/versions.jsonl',
 ]);
 
 function text(value) {
@@ -101,6 +118,20 @@ function validateReport(report) {
   if (report.decisions.some((decision) => !['admit', 'context_only'].includes(decision.decision))) {
     throw new Error('Bluesky batch report has an invalid decision');
   }
+  if (report.pressthink) {
+    const source = report.pressthink;
+    for (const name of ['captured', 'added', 'updated', 'versions_added']) {
+      if (!Number.isSafeInteger(source[name]) || source[name] < 0 || source[name] > 2_000) {
+        throw new Error(`PressThink batch report has invalid ${name}`);
+      }
+    }
+    if (source.reservations_advanced !== undefined && typeof source.reservations_advanced !== 'boolean') {
+      throw new Error('PressThink reservation change state is invalid');
+    }
+    if (source.changed !== Boolean(source.added || source.updated || source.versions_added || source.reservations_advanced)) {
+      throw new Error('PressThink batch report change state is inconsistent');
+    }
+  }
   return report;
 }
 
@@ -154,6 +185,41 @@ export function buildIngestionReceipt({
   };
   if (errorClass) receipt.errorClass = errorClass;
   return receipt;
+}
+
+export function buildSourceIngestionReceipt(options) {
+  // Reuse the established envelope validation without changing legacy output.
+  const receipt = buildIngestionReceipt({ ...options, report: emptyReport(options.checkedAt) });
+  const report = options.report?.pressthink;
+  const failed = options.status === 'failed';
+  if (!report && !failed) throw new Error('PressThink capture report is missing');
+  for (const name of ['captured', 'added', 'updated', 'versions_added']) {
+    if (report && (!Number.isSafeInteger(report[name]) || report[name] < 0 || report[name] > 2000)) {
+      throw new Error('PressThink report count is invalid');
+    }
+  }
+  const associations = report?.associations || [];
+  if (!Array.isArray(associations) || associations.length > 2000) throw new Error('PressThink associations are invalid');
+  const published = new Set(options.publishedRecordIds || []);
+  const records = failed ? [] : associations.filter(item => published.has(item.record_id))
+    .map(item => ({ uri: item.uri, recordId: item.record_id, decision: 'accepted' }));
+  const uris = new Set();
+  const ids = new Set();
+  for (const record of records) {
+    if (!/^https:\/\/pressthink\.org\/\d{4}\/\d{2}\/[^/?#]+\/$/.test(record.uri || '')
+      || !/^RECORD-\d{5,}$/.test(record.recordId || '') || uris.has(record.uri) || ids.has(record.recordId)) {
+      throw new Error('PressThink receipt association is invalid');
+    }
+    uris.add(record.uri);
+    ids.add(record.recordId);
+  }
+  const captured = report?.captured || 0;
+  if (records.length > captured) throw new Error('PressThink receipt counts are inconsistent');
+  return { ...receipt, sourceId: PRESSTHINK_SOURCE, captured, admitted: records.length,
+    contextOnly: captured - records.length, added: report?.added || 0,
+    updated: report?.updated || 0, versions: report?.versions_added || 0,
+    sourceLatestAt: report?.newest_source_time ? safeIso(report.newest_source_time) : null,
+    records };
 }
 
 export async function postFailedReceipt(payload, token, {
@@ -230,7 +296,7 @@ function isReleaseDataPath(file) {
 }
 
 export function changedPaths(root) {
-  const entries = gitRaw(root, ['status', '--porcelain=v1', '-z']).split('\0');
+  const entries = gitRaw(root, ['status', '--porcelain=v1', '--untracked-files=all', '-z']).split('\0');
   const paths = [];
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
@@ -248,7 +314,7 @@ export function changedPaths(root) {
   return paths;
 }
 
-export function stageReleaseCommit(root, browserPaths) {
+export function releasePaths(root, browserPaths) {
   const allowed = new Set(browserPaths);
   for (const file of changedPaths(root)) {
     if (!allowed.has(file) && !isReleaseDataPath(file)) {
@@ -262,8 +328,13 @@ export function stageReleaseCommit(root, browserPaths) {
   const adjacencyPaths = changedPaths(root).filter((file) => /^data\/relationship-adjacency-[0-9a-f]\.json$/.test(file));
   const explicitPaths = [...new Set([...toStage, ...feedPaths, ...adjacencyPaths])].sort();
   if (explicitPaths.length === 0) throw new Error('publication produced no release changes');
+  return explicitPaths;
+}
+
+export function stageReleaseCommit(root, browserPaths) {
+  const explicitPaths = releasePaths(root, browserPaths);
   run(root, 'git', ['add', '--', ...explicitPaths]);
-  run(root, 'git', ['commit', '-m', 'data: publish Bluesky stewardship update']);
+  run(root, 'git', ['commit', '-m', 'data: publish source stewardship update']);
 }
 
 export function stageCensusCommit(root) {
@@ -292,6 +363,7 @@ function statePaths() {
   return {
     temporaryRoot,
     reportPath: path.join(temporaryRoot, 'bluesky-batch-report.json'),
+    pressThinkReportPath: path.join(temporaryRoot, 'pressthink-batch-report.json'),
     snapshotDir: path.join(temporaryRoot, 'bluesky-source-snapshot'),
     baselinePath: path.join(temporaryRoot, 'archive-data-baseline.json'),
     statePath: path.join(temporaryRoot, 'bluesky-stewardship-state.json'),
@@ -319,6 +391,7 @@ function initialState(root) {
   const now = new Date().toISOString();
   return {
     version: 1,
+    sourceId: configuredSource(),
     phase: 'initialized',
     startCommit: git(root, ['rev-parse', 'HEAD']),
     canonicalCommit: git(root, ['rev-parse', 'HEAD']),
@@ -356,7 +429,7 @@ export function runPreparation({
       verifyLive();
       state.phase = 'dry_run';
       state.liveVerified = true;
-    } else if (report.canonical.rows_appended === 0) {
+    } else if (report.canonical.rows_appended === 0 && !report.pressthink?.changed) {
       try {
         verifyLive();
         state.phase = 'no_change';
@@ -390,6 +463,17 @@ export function runPreparation({
 function captureBatch(root, paths, dryRun) {
   if (git(root, ['status', '--porcelain'])) throw new Error('starting checkout is not clean');
   fs.copyFileSync(path.join(root, 'data/archive-data.json'), paths.baselinePath);
+  if (configuredSource() === PRESSTHINK_SOURCE) {
+    const args = ['backend/scripts/pressthink_batch_update.py', '--report', paths.pressThinkReportPath];
+    if (dryRun) args.push('--dry-run');
+    run(root, 'python', args);
+    if (!dryRun) {
+      run(root, 'python', ['backend/scripts/pressthink_authorship.py', paths.pressThinkReportPath]);
+    }
+    const report = { ...emptyReport(new Date().toISOString()), pressthink: readJson(paths.pressThinkReportPath) };
+    writeJson(paths.reportPath, report);
+    return report;
+  }
   const adapterArgs = [
     'backend/scripts/bluesky_batch_update.py',
     '--report', paths.reportPath,
@@ -424,12 +508,15 @@ export function validateRecoveryRelease(root, state, {
   assertRemoteHeadUnchanged(root, state.startCommit, gitCommand);
 }
 
-function publishChangedRelease(root, paths, state, report) {
+export function prepareChangedRelease(root, paths, report, { rebuildArticles = false } = {}) {
   const asOf = safeIso(report.captured_at).slice(0, 10);
   run(root, 'npm', [
     'run', 'refresh:social-release', '--', '--as-of', asOf,
     '--report', paths.reportPath,
   ]);
+  if (rebuildArticles || report.pressthink?.added || report.pressthink?.updated) {
+    run(root, 'npm', ['run', 'build-embeddings']);
+  }
   run(root, 'npm', [
     'run', 'build-social-embeddings', '--', '--incremental',
     '--previous-archive', paths.baselinePath,
@@ -442,8 +529,11 @@ function publishChangedRelease(root, paths, state, report) {
     verify: () => run(root, process.execPath, ['--test', 'tests/version-consistency.test.js']),
   });
   const browserPaths = [...stamped.changedFiles, ...incrementDataCache(root)];
+  return browserPaths;
+}
 
-  run(root, 'npm', ['test']);
+export function publishChangedRelease(root, paths, state, report) {
+  const browserPaths = prepareChangedRelease(root, paths, report);
   configureJoeIdentity(root);
   stageReleaseCommit(root, browserPaths);
 
@@ -457,7 +547,7 @@ function publishChangedRelease(root, paths, state, report) {
   run(root, 'git', ['push', 'origin', 'HEAD:main']);
   return {
     canonicalCommit: git(root, ['rev-parse', 'HEAD']),
-    releaseVersion: nextVersion,
+    releaseVersion: readJson(path.join(root, 'version.json')).version,
   };
 }
 
@@ -465,7 +555,7 @@ function prepare(root) {
   const paths = statePaths();
   const state = fs.existsSync(paths.statePath) ? readJson(paths.statePath) : initialState(root);
   const dryRun = process.env.DRY_RUN === 'true';
-  return runPreparation({
+  const result = runPreparation({
     dryRun,
     state,
     capture: () => captureBatch(root, paths, dryRun),
@@ -475,6 +565,13 @@ function prepare(root) {
     persist: (nextState) => writeJson(paths.statePath, nextState),
     emit: output,
   });
+  if (state.sourceId === PRESSTHINK_SOURCE && !dryRun) {
+    const published = new Set(readJson(path.join(root, 'data/archive-data.json')).records.map(record => record.id));
+    state.publishedRecordIds = (state.report.pressthink?.associations || [])
+      .map(item => item.record_id).filter(id => published.has(id));
+    writeJson(paths.statePath, state);
+  }
+  return result;
 }
 
 export function finalizePublication(state, {
@@ -508,13 +605,15 @@ export function finalizePublication(state, {
     errorClass = deployOutcome === 'success' ? 'live_verification_failed' : 'deploy_failed';
   }
 
-  const receipt = buildIngestionReceipt({
+  const builder = state.sourceId === PRESSTHINK_SOURCE ? buildSourceIngestionReceipt : buildIngestionReceipt;
+  const receipt = builder({
     runId,
     status,
     checkedAt,
     canonicalCommit: state.canonicalCommit,
     releaseVersion: state.releaseVersion,
     report: state.report,
+    publishedRecordIds: state.publishedRecordIds,
     errorClass: errorClass || undefined,
   });
   return { status, errorClass, receipt };
@@ -545,6 +644,19 @@ function finalize(root) {
 async function main() {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
   const command = process.argv[2];
+  if (command === 'prepare-record-release') {
+    const reportPath = process.argv[3];
+    if (!reportPath || !path.isAbsolute(reportPath) || reportPath.startsWith(root + path.sep)) {
+      throw new Error('Release preparation report must be outside the repository');
+    }
+    const paths = statePaths();
+    fs.copyFileSync(path.join(root, 'data/archive-data.json'), paths.baselinePath);
+    const report = emptyReport(new Date().toISOString());
+    writeJson(paths.reportPath, report);
+    const browserPaths = prepareChangedRelease(root, paths, report, { rebuildArticles: true });
+    writeJson(reportPath, { paths: releasePaths(root, browserPaths) });
+    return;
+  }
   if (command === 'init') {
     const { statePath } = statePaths();
     writeJson(statePath, initialState(root));
@@ -557,7 +669,7 @@ async function main() {
     console.log('Failed ingestion receipt accepted.');
     return;
   }
-  throw new Error('usage: bluesky-stewardship-publisher.mjs init|prepare|finalize|send-failed-receipt');
+  throw new Error('usage: bluesky-stewardship-publisher.mjs init|prepare|prepare-record-release REPORT|finalize|send-failed-receipt');
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

@@ -25,9 +25,9 @@ Behavior (12-step pipeline from the design's "Architecture" diagram):
     6.  enrich_data() + _sanitize_cell()            (mimic Pillar 3; flag review)
     7.  Append to data/archive_records-public.csv   (atomic tmp+rename)
     8.  node data/export-archive-data.js            (regen JSONs)
-    9.  npm test                                    (abort commit on fail)
-   10.  commit data, regenerate/commit census, push (App-token identity)
-   11.  SFTP push JSONs + affected metadata shell   (sftp_push.py)
+    9.  Prepare graph, vectors and cache versions
+   10.  Commit inputs/census, run full suite, then push (replay uses same gate)
+   11.  Full release with pair rollback and public byte verification
    12.  Sheet writeback F='live', G=RECORD-NNNNN   (retry once, then exit-non-0)
 
 Status outcomes: ``live | committed | archived | duplicate | error | noop``.
@@ -81,6 +81,7 @@ from rosen_scraper import entity_resolver  # noqa: E402
 from rosen_scraper.url_safety import is_safe_public_url  # noqa: E402
 from rosen_scraper.workflow import enrich_data  # noqa: E402
 from submission_runtime import sftp_push, sheets_callback  # noqa: E402
+from submission_runtime.release_preparation import prepare_release  # noqa: E402
 from submission_runtime.artifacts import (
     DATA_DEPLOY_JSON_FILES,
     data_deploy_files,
@@ -418,7 +419,7 @@ def _retry_publication(
         push = (
             {"ok": True}
             if prototype_mode
-            else sftp_push.push_to_production(record_ids=(record_id,))
+            else sftp_push.push_full_release(record_ids=(record_id,))
         )
     except Exception as exc:  # noqa: BLE001 — keep the row recoverable
         push = {"ok": False, "error": str(exc)}
@@ -490,6 +491,7 @@ def _git_commit_and_push(
     short = _short_title(title) or "auto-submit"
     message = f"data: add {record_id} via auto-submit ({short})"
     try:
+        paths += prepare_release()
         # Configure bot identity for the commit. The Action sets GIT_AUTHOR_*
         # env vars too, but a direct configure keeps the script portable.
         subprocess.run(
@@ -565,6 +567,9 @@ def _git_commit_and_push(
             capture_output=True,
             text=True,
         )
+        test_error = _run_test_gate()
+        if test_error:
+            return _PushResult(ok=False, non_ff=False, error=test_error)
         subprocess.run(
             ["git", "push", "origin", "HEAD:main"],
             cwd=str(PROJECT_ROOT),
@@ -584,6 +589,10 @@ def _git_commit_and_push(
             ok=False,
             non_ff=non_ff,
             error=f"commit/push pipeline failed: " f"{diagnostics or exc}",
+        )
+    except (ValueError, OSError) as exc:
+        return _PushResult(
+            ok=False, non_ff=False, error=f"release preparation failed: {exc}"
         )
 
 
@@ -700,7 +709,7 @@ def _replay_record_onto_main(
 def _run_test_gate() -> Optional[str]:
     """Run the node test suite. Returns None on pass, an error string on fail.
 
-    Shared by step 9 and the reset-and-replay retry: a replay rebuilds the
+    Used before every initial or reset-and-replay push: a replay rebuilds the
     commit on top of a main that may have advanced with new tests or export
     invariants, so the merged tree must clear the SAME gate before its push —
     otherwise a record built against the old schema could land a red main.
@@ -711,7 +720,7 @@ def _run_test_gate() -> Optional[str]:
     except subprocess.CalledProcessError as exc:
         combined = (exc.stderr or "") + (exc.stdout or "")
         truncated = combined[-500:].strip() or "tests failed (no output)"
-        return f"Tests failed; commit aborted. {truncated}"
+        return f"Tests failed; push aborted. {truncated}"
     except Exception as exc:  # noqa: BLE001
         return f"Tests failed to run: {exc}"
 
@@ -1138,23 +1147,8 @@ def process_one(
                     "exit_code": 1,
                 }
 
-    # --- Step 9: node test suite. -----------------------------------------
-    test_err = _run_test_gate()
-    if test_err:
-        _safe_writeback(
-            sheet_id,
-            sheet_tab,
-            sheet_row or 0,
-            status="error",
-            record_id=record_id,
-            error=test_err,
-        )
-        return {
-            "status": "error",
-            "record_id": record_id,
-            "error": test_err,
-            "exit_code": 1,
-        }
+    # Full validation runs inside the commit helper, after census generation and
+    # before every push attempt, including reset-and-replay.
 
     # --- Step 10: data commit + census commit + push (retry races, #303). ---
     # The push targets main directly only after the data commit and its matching
@@ -1197,24 +1191,7 @@ def process_one(
         except Exception as exc:  # noqa: BLE001 — replay is best-effort
             push = _PushResult(ok=False, non_ff=False, error=f"replay failed: {exc}")
             break
-        # Re-run the test gate against the merged tree: the advanced main may
-        # carry new tests or export invariants the first-pass run never saw.
-        test_err = _run_test_gate()
-        if test_err:
-            _safe_writeback(
-                sheet_id,
-                sheet_tab,
-                sheet_row or 0,
-                status="error",
-                record_id=record_id,
-                error=test_err,
-            )
-            return {
-                "status": "error",
-                "record_id": record_id,
-                "error": test_err,
-                "exit_code": 1,
-            }
+        # The next commit-helper call validates the replay's complete tree.
         rel_csv = _csv_relpath(csv_path)
 
     if not push.ok:
@@ -1237,7 +1214,7 @@ def process_one(
     else:
         try:
             _stage_for_ftp()
-            push = sftp_push.push_to_production(record_ids=(record_id,))
+            push = sftp_push.push_full_release(record_ids=(record_id,))
         except Exception as exc:  # noqa: BLE001 — preserve the committed identity
             push = {"ok": False, "error": f"Publication staging failed: {exc}"}
         if not (push.get('ok') and not push.get('skipped')):  # fmt: skip

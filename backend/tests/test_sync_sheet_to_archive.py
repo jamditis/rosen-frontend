@@ -36,6 +36,18 @@ def _load_module():
 sync = _load_module()
 
 
+@pytest.fixture(autouse=True)
+def stub_release_preparation(monkeypatch):
+    monkeypatch.setattr(
+        sync,
+        "prepare_release",
+        lambda: [
+            "data/archive-embeddings.bin",
+            "data/archive-embeddings.json",
+        ],
+    )
+
+
 def test_maintenance_preserves_untouched_mixed_newline_records(tmp_path):
     path = tmp_path / "archive.csv"
     untouched = b"R1,,First paragraph\nSecond paragraph,keep\r\n"
@@ -450,6 +462,37 @@ def test_open_sync_pr_commits_census_after_input_data(tmp_path, monkeypatch):
         index for index, cmd in enumerate(commands) if cmd[:2] == ["git", "commit"]
     )
     assert push_index > second_commit_index
+    assert second_commit_index < commands.index(["npm", "test"]) < push_index
+
+
+def test_open_sync_pr_never_pushes_when_final_committed_suite_fails(
+    tmp_path, monkeypatch
+):
+    csv_path = _seed_csv(tmp_path)
+
+    def fake_run(cmd, *args, **kwargs):
+        if cmd == ["npm", "test"]:
+            raise subprocess.CalledProcessError(
+                1, cmd, output="invalid final archive", stderr=""
+            )
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+
+    run_mock = MagicMock(side_effect=fake_run)
+    monkeypatch.setattr(sync.subprocess, "run", run_mock)
+    branch, message = sync.open_sync_pr(
+        csv_path,
+        {
+            "rows_changed": 1,
+            "matched": 1,
+            "writes_by_field": {"key_concepts": 1},
+        },
+    )
+    assert branch is None
+    assert "invalid final archive" in message
+    commands = [call.args[0] for call in run_mock.call_args_list]
+    assert len([cmd for cmd in commands if cmd[:2] == ["git", "commit"]]) == 2
+    assert not any(cmd[:2] == ["git", "push"] for cmd in commands)
+    assert not any(cmd[:3] == ["gh", "pr", "create"] for cmd in commands)
 
 
 def test_open_sync_pr_blocks_publication_when_census_check_fails(tmp_path, monkeypatch):

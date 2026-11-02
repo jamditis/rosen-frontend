@@ -304,6 +304,7 @@ def reconcile(posts, columns, rows, entries, *, captured_at, high_water=0):
         ),
     )
     added, updated, versions, excluded, proposed, retired = 0, 0, [], [], [], []
+    associations = []
     for source in sources:
         identity = str(source["id"])
         old = previous.get(identity)
@@ -361,6 +362,8 @@ def reconcile(posts, columns, rows, entries, *, captured_at, high_water=0):
         association_changed = old and (
             old.get("state", "linked") != state or old.get("record_id") != record_id
         )
+        if row and state != "retired":
+            associations.append({"uri": source["url"], "record_id": record_id})
         if changed or association_changed:
             entry = {
                 "source": source,
@@ -385,6 +388,12 @@ def reconcile(posts, columns, rows, entries, *, captured_at, high_water=0):
             "excluded": excluded,
             "proposed_additions": proposed,
             "retired_record_ids": retired,
+            "associations": associations,
+            "newest_source_time": (
+                max((source["modified_gmt"] for source in sources), default="") + "Z"
+                if sources
+                else None
+            ),
             "changed": bool(added or updated or versions),
         },
     )
@@ -414,7 +423,8 @@ def run_batch(*, dry_run=False, csv_path=None, history_path=None, posts=None):
         captured_at=captured_at,
         high_water=sequence_before,
     )
-    report["changed"] |= report["record_id_high_water"] > sequence_before
+    report["reservations_advanced"] = report["record_id_high_water"] > sequence_before
+    report["changed"] |= report["reservations_advanced"]
     if not dry_run and report["changed"]:
         if csv_path.read_bytes() != before:
             raise ValueError("Canonical CSV changed during PressThink capture")

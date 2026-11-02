@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   buildIngestionReceipt,
+  buildSourceIngestionReceipt,
   changedPaths,
   finalizePublication,
   postFailedReceipt,
@@ -92,7 +93,59 @@ function gitFixture(t, files) {
   return directory;
 }
 
+it('commits the exact article CSV, semantic pair, and source journal paths', (t) => {
+  const directory = gitFixture(t, { 'baseline.txt': 'baseline\n' });
+  const files = {
+    'data/archive_records-public.csv': 'id,title\nRECORD-00001,Example\n',
+    'data/archive-embeddings.json': '{"sha256":"example"}\n',
+    'data/archive-embeddings.bin': 'example-vector-bytes',
+    'preservation/pressthink/versions.jsonl': '{"source":{"id":1}}\n',
+  };
+  for (const [name, body] of Object.entries(files)) {
+    fs.mkdirSync(path.dirname(path.join(directory, name)), { recursive: true });
+    fs.writeFileSync(path.join(directory, name), body);
+  }
+  stageReleaseCommit(directory, []);
+  const committed = gitCommand(directory, ['diff-tree', '--no-commit-id', '--name-only', '-r', 'HEAD']).split('\n').sort();
+  assert.deepEqual(committed, Object.keys(files).sort());
+  assert.equal(gitCommand(directory, ['status', '--porcelain']), '');
+  fs.writeFileSync(path.join(directory, 'preservation/pressthink/unapproved.txt'), 'unexpected\n');
+  assert.throws(() => stageReleaseCommit(directory, []), /unapproved path/);
+});
+
 describe('Bluesky stewardship preparation used by the CLI', () => {
+  it('publishes a durable reservation repair without new source content', () => {
+    const combined = { ...report(0), pressthink: { captured: 227, added: 0,
+      updated: 0, versions_added: 0, reservations_advanced: true, changed: true } };
+    const ops = preparation({ capture: () => combined });
+    assert.equal(runPreparation(ops).phase, 'pushed');
+    assert.equal(ops.outputs.get('needs_deploy'), 'true');
+  });
+  it('publishes article source changes even when no Bluesky rows were added', () => {
+    const combined = {
+      ...report(0),
+      pressthink: { captured: 227, added: 1, updated: 0, versions_added: 227, changed: true },
+    };
+    const ops = preparation({ capture: () => combined });
+    const result = runPreparation(ops);
+    assert.equal(result.phase, 'pushed');
+    assert.equal(result.canonicalCommit, PUBLISHED);
+    assert.equal(ops.outputs.get('needs_deploy'), 'true');
+    assert.equal(result.report.counts.captured, 0);
+    assert.equal(result.report.pressthink.captured, 227);
+  });
+
+  it('refuses an inconsistent article change report before publication', () => {
+    const combined = {
+      ...report(0),
+      pressthink: { captured: 227, added: 0, updated: 0, versions_added: 0, changed: true },
+    };
+    const ops = preparation({ capture: () => combined });
+    assert.throws(() => runPreparation(ops), /PressThink batch report change state/);
+    assert.equal(ops.state.phase, 'failed');
+    assert.equal(ops.state.canonicalCommit, START);
+  });
+
   it('verifies live state and emits no_change without publishing when no rows are missing', () => {
     const ops = preparation({ capture: () => report(0) });
     const result = runPreparation(ops);
@@ -467,3 +520,35 @@ describe('Bluesky stewardship receipt and workflow boundary', () => {
   });
 });
 
+
+
+describe('PressThink source receipts', () => {
+  const article = 'https://pressthink.org/2017/12/show-work/';
+  const state = (phase = 'pushed') => ({ sourceId: 'pressthink-wordpress-posts', phase,
+    canonicalCommit: PUBLISHED, releaseVersion: '3.8.57', liveVerified: phase === 'no_change',
+    publishedRecordIds: ['RECORD-00919'], report: { pressthink: { captured: 2, added: 1,
+      updated: 0, versions_added: 2, newest_source_time: NOW,
+      associations: [{ uri: article, record_id: 'RECORD-00919' },
+        { uri: article.replace('show-work', 'held'), record_id: 'RECORD-00920' }] } } });
+  it('settles only IDs in the actual published export', () => {
+    const result = finalizePublication(state(), { deployOutcome: 'success', verifyOutcome: 'success', runId: 'wp_1', checkedAt: NOW });
+    assert.equal(result.receipt.sourceId, 'pressthink-wordpress-posts');
+    assert.equal(result.receipt.status, 'published');
+    assert.equal(result.receipt.admitted, 1);
+    assert.equal(result.receipt.contextOnly, 1);
+    assert.deepEqual(result.receipt.records, [{ uri: article, recordId: 'RECORD-00919', decision: 'accepted' }]);
+    assert.equal(finalizePublication(state('no_change'), { runId: 'wp_2', checkedAt: NOW }).receipt.status, 'no_change');
+  });
+  it('sends a source failure without capture metadata or decisions', () => {
+    const failed = { ...state('failed'), report: {}, errorClass: 'prepare_failed' };
+    const result = finalizePublication(failed, { runId: 'wp_3', checkedAt: NOW });
+    assert.equal(result.receipt.sourceId, 'pressthink-wordpress-posts');
+    assert.equal(result.receipt.captured, 0);
+    assert.deepEqual(result.receipt.records, []);
+    assert.equal(finalizePublication(state('dry_run'), { runId: 'wp_4', checkedAt: NOW }).receipt, null);
+  });
+  it('rejects a successful run without its source capture', () => {
+    assert.throws(() => buildSourceIngestionReceipt({ runId: 'wp_5', checkedAt: NOW,
+      status: 'published', canonicalCommit: PUBLISHED, releaseVersion: '3.8.57', report: {} }), /missing/);
+  });
+});

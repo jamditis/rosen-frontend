@@ -44,7 +44,19 @@ const ARTIFACTS_NAMING_RECORDS = [
 // would pass no matter how stale they were, so they are checked by their totals.
 // 1,030, not the 1,029 this drop alone leaves: the RECORD-00429 split (issue
 // #863) added RECORD-00918 to the same release.
-const CURATED_RECORD_COUNT = 1030;
+const ADJUDICATED_RECORD_COUNT = 1030;
+
+function assertCurrentTotals({ records, census, relationships, entities, archive, analytics }) {
+  assert.ok(records.length >= ADJUDICATED_RECORD_COUNT, 'Retain the adjudicated baseline while accepting later additions');
+  const curatedIds = new Set(records.map(record => record.id));
+  const publishedCurated = archive.records.filter(record => curatedIds.has(record.id)).length;
+  assert.equal(census.records.reconciliation.curated.source, records.length);
+  assert.equal(census.records.reconciliation.curated.published, publishedCurated);
+  assert.equal(census.graph.relationships.total, relationships.length);
+  assert.equal(census.graph.entities.total, entities.length);
+  assert.equal(analytics.stats.records, archive.records.length);
+  assert.equal(analytics.stats.entities, entities.length);
+}
 
 // Each dropped record with the fuller capture that supersedes it.
 const DROPPED = new Map([
@@ -139,28 +151,44 @@ describe('2026-08-27 duplicate adjudication (#867)', () => {
       columns: true,
       skip_empty_lines: true,
     });
-    assert.equal(records.length, CURATED_RECORD_COUNT);
-
     const census = JSON.parse(read('data/stewardship-census.json'));
-    assert.equal(census.records.reconciliation.curated.source, CURATED_RECORD_COUNT);
-    assert.equal(census.records.reconciliation.curated.published, CURATED_RECORD_COUNT);
 
     const relationships = parse(read('data/extracted_relationships.csv').toString('utf8'), {
       columns: true,
       skip_empty_lines: true,
     });
-    assert.equal(census.graph.relationships.total, relationships.length);
 
     const entities = parse(read('data/extracted_entities.csv').toString('utf8'), {
       columns: true,
       skip_empty_lines: true,
     });
-    assert.equal(census.graph.entities.total, entities.length);
 
     const archive = JSON.parse(read('data/archive-data.json'));
     const analytics = JSON.parse(read('data/archive-analytics.json'));
-    assert.equal(analytics.stats.records, archive.records.length);
-    assert.equal(analytics.stats.entities, entities.length);
+    assertCurrentTotals({ records, census, relationships, entities, archive, analytics });
+  });
+
+  it('accepts one later article while rejecting stale source, graph and publication totals', () => {
+    const records = Array.from({ length: 1031 }, (_, index) => ({ id: `fixture-${index}` }));
+    const fixture = {
+      records, relationships: [{ id: 'new-relation' }], entities: [{ id: 'new-entity' }],
+      archive: { records: [...records, { id: 'social-fixture' }] },
+      analytics: { stats: { records: 1032, entities: 1 } },
+      census: { records: { reconciliation: { curated: { source: 1031, published: 1031 } } },
+        graph: { relationships: { total: 1 }, entities: { total: 1 } } },
+    };
+    assertCurrentTotals(fixture);
+    for (const mutate of [
+      value => { value.census.records.reconciliation.curated.source = 1030; },
+      value => { value.census.records.reconciliation.curated.published = 1030; },
+      value => { value.census.graph.entities.total = 0; },
+      value => { value.census.graph.relationships.total = 0; },
+      value => { value.analytics.stats.records = 1031; },
+    ]) {
+      const stale = structuredClone(fixture);
+      mutate(stale);
+      assert.throws(() => assertCurrentTotals(stale));
+    }
   });
 
   it('keeps the embedding sidecar and binary row-aligned with published documents', () => {

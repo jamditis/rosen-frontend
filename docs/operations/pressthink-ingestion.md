@@ -67,10 +67,38 @@ journal. Retain the original journal and targets as recovery evidence. A hash
 mismatch alone never proves that no replacement occurred. Never replace an
 unexpected edit or discard a pending transaction automatically.
 
-The adapter prepares data only. Scheduling, public publication, receipt delivery,
-and per-source health must be verified separately when its publisher integration
-is enabled. A local source change or successful dry run does not prove live
-article ingestion. Existing Bluesky publication remains independent until that
-integration lands.
+The PressThink publisher has its own daily job, retry outcome and source receipt.
+It shares the tested release builder, FIFO queue, version/cache update, Git push,
+certificate-verified FTPS transfer and public byte verification with Bluesky.
+New or updated article records rebuild article semantic vectors too. A no-change
+run still verifies the public release. Failure to capture or publish PressThink
+prevents a successful PressThink receipt. The Bluesky job can still run on its
+own schedule.
+
+Newly admitted articles receive a Work entity and an `Authored By` link to Jay's
+existing Person entity, supported by the public author metadata. This is the
+minimum graph coverage for a captured article. It does not claim that every
+body entity or relationship has been extracted. Work labels retain the title
+captured at admission as a stable bibliographic label. Later source titles appear
+in the canonical record and preserved source versions; they do not rename those
+graph labels automatically. Existing curated entity and relationship rows are
+preserved. A conflicting relationship identity fails before publication.
+
+The source journal is committed as an exact allowed path. It is not a public
+website asset. The website content backup and the repository serve different
+purposes: The monthly website mirror does not include this repository-only
+journal. Its presence in Git does not prove a fresh Legion copy.
+
+The public Worker stores PressThink outcomes in a separate source-scoped table.
+A successful receipt settles only source associations present in the generated,
+verified public export. Review holds and retired rows remain unsettled. A no-change
+capture retains associations so receipt recovery does not require another edit.
+
+Apply migration 0006 before deploying the Worker. Legacy Bluesky receipts and its
+table remain unchanged. PressThink health uses the daily receipt time with a
+36-hour allowance, separately from the weekly discovery backstop and the date of
+the most recent blog edit. A missing, failed or stale PressThink receipt degrades
+aggregate health. Run the first real publisher immediately after Worker activation.
+Never manufacture a receipt to clear health.
 
 All repository tests, builds, lint, and validation run on GitHub-hosted CI.

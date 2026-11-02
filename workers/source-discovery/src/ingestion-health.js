@@ -7,6 +7,8 @@ const FRESHNESS_MS = 36 * 60 * 60 * 1_000;
 const ACTOR_POST = /^at:\/\/did:plc:3t37x6vfigdzzp2gjcfnzlz4\/app\.bsky\.feed\.post\/[A-Za-z0-9._~:-]{1,128}$/;
 const ACTOR_POST_PREFIX = "at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/";
 const SUCCESS = new Set(["candidates_found", "no_candidates", "not_modified", "skipped_interval"]);
+const PRESSTHINK_SOURCE = "pressthink-wordpress-posts";
+const ARTICLE_URI = /^https:\/\/pressthink\.org\/\d{4}\/\d{2}\/[^/?#]+\/$/;
 
 function fresh(timestamp, now, maximumAge = FRESHNESS_MS) {
   const time = Date.parse(timestamp || "");
@@ -35,9 +37,32 @@ export async function readArchiveHealth(database, now = Date.now()) {
   ).bind().first();
   const ingestionFresh = Boolean(ingestion && fresh(ingestion.checked_at, now));
   const ingestionHealthy = Boolean(ingestionFresh && ingestion.status !== "failed");
+  const articleRun = await database.prepare(
+    "SELECT * FROM source_ingestion_runs WHERE source_id = ? ORDER BY checked_at DESC LIMIT 1",
+  ).bind(PRESSTHINK_SOURCE).first();
+  const articleFresh = Boolean(articleRun && fresh(articleRun.checked_at, now));
+  const sourceIngestion = [{
+    sourceId: PRESSTHINK_SOURCE,
+    runId: articleRun?.run_id || null,
+    checkedAt: articleRun?.checked_at || null,
+    status: !articleRun ? "never_run" : articleFresh ? articleRun.status : "receipt_stale",
+    lastReceiptStatus: articleRun?.status || null,
+    canonicalCommit: articleRun?.canonical_commit || null,
+    releaseVersion: articleRun?.release_version || null,
+    captured: articleRun?.captured_count || 0,
+    admitted: articleRun?.admitted_count || 0,
+    held: articleRun?.context_only_count || 0,
+    added: articleRun?.added_count || 0,
+    updated: articleRun?.updated_count || 0,
+    versions: articleRun?.version_count || 0,
+    sourceLatestAt: articleRun?.source_latest_at || null,
+    errorClass: !articleRun ? "publication_receipt_missing" : !articleFresh ? "publication_receipt_stale" : articleRun.error_class,
+    healthy: Boolean(articleFresh && articleRun.status !== "failed"),
+  }];
   return {
-    healthy: discovery.every(source => source.healthy) && ingestionHealthy,
+    healthy: discovery.every(source => source.healthy) && ingestionHealthy && sourceIngestion.every(source => source.healthy),
     discovery,
+    sourceIngestion,
     ingestion: ingestion ? {
       runId: ingestion.run_id,
       checkedAt: ingestion.checked_at,
@@ -92,6 +117,9 @@ export async function readPendingIngestionCandidates(request, env) {
 
 export function validateIngestionReceipt(value, now = Date.now()) {
   if (!value || typeof value !== "object" || Array.isArray(value) || value.version !== 1) throw new Error("invalid_receipt");
+  const sourceId = value.sourceId ?? "jay-rosen-bluesky";
+  if (!["jay-rosen-bluesky", PRESSTHINK_SOURCE].includes(sourceId)) throw new Error("invalid_source_id");
+  const article = sourceId === PRESSTHINK_SOURCE;
   if (!/^[A-Za-z0-9_-]{1,64}$/.test(value.runId || "")) throw new Error("invalid_run_id");
   if (!["published", "no_change", "failed"].includes(value.status)) throw new Error("invalid_status");
   if (!fresh(value.checkedAt, now, 24 * 3_600_000)) throw new Error("invalid_check_time");
@@ -101,13 +129,20 @@ export function validateIngestionReceipt(value, now = Date.now()) {
     if (!Number.isSafeInteger(value[name]) || value[name] < 0 || value[name] > 100_000) throw new Error("invalid_counts");
   }
   if (value.admitted + value.contextOnly !== value.captured) throw new Error("inconsistent_counts");
+  if (article) {
+    for (const name of ["added", "updated", "versions"]) {
+      if (!Number.isSafeInteger(value[name]) || value[name] < 0 || value[name] > 100_000) throw new Error("invalid_counts");
+    }
+  }
   if (value.sourceLatestAt !== null && (typeof value.sourceLatestAt !== "string" || !Number.isFinite(Date.parse(value.sourceLatestAt)) || Date.parse(value.sourceLatestAt) > now + 300_000)) throw new Error("invalid_source_time");
   if (value.errorClass != null && !/^[A-Za-z0-9_-]{1,80}$/.test(value.errorClass)) throw new Error("invalid_error_class");
   if (!Array.isArray(value.records) || value.records.length > MAX_RECORD_DECISIONS) throw new Error("invalid_records");
   const uris = new Set();
   for (const record of value.records) {
-    if (!record || !ACTOR_POST.test(record.uri || "") || uris.has(record.uri)) throw new Error("invalid_record_uri");
-    if (!["accepted", "rejected"].includes(record.decision) || !/^BSKY-\d{5,}$/.test(record.recordId || "")) throw new Error("invalid_record_decision");
+    if (!record || !(article ? ARTICLE_URI : ACTOR_POST).test(record.uri || "") || uris.has(record.uri)) throw new Error("invalid_record_uri");
+    if (article) {
+      if (record.decision !== "accepted" || !/^RECORD-\d{5,}$/.test(record.recordId || "")) throw new Error("invalid_record_decision");
+    } else if (!["accepted", "rejected"].includes(record.decision) || !/^BSKY-\d{5,}$/.test(record.recordId || "")) throw new Error("invalid_record_decision");
     uris.add(record.uri);
   }
   if (value.status === "failed" && value.records.length) throw new Error("failed_receipt_has_decisions");
@@ -129,6 +164,7 @@ export async function receiveIngestionReceipt(request, env, now = Date.now()) {
   } catch {
     return { status: 400, body: { error: "invalid_receipt" } };
   }
+  if (receipt.sourceId === PRESSTHINK_SOURCE) return recordArticleReceipt(receipt, env);
   const statements = [env.DISCOVERY_LEDGER.prepare(`
     INSERT INTO archive_ingestion_runs (run_id, checked_at, status, canonical_commit, release_version, captured_count, admitted_count, context_only_count, source_latest_at, error_class)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -152,4 +188,38 @@ export async function receiveIngestionReceipt(request, env, now = Date.now()) {
   }
   await env.DISCOVERY_LEDGER.batch(statements);
   return { status: 200, body: { status: "recorded", runId: receipt.runId, decisions: receipt.records.length } };
+}
+
+async function recordArticleReceipt(receipt, env) {
+  const statements = [env.DISCOVERY_LEDGER.prepare(`
+    INSERT INTO source_ingestion_runs
+      (source_id, run_id, checked_at, status, canonical_commit, release_version,
+       captured_count, admitted_count, context_only_count, added_count, updated_count,
+       version_count, source_latest_at, error_class)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(source_id, run_id) DO UPDATE SET
+      checked_at = excluded.checked_at, status = excluded.status,
+      canonical_commit = excluded.canonical_commit, release_version = excluded.release_version,
+      captured_count = excluded.captured_count, admitted_count = excluded.admitted_count,
+      context_only_count = excluded.context_only_count, added_count = excluded.added_count,
+      updated_count = excluded.updated_count, version_count = excluded.version_count,
+      source_latest_at = excluded.source_latest_at, error_class = excluded.error_class
+    WHERE source_ingestion_runs.checked_at < excluded.checked_at
+  `).bind(receipt.sourceId, receipt.runId, receipt.checkedAt, receipt.status,
+    receipt.canonicalCommit, receipt.releaseVersion, receipt.captured, receipt.admitted,
+    receipt.contextOnly, receipt.added, receipt.updated, receipt.versions,
+    receipt.sourceLatestAt, receipt.errorClass || null)];
+  for (const record of receipt.records) {
+    statements.push(env.DISCOVERY_LEDGER.prepare(`
+      INSERT INTO discovery_candidates (source_id, canonical_url, first_seen_at, last_seen_at, latest_run_id, review_status)
+      SELECT ?, ?, ?, ?, ?, ?
+      WHERE EXISTS (SELECT 1 FROM source_ingestion_runs WHERE source_id = ? AND run_id = ? AND checked_at = ? AND status = ? AND canonical_commit = ?)
+        AND NOT EXISTS (SELECT 1 FROM source_ingestion_runs WHERE source_id = ? AND checked_at > ?)
+      ON CONFLICT(source_id, canonical_url) DO UPDATE SET review_status = excluded.review_status
+    `).bind(receipt.sourceId, record.uri, receipt.checkedAt, receipt.checkedAt,
+      receipt.runId, record.decision, receipt.sourceId, receipt.runId,
+      receipt.checkedAt, receipt.status, receipt.canonicalCommit, receipt.sourceId, receipt.checkedAt));
+  }
+  await env.DISCOVERY_LEDGER.batch(statements);
+  return { status: 200, body: { status: "recorded", sourceId: receipt.sourceId, runId: receipt.runId, decisions: receipt.records.length } };
 }
