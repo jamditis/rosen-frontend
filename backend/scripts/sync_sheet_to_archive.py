@@ -10,8 +10,8 @@ Google Sheet. Nothing carries that work into ``data/archive_records-public.csv``
 so it never reaches the live site. This job closes that tail:
 
     read the sheet -> merge enriched columns into the CSV by ``id``
-    -> regen JSONs -> npm test -> commit data -> regenerate/commit census
-    -> open review PR
+    -> prepare graph, vectors and cache versions -> commit inputs
+    -> regenerate/commit census -> full tests -> push and open review PR
     -> Pillar 3c full-site deploy after merge
 
 The merge is ADDITIVE and never destructive:

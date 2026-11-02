@@ -532,7 +532,7 @@ export function prepareChangedRelease(root, paths, report, { rebuildArticles = f
   return browserPaths;
 }
 
-function publishChangedRelease(root, paths, state, report) {
+export function publishChangedRelease(root, paths, state, report) {
   const browserPaths = prepareChangedRelease(root, paths, report);
   configureJoeIdentity(root);
   stageReleaseCommit(root, browserPaths);
@@ -547,7 +547,7 @@ function publishChangedRelease(root, paths, state, report) {
   run(root, 'git', ['push', 'origin', 'HEAD:main']);
   return {
     canonicalCommit: git(root, ['rev-parse', 'HEAD']),
-    releaseVersion: nextVersion,
+    releaseVersion: readJson(path.join(root, 'version.json')).version,
   };
 }
 
@@ -651,7 +651,9 @@ async function main() {
     }
     const paths = statePaths();
     fs.copyFileSync(path.join(root, 'data/archive-data.json'), paths.baselinePath);
-    const browserPaths = prepareChangedRelease(root, paths, emptyReport(new Date().toISOString()), { rebuildArticles: true });
+    const report = emptyReport(new Date().toISOString());
+    writeJson(paths.reportPath, report);
+    const browserPaths = prepareChangedRelease(root, paths, report, { rebuildArticles: true });
     writeJson(reportPath, { paths: releasePaths(root, browserPaths) });
     return;
   }
@@ -667,7 +669,7 @@ async function main() {
     console.log('Failed ingestion receipt accepted.');
     return;
   }
-  throw new Error('usage: bluesky-stewardship-publisher.mjs init|prepare|finalize|send-failed-receipt');
+  throw new Error('usage: bluesky-stewardship-publisher.mjs init|prepare|prepare-record-release REPORT|finalize|send-failed-receipt');
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

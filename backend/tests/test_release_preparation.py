@@ -86,10 +86,13 @@ def test_verification_failure_never_reports_live_and_keeps_transfer_count(monkey
     )
 
     def failed(command, **kwargs):
-        raise subprocess.CalledProcessError(1, command)
+        raise subprocess.CalledProcessError(
+            1, command, stderr="data/archive-core.json SHA mismatch"
+        )
 
     monkeypatch.setattr(sftp_push.subprocess, "run", failed)
     result = sftp_push.push_full_release()
     assert result["ok"] is False
     assert result["skipped"] is False
     assert result["files_pushed"] == 7
+    assert "archive-core.json SHA mismatch" in result["error"]

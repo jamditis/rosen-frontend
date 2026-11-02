@@ -66,11 +66,17 @@ def push_full_release(record_ids=()):
         return result
     except Exception as exc:
         logger.error("Full release publication failed: %s", exc)
+        diagnostics = ""
+        if isinstance(exc, subprocess.CalledProcessError):
+            diagnostics = ((exc.stderr or "") + (exc.stdout or ""))[-2000:].strip()
+            if diagnostics:
+                logger.error("Public byte verification details: %s", diagnostics)
         return {
             "ok": False,
             "skipped": False,
             "files_pushed": completed,
-            "error": "Full release transfer or public byte verification failed",
+            "error": "Full release transfer or public byte verification failed"
+            + (": " + diagnostics[-400:] if diagnostics else ""),
         }
 
 

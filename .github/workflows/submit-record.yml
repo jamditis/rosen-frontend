@@ -97,8 +97,11 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Materialize current release binaries and PDFs
-        run: git lfs pull
+      - name: Materialize semantic search binaries
+        run: git lfs pull --include="frontend/vendor/semantic/v1/**"
+
+      - name: Materialize current release PDFs
+        run: git lfs pull --include="dissertation/**/*.pdf"
 
       - name: Set up Python 3.13
         uses: actions/setup-python@v6
