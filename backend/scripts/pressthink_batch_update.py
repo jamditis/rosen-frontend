@@ -295,6 +295,7 @@ def reconcile(posts, columns, rows, entries, *, captured_at, high_water=0):
         fields=source_fields,
         managed_note=MANAGED_NOTE,
         can_create=lambda source: source["author"] == "Jay Rosen",
+        observed_ids={str(source["id"]) for source in sources},
     )
 
 
@@ -309,6 +310,7 @@ def reconcile_sources(
     fields,
     managed_note,
     can_create,
+    observed_ids,
 ):
     """Reconcile validated source metadata while retaining curator-owned values."""
     if len({str(s["id"]) for s in sources}) != len(sources):
@@ -372,7 +374,12 @@ def reconcile_sources(
                 }
             )
         changed = old is None or old["source"] != source
-        if not record_id and not possible_duplicates and can_create(source):
+        if (
+            not record_id
+            and not possible_duplicates
+            and can_create(source)
+            and identity in observed_ids
+        ):
             next_id += 1
             record_id = f"RECORD-{next_id:05d}"
             row = {column: "" for column in columns}

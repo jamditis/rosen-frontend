@@ -339,3 +339,42 @@ def test_normalized_url_alias_retains_identity_and_legacy_heads_do_not_wedge(tmp
     )
     assert not again["changed"]
     feed.archive.load_history(history)
+
+
+def test_historical_syndication_hold_cannot_create_after_curator_retitles_candidate(
+    tmp_path,
+):
+    csv_path, history, sources = fixture(tmp_path)
+    columns, _rows = feed.archive.read_archive_csv(csv_path)
+    candidate = {"id": "RECORD-00001", **feed.metadata_fields(sources[0], "2026-01-01")}
+    candidate["notes"] = "Curator-reviewed record with no publisher journal association"
+    feed.archive.write_archive_csv(csv_path, columns, [candidate])
+    feed.archive.record_id_sequence.advance(csv_path, 1)
+    held_source = {
+        **sources[0],
+        "id": CJR + ":https://www.cjr.org/analysis/syndicated.php",
+        "url": "https://www.cjr.org/analysis/syndicated.php",
+    }
+    held = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=[held_source]
+    )
+    assert held["added"] == 0
+    assert held["excluded"][0]["candidate_record_ids"] == ["RECORD-00001"]
+    candidate["title"] = "Curator's corrected title"
+    feed.archive.write_archive_csv(csv_path, columns, [candidate])
+    current = feed.parse_feed(
+        CJR,
+        rss(
+            title="A different current article",
+            url="https://www.cjr.org/analysis/current.php",
+        ),
+    )
+    result = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=current
+    )
+    assert result["added"] == 1
+    assert result["historical_reconsidered"] == 1
+    assert any(item["source_id"] == held_source["id"] for item in result["excluded"])
+    assert held_source["url"] not in {
+        row["url"] for row in feed.archive.read_archive_csv(csv_path)[1]
+    }

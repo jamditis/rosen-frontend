@@ -273,6 +273,7 @@ def run_batch(
             managed_note=MANAGED_NOTE,
             can_create=lambda source: source["admission_basis"]
             in {"by_jay", "about_jay"},
+            observed_ids=current_ids,
         )
         old_entries = {entry["source"]["id"]: entry for entry in entries}
         for entry in versions:
