@@ -440,7 +440,9 @@ def _notification_message(event: str, probe: ProbeResult, failures: int) -> str:
             or "jay-rosen-bluesky" in probe.affected_sources
         ):
             action_urls.append(ACTIONS_URL)
-        runbook = ARTICLE_RUNBOOK_PATH
+            runbook = ARTICLE_RUNBOOK_PATH + " and " + RUNBOOK_PATH
+        else:
+            runbook = ARTICLE_RUNBOOK_PATH
     return (
         f"Rosen archive health alert. Affected: {affected}.{sources}"
         f"{ingestion_status}{error_class} Consecutive failures: {failures}. "

@@ -532,9 +532,15 @@ def test_article_alert_links_to_its_workflow_and_recovery_guide():
         error_class="publication_receipt_stale",
     )
     message = watcher._notification_message("outage", probe, 2)
-    assert watcher.FEED_ACTIONS_URL in message
-    assert watcher.ARTICLE_RUNBOOK_PATH in message
-    assert watcher.ACTIONS_URL not in message
+    assert (
+        "https://github.com/jamditis/rosen-frontend/actions/workflows/publisher-feeds-stewardship.yml"
+        in message
+    )
+    assert "docs/operations/pressthink-ingestion.md" in message
+    assert (
+        "https://github.com/jamditis/rosen-frontend/actions/workflows/bluesky-stewardship.yml"
+        not in message
+    )
     wordpress = watcher.ProbeResult(
         health="degraded",
         affected_components=("archive discovery",),
@@ -543,3 +549,19 @@ def test_article_alert_links_to_its_workflow_and_recovery_guide():
     assert watcher.ARTICLE_ACTIONS_URL in watcher._notification_message(
         "outage", wordpress, 2
     )
+
+
+def test_mixed_alert_preserves_each_workflow_and_runbook():
+    probe = watcher.ProbeResult(
+        health="degraded",
+        affected_components=("archive publication", "article publication"),
+        affected_sources=("cjr-jay-rosen-author", "jay-rosen-bluesky"),
+    )
+    message = watcher._notification_message("outage", probe, 2)
+    for expected in (
+        "https://github.com/jamditis/rosen-frontend/actions/workflows/publisher-feeds-stewardship.yml",
+        "https://github.com/jamditis/rosen-frontend/actions/workflows/bluesky-stewardship.yml",
+        "docs/operations/pressthink-ingestion.md",
+        "docs/operations/bluesky-stewardship.md",
+    ):
+        assert expected in message
