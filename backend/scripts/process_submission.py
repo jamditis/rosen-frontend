@@ -706,6 +706,15 @@ def _run_test_gate() -> Optional[str]:
     otherwise a record built against the old schema could land a red main.
     """
     try:
+        # The first gate observes dirty input files. Refresh provisional totals;
+        # _git_commit_and_push restamps them from committed inputs before push.
+        subprocess.run(
+            ["npm", "run", "census:stewardship"],
+            cwd=str(PROJECT_ROOT),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
         subprocess.run(['npm', 'test'], cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)  # fmt: skip
         return None
     except subprocess.CalledProcessError as exc:

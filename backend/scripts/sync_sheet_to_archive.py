@@ -284,6 +284,11 @@ def regen_json() -> Tuple[bool, str]:
 
 
 def run_node_tests() -> Tuple[bool, str]:
+    # Current totals are needed by the dirty-input gate. open_sync_pr regenerates
+    # the final provenance stamp after committing those inputs.
+    ok, out = _run(["npm", "run", "census:stewardship"], PROJECT_ROOT)
+    if not ok:
+        return False, out[-800:]
     ok, out = _run(["npm", "test"], PROJECT_ROOT)
     # Surface only the tail of the test log on failure.
     return ok, (out[-800:] if not ok else "")

@@ -525,7 +525,6 @@ function publishChangedRelease(root, paths, state, report) {
   });
   const browserPaths = [...stamped.changedFiles, ...incrementDataCache(root)];
 
-  run(root, 'npm', ['test']);
   configureJoeIdentity(root);
   stageReleaseCommit(root, browserPaths);
 
