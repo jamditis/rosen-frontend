@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import errno
 import hashlib
+import json
 import logging
 import os
 import subprocess
@@ -42,10 +43,25 @@ def push_full_release(record_ids=()):
     """Publish the tested release with existing pair rollback, then verify it."""
     from scripts import deploy_full_site as deploy
 
+    record_ids = tuple(record_ids)
     for record_id in record_ids:
         validate_record_id(record_id)
     completed = 0
     try:
+        if record_ids:
+            with (PROJECT_ROOT / "data/archive-data.json").open(
+                encoding="utf-8"
+            ) as source:
+                published = {record["id"] for record in json.load(source)["records"]}
+            missing = set(record_ids) - published
+            if missing:
+                return {
+                    "ok": False,
+                    "skipped": False,
+                    "files_pushed": 0,
+                    "error": "Requested records are absent from the public export: "
+                    + ", ".join(sorted(missing)),
+                }
         cfg = deploy._read_env()
         if cfg is None:
             return {"ok": True, "skipped": True, "files_pushed": 0, "error": None}

@@ -96,3 +96,20 @@ def test_verification_failure_never_reports_live_and_keeps_transfer_count(monkey
     assert result["skipped"] is False
     assert result["files_pushed"] == 7
     assert "archive-core.json SHA mismatch" in result["error"]
+
+
+def test_full_publication_refuses_missing_selected_record_before_transfer(
+    monkeypatch, tmp_path
+):
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data/archive-data.json").write_text(
+        json.dumps({"records": [{"id": "RECORD-00001"}]}), encoding="utf-8"
+    )
+    monkeypatch.setattr(sftp_push, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(
+        deploy, "_read_env", lambda: pytest.fail("transfer setup was reached")
+    )
+    result = sftp_push.push_full_release(record_ids=("RECORD-00001", "RECORD-99999"))
+    assert result["ok"] is False
+    assert result["files_pushed"] == 0
+    assert "RECORD-99999" in result["error"]
