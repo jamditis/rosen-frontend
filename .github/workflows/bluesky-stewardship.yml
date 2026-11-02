@@ -109,7 +109,7 @@ jobs:
       - name: Install root npm dependencies
         run: npm ci --ignore-scripts
 
-      - name: Capture Bluesky and PressThink, test, commit, and push update
+      - name: Capture, test, commit, and push update
         id: prepare
         continue-on-error: true
         working-directory: backend

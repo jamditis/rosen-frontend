@@ -56,6 +56,7 @@ def test_new_long_article_has_source_supported_authorship_and_stable_graph_ids(
         "link": "https://pressthink.org/2017/12/new-article/",
         "status": "publish",
         "type": "post",
+        "date": "2017-12-01T09:00:00",
         "date_gmt": "2017-12-01T14:00:00",
         "modified_gmt": "2017-12-02T14:00:00",
         "title": {"rendered": "A new public PressThink article"},

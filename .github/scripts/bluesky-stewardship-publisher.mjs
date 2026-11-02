@@ -17,6 +17,16 @@ const RECORD_ID = /^BSKY-\d{5,}$/;
 const JAY_POST_URI = /^at:\/\/did:plc:3t37x6vfigdzzp2gjcfnzlz4\/app\.bsky\.feed\.post\/[A-Za-z0-9._~:-]+$/;
 const MAX_REPORT_RECORDS = 1_000;
 const RECEIPT_ENDPOINT = 'https://rosen-source-discovery.jamditis.workers.dev/ingestion-receipt';
+const BLUESKY_SOURCE = 'jay-rosen-bluesky';
+const PRESSTHINK_SOURCE = 'pressthink-wordpress-posts';
+
+function configuredSource() {
+  const source = process.env.STEWARDSHIP_SOURCE || BLUESKY_SOURCE;
+  if (![BLUESKY_SOURCE, PRESSTHINK_SOURCE].includes(source)) {
+    throw new Error('Unrecognized stewardship source');
+  }
+  return source;
+}
 
 const RELEASE_DATA_PATHS = new Set([
   'data/archive-analytics.json',
@@ -337,6 +347,7 @@ function initialState(root) {
   const now = new Date().toISOString();
   return {
     version: 1,
+    sourceId: configuredSource(),
     phase: 'initialized',
     startCommit: git(root, ['rev-parse', 'HEAD']),
     canonicalCommit: git(root, ['rev-parse', 'HEAD']),
@@ -408,6 +419,17 @@ export function runPreparation({
 function captureBatch(root, paths, dryRun) {
   if (git(root, ['status', '--porcelain'])) throw new Error('starting checkout is not clean');
   fs.copyFileSync(path.join(root, 'data/archive-data.json'), paths.baselinePath);
+  if (configuredSource() === PRESSTHINK_SOURCE) {
+    const args = ['backend/scripts/pressthink_batch_update.py', '--report', paths.pressThinkReportPath];
+    if (dryRun) args.push('--dry-run');
+    run(root, 'python', args);
+    if (!dryRun) {
+      run(root, 'python', ['backend/scripts/pressthink_authorship.py', paths.pressThinkReportPath]);
+    }
+    const report = { ...emptyReport(new Date().toISOString()), pressthink: readJson(paths.pressThinkReportPath) };
+    writeJson(paths.reportPath, report);
+    return report;
+  }
   const adapterArgs = [
     'backend/scripts/bluesky_batch_update.py',
     '--report', paths.reportPath,
@@ -416,18 +438,7 @@ function captureBatch(root, paths, dryRun) {
   ];
   if (dryRun) adapterArgs.push('--dry-run');
   run(root, 'python', adapterArgs);
-  const pressThinkArgs = [
-    'backend/scripts/pressthink_batch_update.py',
-    '--report', paths.pressThinkReportPath,
-  ];
-  if (dryRun) pressThinkArgs.push('--dry-run');
-  run(root, 'python', pressThinkArgs);
-  if (!dryRun) {
-    run(root, 'python', ['backend/scripts/pressthink_authorship.py', paths.pressThinkReportPath]);
-  }
-  const report = { ...readJson(paths.reportPath), pressthink: readJson(paths.pressThinkReportPath) };
-  writeJson(paths.reportPath, report);
-  return report;
+  return readJson(paths.reportPath);
 }
 
 function assertRemoteHeadUnchanged(root, startCommit, gitCommand = git) {

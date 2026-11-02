@@ -57,13 +57,13 @@ journal. Retain the original journal and targets as recovery evidence. A hash
 mismatch alone never proves that no replacement occurred. Never replace an
 unexpected edit or discard a pending transaction automatically.
 
-The daily stewardship publisher captures PressThink after Bluesky. It retains the
-Bluesky report's counts and candidate decisions and includes the PressThink report
-separately. Changes to either source enter the existing tested release, FIFO
-queue, version/cache update, Git push, certificate-verified FTPS transfer and
-public byte verification. New or updated article records rebuild article semantic
-vectors too. A no-change run still verifies the public release. Source capture or
-publication failure prevents a successful overall publication receipt.
+The PressThink publisher has its own daily job, retry outcome and source receipt.
+It shares the tested release builder, FIFO queue, version/cache update, Git push,
+certificate-verified FTPS transfer and public byte verification with Bluesky.
+New or updated article records rebuild article semantic vectors too. A no-change
+run still verifies the public release. Failure to capture or publish PressThink
+prevents a successful PressThink receipt. The Bluesky job can still run on its
+own schedule.
 
 Newly admitted articles receive a Work entity and an `Authored By` link to Jay's
 existing Person entity, supported by the public author metadata. This is the
