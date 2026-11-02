@@ -24,6 +24,13 @@ ACTIONS_URL = (
     "bluesky-stewardship.yml"
 )
 RUNBOOK_PATH = "docs/operations/bluesky-stewardship.md"
+ARTICLE_ACTIONS_URL = ACTIONS_URL.replace(
+    "bluesky-stewardship.yml", "pressthink-stewardship.yml"
+)
+FEED_ACTIONS_URL = ACTIONS_URL.replace(
+    "bluesky-stewardship.yml", "publisher-feeds-stewardship.yml"
+)
+ARTICLE_RUNBOOK_PATH = "docs/operations/pressthink-ingestion.md"
 REQUEST_TIMEOUT_SECONDS = 10
 MAX_RESPONSE_BYTES = 64 * 1024
 FAILURES_BEFORE_ALERT = 2
@@ -415,10 +422,29 @@ def _notification_message(event: str, probe: ProbeResult, failures: int) -> str:
         if probe.ingestion_status
         else ""
     )
+    action_urls = [ACTIONS_URL]
+    runbook = RUNBOOK_PATH
+    article_sources = [
+        source for source in probe.affected_sources if source != "jay-rosen-bluesky"
+    ]
+    if "article publication" in probe.affected_components or article_sources:
+        action_urls = []
+        if "pressthink-wordpress-posts" in article_sources:
+            action_urls.append(ARTICLE_ACTIONS_URL)
+        if any(source != "pressthink-wordpress-posts" for source in article_sources):
+            action_urls.append(FEED_ACTIONS_URL)
+        if not action_urls:
+            action_urls.extend([ARTICLE_ACTIONS_URL, FEED_ACTIONS_URL])
+        if (
+            "archive publication" in probe.affected_components
+            or "jay-rosen-bluesky" in probe.affected_sources
+        ):
+            action_urls.append(ACTIONS_URL)
+        runbook = ARTICLE_RUNBOOK_PATH
     return (
         f"Rosen archive health alert. Affected: {affected}.{sources}"
         f"{ingestion_status}{error_class} Consecutive failures: {failures}. "
-        f"Action: inspect {ACTIONS_URL} and follow {RUNBOOK_PATH}."
+        f"Action: Inspect {', '.join(action_urls)} and follow {runbook}."
     )
 
 

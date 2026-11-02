@@ -521,3 +521,25 @@ def test_article_failure_identifies_source_even_when_bluesky_is_healthy():
     assert watcher._parse_operational_health(payload).healthy is False
     payload["sourceIngestion"].append(dict(payload["sourceIngestion"][0]))
     assert watcher._parse_operational_health(payload) is None
+
+
+def test_article_alert_links_to_its_workflow_and_recovery_guide():
+    probe = watcher.ProbeResult(
+        health="degraded",
+        affected_components=("article publication",),
+        affected_sources=("cjr-jay-rosen-author",),
+        ingestion_status="receipt_stale",
+        error_class="publication_receipt_stale",
+    )
+    message = watcher._notification_message("outage", probe, 2)
+    assert watcher.FEED_ACTIONS_URL in message
+    assert watcher.ARTICLE_RUNBOOK_PATH in message
+    assert watcher.ACTIONS_URL not in message
+    wordpress = watcher.ProbeResult(
+        health="degraded",
+        affected_components=("archive discovery",),
+        affected_sources=("pressthink-wordpress-posts",),
+    )
+    assert watcher.ARTICLE_ACTIONS_URL in watcher._notification_message(
+        "outage", wordpress, 2
+    )

@@ -213,19 +213,18 @@ def run_batch(
     def reconcile(captured, columns, rows, entries, **kwargs):
         if any(source.get("feed_id") != source_id for source in captured):
             raise ValueError("Mixed publisher capture identities")
-        current_ids = {source["id"] for source in captured}
         heads = {entry["source"]["id"]: entry["source"] for entry in entries}
-        older = [
-            source
-            for identity, source in heads.items()
-            if source.get("feed_id") == source_id and identity not in current_ids
-        ]
-        if len(captured) + len(older) > 2000:
-            raise ValueError("Preserved feed catch-up exceeds 2000 metadata items")
-        for source in older:
+        canonical_heads = {}
+        superseded = []
+        for identity, source in heads.items():
+            if source.get("feed_id") != source_id:
+                continue
             parsed = urlsplit(source["url"])
+            prefix = source_id + ":"
             if (
-                source["id"] != source_id + ":" + source["url"]
+                not identity.startswith(prefix)
+                or archive.url_identity(identity[len(prefix) :])
+                != archive.url_identity(source["url"])
                 or parsed.scheme != "https"
                 or parsed.netloc != urlsplit(FEEDS[source_id]["url"]).netloc
                 or parsed.query
@@ -233,10 +232,36 @@ def run_batch(
                 or parsed.username
             ):
                 raise ValueError("Invalid preserved publisher identity")
+            key = archive.url_identity(source["url"])
+            if key in canonical_heads:
+                superseded.append(identity)
+            else:
+                canonical_heads[key] = source
+        current_keys = {archive.url_identity(source["url"]) for source in captured}
+        # A changed URL spelling keeps the first captured identity and notes
+        # ownership, while the current source URL remains evidence of the alias.
+        captured = [
+            (
+                {
+                    **source,
+                    "id": canonical_heads[archive.url_identity(source["url"])]["id"],
+                }
+                if archive.url_identity(source["url"]) in canonical_heads
+                else source
+            )
+            for source in captured
+        ]
+        current_ids = {source["id"] for source in captured}
+        older = [
+            source for key, source in canonical_heads.items() if key not in current_keys
+        ]
+        if len(captured) + len(older) > 2000:
+            raise ValueError("Preserved feed catch-up exceeds 2000 metadata items")
         replay_counts.update(
             current_feed_items=len(captured),
             historical_reconsidered=len(older),
             absent_from_current_feed=[source["id"] for source in older],
+            superseded_history_identities=superseded,
         )
         successor, versions, report = archive.reconcile_sources(
             sorted(captured + older, key=lambda source: source["id"]),

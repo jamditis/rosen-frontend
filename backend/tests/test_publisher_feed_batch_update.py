@@ -3,6 +3,7 @@
 import csv
 import io
 import json
+import subprocess
 from xml.sax.saxutils import escape
 
 import pytest
@@ -238,6 +239,41 @@ def test_absent_feed_metadata_can_resolve_a_former_hold_without_refetching_body(
         "record_id": first["associations"][0]["record_id"],
     } in replay["associations"]
     assert replay["current_feed_items"] == 1
+    published_ids = [row["id"] for row in feed.archive.read_archive_csv(csv_path)[1]]
+    program = """
+import fs from 'node:fs';
+import { buildSourceIngestionReceipt } from './.github/scripts/bluesky-stewardship-publisher.mjs';
+console.log(JSON.stringify(buildSourceIngestionReceipt(JSON.parse(fs.readFileSync(0, 'utf8')))));
+"""
+    receipt = json.loads(
+        subprocess.run(
+            ["node", "--input-type=module", "-e", program],
+            cwd=feed.ROOT,
+            input=json.dumps(
+                {
+                    "sourceId": CJR,
+                    "runId": "history_fixture",
+                    "status": "published",
+                    "checkedAt": "2026-11-02T12:00:00Z",
+                    "canonicalCommit": "a" * 40,
+                    "releaseVersion": "3.8.58",
+                    "publishedRecordIds": published_ids,
+                    "report": {"article": replay},
+                }
+            ),
+            text=True,
+            capture_output=True,
+            check=True,
+        ).stdout
+    )
+    assert len(receipt["records"]) == len(replay["associations"])
+    assert (
+        sum(
+            record["recordId"] == first["associations"][0]["record_id"]
+            for record in receipt["records"]
+        )
+        == 2
+    )
 
 
 def test_managed_publisher_relevance_changes_use_neutral_metadata_and_recover(tmp_path):
@@ -263,3 +299,43 @@ def test_managed_publisher_relevance_changes_use_neutral_metadata_and_recover(tm
     assert restored["updated"] == 1
     assert restored["associations"][0]["record_id"] == record_id
     assert feed.archive.read_archive_csv(csv_path)[1][0]["author"] == "Jay Rosen"
+
+
+def test_normalized_url_alias_retains_identity_and_legacy_heads_do_not_wedge(tmp_path):
+    csv_path, history, _sources = fixture(tmp_path)
+    original_url = "https://www.cjr.org/analysis/alias"
+    original = feed.parse_feed(CJR, rss(url=original_url))
+    first = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=original
+    )
+    record_id = first["associations"][0]["record_id"]
+    entry = json.loads(history.read_text().splitlines()[0])
+    legacy_alias = {
+        **entry,
+        "source": {
+            **entry["source"],
+            "id": CJR + ":" + original_url + "/",
+            "url": original_url + "/",
+        },
+        "previous": None,
+    }
+    legacy_alias["sha256"] = feed.archive.digest(
+        {key: value for key, value in legacy_alias.items() if key != "sha256"}
+    )
+    with history.open("a") as stream:
+        stream.write(json.dumps(legacy_alias) + "\n")
+    aliased = feed.parse_feed(CJR, rss(url=original_url + "/"))
+    result = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=aliased
+    )
+    assert result["added"] == 0
+    assert result["associations"] == [
+        {"uri": original_url + "/", "record_id": record_id}
+    ]
+    assert result["superseded_history_identities"] == [legacy_alias["source"]["id"]]
+    assert feed.archive.read_archive_csv(csv_path)[1][0]["url"] == original_url + "/"
+    again = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=aliased
+    )
+    assert not again["changed"]
+    feed.archive.load_history(history)

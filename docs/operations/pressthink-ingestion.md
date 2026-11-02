@@ -160,3 +160,10 @@ The hourly notification-only watcher reads source-specific article health and
 names the affected source and receipt error. It does not repair, publish, dispatch
 or back up automatically. The separate PressThink root monitor remains every two
 hours and notification-only.
+
+The receipt token reaches only the authenticated Python candidate reader and the
+receipt sender. Other preparation children, including tests, vector builds,
+census generation and Git, receive a sanitized environment. Source URI aliases
+can settle the same canonical record without changing its identity. Replayed
+metadata groups normalized URL spellings, preserves the original managed identity,
+and reports superseded historical aliases without deleting their evidence.
