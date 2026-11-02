@@ -620,6 +620,7 @@ class TestPublicVerification:
         response.__enter__.return_value = response
         get = MagicMock(return_value=response)
         monkeypatch.setattr(sftp_push.requests, "get", get)
+        monkeypatch.setattr(sftp_push.time, "sleep", MagicMock())
         if accepted:
             sftp_push._verify_live({"data/feeds/rss.xml": b"expected"})
         else:
@@ -631,3 +632,19 @@ class TestPublicVerification:
         )
         assert get.call_args.kwargs["allow_redirects"] is False
         assert get.call_args.kwargs["params"]["deploy_verify"]
+
+    def test_transient_stale_response_is_retried(self, monkeypatch):
+        responses = []
+        for body in (b"stale", b"expected"):
+            response = MagicMock()
+            response.status_code = 200
+            response.__enter__.return_value = response
+            response.iter_content.return_value = [body]
+            responses.append(response)
+        get = MagicMock(side_effect=responses)
+        sleep = MagicMock()
+        monkeypatch.setattr(sftp_push.requests, "get", get)
+        monkeypatch.setattr(sftp_push.time, "sleep", sleep)
+        sftp_push._verify_live({"data/feeds/rss.xml": b"expected"})
+        assert get.call_count == 2
+        sleep.assert_called_once_with(15)

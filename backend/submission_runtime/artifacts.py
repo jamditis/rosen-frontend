@@ -55,6 +55,6 @@ def data_deploy_files(directory: Path):
             raise ValueError("Feed symlinks are not deployable")
         if path.is_file():
             if path.suffix not in (".xml", ".opml", ".json"):
-                raise ValueError(f"Unexpected feed artifact: {path.name}")
+                continue  # Source documentation is not a generated public feed.
             feeds.append(path.relative_to(directory).as_posix())
     return (*DATA_DEPLOY_JSON_FILES, *feeds)

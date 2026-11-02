@@ -1221,8 +1221,11 @@ def process_one(
     if prototype_mode:
         logger.info("Prototype mode: skipping SFTP push to production")
     else:
-        _stage_for_ftp()
-        push = sftp_push.push_to_production(record_ids=(record_id,))
+        try:
+            _stage_for_ftp()
+            push = sftp_push.push_to_production(record_ids=(record_id,))
+        except Exception as exc:  # noqa: BLE001 — preserve the committed identity
+            push = {"ok": False, "error": f"Publication staging failed: {exc}"}
         if not (push.get('ok') and not push.get('skipped')):  # fmt: skip
             if push.get('skipped'):  # fmt: skip
                 # SFTP isn't configured on this runner, so retrying never makes

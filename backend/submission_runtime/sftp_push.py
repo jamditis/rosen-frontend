@@ -19,6 +19,7 @@ import hashlib
 import logging
 import os
 import tempfile
+import time
 import uuid
 from pathlib import Path, PurePosixPath
 from typing import Any, Dict, Iterable, Optional, Tuple
@@ -38,30 +39,42 @@ _LIVE_SITE_ROOT = "https://pressthink.org/j/rosen-archive/"
 
 def _verify_live(artifacts):
     """Require exact public bytes before a submission can be marked live."""
+    # Match the full-site verifier's bounded allowance for origin/edge lag.
     for relative_path, expected in artifacts.items():
-        url = _LIVE_SITE_ROOT + relative_path
-        with requests.get(
-            url,
-            params={"deploy_verify": uuid.uuid4().hex},
-            headers={"Cache-Control": "no-cache", "Accept-Encoding": "identity"},
-            timeout=(10, 30),
-            allow_redirects=False,
-            stream=True,
-        ) as response:
-            if response.status_code != 200:
-                raise RuntimeError(f"{relative_path}: HTTP {response.status_code}")
-            digest = hashlib.sha256()
-            size = 0
-            for block in response.iter_content(256 * 1024):
-                size += len(block)
-                if size > len(expected):
-                    raise RuntimeError(f"{relative_path}: public response is larger")
-                digest.update(block)
-            if (
-                size != len(expected)
-                or digest.digest() != hashlib.sha256(expected).digest()
-            ):
-                raise RuntimeError(f"{relative_path}: public bytes differ")
+        for attempt in range(6):
+            try:
+                _verify_public_artifact(relative_path, expected)
+                break
+            except (requests.RequestException, RuntimeError):
+                if attempt == 5:
+                    raise
+                time.sleep(15)
+
+
+def _verify_public_artifact(relative_path, expected):
+    url = _LIVE_SITE_ROOT + relative_path
+    with requests.get(
+        url,
+        params={"deploy_verify": uuid.uuid4().hex},
+        headers={"Cache-Control": "no-cache", "Accept-Encoding": "identity"},
+        timeout=(10, 30),
+        allow_redirects=False,
+        stream=True,
+    ) as response:
+        if response.status_code != 200:
+            raise RuntimeError(f"{relative_path}: HTTP {response.status_code}")
+        digest = hashlib.sha256()
+        size = 0
+        for block in response.iter_content(256 * 1024):
+            size += len(block)
+            if size > len(expected):
+                raise RuntimeError(f"{relative_path}: public response is larger")
+            digest.update(block)
+        if (
+            size != len(expected)
+            or digest.digest() != hashlib.sha256(expected).digest()
+        ):
+            raise RuntimeError(f"{relative_path}: public bytes differ")
 
 
 class TransferConfigurationError(ValueError):

@@ -266,6 +266,9 @@ class TestHappyPath:
         msg = " ".join(git_calls[0].args[0])
         assert result["record_id"] in msg
         commands = [c.args[0] for c in process_submission.subprocess.run.call_args_list]
+        assert any(
+            cmd[:2] == ["git", "add"] and "data/feeds" in cmd for cmd in commands
+        )
         assert ["npm", "run", "census:stewardship"] in commands
         assert ["node", "--test", "tests/stewardship-census.test.js"] in commands
         census_add = next(
@@ -906,6 +909,29 @@ class TestSheetWritebackResilience:
 
 class TestSubmissionRegressions:
     """Regressions for bugs surfaced during the initial PR review."""
+
+    def test_post_commit_staging_failure_keeps_record_archived(
+        self, monkeypatch, csv_with_headers
+    ):
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)
+        sheets = _stub_sheets(monkeypatch)
+        transfer = _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+        monkeypatch.setattr(
+            process_submission,
+            "_stage_for_ftp",
+            MagicMock(side_effect=ValueError("required feed missing")),
+        )
+
+        result = _run(monkeypatch, csv_with_headers)
+
+        assert result["status"] == "archived"
+        assert result["record_id"]
+        assert "required feed missing" in result["error"]
+        assert sheets.call_args.kwargs["status"] == "archived"
+        assert sheets.call_args.kwargs["record_id"] == result["record_id"]
+        transfer.assert_not_called()
 
     def test_skipped_sentinel_is_committed_and_keeps_identity(
         self, monkeypatch, csv_with_headers
@@ -2164,3 +2190,27 @@ class TestProcessorIdCollision:
 
         result = _run(monkeypatch, csv_with_headers, url="https://example.com/clip-new")
         assert result["record_id"] == "CLIP-00500"
+
+
+def test_staging_preserves_nested_generated_feeds(monkeypatch, tmp_path):
+    from submission_runtime.artifacts import REQUIRED_FEED_FILES
+
+    source = tmp_path / "source"
+    staged = tmp_path / "staged"
+    files = (
+        *process_submission._STAGED_JSON_FILES,
+        *REQUIRED_FEED_FILES,
+        "feeds/categories/press.xml",
+        "feeds/eras/early.xml",
+    )
+    for name in files:
+        path = source / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("generated " + name)
+    monkeypatch.setattr(process_submission, "DATA_DIR", source)
+    monkeypatch.setattr(process_submission, "FTP_STAGING_DIR", staged)
+
+    process_submission._stage_for_ftp()
+
+    for name in files:
+        assert (staged / name).read_bytes() == (source / name).read_bytes()
