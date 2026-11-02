@@ -60,7 +60,7 @@ permissions:
 
 jobs:
   submit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Five hours may be spent behind older releases, leaving one hour for the
     # submission pipeline after the FIFO wait completes.
     timeout-minutes: 360

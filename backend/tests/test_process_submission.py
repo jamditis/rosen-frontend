@@ -284,6 +284,31 @@ class TestHappyPath:
 
 class TestDedup:
 
+    def test_existing_record_with_failed_delivery_stays_retryable(
+        self, monkeypatch, csv_with_existing_url
+    ):
+        before = csv_with_existing_url.read_bytes()
+        dispatch = MagicMock()
+        categorize = MagicMock()
+        monkeypatch.setattr(process_submission, "dispatch_url", dispatch)
+        monkeypatch.setattr(process_submission, "categorize", categorize)
+        sheets = _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch, {"ok": False, "error": "storage refused"})
+        _stub_subprocess(monkeypatch)
+
+        result = _run(
+            monkeypatch, csv_with_existing_url, url="https://example.com/already"
+        )
+
+        assert result["status"] == "archived"
+        assert result["record_id"] == "PRESSTH-00099"
+        assert result["exit_code"] != 0
+        assert csv_with_existing_url.read_bytes() == before
+        dispatch.assert_not_called()
+        categorize.assert_not_called()
+        final = sheets.call_args_list[-1].kwargs
+        assert (final["status"], final["record_id"]) == ("archived", "PRESSTH-00099")
+
     def test_dedup_url_already_in_csv(self, monkeypatch, csv_with_existing_url):
         _stub_schema(monkeypatch)
         # No scrape needed — dedup short-circuits.
@@ -307,11 +332,11 @@ class TestDedup:
             if c.args[0][:2] == ["git", "commit"]
         ]
         assert git_calls == []
-        # Sheets gets the duplicate status with the existing record id
+        # Re-publish the existing identity before confirming live delivery
         final = sheets_mock.call_args_list[-1].kwargs
         assert final["status"] == "duplicate"
         assert final["record_id"] == "PRESSTH-00099"
-        sftp_mock.assert_not_called()
+        sftp_mock.assert_called_once_with(record_ids=("PRESSTH-00099",))
 
 
 class TestScrapeFailure:
@@ -882,6 +907,70 @@ class TestSheetWritebackResilience:
 class TestSubmissionRegressions:
     """Regressions for bugs surfaced during the initial PR review."""
 
+    def test_skipped_sentinel_is_committed_and_keeps_identity(
+        self, monkeypatch, csv_with_headers
+    ):
+        sheets = _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch, {"ok": True, "skipped": True})
+        _stub_subprocess(monkeypatch)
+
+        result = _run(
+            monkeypatch,
+            csv_with_headers,
+            url="https://example.com/sweep-noop-1748147200",
+            retry_record_id="RECORD-00042",
+        )
+
+        assert result["status"] == "committed"
+        assert result["record_id"] == "RECORD-00042"
+        assert sheets.call_args.kwargs["status"] == "committed"
+        assert sheets.call_args.kwargs["record_id"] == "RECORD-00042"
+
+    @pytest.mark.parametrize("skipped", [False, True])
+    def test_retry_terminal_writeback_keeps_identity_and_reports_failure(
+        self, monkeypatch, csv_with_headers, skipped
+    ):
+        sheets = _stub_sheets(
+            monkeypatch, side_effect=RuntimeError("Sheets unavailable")
+        )
+        _stub_sftp(monkeypatch, {"ok": True, "skipped": skipped})
+        _stub_subprocess(monkeypatch)
+
+        result = _run(
+            monkeypatch,
+            csv_with_headers,
+            url="https://example.com/sweep-noop-1748147200",
+            retry_record_id="RECORD-00042",
+        )
+
+        assert result["exit_code"] == 2
+        assert result["record_id"] == "RECORD-00042"
+        assert sheets.call_count == 2
+        for call in sheets.call_args_list:
+            assert call.kwargs["record_id"] == "RECORD-00042"
+            assert call.kwargs["status"] == ("committed" if skipped else "live")
+
+    def test_retry_regeneration_failure_does_not_publish_stale_staging(
+        self, monkeypatch, csv_with_headers
+    ):
+        sheets = _stub_sheets(monkeypatch)
+        transfer = _stub_sftp(monkeypatch)
+        _stub_subprocess(
+            monkeypatch, returncode_for=lambda cmd: 1 if cmd[0] == "node" else 0
+        )
+
+        result = _run(
+            monkeypatch,
+            csv_with_headers,
+            url="https://example.com/sweep-noop-1748147200",
+            retry_record_id="RECORD-00042",
+        )
+
+        assert result["status"] == "archived"
+        assert result["exit_code"] != 0
+        transfer.assert_not_called()
+        assert sheets.call_args.kwargs["record_id"] == "RECORD-00042"
+
     def test_sentinel_writes_live_on_sftp_success(self, monkeypatch, csv_with_headers):
         """An archived row recovered via sweep retry must be writeback'd to
         'live' so the cron sweeper's 'archived > 24h' query stops re-firing
@@ -909,6 +998,7 @@ class TestSubmissionRegressions:
             for c in sheets_mock.call_args_list
             if c.kwargs.get("status") == "live" and c.kwargs.get("row") == 42
         ]
+        assert all(c.kwargs["record_id"] == "RECORD-00042" for c in live_calls)
         assert live_calls, (
             "sentinel retry must writeback live on SFTP success — "
             f"got calls: {sheets_mock.call_args_list}"

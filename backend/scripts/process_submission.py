@@ -344,7 +344,7 @@ def _safe_writeback(
     sheet_tab: str,
     sheet_row: int,
     status: str,
-    record_id: str = "",
+    record_id: Optional[str] = None,
     error: str = "",
     *,
     fatal: bool = False,
@@ -368,12 +368,90 @@ def _safe_writeback(
             error=_sanitize_cell(error or ""),
         )
         if isinstance(result, dict):
-            return bool(result.get("ok"))
+            return bool(result.get("ok")) and not result.get("skipped", False)
         return True
     except Exception as exc:  # noqa: BLE001 — best-effort
         level = logger.error if fatal else logger.warning
         level(f"Sheet writeback failed (status={status}): {exc}")
         return False
+
+
+def _final_writeback(sheet_id, sheet_tab, sheet_row, status, record_id, error=""):
+    """Retry the idempotent terminal write once; report an unconfirmed write."""
+    for attempt in range(2):
+        if _safe_writeback(
+            sheet_id,
+            sheet_tab,
+            sheet_row or 0,
+            status=status,
+            record_id=record_id,
+            error=error,
+            fatal=True,
+        ):
+            return True
+        if not sheet_id or not sheet_row:
+            return True  # A caller without a sheet has no writeback obligation.
+        if attempt == 0:
+            logger.warning("Final sheet writeback failed; retrying once")
+    return False
+
+
+def _retry_publication(
+    record_id, sheet_id, sheet_tab, sheet_row, prototype_mode=False, *, duplicate=False
+):
+    """Publish an existing canonical record without scraping or appending it."""
+    try:
+        # Always regenerate: a leftover staging tree may predate the CSV commit.
+        subprocess.run(
+            ["node", str(EXPORT_SCRIPT)],
+            cwd=str(DATA_DIR),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        _stage_for_ftp()
+        push = (
+            {"ok": True}
+            if prototype_mode
+            else sftp_push.push_to_production(record_ids=(record_id,))
+        )
+    except Exception as exc:  # noqa: BLE001 — keep the row recoverable
+        push = {"ok": False, "error": f"Publication retry failed: {exc}"}
+
+    if push.get("skipped"):
+        status, note = "committed", "Live push not configured on this runner"
+    elif push.get("ok"):
+        status = "duplicate" if duplicate else "live"
+        note = (
+            "URL already in archive; publication confirmed"
+            if duplicate
+            else "Recovered via publication retry"
+        )
+    else:
+        note = f"Publication retry failed: {push.get('error', 'unknown')}"
+        _safe_writeback(
+            sheet_id,
+            sheet_tab,
+            sheet_row or 0,
+            status="archived",
+            record_id=record_id,
+            error=note,
+        )
+        return {
+            "status": "archived",
+            "record_id": record_id,
+            "error": note,
+            "exit_code": 1,
+        }
+
+    if not _final_writeback(sheet_id, sheet_tab, sheet_row, status, record_id, note):
+        return {
+            "status": "error",
+            "record_id": record_id,
+            "error": f"Publication {status}; sheet status writeback failed",
+            "exit_code": 2,
+        }
+    return {"status": status, "record_id": record_id, "error": note, "exit_code": 0}
 
 
 def _short_title(title: str, width: int = 60) -> str:
@@ -693,79 +771,10 @@ def process_one(
                 }
             )
             return result
-        logger.info(
-            f"Sentinel URL ({url}); skipping scrape/categorize/append, "
-            "running SFTP only"
+        logger.info("Sentinel retry; publishing existing record %s", retry_record_id)
+        return _retry_publication(
+            retry_record_id, sheet_id, sheet_tab, sheet_row, prototype_mode
         )
-        # Even on a noop we still need the staged JSONs to push. Regen if
-        # the staging dir is empty.
-        if not all((FTP_STAGING_DIR / f).exists() for f in _STAGED_JSON_FILES):
-            try:
-                subprocess.run(
-                    ["node", str(EXPORT_SCRIPT)],
-                    cwd=str(DATA_DIR),
-                    check=True,
-                    capture_output=True,
-                    text=True,
-                )
-                _stage_for_ftp()
-            except Exception as exc:  # noqa: BLE001
-                logger.warning(f"Sentinel regen failed (continuing): {exc}")
-        push = sftp_push.push_to_production(record_ids=(retry_record_id,))
-        if push.get('skipped'):  # fmt: skip
-            # A skipped push returns ok=True (a successful no-op), so it must be
-            # matched before the ok branch below or it would fall through to
-            # 'live'. SFTP isn't configured on this runner, so this sweep -- and
-            # every one after it -- can never make the row live. Promote it to
-            # the terminal 'committed' status so the sweeper stops re-firing the
-            # sentinel every 24h forever (#414).
-            # fmt: off
-            _safe_writeback(
-                sheet_id,
-                sheet_tab,
-                sheet_row or 0,
-                status='committed',
-                error="Live push not configured on this runner",
-            )
-            # fmt: on
-            result.update(
-                {
-                    "status": "noop",
-                    "exit_code": 0,
-                    "error": "sentinel sweep no-op; SFTP not configured",
-                }
-            )
-        elif push.get('ok'):  # fmt: skip
-            # Genuine upload succeeded. Promote the originally-archived row to
-            # 'live' so the sweeper's `archived > 24hr` query stops re-firing
-            # it. Without this the row stays archived forever and every cron
-            # tick re-dispatches.
-            _safe_writeback(
-                sheet_id,
-                sheet_tab,
-                sheet_row or 0,
-                status="live",
-                error="Recovered via sweep retry",
-            )
-            result.update(
-                {
-                    "status": "noop",
-                    "exit_code": 0,
-                    "error": "sentinel sweep no-op; SFTP retry ok",
-                }
-            )
-        else:
-            # Genuine push failure: leave the row at 'archived'; the next sweep
-            # tick will retry.
-            result.update(
-                {
-                    "status": "noop",
-                    "exit_code": 0,
-                    "error": f"sentinel sweep no-op; SFTP retry: "
-                    f"{push.get('error', 'unknown')}",
-                }
-            )
-        return result
 
     # --- Step 1: sheet ack (best-effort). ---------------------------------
     _safe_writeback(sheet_id, sheet_tab, sheet_row or 0, status="processing")
@@ -776,21 +785,12 @@ def process_one(
     existing_urls, existing_ids, url_to_id = _read_existing(csv_path)
     if url in existing_urls:
         existing_id = url_to_id.get(url, "")
-        logger.info(f"Duplicate URL → {existing_id}")
-        _safe_writeback(
-            sheet_id,
-            sheet_tab,
-            sheet_row or 0,
-            status="duplicate",
-            record_id=existing_id,
-            error="URL already in archive",
+        logger.info("Existing URL; reconciling publication of %s", existing_id)
+        # A previous worker may have stopped after git push, before transfer or
+        # sheet writeback. Canonical presence alone does not prove delivery.
+        return _retry_publication(
+            existing_id, sheet_id, sheet_tab, sheet_row, prototype_mode, duplicate=True
         )
-        return {
-            "status": "duplicate",
-            "record_id": existing_id,
-            "error": "URL already in archive",
-            "exit_code": 0,
-        }
 
     # --- Step 2b: SSRF guard. ---------------------------------------------
     # Run after the dedup short-circuit (a URL already in the archive needs no
@@ -1262,27 +1262,7 @@ def process_one(
             }
 
     # --- Step 12: final sheet writeback. Retry once. ----------------------
-    ok = _safe_writeback(
-        sheet_id,
-        sheet_tab,
-        sheet_row or 0,
-        status="live",
-        record_id=record_id,
-        error="",
-        fatal=True,
-    )
-    if not ok and sheet_id and sheet_row:
-        logger.warning("Final sheet writeback failed; retrying once")
-        ok = _safe_writeback(
-            sheet_id,
-            sheet_tab,
-            sheet_row or 0,
-            status="live",
-            record_id=record_id,
-            error="",
-            fatal=True,
-        )
-    if not ok and sheet_id and sheet_row:
+    if not _final_writeback(sheet_id, sheet_tab, sheet_row, "live", record_id):
         # The data is live; only the sheet status is out of date. Exit
         # non-zero so the Action shows red and Joe / Hali notice.
         return {

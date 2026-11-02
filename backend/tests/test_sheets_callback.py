@@ -67,6 +67,27 @@ class TestSkipPaths:
 class TestSuccessfulWriteback:
     """A configured callback writes status, record_id, error to F/G/H in one batchUpdate."""
 
+    @pytest.mark.parametrize("record_id", [None, ""])
+    def test_omitted_identity_is_preserved_but_explicit_empty_can_clear(
+        self, monkeypatch, record_id
+    ):
+        with patch.object(
+            sheets_callback, "_load_credentials", return_value=MagicMock()
+        ), patch("googleapiclient.discovery.build") as build:
+            sheets_callback.update_row(
+                "SHEET", "Queue", 42, "processing", record_id=record_id
+            )
+            batch = (
+                build.return_value.spreadsheets.return_value.values.return_value.batchUpdate
+            )
+            updates = {
+                d["range"]: d["values"] for d in batch.call_args.kwargs["body"]["data"]
+            }
+        assert updates["'Queue'!F42"] == [["processing"]]
+        assert ("'Queue'!G42" in updates) is (record_id is not None)
+        if record_id is not None:
+            assert updates["'Queue'!G42"] == [[""]]
+
     def test_batch_update_targets_F_G_H_of_given_row(self, monkeypatch):
         monkeypatch.setenv("ROSEN_SHEETS_SA_KEY_JSON", json.dumps(SA_INFO))
 
