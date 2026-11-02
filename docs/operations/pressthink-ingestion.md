@@ -147,6 +147,14 @@ not claim a new source observation. At most 2,000 current plus historical items
 per feed are reconsidered. Retirements and unresolved syndication holds stay in
 place. This recovers earlier captured associations, not unknown historical works.
 
+For these metadata feeds, receipt and health `captured` counts all current and
+historical items reconsidered. `held` includes unresolved historical items.
+These counts are not the number of new RSS observations. The run report's
+`current_feed_items` and `historical_reconsidered` give the split. Receipt
+`sourceLatestAt` uses only the current RSS observations, or null for an empty
+feed. Historical associations can settle a pending candidate without claiming
+that the source was observed again.
+
 The Bluesky publisher also reads the authenticated pending Jay URI ledger before
 publication. It fetches at most 200 missing older posts with the fixed public
 `getPosts` endpoint, independent of the normal moving cutoff. Those posts use the

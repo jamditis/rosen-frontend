@@ -275,6 +275,11 @@ def run_batch(
             in {"by_jay", "about_jay"},
             observed_ids=current_ids,
         )
+        report["newest_source_time"] = (
+            max(source["modified_gmt"] for source in captured) + "Z"
+            if captured
+            else None
+        )
         old_entries = {entry["source"]["id"]: entry for entry in entries}
         for entry in versions:
             identity = entry["source"]["id"]

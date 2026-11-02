@@ -227,6 +227,7 @@ def test_absent_feed_metadata_can_resolve_a_former_hold_without_refetching_body(
             "id": CJR + ":https://www.cjr.org/analysis/newer.php",
             "url": "https://www.cjr.org/analysis/newer.php",
             "title": "A different current feed article",
+            "modified_gmt": "2024-01-01T00:00:00",
         }
     ]
     replay = feed.run_batch(
@@ -239,6 +240,8 @@ def test_absent_feed_metadata_can_resolve_a_former_hold_without_refetching_body(
         "record_id": first["associations"][0]["record_id"],
     } in replay["associations"]
     assert replay["current_feed_items"] == 1
+    assert replay["captured"] == 3
+    assert replay["newest_source_time"] == "2024-01-01T00:00:00Z"
     published_ids = [row["id"] for row in feed.archive.read_archive_csv(csv_path)[1]]
     program = """
 import fs from 'node:fs';
@@ -267,6 +270,9 @@ console.log(JSON.stringify(buildSourceIngestionReceipt(JSON.parse(fs.readFileSyn
         ).stdout
     )
     assert len(receipt["records"]) == len(replay["associations"])
+    assert receipt["captured"] == 3
+    assert receipt["sourceLatestAt"] == "2024-01-01T00:00:00.000Z"
+    assert receipt["contextOnly"] == 3 - len(receipt["records"])
     assert (
         sum(
             record["recordId"] == first["associations"][0]["record_id"]
