@@ -17,7 +17,6 @@ import {
 } from "../src/discovery.js";
 import {
   SOURCE_MANIFEST,
-  PUBLIC_SOURCE_MANIFEST,
   SOURCE_MANIFEST_VERSION,
 } from "../src/source-manifest.js";
 
@@ -202,7 +201,13 @@ test("the health endpoint exposes no fetch trigger or source URL", async () => {
     status: "ok",
     mode: "disabled",
     manifestVersion: SOURCE_MANIFEST_VERSION,
-    sources: PUBLIC_SOURCE_MANIFEST,
+    sources: [
+      { id: "jay-rosen-bluesky", label: "Jay Rosen Bluesky activity", kind: "atproto-author-feed", maxCandidates: 100 },
+      { id: "pressthink-wordpress-posts", label: "PressThink recent posts", kind: "wordpress-api", maxCandidates: 25 },
+      { id: "cjr-jay-rosen-search", label: "CJR articles about Jay Rosen", kind: "rss", maxCandidates: 100 },
+      { id: "cjr-jay-rosen-author", label: "Jay Rosen at CJR", kind: "rss", maxCandidates: 100 },
+      { id: "common-dreams-jay-rosen-author", label: "Jay Rosen at Common Dreams", kind: "rss", maxCandidates: 100 },
+    ],
 
   });
   assert.deepEqual(body.sources.map(source => source.id), [

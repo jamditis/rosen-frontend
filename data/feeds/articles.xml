@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Articles and essays from Jay Rosen&apos;s journalism scholarship</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 02 Nov 2026 14:43:41 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 02 Nov 2026 19:55:48 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/articles.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
   <item>
@@ -813,6 +813,14 @@
     <category>Journalism Theory &amp; Practice</category>
   </item>
   <item>
+    <title>Tim Lambert and Scott Blanchard of WITF.org explain why they decided to repeatedly connect local lawmakers to their election-fraud actions</title>
+    <link>https://pressthink.org/2021/03/tim-lambert-and-scott-blanchard-of-witf-org-explain-why-they-decided-to-repeatedly-connect-local-lawmakers-to-their-election-fraud-actions/</link>
+    <guid isPermaLink="true">https://pressthink.org/2021/03/tim-lambert-and-scott-blanchard-of-witf-org-explain-why-they-decided-to-repeatedly-connect-local-lawmakers-to-their-election-fraud-actions/</guid>
+    <pubDate>Sun, 21 Mar 2021 00:00:00 GMT</pubDate>
+    <description>Source excerpt: WITF.org is the public broadcaster in the Harrisburg region of central Pennsylvania. On January 28 the newsroom explained a new policy toward those in public office who spread the election fraud lie and encouraged the January 6 insurrection. The journalists at WITF declared that they intended to contextualize future actions by these officals with reminders about their fateful moves in the period between the 2020 election and the inauguration of Joe Biden. I wrote about the bold actions of WITF i</description>
+    <category>Politics &amp; Democracy</category>
+  </item>
+  <item>
     <title>TNR Live: Politics and the Media</title>
     <link>https://youtu.be/EVfF3pBHwTc</link>
     <guid isPermaLink="true">https://youtu.be/EVfF3pBHwTc</guid>
@@ -959,22 +967,12 @@
     <category>Journalism Theory &amp; Practice</category>
   </item>
   <item>
-    <title>What newsrooms can learn from threat modeling at Facebook</title>
-    <link>https://www.theverge.com/21435639/threat-modeling-facebook-alex-stamos-newsroom-security</link>
-    <guid isPermaLink="true">https://www.theverge.com/21435639/threat-modeling-facebook-alex-stamos-newsroom-security</guid>
-    <pubDate>Mon, 14 Sep 2020 00:00:00 GMT</pubDate>
-    <description>Rosen interviews Alex Stamos, former Facebook CSO, about how newsrooms could adapt corporate threat modeling for election coverage. Stamos explains threat modeling, threat ideation, red teaming, and tabletop exercises in detail, then applies each to a journalism context. They discuss how the 2016 GRU hack-and-leak campaign manipulated the press, how to prepare for similar 2020 attacks, and why newsrooms need internal guidelines for handling manipulated information. Published on The Verge.</description>
-    <category>Journalism Theory &amp; Practice</category>
+    <title>Notes on Membership</title>
+    <link>https://pressthink.org/2020/09/notes-on-membership/</link>
+    <guid isPermaLink="true">https://pressthink.org/2020/09/notes-on-membership/</guid>
+    <pubDate>Wed, 16 Sep 2020 00:00:00 GMT</pubDate>
+    <description>Source excerpt: 1. Subsidy systems Public service journalism has always been subsidized by something. But the system of subsidy varies across cultural eras and national boundaries. New subsidy systems can arise. Reliable ones can fail. We are living through such a shift today. These notes on membership have a premise: Every system for subsidizing the production of real news has strengths and weaknesses. There is no perfect or stable answer. We have to be smart about the risks and advantages of each. “Membership</description>
     <category>Technology &amp; Digital Media</category>
-    <category>Politics &amp; Democracy</category>
-  </item>
-  <item>
-    <title>The Membership Guide: Handbook</title>
-    <link>https://membershipguide.org/handbook</link>
-    <guid isPermaLink="true">https://membershipguide.org/handbook</guid>
-    <pubDate>Sun, 13 Sep 2020 00:00:00 GMT</pubDate>
-    <description>Rosen defines membership in journalism as a social contract between a news organization and its members. It emphasizes the importance of memberful routines, a membership strategy, and a membership program. It distinguishes membership from subscription, donation, and crowdfunding models, highlighting the unique value proposition and expectations associated with each. The article draws on research from diverse member-driven movements to offer insights into successful membership programs, including the importance of listening to members, connecting to a larger purpose, offering flexible participation, and growing at a human scale.</description>
-    <category>Journalism Theory &amp; Practice</category>
     <category>Audience &amp; Public Engagement</category>
     <category>Press &amp; Media Criticism</category>
   </item>
