@@ -35,6 +35,34 @@ def _load_module():
 
 sync = _load_module()
 
+
+def test_maintenance_preserves_untouched_mixed_newline_records(tmp_path):
+    path = tmp_path / "archive.csv"
+    untouched = b"R1,,First paragraph\nSecond paragraph,keep\r\n"
+    path.write_bytes(
+        b"id,key_concepts,raw_text,summary\r\n" + untouched + b"R2,,body,= formula\r\n"
+    )
+    columns, rows = sync.load_csv(path)
+    assert len(rows) == 2
+    rows[1]["key_concepts"] = "New concept"
+    sync.write_csv_atomic(path, columns, rows)
+    assert untouched in path.read_bytes()
+    assert sync.load_csv(path)[1] == [
+        {
+            "id": "R1",
+            "key_concepts": "",
+            "raw_text": "First paragraph\nSecond paragraph",
+            "summary": "keep",
+        },
+        {
+            "id": "R2",
+            "key_concepts": "New concept",
+            "raw_text": "body",
+            "summary": "'= formula",
+        },
+    ]
+
+
 # Share the canonical trigger set with the code under test so the two cannot drift.
 from rosen_scraper.csv_safety import CSV_INJECTION_PREFIXES  # noqa: E402
 

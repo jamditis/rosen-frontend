@@ -42,6 +42,11 @@ process_submission = _load_script_module()
 _REAL_SUBPROCESS_RUN = subprocess.run
 
 
+@pytest.fixture(autouse=True)
+def record_sequence(tmp_path):
+    (tmp_path / "record-id-sequence.json").write_text('{"version":1,"high_water":0}')
+
+
 def _is_native_csv_bridge(cmd):
     return len(cmd) > 1 and str(cmd[1]).endswith("/data/lib/python-csv-maintenance.js")
 
@@ -650,6 +655,17 @@ class TestPushRaceRetry:
 
     @staticmethod
     def _write_csv(csv_path, rows):
+        # A real hard reset restores both canonical rows and tracked ID state.
+        high_water = max(
+            (
+                process_submission.record_id_sequence.numeric_id(row["id"])
+                for row in rows
+            ),
+            default=0,
+        )
+        (csv_path.parent / "record-id-sequence.json").write_text(
+            json.dumps({"version": 1, "high_water": high_water})
+        )
         with csv_path.open("w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=CSV_HEADERS, extrasaction="ignore")
             writer.writeheader()
@@ -2333,3 +2349,43 @@ def test_staging_preserves_nested_generated_feeds(monkeypatch, tmp_path):
 
     for name in files:
         assert (staged / name).read_bytes() == (source / name).read_bytes()
+
+
+def test_manual_submission_and_replay_respect_retired_ids(
+    monkeypatch, csv_with_headers
+):
+    _stub_schema(monkeypatch)
+    _stub_dispatcher_ok(monkeypatch, id="RECORD-00002")
+    _stub_sheets(monkeypatch)
+    _stub_sftp(monkeypatch)
+    _stub_subprocess(monkeypatch)
+    sequence = csv_with_headers.parent / "record-id-sequence.json"
+    sequence.write_text('{"version":1,"high_water":2}')
+    result = _run(monkeypatch, csv_with_headers)
+    assert result["status"] == "live"
+    assert result["record_id"] == "RECORD-00003"
+    # Curator retirement leaves the reservation in the next main checkout.
+    columns, _ = process_submission.read_archive_csv(csv_with_headers)
+    process_submission.write_archive_csv(csv_with_headers, columns, [])
+    chosen = process_submission._replay_record_onto_main(
+        {"url": "https://example.com/replay", "title": "Replay after retirement"},
+        None,
+        csv_with_headers,
+        columns,
+        "RECORD-00003",
+    )
+    assert chosen == "RECORD-00004"
+    assert json.loads(sequence.read_text())["high_water"] == 4
+
+
+def test_manual_corrupt_reservations_leave_csv_untouched(monkeypatch, csv_with_headers):
+    _stub_schema(monkeypatch)
+    _stub_dispatcher_ok(monkeypatch)
+    _stub_sheets(monkeypatch)
+    _stub_subprocess(monkeypatch)
+    (csv_with_headers.parent / "record-id-sequence.json").write_text("corrupt")
+    before = csv_with_headers.read_bytes()
+    result = _run(monkeypatch, csv_with_headers)
+    assert result["status"] == "error"
+    assert "reservation failed" in result["error"]
+    assert csv_with_headers.read_bytes() == before

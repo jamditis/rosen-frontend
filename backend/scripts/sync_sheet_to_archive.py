@@ -59,11 +59,13 @@ from typing import Any, Dict, List, Optional, Tuple
 # `python backend/scripts/sync_sheet_to_archive.py` or via the workflow's
 # `cd backend && python scripts/...` invocation. Mirrors process_submission.py.
 _BACKEND = pathlib.Path(__file__).resolve().parents[1]
-for _candidate in (_BACKEND, _BACKEND / "src"):
+for _candidate in (_BACKEND, _BACKEND / "src", _BACKEND.parent / "data"):
     if str(_candidate) not in sys.path:
         sys.path.insert(0, str(_candidate))
 
 from rosen_scraper.sheets_client import open_spreadsheet  # noqa: E402
+from csv_safe_write import read_archive_csv, write_archive_csv  # noqa: E402
+from scripts.record_id_sequence import assert_no_pending_capture  # noqa: E402
 from rosen_scraper.csv_safety import sanitize_csv_value  # noqa: E402
 from submission_runtime.artifacts import DATA_DEPLOY_JSON_FILES  # noqa: E402
 from submission_runtime.config import (  # noqa: E402
@@ -221,11 +223,7 @@ def merge_enrichment(
 
 def load_csv(csv_path: pathlib.Path) -> Tuple[List[str], List[Dict[str, Any]]]:
     """Return (fieldnames, rows). Preserves the file's exact header order."""
-    with csv_path.open("r", encoding="utf-8-sig", newline="") as f:
-        reader = csv.DictReader(f)
-        fieldnames = list(reader.fieldnames or [])
-        rows = [dict(r) for r in reader]
-    return fieldnames, rows
+    return read_archive_csv(csv_path)
 
 
 def write_csv_atomic(
@@ -240,16 +238,22 @@ def write_csv_atomic(
     -- and the site reverses it at export (#335). Rows are copied, so the caller's
     dicts are not mutated.
     """
+    assert_no_pending_capture(csv_path)
     csv_path.parent.mkdir(parents=True, exist_ok=True)
+    sanitized = [
+        {column: sanitize_csv_value(row.get(column, "")) for column in fieldnames}
+        for row in rows
+    ]
+    if csv_path.exists() and csv_path.stat().st_size > 0:
+        write_archive_csv(csv_path, fieldnames, sanitized)
+        return
     fd, tmp_path = tempfile.mkstemp(prefix=".csv_tmp.", dir=str(csv_path.parent))
     os.close(fd)
     try:
         with open(tmp_path, "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
-            writer.writerows(
-                {k: sanitize_csv_value(v) for k, v in row.items()} for row in rows
-            )
+            writer.writerows(sanitized)
         os.replace(tmp_path, str(csv_path))
     except Exception:
         if os.path.exists(tmp_path):
