@@ -11,6 +11,7 @@ import argparse
 import datetime as dt
 import hashlib
 import json
+import os
 import re
 import sys
 import tempfile
@@ -37,7 +38,7 @@ PER_PAGE = 100
 MAX_PAGES = 20
 MAX_BODY_BYTES = 8_000_000
 MANAGED_NOTE = "PressThink API managed source; post id: "
-FIELDS = "id,link,status,type,date_gmt,modified_gmt,title,content,yoast_head_json"
+FIELDS = "id,link,status,type,date,date_gmt,modified_gmt,title,content,yoast_head_json"
 
 
 def get_public(url, *, params=None):
@@ -177,7 +178,7 @@ def source_post(post):
         or parsed.fragment
     ):
         raise ValueError("PressThink post has an unexpected canonical URL")
-    for key in ("date_gmt", "modified_gmt"):
+    for key in ("date", "date_gmt", "modified_gmt"):
         dt.datetime.fromisoformat(post[key])
     title = plain_text(post["title"]["rendered"])
     html = post["content"]["rendered"]
@@ -190,6 +191,7 @@ def source_post(post):
         "url": post["link"],
         "title": title,
         "author": author,
+        "published_local": post["date"],
         "published_gmt": post["date_gmt"],
         "modified_gmt": post["modified_gmt"],
         "html": html,
@@ -234,7 +236,7 @@ def source_fields(source, captured_at):
         "title": source["title"],
         "url": source["url"],
         "author": source["author"],
-        "publication_date": source["published_gmt"][:10],
+        "publication_date": source["published_local"][:10],
         "original_publication": "PressThink",
         "publisher": "PressThink",
         "platform": "PressThink",
@@ -264,7 +266,7 @@ def source_association(source, old, by_id, by_url, by_title):
     if record_id and not row:
         return record_id, "retired", []
     title_matches = by_title.get(
-        (title_identity(source["title"]), source["published_gmt"][:4]), []
+        (title_identity(source["title"]), source["published_local"][:4]), []
     )
     possible_duplicates = matches if len(matches) > 1 else title_matches
     state = "review" if not record_id and possible_duplicates else "linked"
@@ -331,7 +333,7 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
             successor.append(row)
             by_id[record_id] = row
             by_url.setdefault(url_identity(source["url"]), []).append(record_id)
-            title_key = (title_identity(source["title"]), source["published_gmt"][:4])
+            title_key = (title_identity(source["title"]), source["published_local"][:4])
             by_title.setdefault(title_key, []).append(record_id)
             added += 1
             proposed.append(
@@ -426,13 +428,31 @@ def run_batch(*, dry_run=False, csv_path=None, history_path=None, posts=None):
     return report
 
 
-if __name__ == "__main__":
+def prepare_report(path):
+    """Check the report destination before observing or changing canonical data."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists() and not path.is_file():
+        raise ValueError("Report destination must be a file")
+    with tempfile.TemporaryFile(dir=path.parent) as probe:
+        probe.write(b"PressThink report preflight\n")
+        probe.flush()
+        os.fsync(probe.fileno())
+
+
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--report", type=Path, required=True)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if args.report.resolve().is_relative_to(ROOT):
         parser.error("Operational reports must stay outside the repository")
+    prepare_report(args.report)
     report = run_batch(dry_run=args.dry_run)
-    args.report.write_text(json.dumps(report, indent=2) + "\n")
+    transaction.atomic_bytes(
+        args.report, (json.dumps(report, indent=2) + "\n").encode()
+    )
     print(json.dumps(report))
+
+
+if __name__ == "__main__":
+    main()

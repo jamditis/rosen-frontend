@@ -41,10 +41,19 @@ files are prepared and checked first. A recovery journal records their exact
 bytes and the previous file hashes before either live file changes. A normal
 retry completes an interrupted replacement before it observes a newer source.
 Unexpected external edits stop recovery without overwriting them. Dry runs do
-not perform recovery writes. The bounded journal holds up to256MB; larger
+not perform recovery writes. The bounded journal holds up to 256 MB; larger
 transactions fail before live replacement and require a reviewed storage change.
 The canonical CSV retains its usual one-level backup. Completed journals are
 removed; source history is retained.
+
+The checkout has one writer. A lost race detected before journaling leaves no
+pending write. If recovery stops on an unexpected edit, pause the writer and
+preserve the journal and both targets before investigation. Compare target hashes
+with the journal's before/after hashes. If no changed target matches its after hash,
+no replacement occurred; retain a copy and remove only the pending journal before
+retrying from the current files. If one target already matches its after hash,
+reconcile the interruption and the external edit before clearing the journal.
+Never replace an unexpected edit automatically.
 
 The adapter prepares data only. Scheduling, public publication, receipt delivery,
 and per-source health must be verified separately when its publisher integration

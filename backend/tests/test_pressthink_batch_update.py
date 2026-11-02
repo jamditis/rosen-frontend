@@ -3,6 +3,7 @@
 import csv
 import io
 import json
+import stat
 from pathlib import Path
 
 import pytest
@@ -19,6 +20,7 @@ def post(post_id=10903, *, body="<p>Journalism should show its work.</p>"):
         "link": f"https://pressthink.org/2017/12/article-{post_id}/",
         "status": "publish",
         "type": "post",
+        "date": "2017-12-01T09:00:00",
         "date_gmt": "2017-12-01T14:00:00",
         "modified_gmt": "2017-12-02T14:00:00",
         "title": {"rendered": f"Show work &amp; trust {post_id}"},
@@ -342,3 +344,78 @@ def test_pending_recovery_preserves_an_unexpected_external_edit(pending_write):
         transaction.recover(csv_path, history)
     assert csv_path.read_bytes() == b"A separate curator edit must survive."
     assert not history.exists()
+
+
+def test_publication_calendar_and_duplicate_year_use_site_local_date(tmp_path):
+    csv_path, history = canonical_fixture(tmp_path)
+    item = post(2)
+    item.update(date="2017-12-31T19:30:00", date_gmt="2018-01-01T00:30:00")
+    result = batch.run_batch(posts=[item], csv_path=csv_path, history_path=history)
+    assert result["added"] == 1
+    _, rows = batch.read_archive_csv(csv_path)
+    assert rows[-1]["publication_date"] == "2017-12-31"
+    duplicate = post(3)
+    duplicate["title"] = item["title"]
+    duplicate.update(date="2017-12-31T20:30:00", date_gmt="2018-01-01T01:30:00")
+    result = batch.run_batch(
+        posts=[item, duplicate], csv_path=csv_path, history_path=history
+    )
+    assert result["added"] == 0
+    assert result["excluded"][0]["candidate_record_ids"] == ["RECORD-00002"]
+
+
+def test_local_year_matches_curated_titles_across_the_utc_year_boundary(tmp_path):
+    csv_path, history = canonical_fixture(tmp_path)
+    duplicate = post(2)
+    duplicate["title"] = post(1)["title"]
+    duplicate.update(date="2017-12-31T19:30:00", date_gmt="2018-01-01T00:30:00")
+    result = batch.run_batch(posts=[duplicate], csv_path=csv_path, history_path=history)
+    assert result["added"] == 0
+    assert result["excluded"][0]["candidate_record_ids"] == ["RECORD-00001"]
+
+
+def test_transaction_preserves_modes_and_history_only_runs_preserve_csv_backup(
+    tmp_path,
+):
+    csv_path, history = canonical_fixture(tmp_path)
+    csv_path.chmod(0o640)
+    backup = csv_path.with_name(csv_path.name + ".bak")
+    backup.write_bytes(b"Earlier rollback copy")
+    kwargs = {"csv_path": csv_path, "history_path": history}
+    batch.run_batch(posts=[post(1)], **kwargs)
+    assert backup.read_bytes() == b"Earlier rollback copy"
+    batch.run_batch(posts=[post(1), post(2)], **kwargs)
+    assert stat.S_IMODE(csv_path.stat().st_mode) == 0o640
+    assert stat.S_IMODE(backup.stat().st_mode) == 0o640
+    assert stat.S_IMODE(history.stat().st_mode) == 0o644
+
+
+def test_lost_race_fails_without_creating_a_recovery_journal(tmp_path):
+    csv_path = tmp_path / "archive.csv"
+    history = tmp_path / "history.jsonl"
+    csv_path.write_bytes(b"An external change")
+    with pytest.raises(ValueError, match="before the transaction"):
+        transaction.commit(
+            csv_path,
+            history,
+            csv_before=b"Old CSV",
+            history_before=None,
+            csv_after=b"Proposed CSV",
+            history_after=b"Proposed history",
+        )
+    assert csv_path.read_bytes() == b"An external change"
+    assert not transaction.journal_path(history).exists()
+
+
+def test_cli_rejects_an_unwritable_report_location_before_network(
+    tmp_path, monkeypatch
+):
+    blocked = tmp_path / "not-a-directory"
+    blocked.write_bytes(b"Existing file")
+
+    def unexpected_network(*args, **kwargs):
+        raise AssertionError("Network must not run before report preflight")
+
+    monkeypatch.setattr(batch.requests, "get", unexpected_network)
+    with pytest.raises(OSError):
+        batch.main(["--dry-run", "--report", str(blocked / "report.json")])

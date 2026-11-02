@@ -4,6 +4,7 @@ import base64
 import hashlib
 import json
 import os
+import stat
 import tempfile
 from pathlib import Path
 
@@ -20,9 +21,11 @@ def file_sha(path):
     return sha(path.read_bytes()) if path.exists() else None
 
 
-def atomic_bytes(path, data):
+def atomic_bytes(path, data, *, mode=None):
     """Make the bytes durable before replacing one directory entry."""
     temporary = None
+    if mode is None:
+        mode = stat.S_IMODE(path.stat().st_mode) if path.exists() else 0o644
     try:
         with tempfile.NamedTemporaryFile(
             dir=path.parent, prefix=".pressthink-", delete=False
@@ -30,6 +33,7 @@ def atomic_bytes(path, data):
             temporary = Path(output.name)
             output.write(data)
             output.flush()
+            os.chmod(output.name, mode)
             os.fsync(output.fileno())
         os.replace(temporary, path)
         sync_directory(path.parent)
@@ -80,8 +84,13 @@ def recover(csv_path, history_path):
                 "Preservation target changed outside the pending transaction"
             )
     backup = csv_path.with_name(csv_path.name + ".bak")
-    if file_sha(backup) != value["csv_before_sha256"]:
-        atomic_bytes(backup, data["csv_before"])
+    if value["csv_before_sha256"] != value["csv_after_sha256"]:
+        if file_sha(backup) != value["csv_before_sha256"]:
+            atomic_bytes(
+                backup,
+                data["csv_before"],
+                mode=stat.S_IMODE(csv_path.stat().st_mode),
+            )
     for target, before_key, after_key in targets:
         current = file_sha(target)
         if current == value[after_key + "_sha256"]:
@@ -100,6 +109,10 @@ def commit(
     pending = journal_path(history_path)
     if pending.exists():
         raise ValueError("Recover the existing PressThink transaction first")
+    if file_sha(csv_path) != sha(csv_before) or file_sha(history_path) != (
+        sha(history_before) if history_before is not None else None
+    ):
+        raise ValueError("Preservation outputs changed before the transaction")
     history_path.parent.mkdir(parents=True, exist_ok=True)
     value = {
         "version": 1,
@@ -119,5 +132,5 @@ def commit(
     payload = json.dumps(value).encode("utf-8")
     if len(payload) > MAX_JOURNAL_BYTES:
         raise ValueError("PressThink transaction exceeds the reviewed byte bound")
-    atomic_bytes(pending, payload)
+    atomic_bytes(pending, payload, mode=0o600)
     recover(csv_path, history_path)
