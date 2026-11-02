@@ -114,6 +114,13 @@ it('commits the exact article CSV, semantic pair, and source journal paths', (t)
 });
 
 describe('Bluesky stewardship preparation used by the CLI', () => {
+  it('publishes a durable reservation repair without new source content', () => {
+    const combined = { ...report(0), pressthink: { captured: 227, added: 0,
+      updated: 0, versions_added: 0, reservations_advanced: true, changed: true } };
+    const ops = preparation({ capture: () => combined });
+    assert.equal(runPreparation(ops).phase, 'pushed');
+    assert.equal(ops.outputs.get('needs_deploy'), 'true');
+  });
   it('publishes article source changes even when no Bluesky rows were added', () => {
     const combined = {
       ...report(0),
