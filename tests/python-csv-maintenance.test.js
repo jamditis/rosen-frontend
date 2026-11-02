@@ -118,6 +118,31 @@ test('safe writer handles header-only results, BOM, edits, and no-op reruns', t 
 });
 
 
+for (const ending of ['\r\n', '\n']) {
+  test(`safe writer appends after an unterminated ${JSON.stringify(ending)} record`, t => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'csv-unterminated-'));
+    t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+    const file = path.join(dir, 'records.csv');
+    const original = '\ufeffid,body' + ending + 'R1,one';
+    fs.writeFileSync(file, original);
+    python(`import sys\nfrom csv_safe_write import read_archive_csv, write_archive_csv\np = sys.argv[1]\ncolumns, rows = read_archive_csv(p)\nrows.append({'id': 'R2', 'body': 'two'})\nwrite_archive_csv(p, columns, rows)\nassert read_archive_csv(p)[1] == rows\nrows.append({'id': 'R3', 'body': 'three'})\nwrite_archive_csv(p, columns, rows)\nassert read_archive_csv(p)[1] == rows`, [file]);
+    const content = fs.readFileSync(file, 'utf8');
+    assert.ok(content.startsWith(original + ending));
+    assert.ok(content.includes('R2,two' + ending + 'R3,three'));
+  });
+}
+
+for (const ending of ['\r\n', '\n', '']) {
+  test(`safe writer appends the first row to a header ending in ${JSON.stringify(ending)}`, t => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'csv-first-row-'));
+    t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+    const file = path.join(dir, 'records.csv');
+    fs.writeFileSync(file, '\ufeffid,body' + ending);
+    python(`import sys\nfrom csv_safe_write import read_archive_csv, write_archive_csv\np = sys.argv[1]\ncolumns, rows = read_archive_csv(p)\nassert rows == []\nwrite_archive_csv(p, columns, [{'id': 'R1', 'body': 'first'}])\nassert read_archive_csv(p)[1] == [{'id': 'R1', 'body': 'first'}]`, [file]);
+    assert.equal(fs.readFileSync(file, 'utf8'), '\ufeffid,body' + (ending || '\n') + 'R1,first' + (ending || '\n'));
+  });
+}
+
 test('LF-delimited inputs remain readable and editable after a pandas-style rewrite', t => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'csv-lf-'));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));

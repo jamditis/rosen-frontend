@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import csv
 import importlib.util
+import json
 import pathlib
 import subprocess
 import sys
@@ -38,6 +39,11 @@ def _load_script_module():
 
 
 process_submission = _load_script_module()
+_REAL_SUBPROCESS_RUN = subprocess.run
+
+
+def _is_native_csv_bridge(cmd):
+    return len(cmd) > 1 and str(cmd[1]).endswith("/data/lib/python-csv-maintenance.js")
 
 
 # ---------- Fixtures ---------------------------------------------------------
@@ -82,6 +88,106 @@ CSV_HEADERS = [
     "low_confidence",
     "needs_review",
 ]
+
+
+@pytest.fixture
+def mixed_newline_archive(tmp_path):
+    path = tmp_path / "archive.csv"
+    path.write_bytes(
+        b"id,title,url,raw_text,verified\r\n"
+        b"RECORD-00001,First article,https://example.test/one,First paragraph\n"
+        b"Second paragraph,TRUE\r\n"
+        b"RECORD-00002,Second article,https://example.test/two,Other text,TRUE\r\n"
+    )
+    return path
+
+
+def test_existing_record_lookup_uses_the_canonical_mixed_newline_grammar(
+    mixed_newline_archive,
+):
+    urls, ids, mapping = process_submission._read_existing(mixed_newline_archive)
+    assert ids == {"RECORD-00001", "RECORD-00002"}
+    assert urls == {"https://example.test/one", "https://example.test/two"}
+    assert mapping["https://example.test/two"] == "RECORD-00002"
+
+
+def test_submission_append_preserves_existing_csv_bytes_and_native_records(
+    mixed_newline_archive,
+):
+    original = mixed_newline_archive.read_bytes()
+    headers = ["id", "title", "url", "raw_text", "verified"]
+    process_submission._atomic_append_row(
+        mixed_newline_archive,
+        {
+            "id": "RECORD-00003",
+            "title": "=A formula-like title",
+            "url": "https://example.test/three",
+            "raw_text": "New text",
+            "verified": "TRUE",
+        },
+        headers,
+    )
+    assert mixed_newline_archive.read_bytes().startswith(original)
+    result = subprocess.run(
+        [
+            "node",
+            str(_BACKEND.parent / "data/lib/python-csv-maintenance.js"),
+            "read",
+            str(mixed_newline_archive),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    _, rows = json.loads(result.stdout)
+    assert [r["id"] for r in rows] == [
+        "RECORD-00001",
+        "RECORD-00002",
+        "RECORD-00003",
+    ]
+    assert rows[0]["raw_text"] == "First paragraph\nSecond paragraph"
+    assert rows[-1]["title"] == "'=A formula-like title"
+
+
+@pytest.mark.parametrize(
+    "initial",
+    [
+        None,
+        b"",
+        b"id,word_count,verified,tags,notes\r\n",
+        b"id,word_count,verified,tags,notes\n",
+        b"id,word_count,verified,tags,notes",
+        b"\xef\xbb\xbfid,word_count,verified,tags,notes\r\n",
+    ],
+)
+def test_append_keeps_first_file_and_python_cell_coercion_contract(tmp_path, initial):
+    path = tmp_path / "new.csv"
+    if initial is not None:
+        path.write_bytes(initial)
+    headers = ["id", "word_count", "verified", "tags", "notes"]
+    process_submission._atomic_append_row(
+        path,
+        {
+            "id": "RECORD-00001",
+            "word_count": 12,
+            "verified": True,
+            "tags": ["journalism", "media"],
+            "notes": None,
+            "extra": "Ignored by the canonical column projection",
+        },
+        headers,
+    )
+    columns, rows = process_submission.read_archive_csv(path)
+    assert columns == headers
+    assert rows == [
+        {
+            "id": "RECORD-00001",
+            "word_count": "12",
+            "verified": "True",
+            "tags": "['journalism', 'media']",
+            "notes": "",
+        }
+    ]
 
 
 @pytest.fixture
@@ -172,6 +278,8 @@ def _stub_subprocess(monkeypatch, returncode_for=None, stdout="", stderr=""):
     """
 
     def _fake_run(cmd, *args, **kwargs):
+        if _is_native_csv_bridge(cmd):
+            return _REAL_SUBPROCESS_RUN(cmd, *args, **kwargs)
         rc = 0
         if returncode_for is not None:
             rc = returncode_for(cmd)
@@ -568,6 +676,8 @@ class TestPushRaceRetry:
         }
 
         def _fake_run(cmd, *args, **kwargs):
+            if _is_native_csv_bridge(cmd):
+                return _REAL_SUBPROCESS_RUN(cmd, *args, **kwargs)
             if cmd[:2] == ["git", "push"]:
                 state["pushes"] += 1
                 if state["pushes"] == 1:
@@ -627,6 +737,8 @@ class TestPushRaceRetry:
         }
 
         def _fake_run(cmd, *args, **kwargs):
+            if _is_native_csv_bridge(cmd):
+                return _REAL_SUBPROCESS_RUN(cmd, *args, **kwargs)
             if cmd[:2] == ["git", "push"]:
                 state["pushes"] += 1
                 if state["pushes"] == 1:
@@ -663,6 +775,8 @@ class TestPushRaceRetry:
         state = {"pushes": 0}
 
         def _fake_run(cmd, *args, **kwargs):
+            if _is_native_csv_bridge(cmd):
+                return _REAL_SUBPROCESS_RUN(cmd, *args, **kwargs)
             if cmd[:2] == ["git", "push"]:
                 state["pushes"] += 1
                 raise self._non_ff_error(cmd)
@@ -717,6 +831,8 @@ class TestPushRaceRetry:
         }
 
         def _fake_run(cmd, *args, **kwargs):
+            if _is_native_csv_bridge(cmd):
+                return _REAL_SUBPROCESS_RUN(cmd, *args, **kwargs)
             if cmd[:2] == ["npm", "test"]:
                 state["npm_tests"] += 1
                 # Step 9 passes against the old checkout; the post-replay run
@@ -1398,6 +1514,8 @@ class TestEntityExtraction:
         node_export_calls = {"count": 0}
 
         def _fake_run(cmd, *args, **kwargs):
+            if _is_native_csv_bridge(cmd):
+                return _REAL_SUBPROCESS_RUN(cmd, *args, **kwargs)
             rc = 0
             stderr = ""
             if cmd[:1] == ["node"] and len(cmd) > 1 and "export-archive-data" in cmd[1]:

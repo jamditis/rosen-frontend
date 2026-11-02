@@ -61,9 +61,11 @@ from typing import Any, Dict, NamedTuple, Optional, Set
 # `python backend/scripts/process_submission.py` and via the workflow's
 # `cd backend && python scripts/...` invocation.
 _BACKEND = pathlib.Path(__file__).resolve().parents[1]
-for _candidate in (_BACKEND, _BACKEND / "src"):
+for _candidate in (_BACKEND, _BACKEND / "src", _BACKEND.parent / "data"):
     if str(_candidate) not in sys.path:
         sys.path.insert(0, str(_candidate))
+
+from csv_safe_write import read_archive_csv, write_archive_csv  # noqa: E402
 
 # Re-exported so tests can monkeypatch a single import surface per module.
 from rosen_scraper.dispatcher import dispatch_url as _dispatch_url  # noqa: E402
@@ -227,7 +229,7 @@ def _load_known_entities() -> Dict[str, Any]:
 
 
 def _read_csv_headers(csv_path: pathlib.Path) -> list:
-    if not csv_path.exists():
+    if not csv_path.exists() or csv_path.stat().st_size == 0:
         return []
     with csv_path.open("r", encoding="utf-8-sig", newline="") as f:
         reader = csv.reader(f)
@@ -239,19 +241,18 @@ def _read_existing(csv_path: pathlib.Path):
     urls = set()
     ids: Set[str] = set()
     url_to_id: Dict[str, str] = {}
-    if not csv_path.exists():
+    if not csv_path.exists() or csv_path.stat().st_size == 0:
         return urls, ids, url_to_id
-    with csv_path.open("r", encoding="utf-8-sig", newline="") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            url = (row.get("url") or "").strip()
-            rid = (row.get("id") or "").strip()
-            if url:
-                urls.add(url)
-            if rid:
-                ids.add(rid)
-            if url and rid:
-                url_to_id[url] = rid
+    _headers, rows = read_archive_csv(csv_path)
+    for row in rows:
+        url = (row.get("url") or "").strip()
+        rid = (row.get("id") or "").strip()
+        if url:
+            urls.add(url)
+        if rid:
+            ids.add(rid)
+        if url and rid:
+            url_to_id[url] = rid
     return urls, ids, url_to_id
 
 
@@ -295,29 +296,27 @@ def _clean_title(title: str, publication: str) -> str:
 def _atomic_append_row(
     csv_path: pathlib.Path, row: Dict[str, Any], headers: list
 ) -> None:
-    """Append one row to ``csv_path`` via tmp+rename.
-
-    Read the existing file, write existing + new row to a sibling tmp, then
-    ``os.replace``. Atomic for any concurrent reader — they see either the
-    pre-append or post-append file, never a partial line.
-    """
+    """Append through the canonical parser without rewriting untouched rows."""
     csv_path.parent.mkdir(parents=True, exist_ok=True)
-    existing_rows = []
-    if csv_path.exists():
-        with csv_path.open("r", encoding="utf-8-sig", newline="") as f:
-            reader = csv.DictReader(f)
-            for r in reader:
-                existing_rows.append(r)
     sanitized = _sanitize_record(row)
+    projected = {
+        header: "" if sanitized.get(header) is None else str(sanitized.get(header, ""))
+        for header in headers
+    }
+    if csv_path.exists() and csv_path.stat().st_size > 0:
+        current_headers, existing_rows = read_archive_csv(csv_path)
+        if current_headers != headers:
+            raise ValueError("Canonical CSV columns changed before append")
+        write_archive_csv(csv_path, headers, [*existing_rows, projected])
+        return
+    # A new file has no legacy row representation to preserve.
     fd, tmp_path = tempfile.mkstemp(prefix=".csv_tmp.", dir=str(csv_path.parent))
     os.close(fd)
     try:
         with open(tmp_path, "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=headers, extrasaction="ignore")
             writer.writeheader()
-            for r in existing_rows:
-                writer.writerow(r)
-            writer.writerow(sanitized)
+            writer.writerow(projected)
         os.replace(tmp_path, str(csv_path))
     except Exception:
         if os.path.exists(tmp_path):
