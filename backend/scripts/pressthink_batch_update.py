@@ -300,6 +300,7 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
         default=0,
     )
     added, updated, versions, excluded, proposed, retired = 0, 0, [], [], [], []
+    associations = []
     for source in sources:
         identity = str(source["id"])
         old = previous.get(identity)
@@ -357,6 +358,8 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
         association_changed = old and (
             old.get("state", "linked") != state or old.get("record_id") != record_id
         )
+        if row and state != "retired":
+            associations.append({"uri": source["url"], "record_id": record_id})
         if changed or association_changed:
             entry = {
                 "source": source,
@@ -380,6 +383,12 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
             "excluded": excluded,
             "proposed_additions": proposed,
             "retired_record_ids": retired,
+            "associations": associations,
+            "newest_source_time": (
+                max((source["modified_gmt"] for source in sources), default="") + "Z"
+                if sources
+                else None
+            ),
             "changed": bool(added or updated or versions),
         },
     )

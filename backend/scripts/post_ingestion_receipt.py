@@ -259,7 +259,11 @@ def append_pending_decisions(
 
 def deliver_receipt(payload: dict[str, Any], token: str, canonical_csv: Path) -> int:
     """Reconcile pending decisions, then deliver every bounded receipt batch."""
-    reconciled = append_pending_decisions(payload, token, canonical_csv)
+    reconciled = (
+        payload
+        if payload.get("sourceId") == "pressthink-wordpress-posts"
+        else append_pending_decisions(payload, token, canonical_csv)
+    )
     batches = list(receipt_batches(reconciled))
     for batch in batches:
         post_batch(batch, token)

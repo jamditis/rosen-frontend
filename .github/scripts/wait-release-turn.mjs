@@ -50,12 +50,23 @@ async function fetchJson(url, token) {
   return response.json();
 }
 
-async function listRecentRuns(apiUrl, repository, token) {
-  const url = new URL(`${apiUrl}/repos/${repository}/actions/runs`);
-  url.searchParams.set('per_page', '100');
-  url.searchParams.set('exclude_pull_requests', 'true');
-  const payload = await fetchJson(url, token);
-  return payload.workflow_runs || [];
+export async function listActiveRuns(apiUrl, repository, token, get = fetchJson) {
+  const runs = [];
+  for (const status of ACTIVE_STATUSES) {
+    for (let page = 1; page <= 10; page += 1) {
+      const url = new URL(`${apiUrl}/repos/${repository}/actions/runs`);
+      url.searchParams.set('per_page', '100');
+      url.searchParams.set('exclude_pull_requests', 'true');
+      url.searchParams.set('status', status);
+      url.searchParams.set('page', String(page));
+      const payload = await get(url, token);
+      if (!Array.isArray(payload.workflow_runs)) throw new Error('Invalid active release query');
+      runs.push(...payload.workflow_runs);
+      if (payload.workflow_runs.length < 100) break;
+      if (page === 10) throw new Error('Active release queue exceeds its reviewed bound');
+    }
+  }
+  return runs;
 }
 
 export async function waitForReleaseTurn({
@@ -72,10 +83,9 @@ export async function waitForReleaseTurn({
   let nextPollMilliseconds = pollMilliseconds;
 
   while (true) {
-    // One repository-wide query per poll keeps a backlog within the Actions
-    // token budget. The interval backs off to five minutes while the same older
-    // run remains active, then resets when the head of the queue changes.
-    const runs = await listRecentRuns(apiUrl, repository, token);
+    // Query active states so unrelated recent CI cannot hide an older writer.
+    // Back off to five minutes while the same older run remains active.
+    const runs = await listActiveRuns(apiUrl, repository, token);
     const blockers = findBlockingRuns(runs, runId);
     if (blockers.length === 0) {
       console.log(`Release turn acquired for run ${runId}.`);

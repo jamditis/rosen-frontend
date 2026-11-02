@@ -31,21 +31,10 @@ It is a read-only candidate-discovery control plane. It is not the archive scrap
 
 The manifest starts with Jay Rosen's public Bluesky author feed. It retains the public PressThink WordPress index as a low-frequency backstop. The Worker only records compact source metadata. The existing repository workflow remains the only route to archive publishing.
 
-## Local checks
+## Checks
 
-Run these commands from this directory:
-
-```bash
-node --test test/*.test.js
-wrangler types /tmp/rosen-source-discovery-worker-configuration.d.ts --config wrangler.jsonc
-wrangler dev --local --test-scheduled --config wrangler.jsonc
-```
-
-The type command generates a temporary binding declaration. The last command
-starts a local server. `GET /health` confirms the mode and public source labels.
-It uses a local D1 database. In live mode an empty ledger is degraded until both
-discovery and publication have succeeded. PressThink retains its weekly allowance;
-Bluesky discovery and publication must succeed within 36 hours.
+This public repository runs Node, Worker, backend and lint checks on GitHub-hosted
+runners. Do not run repository CI on the local machine or fleet.
 
 ## Deployment and rollback
 
@@ -58,7 +47,14 @@ wrangler deploy --config wrangler.jsonc
 
 Migration `0004_candidate_history_index.sql` adds the bounded Bluesky history lookup index. Candidate writes use batches that stay below D1's 100-parameter statement limit.
 
-Migration `0005_ingestion_health.sql` adds publication receipts. Set
+Migration `0006_source_ingestion_runs.sql` adds source-specific PressThink receipts
+without changing the legacy Bluesky table. Apply it before deploying this Worker.
+Run the reviewed PressThink publisher after activation; until the first verified
+receipt, aggregate health is degraded. PressThink receipt freshness is 36 hours;
+its discovery backstop retains the weekly allowance. Blog edit age is evidence,
+not publisher freshness.
+
+Migration `0005_ingestion_health.sql` adds legacy Bluesky publication receipts. Set
 `INGESTION_RECEIPT_TOKEN` with Wrangler secret input before deploying. The matching
 GitHub secret is `ROSEN_INGESTION_RECEIPT_TOKEN`; its encrypted credential pointer
 is `claude/rosen/ingestion-receipt-token`. Never put its value in configuration,

@@ -37,6 +37,7 @@ const RELEASE_DATA_PATHS = new Set([
   'data/archive-embeddings.bin',
   'data/archive-embeddings.json',
   'data/archive_records-public.csv',
+  'data/record-id-sequence.json',
   'data/extracted_entities.csv',
   'data/extracted_relationships.csv',
   'data/archive-social-embeddings.bin',
@@ -181,6 +182,41 @@ export function buildIngestionReceipt({
   };
   if (errorClass) receipt.errorClass = errorClass;
   return receipt;
+}
+
+export function buildSourceIngestionReceipt(options) {
+  // Reuse the established envelope validation without changing legacy output.
+  const receipt = buildIngestionReceipt({ ...options, report: emptyReport(options.checkedAt) });
+  const report = options.report?.pressthink;
+  const failed = options.status === 'failed';
+  if (!report && !failed) throw new Error('PressThink capture report is missing');
+  for (const name of ['captured', 'added', 'updated', 'versions_added']) {
+    if (report && (!Number.isSafeInteger(report[name]) || report[name] < 0 || report[name] > 2000)) {
+      throw new Error('PressThink report count is invalid');
+    }
+  }
+  const associations = report?.associations || [];
+  if (!Array.isArray(associations) || associations.length > 2000) throw new Error('PressThink associations are invalid');
+  const published = new Set(options.publishedRecordIds || []);
+  const records = failed ? [] : associations.filter(item => published.has(item.record_id))
+    .map(item => ({ uri: item.uri, recordId: item.record_id, decision: 'accepted' }));
+  const uris = new Set();
+  const ids = new Set();
+  for (const record of records) {
+    if (!/^https:\/\/pressthink\.org\/\d{4}\/\d{2}\/[^/?#]+\/$/.test(record.uri || '')
+      || !/^RECORD-\d{5,}$/.test(record.recordId || '') || uris.has(record.uri) || ids.has(record.recordId)) {
+      throw new Error('PressThink receipt association is invalid');
+    }
+    uris.add(record.uri);
+    ids.add(record.recordId);
+  }
+  const captured = report?.captured || 0;
+  if (records.length > captured) throw new Error('PressThink receipt counts are inconsistent');
+  return { ...receipt, sourceId: PRESSTHINK_SOURCE, captured, admitted: records.length,
+    contextOnly: captured - records.length, added: report?.added || 0,
+    updated: report?.updated || 0, versions: report?.versions_added || 0,
+    sourceLatestAt: report?.newest_source_time ? safeIso(report.newest_source_time) : null,
+    records };
 }
 
 export async function postFailedReceipt(payload, token, {
@@ -508,7 +544,7 @@ function prepare(root) {
   const paths = statePaths();
   const state = fs.existsSync(paths.statePath) ? readJson(paths.statePath) : initialState(root);
   const dryRun = process.env.DRY_RUN === 'true';
-  return runPreparation({
+  const result = runPreparation({
     dryRun,
     state,
     capture: () => captureBatch(root, paths, dryRun),
@@ -518,6 +554,13 @@ function prepare(root) {
     persist: (nextState) => writeJson(paths.statePath, nextState),
     emit: output,
   });
+  if (state.sourceId === PRESSTHINK_SOURCE && !dryRun) {
+    const published = new Set(readJson(path.join(root, 'data/archive-data.json')).records.map(record => record.id));
+    state.publishedRecordIds = (state.report.pressthink?.associations || [])
+      .map(item => item.record_id).filter(id => published.has(id));
+    writeJson(paths.statePath, state);
+  }
+  return result;
 }
 
 export function finalizePublication(state, {
@@ -551,13 +594,15 @@ export function finalizePublication(state, {
     errorClass = deployOutcome === 'success' ? 'live_verification_failed' : 'deploy_failed';
   }
 
-  const receipt = buildIngestionReceipt({
+  const builder = state.sourceId === PRESSTHINK_SOURCE ? buildSourceIngestionReceipt : buildIngestionReceipt;
+  const receipt = builder({
     runId,
     status,
     checkedAt,
     canonicalCommit: state.canonicalCommit,
     releaseVersion: state.releaseVersion,
     report: state.report,
+    publishedRecordIds: state.publishedRecordIds,
     errorClass: errorClass || undefined,
   });
   return { status, errorClass, receipt };

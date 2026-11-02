@@ -419,3 +419,23 @@ def test_cli_rejects_an_unwritable_report_location_before_network(
     monkeypatch.setattr(batch.requests, "get", unexpected_network)
     with pytest.raises(OSError):
         batch.main(["--dry-run", "--report", str(blocked / "report.json")])
+
+
+def test_no_change_report_retains_source_associations(tmp_path):
+    path, history = canonical_fixture(tmp_path)
+    first = batch.run_batch(
+        csv_path=path, history_path=history, posts=[post(1), post(2)]
+    )
+    again = batch.run_batch(
+        csv_path=path, history_path=history, posts=[post(1), post(2)]
+    )
+    assert again["changed"] is False
+    assert (
+        again["associations"]
+        == first["associations"]
+        == [
+            {"uri": post(1)["link"], "record_id": "RECORD-00001"},
+            {"uri": post(2)["link"], "record_id": "RECORD-00002"},
+        ]
+    )
+    assert again["newest_source_time"] == "2017-12-02T14:00:00Z"

@@ -26,7 +26,7 @@ const receipt = (overrides = {}) => ({
 async function database() {
   const SQL = await initSqlJs();
   const raw = new SQL.Database();
-  for (const name of ["0001_initial.sql", "0002_bluesky_candidate_metadata.sql", "0003_origin_backoff.sql", "0004_candidate_history_index.sql", "0005_ingestion_health.sql"]) {
+  for (const name of ["0001_initial.sql", "0002_bluesky_candidate_metadata.sql", "0003_origin_backoff.sql", "0004_candidate_history_index.sql", "0005_ingestion_health.sql", "0006_source_ingestion_runs.sql"]) {
     raw.run(await readFile(new URL(`../migrations/${name}`, import.meta.url), "utf8"));
   }
   return {
@@ -151,6 +151,10 @@ test("health needs both recent discovery and verified ingestion, with a weekly P
   assert.equal(neverRun.healthy, false);
   assert.equal(neverRun.ingestion.errorClass, "publication_receipt_missing");
   await receiveIngestionReceipt(request(receipt()), { DISCOVERY_LEDGER: db, INGESTION_RECEIPT_TOKEN: TOKEN }, NOW);
+  const missingArticle = await readArchiveHealth(db, NOW);
+  assert.equal(missingArticle.healthy, false);
+  assert.equal(missingArticle.sourceIngestion[0].errorClass, "publication_receipt_missing");
+  await receiveIngestionReceipt(request(articleReceipt()), { DISCOVERY_LEDGER: db, INGESTION_RECEIPT_TOKEN: TOKEN }, NOW);
   assert.equal((await readArchiveHealth(db, NOW)).healthy, true);
   const stale = await readArchiveHealth(db, NOW + 37 * 3_600_000);
   assert.equal(stale.healthy, false);
@@ -171,4 +175,46 @@ test("a live health endpoint cannot report success without its ledger", async ()
   const body = await response.json();
   assert.equal(body.status, "degraded");
   assert.equal(body.error, "ledger_unavailable");
+});
+
+const ARTICLE = "https://pressthink.org/2017/12/show-work/";
+function articleReceipt(overrides = {}) {
+  return receipt({ sourceId: "pressthink-wordpress-posts", added: 1, updated: 0,
+    versions: 2, records: [{ uri: ARTICLE, decision: "accepted", recordId: "RECORD-00919" }], ...overrides });
+}
+
+test("PressThink receipts isolate sources, accept equal-time chunks and reject older decisions", async () => {
+  const db = await database();
+  const env = { DISCOVERY_LEDGER: db, INGESTION_RECEIPT_TOKEN: TOKEN };
+  await receiveIngestionReceipt(request(receipt({ checkedAt: "2026-10-14T18:01:00Z" })), env, NOW + 60_000);
+  await receiveIngestionReceipt(request(articleReceipt()), env, NOW + 60_000);
+  const second = ARTICLE.replace("show-work", "second");
+  const chunk = articleReceipt({ records: [{ uri: second, decision: "accepted", recordId: "RECORD-00920" }] });
+  await receiveIngestionReceipt(request(chunk), env, NOW + 60_000);
+  await receiveIngestionReceipt(request(chunk), env, NOW + 60_000);
+  assert.equal(db.raw.exec("SELECT count(*) FROM source_ingestion_runs")[0].values[0][0], 1);
+  assert.equal(db.raw.exec("SELECT count(*) FROM archive_ingestion_runs")[0].values[0][0], 1);
+  assert.equal(db.raw.exec("SELECT count(*) FROM discovery_candidates WHERE source_id = 'pressthink-wordpress-posts' AND review_status = 'accepted'")[0].values[0][0], 2);
+  await receiveIngestionReceipt(request(articleReceipt({ runId: "newer", status: "failed", records: [], checkedAt: "2026-10-14T18:02:00Z", errorClass: "deploy_failed" })), env, NOW + 120_000);
+  const oldUri = ARTICLE.replace("show-work", "late-old-chunk");
+  await receiveIngestionReceipt(request(articleReceipt({ records: [{ uri: oldUri, decision: "accepted", recordId: "RECORD-00921" }] })), env, NOW + 120_000);
+  assert.equal(db.raw.exec("SELECT count(*) FROM discovery_candidates WHERE canonical_url = '" + oldUri + "'")[0].values[0][0], 0);
+  const health = await readArchiveHealth(db, NOW + 120_000);
+  assert.equal(health.ingestion.healthy, true);
+  assert.equal(health.sourceIngestion[0].status, "failed");
+  assert.equal(health.sourceIngestion[0].errorClass, "deploy_failed");
+  assert.equal((await readArchiveHealth(db, NOW + 37 * 3_600_000)).sourceIngestion[0].status, "receipt_stale");
+  db.raw.close();
+});
+
+test("PressThink receipt validation and batch rollback leave legacy storage untouched", async () => {
+  for (const value of [articleReceipt({ sourceId: "unknown" }), articleReceipt({ records: [{ uri: "https://other.test/a", recordId: "RECORD-00919", decision: "accepted" }] }), articleReceipt({ records: [{ uri: ARTICLE, recordId: "BSKY-00919", decision: "accepted" }] }), articleReceipt({ added: -1 })]) {
+    assert.throws(() => validateIngestionReceipt(value, NOW));
+  }
+  const db = await database();
+  db.raw.run("CREATE TRIGGER reject_article BEFORE INSERT ON discovery_candidates BEGIN SELECT RAISE(ABORT, 'example_database_failure'); END;");
+  await assert.rejects(receiveIngestionReceipt(request(articleReceipt()), { DISCOVERY_LEDGER: db, INGESTION_RECEIPT_TOKEN: TOKEN }, NOW));
+  assert.equal(db.raw.exec("SELECT count(*) FROM source_ingestion_runs")[0].values[0][0], 0);
+  assert.equal(db.raw.exec("SELECT count(*) FROM archive_ingestion_runs")[0].values[0][0], 0);
+  db.raw.close();
 });

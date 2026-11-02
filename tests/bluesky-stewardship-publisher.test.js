@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   buildIngestionReceipt,
+  buildSourceIngestionReceipt,
   changedPaths,
   finalizePublication,
   postFailedReceipt,
@@ -512,3 +513,35 @@ describe('Bluesky stewardship receipt and workflow boundary', () => {
   });
 });
 
+
+
+describe('PressThink source receipts', () => {
+  const article = 'https://pressthink.org/2017/12/show-work/';
+  const state = (phase = 'pushed') => ({ sourceId: 'pressthink-wordpress-posts', phase,
+    canonicalCommit: PUBLISHED, releaseVersion: '3.8.57', liveVerified: phase === 'no_change',
+    publishedRecordIds: ['RECORD-00919'], report: { pressthink: { captured: 2, added: 1,
+      updated: 0, versions_added: 2, newest_source_time: NOW,
+      associations: [{ uri: article, record_id: 'RECORD-00919' },
+        { uri: article.replace('show-work', 'held'), record_id: 'RECORD-00920' }] } } });
+  it('settles only IDs in the actual published export', () => {
+    const result = finalizePublication(state(), { deployOutcome: 'success', verifyOutcome: 'success', runId: 'wp_1', checkedAt: NOW });
+    assert.equal(result.receipt.sourceId, 'pressthink-wordpress-posts');
+    assert.equal(result.receipt.status, 'published');
+    assert.equal(result.receipt.admitted, 1);
+    assert.equal(result.receipt.contextOnly, 1);
+    assert.deepEqual(result.receipt.records, [{ uri: article, recordId: 'RECORD-00919', decision: 'accepted' }]);
+    assert.equal(finalizePublication(state('no_change'), { runId: 'wp_2', checkedAt: NOW }).receipt.status, 'no_change');
+  });
+  it('sends a source failure without capture metadata or decisions', () => {
+    const failed = { ...state('failed'), report: {}, errorClass: 'prepare_failed' };
+    const result = finalizePublication(failed, { runId: 'wp_3', checkedAt: NOW });
+    assert.equal(result.receipt.sourceId, 'pressthink-wordpress-posts');
+    assert.equal(result.receipt.captured, 0);
+    assert.deepEqual(result.receipt.records, []);
+    assert.equal(finalizePublication(state('dry_run'), { runId: 'wp_4', checkedAt: NOW }).receipt, null);
+  });
+  it('rejects a successful run without its source capture', () => {
+    assert.throws(() => buildSourceIngestionReceipt({ runId: 'wp_5', checkedAt: NOW,
+      status: 'published', canonicalCommit: PUBLISHED, releaseVersion: '3.8.57', report: {} }), /missing/);
+  });
+});

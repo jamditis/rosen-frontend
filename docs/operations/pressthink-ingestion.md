@@ -74,8 +74,18 @@ are preserved. A conflicting relationship identity fails before publication.
 The source journal is committed as an exact allowed path. It is not a public
 website asset. The website content backup and the repository serve different
 purposes: The monthly website mirror does not include this repository-only
-journal. Its presence in Git does not prove a fresh Legion copy. The public Worker receipt
-currently records Bluesky counts and decisions. Per-source PressThink receipt
-storage and candidate settlement remain a separate integration requirement.
+journal. Its presence in Git does not prove a fresh Legion copy.
+
+The public Worker stores PressThink outcomes in a separate source-scoped table.
+A successful receipt settles only source associations present in the generated,
+verified public export. Review holds and retired rows remain unsettled. A no-change
+capture retains associations so receipt recovery does not require another edit.
+
+Apply migration 0006 before deploying the Worker. Legacy Bluesky receipts and its
+table remain unchanged. PressThink health uses the daily receipt time with a
+36-hour allowance, separately from the weekly discovery backstop and the date of
+the most recent blog edit. A missing, failed or stale PressThink receipt degrades
+aggregate health. Run the first real publisher immediately after Worker activation.
+Never manufacture a receipt to clear health.
 
 All repository tests, builds, lint, and validation run on GitHub-hosted CI.
