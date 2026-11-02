@@ -238,3 +238,28 @@ def test_absent_feed_metadata_can_resolve_a_former_hold_without_refetching_body(
         "record_id": first["associations"][0]["record_id"],
     } in replay["associations"]
     assert replay["current_feed_items"] == 1
+
+
+def test_managed_publisher_relevance_changes_use_neutral_metadata_and_recover(tmp_path):
+    csv_path, history, sources = fixture(tmp_path)
+    first = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=sources
+    )
+    record_id = first["associations"][0]["record_id"]
+    changed = feed.parse_feed(CJR, rss(author="Corrected public byline"))
+    review = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=changed
+    )
+    assert review["updated"] == 1
+    assert review["excluded"][0]["record_id"] == record_id
+    assert review["associations"] == []
+    row = feed.archive.read_archive_csv(csv_path)[1][0]
+    assert row["author"] == "Corrected public byline"
+    assert "Relevance requires review" in row["summary"]
+    assert "about Jay Rosen" not in row["summary"]
+    restored = feed.run_batch(
+        CJR, csv_path=csv_path, history_path=history, sources=sources
+    )
+    assert restored["updated"] == 1
+    assert restored["associations"][0]["record_id"] == record_id
+    assert feed.archive.read_archive_csv(csv_path)[1][0]["author"] == "Jay Rosen"
