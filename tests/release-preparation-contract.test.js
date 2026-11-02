@@ -21,6 +21,8 @@ test('real preparation CLI and publisher preserve reports, versions and final Gi
   const env = { ...process.env, GIT_LFS_SKIP_SMUDGE: '1', RUNNER_TEMP: runtime,
     PATH: bin + path.delimiter + process.env.PATH,
     ROSEN_RELEASE_CONTRACT_LOG: path.join(temporary, 'commands.jsonl') };
+  // Descendant test runners must start outside the parent Node test context.
+  delete env.NODE_TEST_CONTEXT;
   const execute = (command, args, cwd = repository) => execFileSync(command, args, {
     cwd, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 8 * 1024 * 1024,
   }).trim();
@@ -35,8 +37,9 @@ test('real preparation CLI and publisher preserve reports, versions and final Gi
   fs.symlinkSync(path.join(repository, 'node_modules'), path.join(root, 'node_modules'), 'dir');
   fs.appendFileSync(path.join(root, '.git/info/exclude'), '\nnode_modules\n');
 
-  // Replace only costly model/export commands. Report reads, version guards,
-  // census generation/checks, commits, fetch and push run their real code.
+  // Keep canonical records unchanged and replace model/export commands.
+  // Report reads, version guards, census generation/checks and Git run for real.
+  // This contract does not test vector inference or publication of a new row.
   fs.writeFileSync(path.join(bin, 'npm'), `#!/usr/bin/env node
 const fs = require('node:fs');
 const { execFileSync } = require('node:child_process');
@@ -67,8 +70,10 @@ if (args[0] === 'run' && args[1] === 'refresh:social-release') {
 
   const state = { startCommit: git(['rev-parse', 'HEAD']) };
   const report = JSON.parse(fs.readFileSync(path.join(runtime, 'bluesky-batch-report.json')));
-  const previousEnvironment = { PATH: process.env.PATH, ROSEN_RELEASE_CONTRACT_LOG: process.env.ROSEN_RELEASE_CONTRACT_LOG };
+  const previousEnvironment = { PATH: process.env.PATH, ROSEN_RELEASE_CONTRACT_LOG: process.env.ROSEN_RELEASE_CONTRACT_LOG,
+    NODE_TEST_CONTEXT: process.env.NODE_TEST_CONTEXT };
   Object.assign(process.env, { PATH: env.PATH, ROSEN_RELEASE_CONTRACT_LOG: env.ROSEN_RELEASE_CONTRACT_LOG });
+  delete process.env.NODE_TEST_CONTEXT;
   let result;
   try {
     result = publishChangedRelease(root, {
