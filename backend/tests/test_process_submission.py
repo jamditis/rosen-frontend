@@ -535,7 +535,7 @@ class TestCategorizeDegrades:
 
 class TestTestSuiteFailure:
 
-    def test_test_suite_failure_aborts_commit(self, monkeypatch, csv_with_headers):
+    def test_test_suite_failure_aborts_push(self, monkeypatch, csv_with_headers):
         _stub_schema(monkeypatch)
         _stub_dispatcher_ok(monkeypatch)
         sheets_mock = _stub_sheets(monkeypatch)
@@ -557,13 +557,14 @@ class TestTestSuiteFailure:
 
         assert result["status"] == "error"
         assert "test" in result["error"].lower()
-        # No git commit ever fired.
-        git_calls = [
-            c
-            for c in process_submission.subprocess.run.call_args_list
-            if c.args[0][:2] == ["git", "commit"]
-        ]
-        assert git_calls == []
+        commands = [c.args[0] for c in process_submission.subprocess.run.call_args_list]
+        # Local commits make census provenance possible. Neither commit may
+        # leave the runner until the complete committed snapshot passes.
+        assert len([cmd for cmd in commands if cmd[:2] == ["git", "commit"]]) == 2
+        assert not any(cmd[:2] == ["git", "push"] for cmd in commands)
+        census_index = commands.index(["npm", "run", "census:stewardship"])
+        test_index = commands.index(["npm", "test"])
+        assert census_index < test_index
         # No SFTP either.
         sftp_mock.assert_not_called()
         final = sheets_mock.call_args_list[-1].kwargs

@@ -101,3 +101,12 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && inputs.pressthink_source_check
         working-directory: backend
         run: poetry run python scripts/pressthink_batch_update.py --dry-run --report "$RUNNER_TEMP/pressthink-dry-run.json"
+
+      - name: Retain the source rehearsal report
+        if: github.event_name == 'workflow_dispatch' && inputs.pressthink_source_check
+        uses: actions/upload-artifact@v6
+        with:
+          name: pressthink-source-rehearsal
+          path: ${{ runner.temp }}/pressthink-dry-run.json
+          if-no-files-found: error
+          retention-days: 14

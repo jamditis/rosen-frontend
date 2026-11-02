@@ -565,6 +565,9 @@ def _git_commit_and_push(
             capture_output=True,
             text=True,
         )
+        test_error = _run_test_gate()
+        if test_error:
+            return _PushResult(ok=False, non_ff=False, error=test_error)
         subprocess.run(
             ["git", "push", "origin", "HEAD:main"],
             cwd=str(PROJECT_ROOT),
@@ -700,27 +703,18 @@ def _replay_record_onto_main(
 def _run_test_gate() -> Optional[str]:
     """Run the node test suite. Returns None on pass, an error string on fail.
 
-    Shared by step 9 and the reset-and-replay retry: a replay rebuilds the
+    Used before every initial or reset-and-replay push: a replay rebuilds the
     commit on top of a main that may have advanced with new tests or export
     invariants, so the merged tree must clear the SAME gate before its push —
     otherwise a record built against the old schema could land a red main.
     """
     try:
-        # The first gate observes dirty input files. Refresh provisional totals;
-        # _git_commit_and_push restamps them from committed inputs before push.
-        subprocess.run(
-            ["npm", "run", "census:stewardship"],
-            cwd=str(PROJECT_ROOT),
-            check=True,
-            capture_output=True,
-            text=True,
-        )
         subprocess.run(['npm', 'test'], cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)  # fmt: skip
         return None
     except subprocess.CalledProcessError as exc:
         combined = (exc.stderr or "") + (exc.stdout or "")
         truncated = combined[-500:].strip() or "tests failed (no output)"
-        return f"Tests failed; commit aborted. {truncated}"
+        return f"Tests failed; push aborted. {truncated}"
     except Exception as exc:  # noqa: BLE001
         return f"Tests failed to run: {exc}"
 
@@ -1147,23 +1141,8 @@ def process_one(
                     "exit_code": 1,
                 }
 
-    # --- Step 9: node test suite. -----------------------------------------
-    test_err = _run_test_gate()
-    if test_err:
-        _safe_writeback(
-            sheet_id,
-            sheet_tab,
-            sheet_row or 0,
-            status="error",
-            record_id=record_id,
-            error=test_err,
-        )
-        return {
-            "status": "error",
-            "record_id": record_id,
-            "error": test_err,
-            "exit_code": 1,
-        }
+    # Full validation runs inside the commit helper, after census generation and
+    # before every push attempt, including reset-and-replay.
 
     # --- Step 10: data commit + census commit + push (retry races, #303). ---
     # The push targets main directly only after the data commit and its matching
@@ -1206,24 +1185,7 @@ def process_one(
         except Exception as exc:  # noqa: BLE001 — replay is best-effort
             push = _PushResult(ok=False, non_ff=False, error=f"replay failed: {exc}")
             break
-        # Re-run the test gate against the merged tree: the advanced main may
-        # carry new tests or export invariants the first-pass run never saw.
-        test_err = _run_test_gate()
-        if test_err:
-            _safe_writeback(
-                sheet_id,
-                sheet_tab,
-                sheet_row or 0,
-                status="error",
-                record_id=record_id,
-                error=test_err,
-            )
-            return {
-                "status": "error",
-                "record_id": record_id,
-                "error": test_err,
-                "exit_code": 1,
-            }
+        # The next commit-helper call validates the replay's complete tree.
         rel_csv = _csv_relpath(csv_path)
 
     if not push.ok:

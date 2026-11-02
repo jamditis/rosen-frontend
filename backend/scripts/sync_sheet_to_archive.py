@@ -284,11 +284,6 @@ def regen_json() -> Tuple[bool, str]:
 
 
 def run_node_tests() -> Tuple[bool, str]:
-    # Current totals are needed by the dirty-input gate. open_sync_pr regenerates
-    # the final provenance stamp after committing those inputs.
-    ok, out = _run(["npm", "run", "census:stewardship"], PROJECT_ROOT)
-    if not ok:
-        return False, out[-800:]
     ok, out = _run(["npm", "test"], PROJECT_ROOT)
     # Surface only the tail of the test log on failure.
     return ok, (out[-800:] if not ok else "")
@@ -425,6 +420,9 @@ def open_sync_pr(
             capture_output=True,
             text=True,
         )
+        ok, out = run_node_tests()
+        if not ok:
+            return None, f"Tests failed; PR not opened. {out}"
         subprocess.run(
             ["git", "push", "origin", branch],
             cwd=str(PROJECT_ROOT),
@@ -553,15 +551,6 @@ def run(
             "rows_changed": stats["rows_changed"],
             "exit_code": 1,
             "error": f"JSON regen failed: {out}",
-        }
-
-    ok, out = run_node_tests()
-    if not ok:
-        return {
-            "status": "error",
-            "rows_changed": stats["rows_changed"],
-            "exit_code": 1,
-            "error": f"Tests failed; PR not opened. {out}",
         }
 
     branch, msg = open_sync_pr(csv_path, stats)
