@@ -203,9 +203,12 @@ def _parse_operational_health(payload: object) -> OperationalHealth | None:
         and ingestion_healthy
         and not failed_articles
     )
+    failed_discovery = [
+        source_id for source_id, source_healthy in discovery if not source_healthy
+    ]
     affected_sources = tuple(
         dict.fromkeys(
-            [source_id for source_id, source_healthy in discovery if not source_healthy]
+            failed_discovery
             + [source_id for source_id, _status, _error in failed_articles]
         )
     )
