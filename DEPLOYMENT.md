@@ -268,11 +268,15 @@ Do not upload these to the production server:
 
 ## Deploy after adding records
 
-The automated `submit-record.yml` path uploads the regenerated JSON set first,
-then rebuilds and uploads the affected `r/ID.html` shell from the live
+The automated `submit-record.yml` path uploads the regenerated JSON set and
+all generated RSS/OPML feeds under `data/feeds/`, then rebuilds and uploads the affected `r/ID.html` shell from the live
 production `index.html`. If that record becomes social, the obsolete shell is
 removed instead. This keeps record metadata current without exposing frontend
-assets from a release that has not had a full deploy.
+assets from a release that has not had a full deploy. The submission becomes
+live only after the public JSON, feeds and affected shell match the staged
+bytes. Verification allows six attempts, 15 seconds apart, for origin or edge
+lag. If it still fails, files may already be uploaded, but the row remains
+`archived` for a later publication retry instead of claiming live delivery.
 
 For a manual record-data update, upload the regenerated JSON set:
 
@@ -284,10 +288,13 @@ For a manual record-data update, upload the regenerated JSON set:
 - `data/search-index.json` (MiniSearch full-text index; regenerated with every record change, so it must ship or full-text search serves the previous index)
 - `data/social-search-index.json` (social-body MiniSearch index; regenerated with every social-record change)
 - `data/relationship-adjacency-0.json` through `data/relationship-adjacency-f.json`, followed by `data/relationship-adjacency-manifest.json` (public-safe record relationship lookup; upload the manifest last)
+- Every generated file under `data/feeds/`, including RSS, OPML, the feed index,
+  and category and era feeds. Include these files in the data commit too.
 
 Then run the full-site deploy so the corresponding record shells are rebuilt
 and reconciled. Do not publish record JSON alone: new or edited share metadata
-would remain stale until the next full deploy.
+would remain stale until the next full deploy. Require successful public-byte
+verification, including the feeds, before reporting the manual update complete.
 
 ## Version cache busting
 
