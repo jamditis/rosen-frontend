@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import csv
 import importlib.util
+import json
 import pathlib
 import subprocess
 import sys
@@ -82,6 +83,65 @@ CSV_HEADERS = [
     "low_confidence",
     "needs_review",
 ]
+
+
+@pytest.fixture
+def mixed_newline_archive(tmp_path):
+    path = tmp_path / "archive.csv"
+    path.write_bytes(
+        b"id,title,url,raw_text,verified\r\n"
+        b"RECORD-00001,First article,https://example.test/one,First paragraph\n"
+        b"Second paragraph,TRUE\r\n"
+        b"RECORD-00002,Second article,https://example.test/two,Other text,TRUE\r\n"
+    )
+    return path
+
+
+def test_existing_record_lookup_uses_the_canonical_mixed_newline_grammar(
+    mixed_newline_archive,
+):
+    urls, ids, mapping = process_submission._read_existing(mixed_newline_archive)
+    assert ids == {"RECORD-00001", "RECORD-00002"}
+    assert urls == {"https://example.test/one", "https://example.test/two"}
+    assert mapping["https://example.test/two"] == "RECORD-00002"
+
+
+def test_submission_append_preserves_existing_csv_bytes_and_native_records(
+    mixed_newline_archive,
+):
+    original = mixed_newline_archive.read_bytes()
+    headers = ["id", "title", "url", "raw_text", "verified"]
+    process_submission._atomic_append_row(
+        mixed_newline_archive,
+        {
+            "id": "RECORD-00003",
+            "title": "=A formula-like title",
+            "url": "https://example.test/three",
+            "raw_text": "New text",
+            "verified": "TRUE",
+        },
+        headers,
+    )
+    assert mixed_newline_archive.read_bytes().startswith(original)
+    result = subprocess.run(
+        [
+            "node",
+            str(_BACKEND.parent / "data/lib/python-csv-maintenance.js"),
+            "read",
+            str(mixed_newline_archive),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    _, rows = json.loads(result.stdout)
+    assert [r["id"] for r in rows] == [
+        "RECORD-00001",
+        "RECORD-00002",
+        "RECORD-00003",
+    ]
+    assert rows[0]["raw_text"] == "First paragraph\nSecond paragraph"
+    assert rows[-1]["title"] == "'=A formula-like title"
 
 
 @pytest.fixture
