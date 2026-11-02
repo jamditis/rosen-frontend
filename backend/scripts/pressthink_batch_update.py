@@ -102,9 +102,7 @@ def capture_posts(get=get_public):
             },
         )
         headers = {k.lower(): v for k, v in headers.items()}
-        total, total_pages = int(headers["x-wp-total"]), int(
-            headers["x-wp-totalpages"]
-        )
+        total, total_pages = int(headers["x-wp-total"]), int(headers["x-wp-totalpages"])
         if not 0 < total <= MAX_PAGES * PER_PAGE or not 0 < total_pages <= MAX_PAGES:
             raise ValueError("PressThink pagination exceeds the reviewed bound")
         if total_pages != (total + PER_PAGE - 1) // PER_PAGE:
@@ -334,12 +332,7 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
             proposed.append(
                 {"record_id": record_id, "url": source["url"], "title": source["title"]}
             )
-        elif (
-            row
-            and changed
-            and old
-            and row.get("notes") == MANAGED_NOTE + identity
-        ):
+        elif row and changed and old and row.get("notes") == MANAGED_NOTE + identity:
             before_fields = source_fields(old["source"], old["captured_at"])
             after_fields = source_fields(source, captured_at)
             changed_fields = {
@@ -351,7 +344,9 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
             updated += bool(changed_fields)
         if not record_id and not possible_duplicates:
             state = "review"
-            excluded.append({"source_id": source["id"], "reason": "Author requires review"})
+            excluded.append(
+                {"source_id": source["id"], "reason": "Author requires review"}
+            )
         association_changed = old and (
             old.get("state", "linked") != state or old.get("record_id") != record_id
         )
@@ -366,17 +361,21 @@ def reconcile(posts, columns, rows, entries, *, captured_at):
             entry["sha256"] = digest(entry)
             versions.append(entry)
     missing = sorted(set(previous) - {str(source["id"]) for source in sources})
-    return successor, versions, {
-        "captured": len(sources),
-        "added": added,
-        "updated": updated,
-        "versions_added": len(versions),
-        "missing_source_ids": missing,
-        "excluded": excluded,
-        "proposed_additions": proposed,
-        "retired_record_ids": retired,
-        "changed": bool(added or updated or versions),
-    }
+    return (
+        successor,
+        versions,
+        {
+            "captured": len(sources),
+            "added": added,
+            "updated": updated,
+            "versions_added": len(versions),
+            "missing_source_ids": missing,
+            "excluded": excluded,
+            "proposed_additions": proposed,
+            "retired_record_ids": retired,
+            "changed": bool(added or updated or versions),
+        },
+    )
 
 
 def run_batch(*, dry_run=False, csv_path=None, history_path=None, posts=None):

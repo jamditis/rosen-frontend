@@ -47,11 +47,7 @@ def test_full_pagination_and_missing_final_page():
 
     def incomplete(url, *, params=None):
         body, headers = get(url, params=params)
-        return (
-            (b"[]", headers)
-            if params and params["page"] == 2
-            else (body, headers)
-        )
+        return (b"[]", headers) if params and params["page"] == 2 else (body, headers)
 
     with pytest.raises(ValueError, match="Incomplete"):
         batch.capture_posts(incomplete)
@@ -108,7 +104,9 @@ def canonical_fixture(tmp_path):
     return path, tmp_path / "versions.jsonl"
 
 
-def test_real_csv_bridge_preserves_curated_bytes_ids_and_prior_source_versions(tmp_path):
+def test_real_csv_bridge_preserves_curated_bytes_ids_and_prior_source_versions(
+    tmp_path,
+):
     csv_path, history = canonical_fixture(tmp_path)
     before = csv_path.read_bytes()
     kwargs = {"csv_path": csv_path, "history_path": history}
@@ -173,9 +171,12 @@ def test_corrupt_history_aborts_before_csv_changes(tmp_path):
 
 
 def test_inline_markup_keeps_punctuation_and_words_intact():
-    assert batch.plain_text(
-        "<p>(<em>Times</em>), <strong>J</strong>ournalism <a>link</a>, and more.</p>"
-    ) == "(Times), Journalism link, and more."
+    assert (
+        batch.plain_text(
+            "<p>(<em>Times</em>), <strong>J</strong>ournalism <a>link</a>, and more.</p>"
+        )
+        == "(Times), Journalism link, and more."
+    )
 
 
 def test_table_definition_list_and_text_after_blocks_keep_word_boundaries():
@@ -242,7 +243,9 @@ def test_assigned_categories_use_canonical_names():
     )
     fields = batch.source_fields(source, "2026-11-02")
     taxonomy = json.loads((batch.ROOT / "backend/schema.json").read_text())
-    assigned = {c.strip() for c in fields["thematic_categories"].split(",") if c.strip()}
+    assigned = {
+        c.strip() for c in fields["thematic_categories"].split(",") if c.strip()
+    }
     assert "Journalism Education" in assigned
     assert assigned <= {c["name"] for c in taxonomy["taxonomy"]["thematic_categories"]}
 
