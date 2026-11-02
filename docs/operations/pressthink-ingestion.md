@@ -57,10 +57,19 @@ journal. Retain the original journal and targets as recovery evidence. A hash
 mismatch alone never proves that no replacement occurred. Never replace an
 unexpected edit or discard a pending transaction automatically.
 
-The adapter prepares data only. Scheduling, public publication, receipt delivery,
-and per-source health must be verified separately when its publisher integration
-is enabled. A local source change or successful dry run does not prove live
-article ingestion. Existing Bluesky publication remains independent until that
-integration lands.
+The daily stewardship publisher captures PressThink after Bluesky. It retains the
+Bluesky report's counts and candidate decisions and includes the PressThink report
+separately. Changes to either source enter the existing tested release, FIFO
+queue, version/cache update, Git push, certificate-verified FTPS transfer and
+public byte verification. New or updated article records rebuild article semantic
+vectors too. A no-change run still verifies the public release. Source capture or
+publication failure prevents a successful overall publication receipt.
+
+The source journal is committed as an exact allowed path. It is not a public
+website asset. The website content backup and the repository serve different
+purposes: The monthly website mirror does not include this repository-only
+journal. Its presence in Git does not prove a fresh Legion copy. The public Worker receipt
+currently records Bluesky counts and decisions. Per-source PressThink receipt
+storage and candidate settlement remain a separate integration requirement.
 
 All repository tests, builds, lint, and validation run on GitHub-hosted CI.

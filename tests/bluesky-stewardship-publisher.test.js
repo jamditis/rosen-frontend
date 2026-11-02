@@ -92,7 +92,52 @@ function gitFixture(t, files) {
   return directory;
 }
 
+it('commits the exact article CSV, semantic pair, and source journal paths', (t) => {
+  const directory = gitFixture(t, { 'baseline.txt': 'baseline\n' });
+  const files = {
+    'data/archive_records-public.csv': 'id,title\nRECORD-00001,Example\n',
+    'data/archive-embeddings.json': '{"sha256":"example"}\n',
+    'data/archive-embeddings.bin': 'example-vector-bytes',
+    'preservation/pressthink/versions.jsonl': '{"source":{"id":1}}\n',
+  };
+  for (const [name, body] of Object.entries(files)) {
+    fs.mkdirSync(path.dirname(path.join(directory, name)), { recursive: true });
+    fs.writeFileSync(path.join(directory, name), body);
+  }
+  stageReleaseCommit(directory, []);
+  const committed = gitCommand(directory, ['diff-tree', '--no-commit-id', '--name-only', '-r', 'HEAD']).split('\n').sort();
+  assert.deepEqual(committed, Object.keys(files).sort());
+  assert.equal(gitCommand(directory, ['status', '--porcelain']), '');
+  fs.writeFileSync(path.join(directory, 'preservation/pressthink/unapproved.txt'), 'unexpected\n');
+  assert.throws(() => stageReleaseCommit(directory, []), /unapproved path/);
+});
+
 describe('Bluesky stewardship preparation used by the CLI', () => {
+  it('publishes article source changes even when no Bluesky rows were added', () => {
+    const combined = {
+      ...report(0),
+      pressthink: { captured: 227, added: 1, updated: 0, versions_added: 227, changed: true },
+    };
+    const ops = preparation({ capture: () => combined });
+    const result = runPreparation(ops);
+    assert.equal(result.phase, 'pushed');
+    assert.equal(result.canonicalCommit, PUBLISHED);
+    assert.equal(ops.outputs.get('needs_deploy'), 'true');
+    assert.equal(result.report.counts.captured, 0);
+    assert.equal(result.report.pressthink.captured, 227);
+  });
+
+  it('refuses an inconsistent article change report before publication', () => {
+    const combined = {
+      ...report(0),
+      pressthink: { captured: 227, added: 0, updated: 0, versions_added: 0, changed: true },
+    };
+    const ops = preparation({ capture: () => combined });
+    assert.throws(() => runPreparation(ops), /PressThink batch report change state/);
+    assert.equal(ops.state.phase, 'failed');
+    assert.equal(ops.state.canonicalCommit, START);
+  });
+
   it('verifies live state and emits no_change without publishing when no rows are missing', () => {
     const ops = preparation({ capture: () => report(0) });
     const result = runPreparation(ops);

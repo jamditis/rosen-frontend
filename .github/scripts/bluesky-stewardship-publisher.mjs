@@ -24,6 +24,9 @@ const RELEASE_DATA_PATHS = new Set([
   'data/archive-data.json',
   'data/archive-details.json',
   'data/archive-entities.json',
+  'data/archive-embeddings.bin',
+  'data/archive-embeddings.json',
+  'data/archive_records-public.csv',
   'data/archive-social-embeddings.bin',
   'data/archive-social-embeddings-build.json',
   'data/archive-social-embeddings.json',
@@ -34,6 +37,7 @@ const RELEASE_DATA_PATHS = new Set([
   'data/search-index.json',
   'data/social-search-index.json',
   'data/social_posts.csv',
+  'preservation/pressthink/versions.jsonl',
 ]);
 
 function text(value) {
@@ -100,6 +104,17 @@ function validateReport(report) {
   }
   if (report.decisions.some((decision) => !['admit', 'context_only'].includes(decision.decision))) {
     throw new Error('Bluesky batch report has an invalid decision');
+  }
+  if (report.pressthink) {
+    const source = report.pressthink;
+    for (const name of ['captured', 'added', 'updated', 'versions_added']) {
+      if (!Number.isSafeInteger(source[name]) || source[name] < 0 || source[name] > 2_000) {
+        throw new Error(`PressThink batch report has invalid ${name}`);
+      }
+    }
+    if (source.changed !== Boolean(source.added || source.updated || source.versions_added)) {
+      throw new Error('PressThink batch report change state is inconsistent');
+    }
   }
   return report;
 }
@@ -230,7 +245,7 @@ function isReleaseDataPath(file) {
 }
 
 export function changedPaths(root) {
-  const entries = gitRaw(root, ['status', '--porcelain=v1', '-z']).split('\0');
+  const entries = gitRaw(root, ['status', '--porcelain=v1', '--untracked-files=all', '-z']).split('\0');
   const paths = [];
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
@@ -263,7 +278,7 @@ export function stageReleaseCommit(root, browserPaths) {
   const explicitPaths = [...new Set([...toStage, ...feedPaths, ...adjacencyPaths])].sort();
   if (explicitPaths.length === 0) throw new Error('publication produced no release changes');
   run(root, 'git', ['add', '--', ...explicitPaths]);
-  run(root, 'git', ['commit', '-m', 'data: publish Bluesky stewardship update']);
+  run(root, 'git', ['commit', '-m', 'data: publish source stewardship update']);
 }
 
 export function stageCensusCommit(root) {
@@ -292,6 +307,7 @@ function statePaths() {
   return {
     temporaryRoot,
     reportPath: path.join(temporaryRoot, 'bluesky-batch-report.json'),
+    pressThinkReportPath: path.join(temporaryRoot, 'pressthink-batch-report.json'),
     snapshotDir: path.join(temporaryRoot, 'bluesky-source-snapshot'),
     baselinePath: path.join(temporaryRoot, 'archive-data-baseline.json'),
     statePath: path.join(temporaryRoot, 'bluesky-stewardship-state.json'),
@@ -356,7 +372,7 @@ export function runPreparation({
       verifyLive();
       state.phase = 'dry_run';
       state.liveVerified = true;
-    } else if (report.canonical.rows_appended === 0) {
+    } else if (report.canonical.rows_appended === 0 && !report.pressthink?.changed) {
       try {
         verifyLive();
         state.phase = 'no_change';
@@ -398,7 +414,15 @@ function captureBatch(root, paths, dryRun) {
   ];
   if (dryRun) adapterArgs.push('--dry-run');
   run(root, 'python', adapterArgs);
-  return readJson(paths.reportPath);
+  const pressThinkArgs = [
+    'backend/scripts/pressthink_batch_update.py',
+    '--report', paths.pressThinkReportPath,
+  ];
+  if (dryRun) pressThinkArgs.push('--dry-run');
+  run(root, 'python', pressThinkArgs);
+  const report = { ...readJson(paths.reportPath), pressthink: readJson(paths.pressThinkReportPath) };
+  writeJson(paths.reportPath, report);
+  return report;
 }
 
 function assertRemoteHeadUnchanged(root, startCommit, gitCommand = git) {
@@ -430,6 +454,9 @@ function publishChangedRelease(root, paths, state, report) {
     'run', 'refresh:social-release', '--', '--as-of', asOf,
     '--report', paths.reportPath,
   ]);
+  if (report.pressthink?.added || report.pressthink?.updated) {
+    run(root, 'npm', ['run', 'build-embeddings']);
+  }
   run(root, 'npm', [
     'run', 'build-social-embeddings', '--', '--incremental',
     '--previous-archive', paths.baselinePath,
