@@ -1,4 +1,4 @@
-import { html } from '../html.js?v=3.8.61';
+import { html } from '../html.js?v=3.8.62';
 import { ArrowLeft, Newspaper } from 'lucide-react';
 
 const ArchiveRouteHeader = ({ onBack, sectionTitle }) => html`

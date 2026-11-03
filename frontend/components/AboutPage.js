@@ -1,9 +1,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
-import { html } from '../html.js?v=3.8.61';
+import { html } from '../html.js?v=3.8.62';
 import { ArrowLeft, ArrowRight, Archive, BookOpen, Network, Search, Github, Mail } from 'lucide-react';
-import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.61';
-import { IDLE_LINE, IDLE_REVEAL_MS } from '../utils/easterEggs.js?v=3.8.61';
+import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.62';
+import { IDLE_LINE, IDLE_REVEAL_MS } from '../utils/easterEggs.js?v=3.8.62';
 
 const IDLE_RESET_EVENTS = ['pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart'];
 
