@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen&apos;s Internet Archive</title>
-    <dateCreated>Tue, 03 Nov 2026 23:45:00 GMT</dateCreated>
-    <dateModified>Tue, 03 Nov 2026 23:45:00 GMT</dateModified>
+    <dateCreated>Wed, 04 Nov 2026 23:58:33 GMT</dateCreated>
+    <dateModified>Wed, 04 Nov 2026 23:58:33 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -356,6 +356,7 @@
         <outline text="The plan is to have no plan" type="link" url="https://www.adbusters.org/article/the-plan-is-to-have-no-plan" created="2020-05-04"/>
       </outline>
       <outline text="Platform Transition &amp; Future Models (2021-Present)" type="category">
+        <outline text="Bluesky’s new CEO wants a big tent, not a bubble..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mzj224rfrc2v" created="2026-11-04"/>
         <outline text="Hmmm..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mysoyejl722c" created="2026-10-26"/>
         <outline text="Thanks for those numbers..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3myiz4p7vyk2o" created="2026-10-23"/>
         <outline text="In the end, barely $13 of your $100 buys real airtime or digital ads..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3myipw7smts2q" created="2026-10-22"/>
@@ -407,7 +408,6 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="Opinion writers, audiences, and newsroom managers" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3muctmvtwj22p" created="2026-08-30"/>
         <outline text="A reader&apos;s comparison with George Lakoff" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mu45rrmmm22q" created="2026-08-28"/>
         <outline text="A media studies doctorate and a journalism teaching career" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mu3ccpg7fs2j" created="2026-08-27"/>
-        <outline text="Two weeks of reading for a journalism course" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mu3juxw4zk23" created="2026-08-27"/>
       </outline>
     </outline>
     <outline text="By Category">
@@ -525,7 +525,8 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="From my latest post" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36gxcpdsk2v"/>
         <outline text="Interesting idea" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35vskmbps2j"/>
       </outline>
-      <outline text="Technology &amp; Digital Media (2962)" type="category">
+      <outline text="Technology &amp; Digital Media (2963)" type="category">
+        <outline text="Bluesky’s new CEO wants a big tent, not a bubble..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mzj224rfrc2v"/>
         <outline text="Hmmm..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mysoyejl722c"/>
         <outline text="Thanks for those numbers..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3myiz4p7vyk2o"/>
         <outline text="In the end, barely $13 of your $100 buys real airtime or digital ads..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3myipw7smts2q"/>
@@ -550,7 +551,6 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="From @status.news Paramount boss David Ellison also recently took the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo3z6kxclk25"/>
         <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnzhtopyfk2y"/>
         <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnxuigz7p223"/>
-        <outline text="If you follow the mess at CBS, don&apos;t dismiss the possibility that Elli..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnkilkth722l"/>
       </outline>
       <outline text="Journalism Education (686)" type="category">
         <outline text="A media studies doctorate and a journalism teaching career" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mu3ccpg7fs2j"/>

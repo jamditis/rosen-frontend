@@ -1,7 +1,28 @@
 {
   "version": "1.1.0",
-  "generated": "2026-11-03T23:44:58.465Z",
+  "generated": "2026-11-04T23:58:30.770Z",
   "records": [
+    {
+      "id": "BSKY-03591",
+      "title": "Bluesky’s new CEO wants a big tent, not a bubble...",
+      "author": "Jay Rosen",
+      "date": "2026-11-04",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3mzj224rfrc2v",
+      "summary": "Replying to @kinneyaaron.bsky.social on Bluesky, Rosen writes: \"Bluesky’s new CEO wants a big tent, not a bubble.\" August 2026 interview between Bluesky CEO Toni Schneider and Nilay Patel, editor-in-chief of The Verge, which mentions the platform's reputation as a home for left wing political views. Does that help?\"",
+      "quote": "\"Bluesky’s new CEO wants a big tent, not a bubble.\"\n\nAugust 2026 interview between Bluesky CEO Toni Schneider and Nilay Patel, editor-in-chief of The Verge, which mentions the platform's reputation as a home for left wing political views.  www.theverge.com/podcast/9743...\n\nDoes that help?",
+      "categories": [
+        "Technology & Digital Media"
+      ],
+      "concepts": [],
+      "tags": [],
+      "verified": true,
+      "needsReview": false,
+      "type": "social",
+      "relatedIds": []
+    },
     {
       "id": "BSKY-03554",
       "title": "Hmmm...",
@@ -808714,6 +808735,7 @@
     "BlueSky — after a long period as invite-only — is now open to all",
     "Blueplatespecial.Net",
     "Bluesky",
+    "Bluesky’s new CEO wants a big tent, not a bubble...",
     "Bluffton Today",
     "Bluffton, South Carolina",
     "Board Of Directors",
