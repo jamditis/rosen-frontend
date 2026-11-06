@@ -1,176 +1,142 @@
-# Jay Rosen's Internet Archive: handoff package
+# Archive handoff and stewardship guide
 
-**For**: Jay Rosen, Hali Rosen, and any future operator picking up this archive after Joe Amditis steps back.
+Updated: November 6, 2026
 
-**About this doc**: the operational reference for keeping the archive alive and useful. Who maintains what, what to do when something breaks, when each piece is expected to need attention, and how to escalate if it's beyond your comfort zone.
+This guide explains what a new steward needs to operate, preserve, and take responsibility for the Jay Rosen archive. It describes the repository’s current operating arrangements. It does not certify who owns the connected accounts, that backups exist elsewhere, or that a transfer of responsibility has already happened. Record those facts in the handoff register below.
 
-**Last updated**: 2026-07-21
+The public archive is at [pressthink.org/j/rosen-archive](https://pressthink.org/j/rosen-archive/). Its source, data, and operating instructions are in [jamditis/rosen-frontend](https://github.com/jamditis/rosen-frontend). The technical publishing procedure is [DEPLOYMENT.md](../DEPLOYMENT.md).
 
-> **Architecture status**: Pillar 3a is the only supported submission design: Apps Script → GitHub App → GitHub Action ingestion, as specified in `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md`. The earlier Flask service was never deployed and has been removed. Until the GitHub App and repository credentials are configured, records use the manual path in [`ADDING-RECORDS.md`](../ADDING-RECORDS.md); there is no Flask fallback.
+## 1. What you are taking care of
 
----
+The archive is a static website: visitors receive files that their browser reads and searches. The public site does not need the editor’s spreadsheet, a running Python server, or a maintainer’s computer to serve its existing collection. Adding material, rebuilding search files, publishing changes, monitoring failures, and preserving source evidence depend on additional services.
 
-## TL;DR for Jay
+Keep these three kinds of material distinct:
 
-If you only read one paragraph: the archive is at `pressthink.org/j/rosen-archive/`. Once the GitHub App and repository credentials are configured, you add new content by ticking a checkbox in a Google Sheet — full instructions are in [`JAY_ADDING_RECORDS.md`](JAY_ADDING_RECORDS.md). Until then, use the manual path in [`ADDING-RECORDS.md`](../ADDING-RECORDS.md). If something looks wrong on the live archive, ask Hali first; if Hali isn't available and it's urgent, email Joe at `jamditis@gmail.com`. The archive runs at $0/mo after Joe steps back — no monthly bills will land on you.
+- **The catalog:** the descriptions, dates, source links, identifiers, classifications, and relationships that tell people what the archive contains.
+- **The published website:** pages and generated search, data, and relationship files used by visitors.
+- **Preservation evidence:** original or captured source material, checksums, capture histories, rights decisions, and verified copies held elsewhere.
 
----
+A working website or a complete catalog does not establish that every linked article, post, image, or video has been preserved. A missing source can remain represented by its catalog record while recovery is investigated. Retain the record’s identifier and clearly describe the limitation.
 
-## The stack at a glance
+## 2. Assign people and verify access
 
-| Layer | What it does | Who owns it | What it costs |
-|---|---|---|---|
-| Google Sheet "Rosen Archive URL List" | Jay's submission inbox; status updates write back here | Jay (Sheet owner) | $0 (free Google account) |
-| Apps Script (bound to the Sheet) | Validates URLs, POSTs new submissions to GitHub, writes status updates back to the Sheet | Whoever owns the Sheet's Google account (Jay or Hali) | $0 |
-| `jamditis/rosen-frontend` GitHub repo | Source of truth for archive data + code | Transferred from Joe to Jay/Hali at handoff (see "Handoff steps" below) | $0 (public repo, free Actions) |
-| GitHub App `rosen-archive-bot` | Authenticates Apps Script → GitHub workflow dispatch | Recreated under Jay/Hali account at handoff | $0 |
-| GitHub Action `submit-record.yml` | Scrapes the new URL, categorizes, appends to archive, regenerates JSON, pushes to live site | Self-running; lives in the repo | $0 (public-repo Actions are unmetered) |
-| Bluehost SFTP → `pressthink.org/j/rosen-archive/` | The live archive readers see | Jay (already pays for Bluehost WP hosting) | Whatever Jay already pays for Bluehost; NO marginal cost |
-| Gemini API (for categorization) | Auto-tags new submissions with themes/concepts/eras | Jay or Hali's free-tier Gemini key | $0 (free tier handles ~10 submissions/day with ~150x headroom) |
+Before calling a handoff complete, fill in a private register with a primary person, a backup person, a recovery method, and the date access was tested for each responsibility. Do not put passwords, private keys, recovery codes, or personal account details in this public repository.
 
-**Nothing in this stack will start charging anyone money after the handoff.** The only $$ is Jay's existing Bluehost WP hosting, which exists independent of this archive.
+| Responsibility | Primary and backup — confirm | Access or decision to verify |
+|---|---|---|
+| Editorial stewardship | To be recorded | Inclusion, corrections, source attribution, review holds, rights questions |
+| Technical maintenance | To be recorded | Repository administration, tests, release workflows, recovery |
+| Website hosting and domain | To be recorded | PressThink hosting, archive directory, certificate, DNS contact |
+| Connected accounts | To be recorded | Google, GitHub App, Cloudflare, API credentials, renewal and billing contacts |
+| Preservation and backups | To be recorded | Independent copies, fixity checks, source files, restoration drills |
+| Monitoring and incidents | To be recorded | Failed workflow notifications, health monitoring, alert destination |
 
----
+Repository access, hosting access, and domain control are separate responsibilities. The source-discovery Worker uses a Cloudflare account; that does not establish control over PressThink’s domain. Verify each service directly with the responsible account holder. Record costs, quotas, renewal dates, and a funding owner using the actual account settings. There is no guarantee that hosting, APIs, storage, or free service allowances will remain free.
 
-## Who does what
+## 3. Know where the records live
 
-### Jay
-- **Adds new content** by ticking the checkbox in the Sheet (per `JAY_ADDING_RECORDS.md`)
-- **Reviews/edits** records via the archive UI or by hand-editing the CSV through a PR (Hali helps with PRs)
-- **Decides what's in scope** for the archive (Jay's editorial judgment)
+The curated article catalog is `data/archive_records-public.csv`; social records are in `data/social_posts.csv`. Entity and relationship data are in `data/extracted_entities.csv` and `data/extracted_relationships.csv`. The schema and taxonomy explain how those fields should be interpreted. Generated JSON, search indexes, embeddings, feeds, and relationship shards support the website and must stay consistent with their inputs.
 
-### Hali
-- **Day-to-day operator** — handles the "Column F says error, what do I do" questions Jay can't self-serve
-- **Coordinates PRs** when Jay wants to hand-edit records or fix something
-- **Knows the GitHub repo's surface** at the level of "I can open a PR, address a Copilot review comment, merge it"
+The master Google Sheet supports submission and enrichment work. Its contents and queue are not automatically equivalent to the public CSVs. Follow [the adding-records guide](../ADDING-RECORDS.md) and [maintenance runbook](setup/maintenance-runbook.md) for the relevant route. Older backend routines use exported CSV files under `csv/`; they are not a live connection to the master Sheet.
 
-### The system (no human required)
-- New URL ticked in Sheet → Apps Script → GitHub Action → scrapes + categorizes + commits + deploys → status writes back to Sheet
-- Stuck-row sweeper runs every 6 hours and re-dispatches anything stuck at "submitted > 30 min"
+When correcting a record, preserve its stable ID, keep evidence for the correction, and rebuild the affected outputs using the documented tools. A source’s wording, an editor’s summary, and a machine suggestion must remain distinguishable. Do not silently replace uncertain claims with confident ones.
 
-### Joe
-- **Not in the critical path** after handoff completes
-- Available for "the world has changed and we need to redesign X" calls — but not for "Column F says error" calls
-- Won't push code, won't approve PRs, won't pay any bills
+## 4. Understand the current automation
 
----
+These are schedules committed in the repository. They are intended run times in UTC; scheduling can be delayed. Inspect actual Actions runs and the Worker health report to establish whether a particular run happened and succeeded.
 
-## Failure modes and what to do
+| Process | Committed schedule | What it does |
+|---|---|---|
+| Cloudflare source discovery | Daily, 09:17 UTC | Checks a fixed source allowlist and keeps candidate and operating metadata in D1; PressThink discovery has a longer per-source interval |
+| Bluesky stewardship | Daily, 18:47 UTC | Collects the allowed author feed, applies conservative rules, rebuilds, tests, publishes, verifies live files, and reports a receipt |
+| PressThink stewardship | Daily, 19:47 UTC | Runs the separate article ingestion and publishing path |
+| Publisher-feed stewardship | Daily, 20:47 UTC | Runs CJR search, CJR author, and Common Dreams consumers in sequence |
+| Full-site deployment | Friday, 09:17 UTC, and manual dispatch | Tests and transfers the reviewed main branch through the release queue |
 
-### Jay's submission shows `error` in Column F
+The discovery Worker does not hold the GitHub or hosting credentials used to publish the archive. It does not write the canonical CSVs. Its D1 database holds compact candidate, decision, and health information. See [the Worker guide](../workers/source-discovery/README.md).
 
-1. Read Column H — it tells you in plain English what went wrong (per `JAY_ADDING_RECORDS.md` "What if Column F says error?")
-2. If it says `URL already exists in archive` — already there, no action
-3. If it says `URL cannot be accepted` — bad URL, fix Column B and re-tick
-4. If it says `Network: ...` — temporary, untick + retick
-5. If it says `Scrape returned no content` — the page is gone; try the Wayback Machine URL instead (paste `https://web.archive.org/web/<URL>` in Column B)
-6. Anything else: **ask Hali** with the row's contents
+The daily Bluesky path can admit and publish qualifying records without a person approving each one. It uses a fixed author identity, bounded collection, deterministic rules, and checks for source and thread context. Uncertain or context-only material can remain unverified. This route does not call a remote language-model API or create entity and relationship assertions. Stop and investigate authentication, robots, policy, or incomplete-collection failures; do not work around them to force a green run.
 
-### The live archive isn't showing recent submissions
+Some other work remains attended. The batch maintenance runner is manually dispatched. Its `sync_to_archive` job creates a review PR; it does not itself merge or publish. The proposal and decision machinery under `stewardship/` is an offline contract, not an installed end-to-end publishing service. The [Bluesky design map](bluesky-stewardship-pipeline.md) also contains future work. Use [the current operations runbook](operations/bluesky-stewardship.md) for implemented behavior.
 
-1. Check the GitHub Action run history at `https://github.com/<owner>/rosen-frontend/actions/workflows/submit-record.yml`
-2. If recent runs show "failure" — Hali clicks into the latest failed run, reads the error, addresses or pings Joe
-3. If recent runs show "success" but the live site is stale — Bluehost SFTP push may be failing silently. Check `Column F` for any rows stuck at `archived` (those are the ones the SFTP push didn't deliver). The next successful submission will retry the push and clear the backlog.
+## 5. Publish through the documented release path
 
-### The Sheet is unresponsive (Apps Script trigger not firing)
+The publication workflows share a first-in, first-out release queue so that transfers do not overlap. A successful commit or upload is only part of a release. The daily stewardship workflows verify the live bytes and then record the outcome. Check the run’s tested commit, release version, transfer result, live verification, and receipt together.
 
-1. Open the Sheet → Extensions → Apps Script
-2. Run the `setup()` function once — re-installs the trigger
-3. If `setup()` fails with "missing script property" — the script needs `GITHUB_APP_ID`, `GITHUB_APP_INSTALL_ID`, `GITHUB_APP_PRIVATE_KEY` set under Project Settings → Script Properties. Get these from Joe (or recreate per "Handoff steps" if Joe is already disengaged).
+Production currently uses certificate-verified explicit FTPS on port 21. The production selector is `ROSEN_TRANSFER_PROTOCOL=ftps`, the archive root is `ROSEN_SFTP_SITE_PATH=j/rosen-archive`, and the data directory is `ROSEN_SFTP_REMOTE_PATH=j/rosen-archive/data`. The retained `SFTP` names do not mean production uses SFTP. Omitting the protocol selector can select the legacy adapter and fail against the current service.
 
-### GitHub Action fails on every submission
+Deployments that change existing semantic-recall artifact pairs require the approved rollback directory, configured by `ROSEN_SFTP_TRANSACTION_PATH`, outside the public archive root and inaccessible over HTTP. The current FTPS arrangement uses `.rosen-archive-transactions`. This provides targeted recovery for those paired artifacts; it does not make publication of the entire website atomic. First publication and byte-identical redeploys do not require that pair rollback storage. Confirm the server’s protection before relying on it.
 
-1. Most common cause: a repo secret expired or got rotated
-2. Check repo Settings → Secrets and variables → Actions. Required secrets (names match `backend/submission_runtime/sheets_callback.py` and `sftp_push.py`):
-   - `ROSEN_SFTP_HOST`, `ROSEN_SFTP_USER`, `ROSEN_SFTP_REMOTE_PATH`, `ROSEN_SFTP_KNOWN_HOSTS` (Bluehost endpoint info)
-   - one of: `ROSEN_SFTP_PASSWORD` (password auth) OR `ROSEN_SFTP_KEY_PATH` (private-key file, preferred)
-   - optional: `ROSEN_SFTP_KEY_PASSPHRASE` (only when the private key is encrypted)
-   - `GEMINI_API_KEY` (for categorization)
-   - one of: `ROSEN_SHEETS_SA_KEY` (path to service-account JSON file) OR `ROSEN_SHEETS_SA_KEY_JSON` (inline JSON content), for sheet writeback
-3. Rotate any that expired; Hali can do this with values from Jay's Bluehost cPanel + Jay's Gemini key
+Use the explicit deployment allowlist in [DEPLOYMENT.md](../DEPLOYMENT.md). Materialize the current Git LFS assets, including the dissertation PDF and semantic model/runtime files. Publish dependencies before the entry pages, service worker, and version markers. Never upload the whole checkout: working CSVs, private captures, credentials, backups, and operational files do not belong on the public server.
 
-### The GitHub App private key leaks or is suspected compromised
+GitHub Pages and PressThink are separate destinations. Publishing one does not prove the other is current. If the interface shows an older count or version while live data files match the tested release, investigate browser and service-worker freshness before declaring the transfer broken.
 
-1. GitHub → Settings → Developer settings → GitHub Apps → `rosen-archive-bot`
-2. Generate a new private key; revoke the old one
-3. Update the `GITHUB_APP_PRIVATE_KEY` script property in the Sheet's Apps Script (~5 min recovery)
+The “making of” feature remains under an explicit publication hold. Do not deploy it or treat its provisional first-person text as approved. Follow `AGENTS.md` and obtain Joe’s explicit approval before lifting that hold.
 
-### Bluehost rotates the SFTP password
+## 6. Preserve more than the website
 
-1. New password lands in Jay's Bluehost cPanel
-2. Hali updates the `ROSEN_SFTP_PASSWORD` repo secret to match (or `ROSEN_SFTP_KEY_PATH` if Bluehost rotated to key-only auth)
-3. Next submission deploys cleanly; until then submissions land as `archived` in Column F
+The daily Bluesky workflow’s raw API snapshots, context, hashes, and detailed decision reports are temporary runner artifacts. It does not preserve attached media or complete conversations as durable source holdings. D1’s compact ledger does not replace those source files. Planned object storage or a preservation design is not evidence that a capture has been stored successfully.
 
-### Categorization (Gemini) starts failing
+The PressThink article adapter retains captured source HTML, parsed text, and public metadata in the append-only `preservation/pressthink/versions.jsonl` journal, with linked hashes. This journal is committed to the repository and excluded from public website deployments; a website mirror does not preserve it. The reviewed CJR and Common Dreams feed adapters retain bibliographic metadata in `preservation/publisher-feeds/versions.jsonl`. They do not capture or republish article bodies or descriptions, and their finite feed views do not establish complete historical coverage. See [article and publisher-feed operations](operations/pressthink-ingestion.md). A journal’s presence in Git does not establish a verified independent copy.
 
-The system is designed to fail soft here — submissions still succeed, the record commits with `categories=["uncategorized"]` and `low_confidence=true`. Hali or Jay can hand-edit the categories later via a PR. No emergency; just a quality-of-categorization issue.
+The [preservation manifest](../preservation/README.md) records source checks, capture attempts, artifacts, copies, fixity checks, rights, and review history. A catalog baseline imported into that system is still a baseline; it is not a verified web capture. A derived Wayback replay URL is not proof that someone has opened and checked the replay.
 
-If categorization fails on EVERY submission for a sustained period:
-1. The Gemini API key may have hit a rate limit or been revoked
-2. Generate a new key at `aistudio.google.com`; update `GEMINI_API_KEY` repo secret
+For each retained source, record what was captured, when, by which method, where the bytes are held, the checksum, access or rights restrictions, and the result of opening the saved material. Keep original evidence and append corrections. Do not erase a failed capture, rejected proposal, or earlier rights decision to simplify the history. Follow [manifest migration instructions](../preservation/MIGRATING.md) when formats change.
 
----
+## 7. Make a recoverable backup
 
-## Handoff steps (Joe → Jay/Hali)
+The repository includes a checksummed data-baseline tool. A checksum is a fingerprint used to detect changed bytes. From a prepared checkout, create a dated baseline outside the repository and verify it:
 
-Estimated total time: ~2 hours, all one-time. Best done with Joe on a call or in person.
+```sh
+npm run baseline:create -- --output /path/outside/repo/baseline-YYYY-MM-DD
+npm run baseline:verify -- /path/outside/repo/baseline-YYYY-MM-DD
+```
 
-1. **GitHub repo transfer**: Joe → Settings → Transfer ownership → Jay or Hali's GitHub username. Repo secrets carry over; old URLs redirect.
-2. **GitHub App recreate**: GitHub Apps cannot be transferred. Jay or Hali creates a new `rosen-archive-bot` App on their own GitHub account. Permissions: `Contents: write`, `Actions: write`, `Metadata: read`. Install on the (now-transferred) repo. Generate a private key.
-3. **Apps Script recreate**: Bound Apps Script does NOT transfer with the Sheet. Jay opens the queue Sheet → Extensions → Apps Script → File → New → Project. Pastes the contents of `automation/apps-script/Code.gs` from the repo. Sets the three script properties to match the new GitHub App. Runs `setup()` once.
-4. **GCP project + service account migration**: if Jay or Hali has a Google Workspace account (university, paid Workspace), create a fresh GCP project under that account. Enable Sheets API. Create a service account. Download JSON. Update `SHEETS_SA_KEY` repo secret. Share the queue Sheet with the new service account's email (Editor). **If only personal Gmail accounts are available**, this still works but be aware: Google deletes personal accounts after 2 years of inactivity (Dec 2023 policy onward), taking the GCP project with them. Workspace accounts are exempt.
-5. **Gemini API key swap**: Jay or Hali generates their own Gemini API key from `aistudio.google.com`. Update `GEMINI_API_KEY` repo secret.
-6. **SFTP credentials sync**: confirm current Bluehost SFTP creds match `ROSEN_SFTP_*` repo secrets. Rotate if stale.
+Keep the entire resulting bag together, including its payload, manifests, and metadata. Copy it to at least two independently controlled locations outside Git, verify each copy, and record custody and verification dates. These are actions the custodian must perform; the tool does not create remote backup copies. See [the baseline guide](../preservation/BASELINE.md).
 
-After step 6, nothing on Joe's machines, accounts, or domains is in the archive's critical path.
+That bag covers an explicit set of archive data files. A full handoff also needs:
 
----
+- Repository history and the required Git LFS objects, plus the code and documentation needed to interpret and regenerate the catalog.
+- Original source files and approved captures, preservation manifests, journals, checksums, and copy-location records.
+- An export of the discovery D1 database, its migration files, and operating receipts before deleting or replacing the Worker or database.
+- The master Sheet, queue state, Apps Script source and configuration, installed-trigger inventory, and account recovery arrangements.
+- Hosting configuration, redirects, approved directory layout, and a secure credential inventory with owners and recovery instructions.
 
-## Retirement timeline
+A downloaded repository ZIP is not proof that LFS content, Git history, or any of those external services has been retained. Do not place secrets inside a public backup bundle.
 
-Joe disengages on a soft timeline driven by Jay's pace, not a fixed date. The expected sequence:
+## 8. Recover in an isolated copy first
 
-1. **Now → Wednesday May 27 demo call**: Joe walks Jay through the live system, addresses any concerns, gets Jay's sign-off.
-2. **May 27 → ~30 days**: parallel-run period. Joe stays available for quick fixes; Hali starts handling everyday operator questions. Any architectural feedback from Jay lands in this window.
-3. **~30 days post-call**: handoff steps 1-6 above execute. Joe transfers repo to Jay/Hali; everything else recreates.
-4. **Steady state**: archive runs unattended. Hali is the day-to-day operator. Joe is available for "the world has changed" calls but not "Column F says error" calls.
+Pause the affected publishing route if continuing it could compound a problem. Save the failed run link, tested commit, release version, transfer report, and receipt status. Preserve the existing catalog and ledger before making repairs.
 
-This timeline is intentionally not a contract — slide it later or earlier based on Jay's comfort.
+For a baseline restoration, keep the original bag untouched, verify a working copy, and create a fresh checkout of its recorded `Source-Commit`. Restore the bag’s `data/data/` payload into that checkout’s `data/` directory. Then run:
 
----
+```sh
+npm run baseline:verify -- /path/to/bag --restore-root /path/to/checkout
+```
 
-## What's INTENTIONALLY left out
+The restore root is the checkout, not its data directory. Materialize the required LFS files, install dependencies from the lockfile, and run the documented tests. Open the isolated site and check search, records, stable links, the dissertation, and relevant browsing tools. Reconcile external Sheet and D1 state separately; restoring catalog files does not rewind those services.
 
-This handoff doc does NOT cover:
+If a publisher committed successfully but its transfer failed, the new records may already be on main. After fixing the cause, the documented next run can test and redeploy that head without adding duplicate records, verify live files, and settle pending candidates. Do not append the same batch manually or fabricate a successful receipt.
 
-- **Detailed Pillar 3a setup and smoke testing** — those live in `docs/setup/pillar-3a-runbook.md`; the failure modes above cover steady-state operation.
-- **Hand-editing records via PR** — that's the normal GitHub PR workflow; if Hali isn't comfortable with PRs yet, ask Joe for a 30-min walkthrough during the parallel-run period.
-- **Adding new categorization themes / eras** — the existing 8 canonical eras and 6 categories (in `data/SCHEMA.md`, established by PR #218) cover Jay's existing work. Adding new ones is a separate scope decision that needs Jay's editorial judgment + a PR.
-- **What to do if Bluehost goes away or rates rise unacceptably** — that's a "redesign X" conversation; call Joe.
-- **What to do if GitHub starts charging for public-repo Actions** — currently unmetered per the 2026 pricing announcement; if that changes, call Joe.
+## 9. Transfer accounts and migrate deliberately
 
----
+Use each provider’s current transfer process. [GitHub Apps can be transferred](https://docs.github.com/en/apps/maintaining-github-apps/transferring-ownership-of-a-github-app); verify installation access, permissions, keys, and both submission and Actions integrations afterward. A repository transfer alone does not establish that every external credential or service has moved.
 
-## Escalation path
+A [container-bound Apps Script inherits its container’s ownership](https://developers.google.com/apps-script/guides/bound). [Installable triggers run as their creator](https://developers.google.com/apps-script/guides/triggers/installable), so inventory them, recreate the required triggers under the continuing operator where appropriate, and test their authorization. Check account and organization restrictions before promising a particular Google ownership transfer.
 
-| Situation | Who to call |
-|---|---|
-| "Column F says error, I don't understand the message" | Hali |
-| "The whole sheet is broken" | Hali → Joe |
-| "I want to bulk-edit categories" | Hali (with PR) |
-| "I want to add a whole new platform (e.g., Substack newsletter)" | Joe |
-| "Something architectural needs to change" | Joe |
-| "GitHub / Bluehost / Google are doing something unexpected" | Joe |
-| "I want to sunset the archive" | Joe + Jay (joint decision) |
+Current Actions configuration includes `ROSEN_GH_APP_ID`, `ROSEN_GH_APP_PRIVATE_KEY`, `ROSEN_SHEETS_SA_KEY_JSON`, the transfer settings above, and `ROSEN_INGESTION_RECEIPT_TOKEN` for receipts. The Worker uses `INGESTION_RECEIPT_TOKEN`. Other jobs have their own settings; verify their current workflow and runbook. Rotate credentials through the affected services together, keeping secret values out of logs and this document.
 
----
+For a new host, prepare and test a separate copy before changing DNS or the public address. Preserve stable record URLs and redirects, check browser security rules and service-worker scope, and transfer only the public allowlist. Retain the old release and recovery access until the new host passes acceptance checks.
 
-## Living-doc maintenance
+## 10. Accept the handoff with evidence
 
-This doc should be updated whenever:
-- A handoff step changes (e.g., GCP project moves to a new account)
-- A failure mode is encountered that isn't covered above
-- A repo secret rotates
-- The escalation contacts change
+Complete the handoff only when the receiving team can independently:
 
-Update it as a normal PR. The point is that the doc reflects the actual operational state, not the originally-planned state.
+1. Access every required account and identify its primary owner, backup, recovery route, renewal obligations, and alert recipient.
+2. Find and verify independent backups, including LFS and separately held source evidence.
+3. Restore an isolated copy, pass its integrity checks, and demonstrate the main reader tasks.
+4. Run an appropriate dry run, explain held or rejected records, and recognize which actions publish automatically.
+5. Complete an authorized tested release, verify the public result, and locate its operating receipt.
+6. Receive a test alert and follow the documented failure and recovery procedure.
+
+Record the evidence, unresolved limitations, named accepting people, and acceptance date. Agree on a recurring review of backups, account access, costs, failed runs, source losses, and editorial requests. Any continuing dependency on a departing maintainer should have a named replacement and a completion date.

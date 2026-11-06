@@ -1,5 +1,13 @@
 # Pillar 3a status and remaining setup
 
+> **Historical setup record: June 16, 2026.** Context added November 6, 2026.
+> The statements below about transfer access, manual upload, secrets, and row
+> status describe that historical setup. Do not use them as current operating
+> instructions or as proof of current account access. Production now uses
+> certificate-verified FTPS. Follow the [deployment guide](../DEPLOYMENT.md),
+> [current handoff guide](../docs/HANDOFF.md), and
+> [current publishing operations](../docs/operations/bluesky-stewardship.md).
+
 Last updated 2026-06-16.
 
 Pillar 3a (sheet checkbox → GitHub Action scrapes, categorizes, commits a record,

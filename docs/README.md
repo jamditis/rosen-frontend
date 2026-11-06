@@ -8,12 +8,16 @@ A guide to the documentation in this repository — where to start depending on 
 |-----------------|-------|
 | Understand what the archive is | The [root README](../README.md), or just visit [the live site](https://pressthink.org/j/rosen-archive/) |
 | Use or analyze the archive data | [`data/README.md`](../data/README.md) and the data dictionary in [`data/SCHEMA.md`](../data/SCHEMA.md) |
-| Add a new record to the archive | [`ADDING-RECORDS.md`](../ADDING-RECORDS.md) — a step-by-step guide for non-technical curators |
+| Suggest a record without editing files | [`JAY_ADDING_RECORDS.md`](JAY_ADDING_RECORDS.md) — public suggestions and the optional submission sheet |
+| Prepare or correct a catalog record | [`ADDING-RECORDS.md`](../ADDING-RECORDS.md) — source fields, IDs, checks, and the complete publication path |
+| Take responsibility for the archive | [`HANDOFF.md`](HANDOFF.md) — roles, account control, preservation, recovery, and acceptance evidence |
 | Work on the code | [`CLAUDE.md`](../CLAUDE.md) (full technical reference) and [`AGENTS.md`](../AGENTS.md) (conventions summary) |
 | Understand the project's vocabulary | [`CONTEXT.md`](../CONTEXT.md) — what "Record," "Entity," and "Facet" mean here |
 | Deploy the site | [`DEPLOYMENT.md`](../DEPLOYMENT.md) — the file-by-file deploy manifest |
 | Understand the backend pipeline | [`backend/README.md`](../backend/README.md) |
-| Follow the Bluesky-first stewardship plan | [`bluesky-stewardship-pipeline.md`](bluesky-stewardship-pipeline.md) — plain-language source, preservation, processing, and escalation map |
+| Operate the current automated intake | [`operations/bluesky-stewardship.md`](operations/bluesky-stewardship.md) and [`operations/pressthink-ingestion.md`](operations/pressthink-ingestion.md) — implemented behavior and recovery |
+| Read the broader stewardship design | [`bluesky-stewardship-pipeline.md`](bluesky-stewardship-pipeline.md) — plans and design context, not proof that every component is deployed |
+| Prepare and verify a preservation copy | [`preservation/BASELINE.md`](../preservation/BASELINE.md) and [`preservation/README.md`](../preservation/README.md) — selected-data packages and source-preservation evidence |
 
 ## What's in this directory
 
@@ -28,7 +32,7 @@ The `docs/` directory holds the project's working documentation — history, pla
 
 - [`plans/`](plans/) — dated design and implementation plans, kept as a record of decisions
 - [`research/`](research/) — dated discovery and inventory writeups
-- [`bluesky-stewardship-pipeline.md`](bluesky-stewardship-pipeline.md) — the current source, preservation, processing, and escalation map for continuous archive stewardship
+- [`bluesky-stewardship-pipeline.md`](bluesky-stewardship-pipeline.md) — the broader source, preservation, processing, and escalation design; current implementation is documented in the operations guides above
 - [`feature-audit/`](feature-audit/) — the June 2026 feature inventory, its two current catalog checks, test-pinned harnesses, and separated historical phase machinery
 - [`pressthink-recovery-index-2026-07-23.md`](pressthink-recovery-index-2026-07-23.md) — the 2009-onward PressThink recovery evidence index
 - [`pressthink-2004-2008-gap-2026-08-27.md`](pressthink-2004-2008-gap-2026-08-27.md) — the Movable Type era gap measurement, regenerated from the checked-in inventories in [`backend/inventories/`](../backend/inventories/README.md)

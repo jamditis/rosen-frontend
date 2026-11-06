@@ -145,8 +145,9 @@ deleted payload file, an injected extra payload file, or an altered tag file
 2. Run `npm run baseline:verify -- <bag-dir>` and confirm it prints `OK`.
 3. Check out the commit recorded as `Source-Commit` in `bag-info.txt`
    (`git checkout <commit>`), or a fresh clone at that commit.
-4. Copy each file from `<bag-dir>/data/data/<path>` to `<checkout>/<path>`,
-   preserving the relative path (for example
+4. For each repository-relative path listed in the manifest, copy
+   `<bag-dir>/data/<repo-relative-path>` to `<checkout>/<repo-relative-path>`,
+   preserving its directory structure (for example
    `<bag-dir>/data/data/archive_records-public.csv` restores to
    `<checkout>/data/archive_records-public.csv`).
 5. Re-verify the restored files against the original bag without copying
@@ -157,7 +158,8 @@ deleted payload file, an injected extra payload file, or an altered tag file
    ```
 
    `--restore-root <checkout>` tells the verifier to read payload files from
-   `<checkout>/<path>` instead of `<bag-dir>/data/data/<path>` — pass the
+   `<checkout>/<repo-relative-path>` instead of
+   `<bag-dir>/data/<repo-relative-path>` — pass the
    checkout's root directory, not its `data/` subdirectory, so you can
    confirm a restore matches the frozen baseline exactly, without needing a
    second full copy of the payload. The Payload-Oxum completeness check is
@@ -174,6 +176,13 @@ Issue #702 asks for at least two copies of a baseline stored outside this git
 working tree, with their retention policies recorded. This tool cannot copy
 files anywhere on its own — that half of the work is deciding where a copy
 lives and how long it stays there, which is recorded here, not automated.
+
+The locations below are proposed destinations, not deposit receipts or proof
+of current account access. The first retention entry contains an unresolved
+conflict: it says both to retain milestone bags indefinitely and to prune
+them after two later milestones. The receiving custodian must record an
+approved, unambiguous retention rule before deleting a bag. This table does
+not establish deletion authority.
 
 | # | Location | Retention policy |
 |---|---|---|
