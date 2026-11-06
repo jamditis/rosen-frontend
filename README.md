@@ -4,22 +4,24 @@ A public archive of the works, critiques, and teachings of Jay Rosen — press c
 
 **Explore the archive:** https://pressthink.org/j/rosen-archive/
 
-This repository contains everything that powers the archive: the website, the data, and the tools used to build and maintain it. The whole thing is open — you can browse the code, download the data, run the site on your own computer, or just read about how it was put together.
+This public repository holds the website source, archive data, and tools used to build and maintain the collection. Hosting, connected accounts, and preservation copies held elsewhere are maintained separately. You can browse the code, download the data, run the site on your own computer, or read about how it was put together.
 
 ## What's in the archive
 
-- **26,865 records** — 1,030 curated records, 25,834 social posts, and the dissertation
-- **7,303 named entities** — people, organizations, and concepts connected to records across the collection
+Counts checked against the repository data on **November 6, 2026**:
+
+- **27,057 published records** — 1,218 curated records, 25,829 published social source records, 9 generated social thread containers, and the dissertation
+- **7,488 named entities** — people, organizations, and concepts connected to records across the collection
 - **The 1986 dissertation** — *The Impossible Press: American Journalism and the Decline of Public Life*, written under Neil Postman and released publicly in December 2025
 
-Every record is categorized by theme, era, and publication. Most of the curated records are also cross-linked to the people, organizations, and ideas they mention; entity extraction is still catching up on some records, and the social media posts are largely not entity-linked yet.
+Records carry theme, era, and publication information, with coverage varying by field and source. Most curated records are also cross-linked to the people, organizations, and ideas they mention; entity extraction is still catching up on some records, and the social media posts are largely not entity-linked yet. The [stewardship census](data/stewardship-census.md) distinguishes source rows, published records, generated threads, and missing fields.
 
 ## Ways to explore
 
 On the live site:
 
 - **[Start here](https://pressthink.org/j/rosen-archive/#start)** — a guided introduction for first-time visitors
-- **The archive browser** — search and filter all records by category, era, and publication
+- **The archive browser** — search records and narrow them by thematic category, era or year, and content type. The separate [data dashboard](https://pressthink.org/j/rosen-archive/tools/active/dataviz/dataviz.html) also offers publication filters and research exports.
 - **[Archive desktop](https://pressthink.org/j/rosen-archive/#desktop)** — an optional alternate way to browse the archive, folders, people and ideas, and research tools. Its archive and folder views include an opt-in “Search by meaning” control alongside regular search.
 - **[Entities](https://pressthink.org/j/rosen-archive/#entities)** — browse the people, organizations, and concepts that appear across the collection
 - **[The dissertation](https://pressthink.org/j/rosen-archive/dissertation/)** — a full-text reader, a foreword, an interactive mind map, and a film analysis of *Network* (1976)
@@ -37,7 +39,7 @@ records, or source files. Browsers without WebMCP support use the site normally.
 
 ## Open data
 
-The archive's data is part of the public record and free to use. See [`data/README.md`](data/README.md) for the full data guide, including:
+The archive's metadata and derived data can be reused under CC BY 4.0 with attribution. Public access does not remove copyright restrictions on the writings, images, or other source material. See [`data/README.md`](data/README.md) for the full data guide, including:
 
 - Generated JSON files the site reads (record cards, full details, entity graph)
 - Source CSV files with every record, post, entity, and relationship
@@ -48,7 +50,7 @@ Licensing: the code in this repository is MIT licensed (see [`LICENSE`](LICENSE)
 
 ## Running the site locally
 
-The site is a zero-build static site — no bundler, no compile step, no database. If you have Python installed:
+The site is a zero-build static site — no bundler, no compile step, no server-side database. If you have Python installed:
 
 ```bash
 python3 -m http.server 8000
@@ -93,7 +95,7 @@ The site reads JSON files generated from four CSV source files:
 | Source file | What it contains |
 |-------------|-----------------|
 | `data/archive_records-public.csv` | Curated archive records |
-| `data/social_posts.csv` | Twitter/X, Bluesky, and Mastodon posts |
+| `data/social_posts.csv` | Twitter, Bluesky, and Mastodon posts |
 | `data/extracted_entities.csv` | Named entities |
 | `data/extracted_relationships.csv` | Entity relationships |
 
@@ -104,13 +106,13 @@ npm install          # first time only
 node data/export-archive-data.js
 ```
 
-Adding a record by hand is a three-step process (edit a CSV, run one command, upload the output) — the step-by-step guide, written for non-technical curators, is [`ADDING-RECORDS.md`](ADDING-RECORDS.md).
+Manual additions require a source edit, regenerated data, validation, and a coordinated release. The step-by-step guide is [`ADDING-RECORDS.md`](ADDING-RECORDS.md). Curator-written summary overrides live in `data/authored-excerpts.csv`; preserve that file with the source data.
 
 ## Continuous stewardship
 
-New public work now appears mainly on Bluesky. The daily stewardship workflow finds Jay Rosen's public posts, keeps meaningful public discourse as record candidates, preserves needed thread context, and sends approved work through the existing archive review and release path. If a release reaches `main` before deployment completes, the next run validates and deploys that exact commit before it settles pending source candidates.
+New public work now appears mainly on Bluesky. The daily Bluesky workflow finds Jay Rosen's public posts, checks available thread context, and applies defined admission rules before the tested release and publication steps. This automated admission is not a separate human approval of every record. Human review remains an editorial responsibility; the general submission path can publish records marked `needs_review`. If a Bluesky release reaches `main` before deployment completes, the next run validates and deploys that exact commit before it settles pending source candidates.
 
-Read the plain-language system map: [Bluesky-first archive stewardship pipeline](docs/bluesky-stewardship-pipeline.md).
+Read the [current daily Bluesky operations guide](docs/operations/bluesky-stewardship.md) for implemented behavior and publication evidence. The [Bluesky-first stewardship design map](docs/bluesky-stewardship-pipeline.md) also describes longer-term preservation and review work; it is not a statement that every proposed capability is running.
 
 Source discovery does not publish records. The repository data, tests, and deployment workflow remain the publication gate.
 
@@ -127,10 +129,10 @@ Tests use the Node.js built-in test runner.
 
 ## Deploying to production
 
-The site is hosted at `pressthink.org/j/rosen-archive/` and deployed by uploading changed files via FTP. The full deploy manifest — what to upload, what to exclude, and the cache-busting steps — lives in [`DEPLOYMENT.md`](DEPLOYMENT.md). The short version:
+The site is hosted at `pressthink.org/j/rosen-archive/` and deployed through certificate-verified explicit FTPS. The full deploy manifest — what to upload, what to exclude, and the cache-busting steps — lives in [`DEPLOYMENT.md`](DEPLOYMENT.md). The short version:
 
 1. Edit source files as needed.
-2. If data changed: `node data/export-archive-data.js`.
+2. If data changed: `node data/export-archive-data.js`. Refresh the required search-by-meaning vectors as described in [`data/README.md`](data/README.md#search-by-meaning-vectors), and complete the data and release checks in the deployment guide.
 3. Run `npm run bump-version -- X.X.X` to stamp the new version across `index.html`, `version.json`, versioned JS/CSS references in `frontend/`, `faq/`, `features/`, and `dissertation/`, and the service worker's `CACHE_VERSION`. The service worker uses exact versioned request URLs and removes old cache namespaces when a release activates, so both version surfaces must move together.
 4. Upload dependencies first, then standalone pages and record shells. Upload root `index.html`, `frontend/sw.js`, root `sw.js`, and `version.json` last, preserving the order from `backend/scripts/deploy_full_site.py`.
 
@@ -157,4 +159,4 @@ The site is hosted at `pressthink.org/j/rosen-archive/` and deployed by uploadin
 
 The archive is curated and maintained by Joe Amditis. Found a broken link, a missing work, or a data error? [Open an issue](https://github.com/jamditis/rosen-frontend/issues) or use the [ways to participate](https://pressthink.org/j/rosen-archive/features/participate/) page.
 
-Record and entity counts above reflect the generated data files in this repository and change as the collection grows.
+Record and entity counts above describe the repository snapshot checked on November 6, 2026. They change as the collection grows and do not, by themselves, verify which revision is live on PressThink.

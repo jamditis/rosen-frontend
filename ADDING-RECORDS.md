@@ -1,27 +1,23 @@
 # Adding new records to the archive
 
-This guide explains how to add new articles, essays, or posts from 2026 onward to Jay Rosen's Internet Archive.
+This guide explains the manual path for adding new or recovered older work to Jay Rosen's Internet Archive. A curator can prepare the source information; the maintainer handles ID allocation, validation, and publication. To suggest a work without editing files, use [Ways to participate](https://pressthink.org/j/rosen-archive/features/participate/).
 
 ---
 
 ## What you'll need
 
-- **A text editor** — anything works (TextEdit, Notepad, VS Code)
-- **Node.js** — download from [nodejs.org](https://nodejs.org) if you don't have it
-- **An FTP client** — [Cyberduck](https://cyberduck.io) (free, Mac/Windows) or FileZilla
-- **FTP credentials** for pressthink.org — ask Joe Amditis
+- **A current working copy of the repository**, with a backup before editing
+- **A spreadsheet app or plain-text editor** that preserves all CSV columns and quoted, multiline text
+- **Node.js** for the maintainer's data-generation and validation steps
+- **An authorized maintainer** who can use the existing release workflow. For a manual transfer, use certificate-verified explicit FTPS and obtain credentials privately from Joe Amditis.
 
 ---
 
 ## Overview
 
-The archive works like this:
+The manual path has four parts: edit the source CSV, regenerate the website files, validate the release, and publish the complete coordinated bundle.
 
-```
-You edit a CSV file → run one command → upload one file → done
-```
-
-There's no database, no CMS login, no complex system. The CSV file is the source of truth.
+There is no CMS editing login. The CSVs are the source records; JSON files are generated copies used by the website. Editing only a JSON file loses the change the next time the data is regenerated. A successful export or GitHub commit is not proof that a record is live.
 
 ---
 
@@ -54,7 +50,7 @@ Open this file in your text editor or a spreadsheet app like Excel or Google She
 data/archive_records-public.csv
 ```
 
-If you open it in Google Sheets or Excel, the columns will be labeled. That's the easiest approach.
+If you open it in Google Sheets or Excel, keep the first row as the column headings. As of November 6, 2026, this file has **38 columns**. Preserve every heading and its order, including `collection_id`, `low_confidence`, and `needs_review`; blank cells still need their columns. Text cells can contain commas, quotation marks, and line breaks, so use a CSV-aware import/export and check the saved result before replacing the working file.
 
 ---
 
@@ -64,18 +60,22 @@ Add a new row at the **bottom** of the file. The most important columns are:
 
 | Column | What to put |
 |--------|-------------|
-| `id` | Next available ID — one past the current max in the file (as of 2026-07-23 the max is `RECORD-00905`, so the next is `RECORD-00906`). Always check the bottom of the file for the real current max; don't fill gaps. |
+| `id` | Ask the maintainer to reserve a new `RECORD-` ID using the shared allocator in `backend/scripts/record_id_sequence.py`. It checks existing IDs and the high-water mark in `data/record-id-sequence.json`. The last row is not a safe allocator; never reuse a retired ID or fill a gap. |
 | `title` | Title of the article or post |
 | `url` | Link to the original |
-| `author` | `Jay Rosen` |
-| `publication_date` | Format: `YYYY-MM-DD` (e.g. `2026-03-15`) |
+| `author` | The author supported by the source; usually `Jay Rosen` |
+| `publication_date` | Verified original publication date in `YYYY-MM-DD` form. Record uncertainty in `notes` and ask the curator when an exact date is unknown. |
 | `original_publication` | Where it was published (e.g. `PressThink`, `The Atlantic`) |
-| `content_type` | `Article`, `Essay`, `Interview`, or `Lecture` |
+| `content_type` | The appropriate existing type, such as `Article`, `Interview (Audio/Video)`, or `Speech/Lecture` |
 | `thematic_categories` | Pick one or more from the list below, separated by commas |
 | `era` | `Platform Transition & Future Models (2021-Present)` for anything after 2021 |
-| `verified` | `TRUE` |
+| `verified` | Set to `TRUE` only after the source details have been checked. For an unresolved manual addition, keep it out of publication and ask the curator to review it. |
+| `needs_review` | Record an outstanding human-review requirement explicitly. This flag alone does **not** prevent publication. |
+| `notes` | Public-safe source evidence, corrections, and any date or attribution uncertainty |
 
-All other columns can be left blank for now.
+Preserve all other columns, even when a value is blank. For an existing record, keep its ID and unrelated fields unchanged. Before changing source rows, the maintainer must check for pending ingestion transactions and coordinate with other writers. Keep the ID reservation state with the data change.
+
+Automated submissions can set `verified=TRUE` while also setting `needs_review=true`. Neither a public record nor the verification flag alone establishes that a human has finished checking it.
 
 ### Thematic categories to use
 
@@ -97,32 +97,55 @@ You can combine them: `Press & Media Criticism, Politics & Democracy`
 > scripts pick up the change with no code edit; this list is the one mirror to
 > keep in step.
 
-### Example row (what a new 2026 PressThink post looks like)
+### Example fields for a new record
 
-```
-RECORD-00906,The Citizens' Agenda in 2026,https://pressthink.org/2026/03/citizens-agenda-2026/,Jay Rosen,2026-03-15,PressThink,PressThink,,Article,text,,,,Summary of the post goes here.,,Press & Media Criticism,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,,,,,,,,,,TRUE,
-```
+This is an illustration, not a row to paste into the archive. Enter values under the matching headings in the current 38-column file; do not reconstruct a CSV row from this table.
+
+| Column | Illustrative value |
+| --- | --- |
+| `id` | The new ID reserved by the maintainer |
+| `title` | Example essay title |
+| `url` | `https://example.invalid/essay/` — replace with the verified source URL |
+| `author` | The author shown on the source |
+| `publication_date` | The date verified on the source |
+| `original_publication` | The publication shown on the source |
+| `content_type` | `Article` |
+| `summary` | A checked description of what the piece says |
+| `thematic_categories` | `Press & Media Criticism` |
+| `era` | The appropriate value from `data/SCHEMA.md` |
+| `verified` | `TRUE` only after review |
+
+Never use an ID from an example as the next available ID.
 
 ---
 
 ## Step 3: Save the CSV
 
-If you edited in **Google Sheets or Excel**: export/save as CSV (not .xlsx). The file should still be named `archive_records-public.csv` and go back in the `data/` folder.
+If you edited in **Google Sheets or Excel**: export/save as UTF-8 CSV (not .xlsx). The file should still be named `archive_records-public.csv` and go back in the `data/` folder. Confirm the 38 headings and existing IDs survived, and that commas, line breaks, and quotation marks remain inside the correct cells. Keep the backup until validation succeeds.
 
 If you edited in a **text editor**: just save the file.
 
 ---
 
-## Step 4: Regenerate the JSON
+## Step 4: Regenerate and validate the release
 
 Open a terminal (Mac: search for "Terminal", Windows: search for "Command Prompt"), navigate to the repo folder, and run:
 
 ```bash
-npm install
+npm ci
 node data/export-archive-data.js
 ```
 
-This takes about 30–60 seconds and produces updated JSON files in the `data/` folder. The script prints progress as it goes: starting the export, reading each CSV file (with a row count for each), processing records, building entities and relationships, and finally writing the four JSON output files. If the run finishes without errors, the updated JSON files are ready to upload.
+The exporter prints source counts and writes the runtime data, lexical search indexes, analytics, relationship files, and feeds. Successful generation is the first check, not permission to publish. Compare the reported record counts and changed files with the intended edit.
+
+After published records change, refresh both search-by-meaning vector pairs as described in [`data/README.md`](data/README.md#search-by-meaning-vectors):
+
+```bash
+npm run build-embeddings
+npm run build-social-embeddings
+```
+
+The data guide explains when a verified incremental social-vector build can be used. Keep each binary and its matching index together.
 
 Next, choose the new release version and stamp every cache and import marker together:
 
@@ -132,28 +155,32 @@ npm run bump-version -- X.X.X
 
 This updates `index.html`, `version.json`, the relevant `?v=` import strings, and `frontend/sw.js` `CACHE_VERSION`. Keep all of those changes in the same release. Returning visitors can otherwise receive cached archive JSON from the previous release.
 
+Run the graph validator and repository tests, and resolve failures before publication:
+
+```bash
+npm run validate:graph
+npm test
+```
+
+The maintainer should preview the affected record, its source link, summary, and citation. The [stewardship census procedure](data/README.md#stewardship-coverage-census) requires committing clean source/runtime inputs before regenerating and committing the census; it also requires full Git history. Follow that sequence and the current [release procedure](DEPLOYMENT.md#release-procedure).
+
 ---
 
-## Step 5: Upload to the live site
+## Step 5: Publish and check the live record
 
-Connect with Edgar's explicit FTPS account (credentials from Joe) and upload
-these files to `j/rosen-archive/data/`. That is the archive path exposed inside
-this account's chroot; filesystem or control-panel paths are not interchangeable
-with it.
+Have the authorized maintainer publish the tested, committed release using the existing workflow in [`DEPLOYMENT.md`](DEPLOYMENT.md#release-procedure). GitHub Pages and the PressThink archive are separate destinations; a successful Pages update does not establish that PressThink is current.
 
-- `data/archive-core.json`
-- `data/archive-data.json`
-- `data/archive-details.json`
+For a manual transfer, use certificate-verified explicit FTPS to the approved `j/rosen-archive/` path. Follow the complete deployment manifest, including regenerated data, search indexes, both vector pairs, relationship shards and manifest, feeds, versioned assets, and record-specific shells. Do not upload just the three main JSON files or the source CSVs. Upload dependencies first, then standalone pages and record shells, with root `index.html`, `frontend/sw.js`, root `sw.js`, and `version.json` last.
 
-Publish the complete versioned bundle in the order documented in [`DEPLOYMENT.md`](DEPLOYMENT.md), with root `index.html`, `frontend/sw.js`, root `sw.js`, and `version.json` last. The coordinated version bump invalidates old browser caches, so visitors do not need to clear them manually.
+Require successful public-byte verification and matching release markers. Then open the record at [the PressThink archive](https://pressthink.org/j/rosen-archive/) and confirm the title, date, source link, changed fields, and citation. Record the release version and record ID. An upload acknowledgement alone does not prove that readers received the update.
 
 ---
 
 ## Adding social posts (Bluesky, Twitter, Mastodon)
 
-This is the manual repair and backfill path. Use `data/social_posts.csv`. Select the ID prefix from the post's platform: `BSKY-` for Bluesky, `TWTR-` for Twitter, and `MAST-` for Mastodon. Find the highest ID with that prefix and use the next zero-padded number. For example, `BSKY-03172` is followed by `BSKY-03173`. The `content_type` should be `Social Media Post`.
+This is the manual repair and backfill path. Use `data/social_posts.csv` and preserve its own current column headings. Select the ID prefix from the post's platform: `BSKY-` for Bluesky, `TWTR-` for Twitter, and `MAST-` for Mastodon. Have the maintainer allocate an unused platform ID against the complete current source while coordinating with automated writers; do not reuse an existing or retired ID. The `content_type` should be `Social Media Post`.
 
-New work now appears mainly on Bluesky. The planned continuous workflow is Bluesky-first. It treats original posts and meaningful public conversation as candidates. It keeps short acknowledgements as thread context, not standalone records. The complete system map is maintained in the public repository `docs/` directory.
+New work now appears mainly on Bluesky. The [current daily publication guide](docs/operations/bluesky-stewardship.md) describes implemented collection, admission, and verified publication. It keeps short acknowledgements and uncertain items as context rather than standalone public records. The [stewardship design map](docs/bluesky-stewardship-pipeline.md) describes additional preservation and review plans; do not assume those plans are already operating.
 
 ---
 
@@ -220,7 +247,7 @@ match. If you change one, change the other the same way.
    the alphabet can land behind that link instead of showing right away.
 4. Regenerate the JSON and bump the version, the same as Step 4 above:
    `node data/export-archive-data.js`, then `npm run bump-version -- X.X.X`.
-5. Upload and commit, the same as Step 5 and "Committing your changes" below.
+5. Validate, commit, and publish using Steps 4 and 5 and "Committing your changes" below.
 
 Do steps 1 and 2 before step 3. A separate repair tool a developer runs from
 time to time (`backend/scripts/archive_record_reviewer.py`) checks every
@@ -256,8 +283,8 @@ works fine on its own.
    category: the auto-categorizer refuses to run at all, and the backend
    test suite fails before a single test runs. That turns the pull request's
    CI check red.
-4. Regenerate the JSON, bump the version, upload, and commit — the same steps
-   as adding a category.
+4. Regenerate the JSON, refresh the required vectors, bump the version,
+   validate, commit, and publish — the same steps as adding a category.
 
 If a record still carries the removed name when you regenerate, that name
 keeps showing up in the sidebar. The sidebar list is built from what is
@@ -279,18 +306,27 @@ bug.
 
 ## Committing your changes to GitHub
 
-After adding records and confirming the site looks right, save your work to the repository:
+The maintainer saves the source and tested release files to the repository before publication. Start from a clean checkout and inspect the exact changes being staged:
 
 ```bash
 git add -u -- .
 git diff --cached --name-only
 git commit -m "Add [number] new records through [date]"
-git push
 ```
 
 Run this from a clean checkout so `git add -u -- .` stages only this release's tracked changes. Before committing, confirm the staged list includes the source CSVs you edited, every generated JSON file, `index.html`, `version.json`, `frontend/sw.js`, and every frontend or standalone-page file changed by the version bump. `data/authored-excerpts.csv` must be present when you changed an authored excerpt; otherwise the next regeneration from a clean checkout loses that override.
 
-This isn't required for the site to work, but it keeps a history of changes and makes it easy to undo mistakes.
+Also preserve any changed `data/record-id-sequence.json`, generated feeds, vector pairs, and relationship files. New files are not included by `git add -u`; inspect and stage those explicitly before the data commit. Once the source/runtime inputs are committed and clean, complete the census step:
+
+```bash
+npm run census:stewardship
+npm run test:data
+git add data/stewardship-census.json data/stewardship-census.md
+git diff --cached --name-only
+git commit -m "Refresh stewardship census"
+```
+
+Commit the reports only if they changed. Push the reviewed commits through the repository's agreed workflow, then use Step 5 to publish and verify the same release. Keep the tested commit and its version together so another maintainer can reproduce the publication and investigate a mistake.
 
 ---
 

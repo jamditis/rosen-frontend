@@ -1,5 +1,15 @@
 # Bluesky-first archive stewardship pipeline
 
+> **Design reference, not a live-service inventory.** Context added November 6, 2026.
+> The diagram and “Current position” table below preserve this design stage.
+> Their planned components and adapter gaps are not current deployment status.
+> Daily discovery and GitHub Actions publishers are implemented; follow
+> [Bluesky operations](operations/bluesky-stewardship.md),
+> [article and publisher-feed operations](operations/pressthink-ingestion.md),
+> and the [current handoff guide](HANDOFF.md) for operating procedures and
+> preservation limits. Proposed control Worker, office-runner, and R2 stages
+> are not evidence that those services run or that durable source copies exist.
+
 **Status:** Design and work map. The existing archive publishing path remains the release boundary.
 
 ## Purpose
