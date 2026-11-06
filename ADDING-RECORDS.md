@@ -1,23 +1,38 @@
-# Adding new records to the archive
+# Adding and correcting archive records
 
-This guide explains the manual path for adding new or recovered older work to Jay Rosen's Internet Archive. A curator can prepare the source information; the maintainer handles ID allocation, validation, and publication. To suggest a work without editing files, use [Ways to participate](https://pressthink.org/j/rosen-archive/features/participate/).
+This guide explains how to submit new work and correct existing records in Jay Rosen's Internet Archive. New articles go through the submission workflow, which assigns and saves their IDs. The manual CSV instructions below are for existing records; they are not a way to reserve IDs or append new rows. To suggest a work without editing files, use [Ways to participate](https://pressthink.org/j/rosen-archive/features/participate/).
 
 ---
 
-## What you'll need
+## What you'll need for a manual correction
 
 - **A current working copy of the repository**, with a backup before editing
 - **A spreadsheet app or plain-text editor** that preserves all CSV columns and quoted, multiline text
 - **Node.js** for the maintainer's data-generation and validation steps
-- **An authorized maintainer** who can use the existing release workflow. For a manual transfer, use certificate-verified explicit FTPS and obtain credentials privately from Joe Amditis.
+- **An authorized maintainer** who can use the existing release workflow. For a manual transfer, use certificate-verified explicit FTPS and obtain credentials privately from the current hosting account owner named in the handoff record.
 
 ---
 
 ## Overview
 
-The manual path has four parts: edit the source CSV, regenerate the website files, validate the release, and publish the complete coordinated bundle.
+For a new article, use the submission workflow described next. It performs the source write, release preparation, tests, and publication. Use the manual steps only when an existing record needs a correction: edit the source CSV, regenerate the website files, validate the release, and publish the complete coordinated bundle.
 
 There is no CMS editing login. The CSVs are the source records; JSON files are generated copies used by the website. Editing only a JSON file loses the change the next time the data is regenerated. A successful export or GitHub commit is not proof that a record is live.
+
+---
+
+## Add a new article through the submission workflow
+
+Use the [confirmed submission sheet](docs/JAY_ADDING_RECORDS.md), or have an authorized maintainer open **Actions → Pillar 3a — submit record → Run workflow** and select `main`. The workflow is defined in [`.github/workflows/submit-record.yml`](.github/workflows/submit-record.yml).
+
+1. Confirm the sheet and publication setup with the current caretaker. For a direct Actions dispatch, supply the real `url`, `sheet_id`, `sheet_tab`, and `sheet_row` for the submission. The URL, sheet ID, and row are required; use the actual tab name rather than assuming its `Sheet1` default. Do not invent sheet values to bypass an unavailable setup.
+2. Provide an optional `title` and public-safe `notes`. If the scraper cannot retrieve an approved source, the caretaker can supply reviewed article text through `raw_text`, keeping the original URL. Leave `retry_record_id` empty for a new submission; it is for recovery of an existing archived record.
+3. Run the workflow once. It waits for the existing release queue, then checks out current `main` before processing. For a new `RECORD-` article, [`process_submission.py`](backend/scripts/process_submission.py) calls `record_id_sequence.reserve(...)`, saves the increased high-water mark in `data/record-id-sequence.json` before writing the CSV, and includes that state in the data commit. A push race reloads current `main` and repeats the reservation before replaying the record.
+4. Keep the run link and resulting record ID. Check the final status and the public record using the [submission guide](docs/JAY_ADDING_RECORDS.md#what-the-status-column-can-say). An error or lost status update is not permission to submit a second copy; inspect the existing run and record first.
+
+This workflow can publish automatically; it is not an ID-only command or a draft queue. `needs_review` does not hold a record out of publication. Complete any required editorial decision before dispatching, then check the generated metadata afterward.
+
+`backend/scripts/record_id_sequence.py` is an internal Python module, not a standalone command. Do not run it as a reservation CLI, call it from an ad hoc script to prepare a manual row, or choose an ID from the last CSV row. Its file lock is local to one checkout; it is not a reservation service across independent clones. Use the queued workflow above so reservation, source write, commit, and publication stay together. Keep unprocessed source information outside the canonical CSV if this route is unavailable.
 
 ---
 
@@ -44,6 +59,8 @@ appears in the archive at its original date, not at its online publication date.
 
 ## Step 1: Open the CSV file
 
+These manual steps correct a record that already has an ID. Start from current `main` in a separate working branch, and retain the record's source evidence. New work must first go through the submission workflow above.
+
 Open this file in your text editor or a spreadsheet app like Excel or Google Sheets:
 
 ```
@@ -54,13 +71,13 @@ If you open it in Google Sheets or Excel, keep the first row as the column headi
 
 ---
 
-## Step 2: Add a new row
+## Step 2: Locate and correct the existing row
 
-Add a new row at the **bottom** of the file. The most important columns are:
+Find the record by its exact ID and source URL. Change the intended fields in that row; do not append a replacement row. The most important columns are:
 
 | Column | What to put |
 |--------|-------------|
-| `id` | Ask the maintainer to reserve a new `RECORD-` ID using the shared allocator in `backend/scripts/record_id_sequence.py`. It checks existing IDs and the high-water mark in `data/record-id-sequence.json`. The last row is not a safe allocator; never reuse a retired ID or fill a gap. |
+| `id` | Keep the existing ID unchanged. For a new article, use the submission workflow above and take the ID it returns; never assign one by hand, reuse a retired ID, or fill a gap. |
 | `title` | Title of the article or post |
 | `url` | Link to the original |
 | `author` | The author supported by the source; usually `Jay Rosen` |
@@ -69,11 +86,11 @@ Add a new row at the **bottom** of the file. The most important columns are:
 | `content_type` | The appropriate existing type, such as `Article`, `Interview (Audio/Video)`, or `Speech/Lecture` |
 | `thematic_categories` | Pick one or more from the list below, separated by commas |
 | `era` | `Platform Transition & Future Models (2021-Present)` for anything after 2021 |
-| `verified` | Set to `TRUE` only after the source details have been checked. For an unresolved manual addition, keep it out of publication and ask the curator to review it. |
+| `verified` | Set to `TRUE` only after the source details have been checked. Ask the curator to resolve uncertainty before approving the correction. |
 | `needs_review` | Record an outstanding human-review requirement explicitly. This flag alone does **not** prevent publication. |
 | `notes` | Public-safe source evidence, corrections, and any date or attribution uncertainty |
 
-Preserve all other columns, even when a value is blank. For an existing record, keep its ID and unrelated fields unchanged. Before changing source rows, the maintainer must check for pending ingestion transactions and coordinate with other writers. Keep the ID reservation state with the data change.
+Preserve all other columns, even when a value is blank. Keep the ID and unrelated fields unchanged. Before changing source rows, the maintainer must check for pending ingestion transactions; stop and follow [the recovery instructions](docs/operations/pressthink-ingestion.md) if one exists. Do not run another writer in the same checkout. Reconcile the correction against the latest `main` before validation and publication, and never lower or hand-edit the ID reservation state.
 
 Automated submissions can set `verified=TRUE` while also setting `needs_review=true`. Neither a public record nor the verification flag alone establishes that a human has finished checking it.
 
@@ -97,13 +114,13 @@ You can combine them: `Press & Media Criticism, Politics & Democracy`
 > scripts pick up the change with no code edit; this list is the one mirror to
 > keep in step.
 
-### Example fields for a new record
+### Example fields to check in an existing record
 
-This is an illustration, not a row to paste into the archive. Enter values under the matching headings in the current 38-column file; do not reconstruct a CSV row from this table.
+This is an illustration, not a row to paste into the archive. Review values under the matching headings in the current 38-column file; do not reconstruct a CSV row from this table.
 
 | Column | Illustrative value |
 | --- | --- |
-| `id` | The new ID reserved by the maintainer |
+| `id` | The record's existing ID, unchanged |
 | `title` | Example essay title |
 | `url` | `https://example.invalid/essay/` — replace with the verified source URL |
 | `author` | The author shown on the source |
@@ -178,9 +195,13 @@ Require successful public-byte verification and matching release markers. Then o
 
 ## Adding social posts (Bluesky, Twitter, Mastodon)
 
-This is the manual repair and backfill path. Use `data/social_posts.csv` and preserve its own current column headings. Select the ID prefix from the post's platform: `BSKY-` for Bluesky, `TWTR-` for Twitter, and `MAST-` for Mastodon. Have the maintainer allocate an unused platform ID against the complete current source while coordinating with automated writers; do not reuse an existing or retired ID. The `content_type` should be `Social Media Post`.
+There is currently **no supported manual new-row or ID-reservation path** for `data/social_posts.csv`. The article allocator handles only `RECORD-` IDs. It does not reserve `BSKY-`, `TWTR-`, or `MAST-` IDs. The Bluesky collector derives new numbers from the social CSV's current maximum; a separately prepared manual batch can choose the same numbers. A conversation with another maintainer or a lock in a different checkout does not prevent that race.
 
-New work now appears mainly on Bluesky. The [current daily publication guide](docs/operations/bluesky-stewardship.md) describes implemented collection, admission, and verified publication. It keeps short acknowledgements and uncertain items as context rather than standalone public records. The [stewardship design map](docs/bluesky-stewardship-pipeline.md) describes additional preservation and review plans; do not assume those plans are already operating.
+Use the [current Bluesky publisher](docs/operations/bluesky-stewardship.md) for Jay's posts within its supported collection scope. It waits in the release queue, refreshes current `main`, prepares the batch, and refuses to push if `main` has moved. A manual dispatch of **Bluesky stewardship publisher** on `main` defaults to `dry_run=true`; a dry run verifies without adding records or publishing. An authorized publishing run must use that same workflow. Do not run `bluesky_feed_backfill.py` or `bluesky_batch_update.py` as a separate canonical writer alongside it, and do not send social backfills through the article submission route as a workaround.
+
+For Twitter, Mastodon, or Bluesky material outside that publisher's scope, prepare the source URLs and review evidence as a backfill request outside the canonical CSV. Adding those rows requires a separately implemented and tested writer that shares durable social-ID reservations and coordinates with the publisher. This guide does not claim that capability exists.
+
+Corrections to a social record that already exists must preserve its ID and the social CSV's current headings. Keep the edit limited to that identified record; do not delete and re-add it or create a replacement ID. Use the current source, pending-work checks, validation, and complete publication procedure above. The [stewardship design map](docs/bluesky-stewardship-pipeline.md) describes additional preservation and review plans; it does not establish a working reservation service.
 
 ---
 
@@ -311,7 +332,7 @@ The maintainer saves the source and tested release files to the repository befor
 ```bash
 git add -u -- .
 git diff --cached --name-only
-git commit -m "Add [number] new records through [date]"
+git commit -m "Correct [record IDs] metadata"
 ```
 
 Run this from a clean checkout so `git add -u -- .` stages only this release's tracked changes. Before committing, confirm the staged list includes the source CSVs you edited, every generated JSON file, `index.html`, `version.json`, `frontend/sw.js`, and every frontend or standalone-page file changed by the version bump. `data/authored-excerpts.csv` must be present when you changed an authored excerpt; otherwise the next regeneration from a clean checkout loses that override.

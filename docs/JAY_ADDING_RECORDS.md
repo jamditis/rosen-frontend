@@ -81,22 +81,46 @@ The workflow can report these states:
 
 ## What if Column F says `error`?
 
-Column H will tell you why in plain English:
+Start with Column H. Its message may include technical details; the maintainer
+may need the GitHub Actions run log to explain it. Keep the existing row while
+the problem is checked. In the examples below, `...` stands for details that vary.
 
-- `URL already exists in archive` — already in there; no action needed.
-- `That URL cannot be accepted: ...` — the server rejected the URL for
-  safety reasons (private IP, malformed). Double-check it's a real
-  public URL.
-- `Network: ...` — the request did not complete normally. Ask the maintainer
-  to check the existing submission before retrying; a lost response does not
-  prove that nothing was processed.
-- `Scrape returned no data (URL may be unreachable)` — the processor could
-  not retrieve usable content. Open the source in your browser and ask the
-  curator to review it. If a public preserved copy exists, supply its exact,
-  checked URL and keep the original URL as provenance. This error alone does
-  not prove that the source has disappeared.
-- Anything else: send the row number, URL, status, and error to the current
-  technical caretaker through the agreed contact route.
+### When the sheet tries to start a job
+
+- `GitHub auth: ...` — the sheet could not authenticate with GitHub. Ask the
+  maintainer to check the app's credentials and access.
+- `Could not reach GitHub: ...` — the sheet did not receive a normal response
+  to its request. Ask the maintainer to check whether a job started before
+  retrying; a lost response does not prove that nothing was processed.
+- `GitHub rejected the dispatch (HTTP ...): ...` — GitHub refused the request
+  to start the job. Send the HTTP number and full message to the maintainer.
+
+### When the job processes the record
+
+- `Unsafe URL refused: ...` — the address failed the public-URL safety check.
+  Double-check the original public link, including `http://` or `https://`.
+  Ask the maintainer to investigate if the link looks correct.
+- `Couldn't fetch or parse this URL automatically (...)` — the processor
+  could not retrieve usable content. Open the source in your browser and ask
+  the curator to review it; this does not prove that the source has disappeared.
+  The message suggests supplying article text. That fallback uses the
+  workflow's `raw_text` input, which the maintainer can fill in through GitHub
+  Actions. The sheet has no article-text column; do not paste it into Notes.
+- `Could not commit to repo: ...` — saving the change to the repository did
+  not complete successfully. Ask the maintainer to check the run and any
+  assigned record ID before retrying.
+
+`URL already in archive` and `URL already in archive; publication confirmed`
+accompany the `duplicate` status. Use the record ID in Column G to check the
+existing record.
+
+A run can also report `Live deploy ok; sheet status writeback failed` while
+the sheet stays unchanged. The record may already be public. Ask the maintainer
+to check the public record and repair the status update before submitting again.
+
+For these or any other errors, send the row number, URL, status, any record ID,
+and the displayed error to the current technical caretaker through the agreed
+contact route.
 
 ## Bulk-add
 

@@ -90,7 +90,7 @@ archived/                     Legacy code kept for reference only
 
 ## Updating the archive data
 
-The site reads JSON files generated from four CSV source files:
+The site reads JSON files generated from four main CSV source files and an optional file of curator-written summary overrides:
 
 | Source file | What it contains |
 |-------------|-----------------|
@@ -98,6 +98,7 @@ The site reads JSON files generated from four CSV source files:
 | `data/social_posts.csv` | Twitter, Bluesky, and Mastodon posts |
 | `data/extracted_entities.csv` | Named entities |
 | `data/extracted_relationships.csv` | Entity relationships |
+| `data/authored-excerpts.csv` | Optional summary overrides keyed by record ID; nonblank entries replace the record summary |
 
 To regenerate the JSON after editing a CSV:
 
@@ -106,7 +107,7 @@ npm install          # first time only
 node data/export-archive-data.js
 ```
 
-Manual additions require a source edit, regenerated data, validation, and a coordinated release. The step-by-step guide is [`ADDING-RECORDS.md`](ADDING-RECORDS.md). Curator-written summary overrides live in `data/authored-excerpts.csv`; preserve that file with the source data.
+Submit new articles through the queued submission workflow in [`ADDING-RECORDS.md`](ADDING-RECORDS.md); it reserves IDs and prepares the tested release. The guide's manual CSV steps are for corrections to existing records, with their IDs unchanged. Curator-written summary overrides live in `data/authored-excerpts.csv`; preserve that file with the source data.
 
 ## Continuous stewardship
 
