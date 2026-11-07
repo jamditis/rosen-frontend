@@ -1,0 +1,441 @@
+{
+  "tool": "SingleFile CLI 2.25.0 core with Playwright",
+  "sourceCommit": "4a16b0c41c26bf25837bb2f102594f145b0f0e60",
+  "results": [
+    {
+      "url": "https://www.salon.com/2012/07/25/dont_bust_bogus_hype/",
+      "recordIds": [
+        "RECORD-00713"
+      ],
+      "discoveredIn": [
+        "data/archive_records-public.csv",
+        "https://www.salon.com/writer/jay_rosen"
+      ],
+      "capturedAt": "2026-11-07T00:29:08.415Z",
+      "files": [
+        {
+          "path": "2012-07-25-dont_bust_bogus_hype.source.html",
+          "mediaType": "text/html",
+          "bytes": 51165,
+          "sha256": "700be94e7200c310f95fa4aa1fa3b3ee57b036178dc6bbcb3bf4de811e128ec5"
+        },
+        {
+          "path": "2012-07-25-dont_bust_bogus_hype.html",
+          "mediaType": "text/html",
+          "bytes": 614927,
+          "sha256": "e930a7bd079207e4b9a9c9386d34370dfb7ba61c6f997d4b4a79285954afe7cb"
+        },
+        {
+          "path": "2012-07-25-dont_bust_bogus_hype.txt",
+          "mediaType": "text/plain",
+          "bytes": 5554,
+          "sha256": "88173551d6bf5cbc627c62dae233120893d0a2308b9c525b36eefeaca40bd764"
+        },
+        {
+          "path": "2012-07-25-dont_bust_bogus_hype.pdf",
+          "mediaType": "application/pdf",
+          "bytes": 40828,
+          "sha256": "3f8686f018a22a0a557e6107ecfde4150cf9ec2f1cf6a60b88f89610779feb0e"
+        }
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2012/07/25/dont_bust_bogus_hype/",
+      "title": "Don’t bust bogus “hype”",
+      "author": "Jay Rosen",
+      "publishedAt": "2012-07-25T22:45:00+00:00",
+      "articleTextSha256": "fd97796f710660209da46337a384f71fb19a3096cf422e2dd71e61db3f179d1b",
+      "articleCharacters": 5372,
+      "paragraphCount": 16,
+      "offlineHtml": {
+        "verified": true,
+        "paragraphsMatched": 16,
+        "externalRequests": []
+      },
+      "pdf": {
+        "verified": true,
+        "allSourceLinesMatched": true,
+        "kind": "article-text-derivative"
+      },
+      "status": "verified"
+    },
+    {
+      "url": "https://www.salon.com/2016/11/06/media-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work/",
+      "recordIds": [
+        "RECORD-00716"
+      ],
+      "discoveredIn": [
+        "data/archive_records-public.csv",
+        "data/urls_to_scrape.csv"
+      ],
+      "capturedAt": "2026-11-07T00:29:18.883Z",
+      "files": [
+        {
+          "path": "2016-11-06-media-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work.source.html",
+          "mediaType": "text/html",
+          "bytes": 71491,
+          "sha256": "7ebb015a3411ad274ba985f42763246f412762958dcc26e298f3effa77cac672"
+        },
+        {
+          "path": "2016-11-06-media-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work.html",
+          "mediaType": "text/html",
+          "bytes": 754651,
+          "sha256": "3b50c6ead35d7002f1a8b9cc2e7d4be8a35c8c10be8cf9d9629e9a30be6d82b7"
+        },
+        {
+          "path": "2016-11-06-media-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work.txt",
+          "mediaType": "text/plain",
+          "bytes": 19187,
+          "sha256": "197687263b52eb02272b059a74f5d4641ee7c3f65d04dfd25178d58c1ac7ad50"
+        },
+        {
+          "path": "2016-11-06-media-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work.pdf",
+          "mediaType": "application/pdf",
+          "bytes": 59062,
+          "sha256": "3e4268e7e0ca4e71296e804e3467a491a26fedee5259a40d2d75abbd4dfa837d"
+        }
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2016/11/06/media-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work/",
+      "title": "Media critic Jay Rosen on 2016 campaign coverage and the rise of Trump: “That’s the way authoritarian societies work”",
+      "author": "Paul Rosenberg",
+      "publishedAt": "2016-11-06T10:00:00+00:00",
+      "articleTextSha256": "9783edbb33b812afbfc45246b47211cb515183ae02515329344725d849e333e5",
+      "articleCharacters": 18778,
+      "paragraphCount": 47,
+      "offlineHtml": {
+        "verified": true,
+        "paragraphsMatched": 47,
+        "externalRequests": []
+      },
+      "pdf": {
+        "verified": true,
+        "allSourceLinesMatched": true,
+        "kind": "article-text-derivative"
+      },
+      "status": "verified"
+    },
+    {
+      "url": "https://www.salon.com/2017/09/14/what-are-journalists-for-in-the-age-of-trump/",
+      "recordIds": [
+        "RECORD-00718"
+      ],
+      "discoveredIn": [
+        "data/archive_records-public.csv"
+      ],
+      "capturedAt": "2026-11-07T00:29:29.117Z",
+      "files": [
+        {
+          "path": "2017-09-14-what-are-journalists-for-in-the-age-of-trump.source.html",
+          "mediaType": "text/html",
+          "bytes": 50816,
+          "sha256": "09d749665cf61ca2bdc248a7647be9bbfed086981fa9876803b33e92ab4e2817"
+        },
+        {
+          "path": "2017-09-14-what-are-journalists-for-in-the-age-of-trump.html",
+          "mediaType": "text/html",
+          "bytes": 654628,
+          "sha256": "34ba11592a397d118da76533a4a7897cc4d04504c709287d828049b8574a0f82"
+        },
+        {
+          "path": "2017-09-14-what-are-journalists-for-in-the-age-of-trump.txt",
+          "mediaType": "text/plain",
+          "bytes": 2019,
+          "sha256": "f58ca117612da06eacb2d7d1aefc0b4252cbe180639b769237b08c56102314ea"
+        },
+        {
+          "path": "2017-09-14-what-are-journalists-for-in-the-age-of-trump.pdf",
+          "mediaType": "application/pdf",
+          "bytes": 37553,
+          "sha256": "2d062852d66644e4f63a3df588a70eec7c224f54128cf26957ea65f7d6155d19"
+        }
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2017/09/14/what-are-journalists-for-in-the-age-of-trump/",
+      "title": "What are journalists for in the age of Trump?",
+      "author": "Tracey Taylor",
+      "publishedAt": "2017-09-14T15:26:09+00:00",
+      "articleTextSha256": "9adbe9ab30638e50d0f91f0f29e9e340786c52eb2c1d1222b647079631da4297",
+      "articleCharacters": 1998,
+      "paragraphCount": 5,
+      "offlineHtml": {
+        "verified": true,
+        "paragraphsMatched": 5,
+        "externalRequests": []
+      },
+      "pdf": {
+        "verified": true,
+        "allSourceLinesMatched": true,
+        "kind": "article-text-derivative"
+      },
+      "status": "verified"
+    },
+    {
+      "url": "https://www.salon.com/2020/11/11/hey-political-reporters-get-lost-this-is-not-your-moment/",
+      "recordIds": [
+        "RECORD-00908"
+      ],
+      "discoveredIn": [
+        "data/archive_records-public.csv"
+      ],
+      "capturedAt": "2026-11-07T00:29:38.473Z",
+      "files": [
+        {
+          "path": "2020-11-11-hey-political-reporters-get-lost-this-is-not-your-moment.source.html",
+          "mediaType": "text/html",
+          "bytes": 61844,
+          "sha256": "09b06a35cbd1e0fd45028a4275312790b01e3fd97bff3a0ab8bff710a9bb45b7"
+        },
+        {
+          "path": "2020-11-11-hey-political-reporters-get-lost-this-is-not-your-moment.html",
+          "mediaType": "text/html",
+          "bytes": 795013,
+          "sha256": "549b122ce8714449ce5f5fe5a76e1b45699e2e4997bc4b2a4a416f37dff54e3f"
+        },
+        {
+          "path": "2020-11-11-hey-political-reporters-get-lost-this-is-not-your-moment.txt",
+          "mediaType": "text/plain",
+          "bytes": 11000,
+          "sha256": "f7f96c2102d64269d07f98b86a41d9c34422edb0de7f7f79fc96a3db5c40eb7b"
+        },
+        {
+          "path": "2020-11-11-hey-political-reporters-get-lost-this-is-not-your-moment.pdf",
+          "mediaType": "application/pdf",
+          "bytes": 50260,
+          "sha256": "8a1a3838ef432c62681c1989451e40a161d26b75dc21d12f1f2e8ede8833d17e"
+        }
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2020/11/11/hey-political-reporters-get-lost-this-is-not-your-moment/",
+      "title": "Hey, political reporters — get lost! This is not your moment",
+      "author": "Dan Froomkin",
+      "publishedAt": "2020-11-11T15:00:01+00:00",
+      "articleTextSha256": "5c77af06bfbb8761e119bfe875cfb37976269388266a11499b6fad065407a8a5",
+      "articleCharacters": 10834,
+      "paragraphCount": 53,
+      "offlineHtml": {
+        "verified": true,
+        "paragraphsMatched": 53,
+        "externalRequests": []
+      },
+      "pdf": {
+        "verified": true,
+        "allSourceLinesMatched": true,
+        "kind": "article-text-derivative"
+      },
+      "status": "verified"
+    },
+    {
+      "url": "https://www.salon.com/2008/01/21/campaign_coverage/",
+      "recordIds": [],
+      "discoveredIn": [
+        "data/urls_to_scrape.csv",
+        "https://www.salon.com/writer/jay_rosen"
+      ],
+      "capturedAt": "2026-11-07T00:29:48.731Z",
+      "files": [
+        {
+          "path": "2008-01-21-campaign_coverage.source.html",
+          "mediaType": "text/html",
+          "bytes": 68549,
+          "sha256": "8d3c72fb9f5594aa604339587a3a0c4536d54642f50bf096d090607c912a8d1b"
+        },
+        {
+          "path": "2008-01-21-campaign_coverage.html",
+          "mediaType": "text/html",
+          "bytes": 415172,
+          "sha256": "fd75c86ccfe49ed8c035f3429c435eeb96e6929524b59d257065d5994bfef013"
+        },
+        {
+          "path": "2008-01-21-campaign_coverage.txt",
+          "mediaType": "text/plain",
+          "bytes": 21772,
+          "sha256": "51b44b87ba36fccfd7c6e8e0dfb4854c2227371368a82521f18523b7be9878d5"
+        },
+        {
+          "path": "2008-01-21-campaign_coverage.pdf",
+          "mediaType": "application/pdf",
+          "bytes": 60091,
+          "sha256": "3310be6a942e34adc1dc420e4f53aaeaaa743b2539d15d3fbe4f07e11f6cdf09"
+        }
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2008/01/21/campaign_coverage/",
+      "title": "Why campaign coverage sucks",
+      "author": "Jay Rosen",
+      "publishedAt": "2008-01-22T01:33:00+00:00",
+      "articleTextSha256": "33efb4fcae236061d556a52839533a1d11bcb6e0db6fc57004452e98f4c5846e",
+      "articleCharacters": 21238,
+      "paragraphCount": 65,
+      "offlineHtml": {
+        "verified": true,
+        "paragraphsMatched": 65,
+        "externalRequests": []
+      },
+      "pdf": {
+        "verified": true,
+        "allSourceLinesMatched": true,
+        "kind": "article-text-derivative"
+      },
+      "status": "verified"
+    },
+    {
+      "url": "https://www.salon.com/2009/01/16/rosen/",
+      "recordIds": [],
+      "discoveredIn": [
+        "data/urls_to_scrape.csv"
+      ],
+      "capturedAt": "2026-11-07T00:29:58.003Z",
+      "files": [
+        {
+          "path": "2009-01-16-rosen.source.html",
+          "mediaType": "text/html",
+          "bytes": 76322,
+          "sha256": "508ecd5ef75967afa27b2503306c9da0d1167a86ccf64117d0bb71213d319762"
+        },
+        {
+          "path": "2009-01-16-rosen.html",
+          "mediaType": "text/html",
+          "bytes": 372975,
+          "sha256": "9c9edac660af73a955a106bfb323f64e64c9430f1b3662b671966e222ee763ca"
+        },
+        {
+          "path": "2009-01-16-rosen.txt",
+          "mediaType": "text/plain",
+          "bytes": 29662,
+          "sha256": "0353db42459b19696620144e2f5e6e433d1a81ca9d0c8c3446c47d8719e736c4"
+        },
+        {
+          "path": "2009-01-16-rosen.pdf",
+          "mediaType": "application/pdf",
+          "bytes": 66870,
+          "sha256": "45312b810a74cde2ddb8184d5771294694d8d119f4994c593313f45f927bdcec"
+        }
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2009/01/16/rosen/",
+      "title": "Salon Radio: Jay Rosen on the media’s control of political debates",
+      "author": "Glenn Greenwald",
+      "publishedAt": "2009-01-16T19:46:00+00:00",
+      "articleTextSha256": "9eb112455120011ce114e8a62368fdfbbff24d8247440b3bb83a0f2e6d9744ba",
+      "articleCharacters": 29085,
+      "paragraphCount": 62,
+      "offlineHtml": {
+        "verified": true,
+        "paragraphsMatched": 62,
+        "externalRequests": []
+      },
+      "pdf": {
+        "verified": true,
+        "allSourceLinesMatched": true,
+        "kind": "article-text-derivative"
+      },
+      "status": "verified"
+    },
+    {
+      "url": "https://www.salon.com/2006/04/20/mclellan_2/",
+      "recordIds": [],
+      "discoveredIn": [
+        "https://www.salon.com/writer/jay_rosen"
+      ],
+      "capturedAt": "2026-11-07T00:30:07.723Z",
+      "files": [
+        {
+          "path": "2006-04-20-mclellan_2.source.html",
+          "mediaType": "text/html",
+          "bytes": 55492,
+          "sha256": "c29d8163198ae589936781c420a1c407517047275f85c2304fe6a05d4f780cb7"
+        },
+        {
+          "path": "2006-04-20-mclellan_2.html",
+          "mediaType": "text/html",
+          "bytes": 383947,
+          "sha256": "ec99fc5c4448c244cd7f9dde9989ad0b74e998c7ddba9e589dd6795e96854936"
+        },
+        {
+          "path": "2006-04-20-mclellan_2.txt",
+          "mediaType": "text/plain",
+          "bytes": 10770,
+          "sha256": "ee13c2812036dc0452b9fb37054874839e4afa0142ed2837425c1ffc359a0b19"
+        },
+        {
+          "path": "2006-04-20-mclellan_2.pdf",
+          "mediaType": "application/pdf",
+          "bytes": 46372,
+          "sha256": "cc8d98cb2dc67366698fc2ff8ab3c6326b3d5c1087104d7a478a4bb37084d029"
+        }
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2006/04/20/mclellan_2/",
+      "title": "Nullifying the press",
+      "author": "Jay Rosen",
+      "publishedAt": "2006-04-20T20:02:00+00:00",
+      "articleTextSha256": "be7d4a81782087a9bb3f149b5a3c82c4440457da96ffef6b9d384f2b3bf0521e",
+      "articleCharacters": 10558,
+      "paragraphCount": 28,
+      "offlineHtml": {
+        "verified": true,
+        "paragraphsMatched": 28,
+        "externalRequests": []
+      },
+      "pdf": {
+        "verified": true,
+        "allSourceLinesMatched": true,
+        "kind": "article-text-derivative"
+      },
+      "status": "verified"
+    },
+    {
+      "url": "https://www.salon.com/2003/10/10/postman/",
+      "recordIds": [],
+      "discoveredIn": [
+        "https://www.salon.com/writer/jay_rosen"
+      ],
+      "capturedAt": "2026-11-07T00:30:17.445Z",
+      "files": [
+        {
+          "path": "2003-10-10-postman.source.html",
+          "mediaType": "text/html",
+          "bytes": 52341,
+          "sha256": "7e0b2bdb3f5c910ddae031d727cc1fbee90a8ece6329f6bb41d4ec9494b1bd56"
+        },
+        {
+          "path": "2003-10-10-postman.html",
+          "mediaType": "text/html",
+          "bytes": 295589,
+          "sha256": "74a82375f7adb614614509a19e9a9d1e40bb11b61e5953015378b4ebdd5836d6"
+        },
+        {
+          "path": "2003-10-10-postman.txt",
+          "mediaType": "text/plain",
+          "bytes": 9336,
+          "sha256": "92cb282d88df4298d886d887e0ae819589b2e9576dc0828510fc36553efbca27"
+        },
+        {
+          "path": "2003-10-10-postman.pdf",
+          "mediaType": "application/pdf",
+          "bytes": 47213,
+          "sha256": "56f42ee9b54cf5a0eef512d4ac927a14412678e4b3ca1caa2dd63fe1da01e572"
+        }
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2003/10/10/postman/",
+      "title": "Neil Postman: A civilized man in a century of barbarism",
+      "author": "Jay Rosen",
+      "publishedAt": "2003-10-10T23:30:00+00:00",
+      "articleTextSha256": "3d67d7bc5483886e4a851e62937df33c1ee64583219e718e96f6c2cf0d899cc7",
+      "articleCharacters": 9170,
+      "paragraphCount": 16,
+      "offlineHtml": {
+        "verified": true,
+        "paragraphsMatched": 16,
+        "externalRequests": []
+      },
+      "pdf": {
+        "verified": true,
+        "allSourceLinesMatched": true,
+        "kind": "article-text-derivative"
+      },
+      "status": "verified"
+    }
+  ]
+}

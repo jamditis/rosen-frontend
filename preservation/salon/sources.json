@@ -1,0 +1,69 @@
+[
+  {
+    "url": "https://www.salon.com/2012/07/25/dont_bust_bogus_hype/",
+    "recordIds": [
+      "RECORD-00713"
+    ],
+    "discoveredIn": [
+      "data/archive_records-public.csv",
+      "https://www.salon.com/writer/jay_rosen"
+    ]
+  },
+  {
+    "url": "https://www.salon.com/2016/11/06/media-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work/",
+    "recordIds": [
+      "RECORD-00716"
+    ],
+    "discoveredIn": [
+      "data/archive_records-public.csv",
+      "data/urls_to_scrape.csv"
+    ]
+  },
+  {
+    "url": "https://www.salon.com/2017/09/14/what-are-journalists-for-in-the-age-of-trump/",
+    "recordIds": [
+      "RECORD-00718"
+    ],
+    "discoveredIn": [
+      "data/archive_records-public.csv"
+    ]
+  },
+  {
+    "url": "https://www.salon.com/2020/11/11/hey-political-reporters-get-lost-this-is-not-your-moment/",
+    "recordIds": [
+      "RECORD-00908"
+    ],
+    "discoveredIn": [
+      "data/archive_records-public.csv"
+    ]
+  },
+  {
+    "url": "https://www.salon.com/2008/01/21/campaign_coverage/",
+    "recordIds": [],
+    "discoveredIn": [
+      "data/urls_to_scrape.csv",
+      "https://www.salon.com/writer/jay_rosen"
+    ]
+  },
+  {
+    "url": "https://www.salon.com/2009/01/16/rosen/",
+    "recordIds": [],
+    "discoveredIn": [
+      "data/urls_to_scrape.csv"
+    ]
+  },
+  {
+    "url": "https://www.salon.com/2006/04/20/mclellan_2/",
+    "recordIds": [],
+    "discoveredIn": [
+      "https://www.salon.com/writer/jay_rosen"
+    ]
+  },
+  {
+    "url": "https://www.salon.com/2003/10/10/postman/",
+    "recordIds": [],
+    "discoveredIn": [
+      "https://www.salon.com/writer/jay_rosen"
+    ]
+  }
+]

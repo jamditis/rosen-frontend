@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <script>
+        const subscriberUser = !!document.cookie.split('; ').find(row => row.startsWith('wordpress_subscriber_user='));
+
+        const userDetails = subscriberUser ? JSON.parse(window.localStorage.getItem('userDetails')) : null;
+        const darkModeEnabled = userDetails ? userDetails?.userPreferences?.darkMode === true : false;
+        const stickyHeaderEnabled = userDetails ? userDetails?.userPreferences?.stickyHeader === true : false;
+
+        // Helper function to read cookies
+        function getCookie(name) {
+            var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+            return v ? v[2] : null;
+        }
+
+        // Check for the 'wordpress_premium_member' cookie
+        const hasPremiumCookie = getCookie('wordpress_premium_member') === '1';
+        const hasPremiumRoleInLS = userDetails
+            && userDetails.userRoles
+            && Array.isArray(userDetails.userRoles)
+            && userDetails.userRoles.includes('premium_member');
+        const isPremium = hasPremiumCookie || hasPremiumRoleInLS;
+
+        if (darkModeEnabled) {
+            document.documentElement.classList.add('dark');
+        }
+
+        if (isPremium) {
+            document.documentElement.classList.add('premium');
+        }
+    </script>
+
+            <!-- START email detection/removal script -->
+        <script>
+            !function(){"use strict";const t={adt_ei:{identityApiKey:"plainText",source:"url",type:"plaintext",priority:1},adt_eih:{identityApiKey:"sha256",source:"urlh",type:"hashed",priority:2},sh_kit:{identityApiKey:"sha256",source:"urlhck",type:"hashed",priority:3}},e=Object.keys(t);function i(t){return function(t){const e=t.match(/((?=([a-z0-9._!#$%+^&*()[\]<>-]+))\2@[a-z0-9._-]+\.[a-z0-9._-]+)/gi);return e?e[0]:""}(function(t){return t.replace(/\s/g,"")}(t.toLowerCase()))}!async function(){const n=new URL(window.location.href),o=n.searchParams;let a=null;const r=Object.entries(t).sort(([,t],[,e])=>t.priority-e.priority).map(([t])=>t);for(const e of r){const n=o.get(e),r=t[e];if(!n||!r)continue;const c=decodeURIComponent(n),d="plaintext"===r.type&&i(c),s="hashed"===r.type&&c;if(d||s){a={value:c,config:r};break}}if(a){const{value:t,config:e}=a;window.adthrive=window.adthrive||{},window.adthrive.cmd=window.adthrive.cmd||[],window.adthrive.cmd.push(function(){window.adthrive.identityApi({source:e.source,[e.identityApiKey]:t},({success:i,data:n})=>{i?window.adthrive.log("info","Plugin","detectEmails",`Identity API called with ${e.type} email: ${t}`,n):window.adthrive.log("warning","Plugin","detectEmails",`Failed to call Identity API with ${e.type} email: ${t}`,n)})})}!function(t,e){const i=new URL(e);t.forEach(t=>i.searchParams.delete(t)),history.replaceState(null,"",i.toString())}(e,n)}()}();
+        </script>
+        <!-- END email detection/removal script -->
+                    <!-- Raptive Head Tag Manual -->
+        <script data-no-optimize="1" data-cfasync="false">
+            (function(w, d) {
+
+                if (isPremium) {
+                    return;
+                }
+
+                w.adthrive = w.adthrive || {};
+                w.adthrive.cmd = w.adthrive.cmd || [];
+                w.adthrive.plugin = 'adthrive-ads-manual';
+                w.adthrive.host = 'ads.adthrive.com';
+                var s = d.createElement('script');
+                s.async = true;
+                s.referrerpolicy = 'no-referrer-when-downgrade';
+                s.src = 'https://' + w.adthrive.host + '/sites/69caa2a59c365653ba27aeb9/ads.min.js?referrer=' + w.encodeURIComponent(w.location.href) + '&cb=' + (Math.floor(Math.random() * 100) + 1);
+                var n = d.getElementsByTagName('script')[0];
+                n.parentNode.insertBefore(s, n);
+            })(window, document);
+        </script>
+        <!-- End of Raptive Head Tag -->
+                    <!-- Dianomi Context Feed -->
+        <script type="text/javascript" id="dianomi_context_script" src="https://www.dianomi.com/js/contextfeed.js"></script>
+        <!-- End Dianomi Context Feed -->
+        
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-MGRKVFC2');</script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google Fonts pre-connect
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://www.salon.com/app/themes/salon/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://www.salon.com/app/themes/salon/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://www.salon.com/app/themes/salon/assets/img/favicon-16x16.png">
+    <link rel="icon" type="image/png" href="https://www.salon.com/app/themes/salon/favicon.ico">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta property="fb:pages" content="120680396518" />
+    <meta property="fb:app_id" content="134091381200152" />
+    <meta name="p:domain_verify" content="afd252c603232fed8ddf2554b144079b"/>
+
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/icomoon.woff" as="font" type="font/woff" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-Bold-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-Oblique-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Georgia-Bold-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/TimesNewRoman-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+
+	<!-- This site is optimized with the Yoast SEO Premium plugin v25.9 (Yoast SEO v25.9) - https://yoast.com/wordpress/plugins/seo/ -->
+	<title>Neil Postman: A civilized man in a century of barbarism - Salon.com</title>
+	<meta name="description" content="A former student remembers a teacher who never stopped raking the worlds of Big Media and technology with his savage wit." />
+	<link rel="canonical" href="https://www.salon.com/2003/10/10/postman/" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://www.salon.com/2003/10/10/postman/?utm_source=website&amp;utm_medium=social&amp;utm_campaign=ogshare&amp;utm_content=og" />
+	<meta property="og:site_name" content="Salon.com" />
+	<meta property="article:publisher" content="120680396518" />
+	<meta property="article:published_time" content="2003-10-10T23:30:00+00:00" />
+	<meta property="article:modified_time" content="2011-09-25T07:50:04+00:00" />
+	
+	<meta property="og:image:width" content="1200"/>
+	<meta property="og:image:height" content="628"/>
+	<meta name="author" content="Jay Rosen" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:label1" content="Written by" />
+	<meta name="twitter:data1" content="Jay Rosen" />
+	<meta name="twitter:label2" content="Est. reading time" />
+	<meta name="twitter:data2" content="8 minutes" />
+	<meta property="article:section" content="All Salon" />
+	<meta property="article:section" content="Culture" />
+	<meta property="article:section" content="Entertainment" />
+	<meta property="article:author" content="Jay Rosen" />
+	<!-- / Yoast SEO Premium plugin. -->
+
+
+<link rel='stylesheet' id='optinmonster-memberpress-css' href='https://www.salon.com/app/plugins/optinmonster/assets/dist/css/memberpress.min.css?ver=2.16.24' media='all' />
+<link rel='stylesheet' id='mp-theme-css' href='https://www.salon.com/app/plugins/memberpress/css/ui/theme.css?ver=1.12.15' media='all' />
+<style id="classic-theme-styles-inline-css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+
+
+<link rel='stylesheet' id='global-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/global.css?ver=1.0.31' media='all' />
+<link rel='stylesheet' id='article-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/article.css?ver=1.0.31' media='all' />
+<link rel='stylesheet' id='ad-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/ad.css?ver=1.0.31' media='all' />
+<script id="nelio-ab-testing-visitor-type-js" src="https://www.salon.com/app/plugins/nelio-ab-testing/assets/dist/js/visitor-type.js?ver=287e8e4cd3bcff28c95d"></script>
+<script type="application/ld+json">{"@context":"https:\/\/schema.org","@graph":[{"@type":"NewsMediaOrganization","@id":"https:\/\/www.salon.com\/#organization","name":"Salon.com","url":"https:\/\/www.salon.com\/","publishingPrinciples":"https:\/\/www.salon.com\/about","masthead":"https:\/\/www.salon.com\/about\/staff","diversityPolicy":"https:\/\/www.salon.com\/about\/diversity","sameAs":["https:\/\/www.facebook.com\/salon","https:\/\/www.instagram.com\/salonofficial","https:\/\/x.com\/salon","https:\/\/www.instagram.com\/salondotcom\/"],"logo":{"@type":"ImageObject","url":"https:\/\/www.salon.com\/app\/themes\/salon\/assets\/img\/salon-logo.svg"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Homepage","item":{"@type":"Thing","@id":"https:\/\/www.salon.com"}},{"@type":"ListItem","position":2,"name":"Culture Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/category\/culture"}},{"@type":"ListItem","position":3,"name":"Entertainment Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/category\/entertainment"}},{"@type":"ListItem","position":4,"name":"Jay Rosen's Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/writer\/jay_rosen"}}]},{"@type":"NewsArticle","headline":"Neil Postman: A civilized man in a century of barbarism","url":"https:\/\/www.salon.com\/2003\/10\/10\/postman\/","thumbnailUrl":false,"alternativeHeadline":"A former student remembers a teacher who never stopped raking the worlds of Big Media and technology with his savage wit.","dateCreated":"2003-10-10T23:30:00+00:00","datePublished":"2003-10-10T23:30:00+00:00","dateModified":"2011-09-25T07:50:04+00:00","articleSection":"All Salon, Culture, Entertainment","image":[false,false,false,false],"keywords":"","author":[{"@type":"Person","name":"Jay Rosen","jobTitle":"","description":"Jay Rosen is chairman of the Journalism Department at New York University and author of \"What Are Journalists For?\" (1999, Yale University Press).  This originally appeared on his weblog, <a target=\"new\" href=\"http:\/\/journalism.nyu.edu\/pubzone\/weblogs\/pressthink\/ \">PressThink.<\/a>","url":"https:\/\/www.salon.com\/writer\/jay_rosen"}],"publisher":{"@id":"https:\/\/www.salon.com\/#organization"},"mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.salon.com\/2003\/10\/10\/postman\/"},"description":"A former student remembers a teacher who never stopped raking the worlds of Big Media and technology with his savage wit."}]}</script>
+
+    <!--<script src="https://www.google.com/recaptcha/api.js?render=6LckLQkrAAAAABD30EsnOQxmtgweb-aPZojeUU3v" async defer></script>-->
+    <script>
+        let siteUrl = 'https://www.salon.com';
+        let captchaKey = '6LckLQkrAAAAABD30EsnOQxmtgweb-aPZojeUU3v';
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '134091381200152',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v21.0'
+            });
+            FB.AppEvents.logPageView();
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+      
+<!-- Chartbeat -->
+<script type="text/javascript">
+(function() {
+    
+    let userType = 'anon';
+
+    if (subscriberUser) {
+        
+        if (isPremium) {
+            userType = 'paid';
+        }
+        else {
+            userType = 'lgdin';
+        }
+    }
+
+    let path = window.location.pathname;
+    var _sf_async_config = window._sf_async_config = (window._sf_async_config || {});
+    _sf_async_config.uid = 1614;
+    _sf_async_config.domain = 'salon.com'; //CHANGE THIS TO THE ROOT DOMAIN
+    _sf_async_config.flickerControl = false;
+    _sf_async_config.path = path;
+    _sf_async_config.sections = "Culture, Entertainment"; // CHANGE THIS TO YOUR SECTION NAME(s)
+    _sf_async_config.authors = "jay_rosen"; // CHANGE THIS TO YOUR AUTHOR NAME(s)
+
+    var _cbq = window._cbq = (window._cbq || []);
+    _cbq.push(["_acct", userType]);
+
+    function loadChartbeat() {
+        var e = document.createElement('script');
+        var n = document.getElementsByTagName('script')[0];
+        e.type = 'text/javascript';
+        e.async = true;
+        e.src = '//static.chartbeat.com/js/chartbeat.js';;
+        n.parentNode.insertBefore(e, n);
+    }
+    loadChartbeat();
+})();
+</script>
+<script async src="//static.chartbeat.com/js/chartbeat_mab.js"></script>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="wp-singular post-template-default single single-post postid-601556 single-format-standard wp-theme-salon">
+    <script>
+        if (stickyHeaderEnabled) {
+            document.body.setAttribute('data-fixed', 'true');
+        } else {
+            document.body.removeAttribute('data-fixed');
+        }
+    </script>
+        <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGRKVFC2"
+                      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+        
+            <div class="loader-modal">
+    <div></div>
+</div>
+        <header class="main-header-container">
+            
+<section class="header__mobile">
+    <div>
+        <div class="header__mobile__logo">
+            <a href="https://www.salon.com" aria-label="To Salon Homepage">
+                <img class="-mt-2.5" src="https://www.salon.com/app/themes/salon/assets/img/mobile-logo.svg" width="136" height="40" alt="Salon logo" />
+            </a>
+        </div>
+        <div class="header__mobile__actions">
+            <button class="button__burger group/button__burger text-[#1e1e1e] dark:text-white text-2xl" aria-pressed="false" aria-controls="mobile-menu">
+    <i class="icon icon-burger block group-aria-pressed/button__burger:hidden" ></i>
+    <i class="icon icon-close hidden group-aria-pressed/button__burger:block" ></i>
+</button>
+        </div>
+    </div>
+    <nav
+    class="navigation__mobile"
+    aria-expanded="false"
+    id="mobile-menu"
+>
+    <div>
+        <div class="search__form w-full">
+    <form role="search" method="GET" action="https://www.salon.com/search/">
+        <div>
+                        <label for="search-form-1" class="hidden">Search</label>
+            <div class="relative">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#666666] dark:text-white">
+                    <i class="icon icon-search" ></i>
+                </div>
+                <input type="search" name="s" id="search-form-1" class="block w-full rounded-sm border border-[#a6a6a6] dark:border-white py-2 pr-4 pl-10 text-[#666666] dark:text-white text-base leading-4 placeholder:text-sm placeholder:text-[#666666] dark:placeholder:text-white placeholder:leading-4 outline-0 dark:bg-[#1d1d1d]" placeholder="Search" value="" />
+            </div>
+        </div>
+    </form>
+</div>
+        <div class="menu-burger-menu-container"><ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/life-stories">Life Stories</a></li>
+<li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li>
+<li class="menu-item menu-item-has-children"><a href="#">Reviews</a>
+<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Lifestyle</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/16/navigating-the-new-sober-boom-where-a-persons-sobriety-is-as-unique-as-their-fingerprint/">The New Sober Boom</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/30/secrets-of-a-serial-addict-how-i-got-hooked-on-quitting-over-and-over-again/">Getting Hooked on Quitting</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Education</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2024/03/16/ignorance-and-democracy-capitalisms-long-against-higher-education/">Liberal Arts Cuts Are Dangerous</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/09/16/college-was-necessary-for-me-will-my-own-child-need-it-like-i-did/">Is College Necessary?</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Finance</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/08/26/my-parents-are-deadcan-i-afford-avocado-toast-now/">Dying Parents Costing Millennials Dear</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/09/09/how-did-le-creuset-the-self-described-heirloom-quality-cookware-change-the-cooking-game/">Gen Z Investing In Le Creuset</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Crypto</a>
+	<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Investing</a>
+		<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/03/23/on-thursdays-we-wear-orange-sec-sues-lindsay-lohan-and-others-over-crypto-money-laundering-scam/">SEC vs Celebrity Crypto Promoters</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/04/16/impulsive-psychopaths-like-crypto-dark-personality-traits-increase-bitcoin-enthusiasm_partner/">&#8216;Dark&#8217; Personalities Drawn to BTC</a></li>
+		</ul>
+</li>
+	</ul>
+</li>
+</ul>
+</li>
+</ul></div>        <div id="userMenuContainerMobile">
+                    </div>
+        <div>
+            <div class="navigation__social">
+    <a href="https://x.com/Salon" target="_blank">
+        <i class="icon icon-twitter" ></i>
+    </a>
+    <a href="https://www.instagram.com/salonofficial" target="_blank">
+        <i class="icon icon-instagram" ></i>
+    </a>
+    <a href="https://www.youtube.com/user/SalonDotCom" target="_blank">
+        <i class="icon icon-youtube" ></i>
+    </a>
+    <a href="https://www.facebook.com/salon" target="_blank">
+        <i class="icon icon-facebook" ></i>
+    </a>
+    <a href="https://www.tiktok.com/@salonofficial" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-tiktok" ></i>
+    </a>
+    <a href="https://www.reddit.com/domain/salon.com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-reddit" ></i>
+    </a>
+    <a href="https://www.linkedin.com/company/salon-com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-linkedin" ></i>
+    </a>
+</div>
+        </div>
+    </div>
+</nav>
+</section>
+            
+<section class="header__desktop">
+    <section class="header__desktop__top">
+        <div>
+            <div>
+                <button class="button__burger group/button__burger text-[#1e1e1e] dark:text-white text-2xl" aria-pressed="false" aria-controls="burger-menu">
+    <i class="icon icon-burger block group-aria-pressed/button__burger:hidden" ></i>
+    <i class="icon icon-close hidden group-aria-pressed/button__burger:block" ></i>
+</button>
+                <nav class="navigation__burger" aria-expanded="false" id="burger-menu">
+    <div>
+        <div class="menu-burger-menu-container"><ul class="flex flex-col gap-2"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/life-stories">Life Stories</a></li>
+<li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li>
+<li class="menu-item menu-item-has-children"><a href="#">Reviews</a>
+<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Lifestyle</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/16/navigating-the-new-sober-boom-where-a-persons-sobriety-is-as-unique-as-their-fingerprint/">The New Sober Boom</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/30/secrets-of-a-serial-addict-how-i-got-hooked-on-quitting-over-and-over-again/">Getting Hooked on Quitting</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Education</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2024/03/16/ignorance-and-democracy-capitalisms-long-against-higher-education/">Liberal Arts Cuts Are Dangerous</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/09/16/college-was-necessary-for-me-will-my-own-child-need-it-like-i-did/">Is College Necessary?</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Finance</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/08/26/my-parents-are-deadcan-i-afford-avocado-toast-now/">Dying Parents Costing Millennials Dear</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/09/09/how-did-le-creuset-the-self-described-heirloom-quality-cookware-change-the-cooking-game/">Gen Z Investing In Le Creuset</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Crypto</a>
+	<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Investing</a>
+		<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/03/23/on-thursdays-we-wear-orange-sec-sues-lindsay-lohan-and-others-over-crypto-money-laundering-scam/">SEC vs Celebrity Crypto Promoters</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/04/16/impulsive-psychopaths-like-crypto-dark-personality-traits-increase-bitcoin-enthusiasm_partner/">&#8216;Dark&#8217; Personalities Drawn to BTC</a></li>
+		</ul>
+</li>
+	</ul>
+</li>
+</ul>
+</li>
+</ul></div>    </div>
+</nav>
+            </div>
+        </div>
+        <div>
+            <div class="navigation__social">
+    <a href="https://x.com/Salon" target="_blank">
+        <i class="icon icon-twitter" ></i>
+    </a>
+    <a href="https://www.instagram.com/salonofficial" target="_blank">
+        <i class="icon icon-instagram" ></i>
+    </a>
+    <a href="https://www.youtube.com/user/SalonDotCom" target="_blank">
+        <i class="icon icon-youtube" ></i>
+    </a>
+    <a href="https://www.facebook.com/salon" target="_blank">
+        <i class="icon icon-facebook" ></i>
+    </a>
+    <a href="https://www.tiktok.com/@salonofficial" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-tiktok" ></i>
+    </a>
+    <a href="https://www.reddit.com/domain/salon.com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-reddit" ></i>
+    </a>
+    <a href="https://www.linkedin.com/company/salon-com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-linkedin" ></i>
+    </a>
+</div>
+            <div class="dropdown__user group/dropdown__user relative text-left">
+    <div class="flex justify-center">
+        <button type="button" class="text-[#1e1e1e] dark:text-white group-hover/dropdown__user:text-[#ed2c1d]" id="dropdown-user-2" aria-haspopup="true">
+            <i class="icon icon-user text-2xl" ></i>
+        </button>
+    </div>
+    <div class="absolute right-0 z-10 pt-2 w-56 origin-top-right rounded-md bg-white dark:bg-[#1d1d1d] shadow-lg invisible transition-opacity ease-out delay-100 opacity-0 group-hover/dropdown__user:opacity-100 group-hover/dropdown__user:visible" role="menu" aria-orientation="vertical" aria-labelledby="dropdown-user-2" tabindex="-1">
+        <div role="none" id="userMenuContainer"></div>
+    </div>
+</div>
+        </div>
+    </section>
+    <section class="header__desktop__middle">
+        
+<nav class="navigation__desktop">
+    <div>
+        <div>
+            
+                <ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li><li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li><li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li></ul>            <div class="logo__desktop">
+                <a href="https://www.salon.com" aria-label="To Salon Homepage">
+                    <img src="https://www.salon.com/app/themes/salon/assets/img/salon-logo.svg" width="341" height="100" alt="Salon logo" />
+                </a>
+            </div>
+                <ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li><li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li><li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li></ul>                    </div>
+    </div>
+</nav>
+    </section>
+    <section class="header__desktop__bottom">
+        <div>
+            <div class="search__form w-full">
+    <form role="search" method="GET" action="https://www.salon.com/search/">
+        <div>
+                        <label for="search-form-3" class="hidden">Search</label>
+            <div class="relative">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#666666] dark:text-white">
+                    <i class="icon icon-search" ></i>
+                </div>
+                <input type="search" name="s" id="search-form-3" class="block w-full rounded-sm border border-[#a6a6a6] dark:border-white py-2 pr-4 pl-10 text-[#666666] dark:text-white text-base leading-4 placeholder:text-sm placeholder:text-[#666666] dark:placeholder:text-white placeholder:leading-4 outline-0 dark:bg-[#1d1d1d]" placeholder="Search" value="" />
+            </div>
+        </div>
+    </form>
+</div>
+        </div>
+    </section>
+</section>
+        </header>
+    
+    <div class="raptive-salon-header hide-if-premium"></div>
+
+    <main class="main-container">
+
+<div class="articles">
+            <article id="post-601556" class="single-column post-601556 post type-post status-publish format-standard hentry category-all-salon category-culture category-entertainment" data-post-id="601556">
+    <!-- TODO: Add the preview message here ... -->
+    
+<section class="article__title">
+        <h1>Neil Postman: A civilized man in a century of barbarism</h1>
+    <h2>A former student remembers a teacher who never stopped raking the worlds of Big Media and technology with his savage wit.</h2>
+    <div class="writers">
+                    <div>
+                <div class="by">
+                    <span>By</span>
+                                            <a href="https://www.salon.com/writer/jay_rosen">
+                            Jay Rosen                        </a>
+                                                            </div>
+                                    <div>
+                                            </div>
+                            </div>
+                <div class="date">
+                            <h3>
+                    <span>Published</span>
+                    <time datetime="2003-10-10T19:30:00-04:00">
+                        October 10, 2003 7:30PM (EDT)                    </time>
+                </h3>
+                    </div>
+    </div>
+</section>
+    <section class="article__feature">
+    <!-- TODO: Add the featured video here... -->
+        <div class="attachment__image">
+    <div class="image">
+        <img src="https://www.salon.com/app/themes/salon/assets/img/article-placeholder.webp" alt="Salon Default"/>
+    </div>
+</div>
+    </section>
+    <section class="main">
+        <div>
+            <!-- TODO: Add the functionality for the article sharing here ... -->
+            
+<section class="article__share">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.salon.com%2F2003%2F10%2F10%2Fpostman%2F&#038;utm_source=facebook&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#3a5697]" rel="nofollow">
+    <i class="icon icon-facebook bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#2c4788]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Facebook    </span>
+    </a>
+            <a href="https://x.com/share?url=https%3A%2F%2Fwww.salon.com%2F2003%2F10%2F10%2Fpostman%2F&#038;text=Neil+Postman%3A+A+civilized+man+in+a+century+of+barbarism&#038;utm_source=twitter&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#03a2e0]" rel="nofollow">
+    <i class="icon icon-twitter bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#048cc1]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        X    </span>
+    </a>
+            <a href="https://www.reddit.com/submit?url=https%3A%2F%2Fwww.salon.com%2F2003%2F10%2F10%2Fpostman%2F&#038;title=Neil+Postman%3A+A+civilized+man+in+a+century+of+barbarism&#038;utm_source=reddit&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#ff661e]" rel="nofollow">
+    <i class="icon icon-reddit bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#ea5a16]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Reddit    </span>
+    </a>
+            <a href="mailto:?subject=Neil%20Postman%3A%20A%20civilized%20man%20in%20a%20century%20of%20barbarism&#038;body=Check%20out%20this%20article%21%20https%3A%2F%2Fwww.salon.com%2F2003%2F10%2F10%2Fpostman%2F%3Futm_source%3Demail%26utm_medium%3Dsocial%26utm_campaign%3Dsocialbuttons%26utm_content%3Dshare_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#3d4e66]" >
+    <i class="icon icon-email bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#2d394a]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Email    </span>
+    </a>
+        <div class="article__title-badges">
+        <div class="google-preferred-source-container">
+            <a
+                class="google-preferred-source"
+                href="https://www.google.com/preferences/source?q=salon.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Set Salon as a preferred source on Google News"
+                            >
+                <picture
+                    data-light-src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png"
+                    data-dark-src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_dark@2x.png"
+                >
+                    <source srcset="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png" media="(prefers-color-scheme: dark)">
+                    <img
+                        src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png"
+                        alt="Set Salon as a preferred source on Google News"
+                        loading="lazy"
+                        width="676"
+                        height="213"
+                    >
+                </picture>
+            </a>
+        </div>
+    </div>
+    <template id="save-article-button">
+        
+<button type="button" id="saveArticleBtn-8859" onclick="saveArticle(this.id);" class="button__tertiary group/button__tertiary border-2 border-[#5f5f5f] rounded text-[#5f5f5f] text-sm font-bold px-2 py-1 h-8 lowercase flex items-center gap-x-1.5 hover:text-[#e42416] hover:border-[#e42416]">
+            <i class="icon icon-save !h-4 !w-3 text-[#5f5f5f] group-hover/button__tertiary:text-[#e42416] text-base" ></i>
+        <span class="btnLabel">Save</span>
+</button>
+    </template>
+</section>
+            <!-- TODO: Add the editor's note here ... -->
+                        <section class="article__content page-article"><p>I have no count, but I sense a dwindling number of people in the academic world who are unclassifiable. Neil Postman, who died Sunday, was one, and now we can say he will always be one. Such figures — with reputation but no real discipline — have a tendency to make people think. Postman had that. </p>
+<p>He was expert in nothing. Therefore nothing was off limits. Therefore one’s mind was always at risk, from a joke, a headline, an idea, a person walking through the door. The only way to respond to such strange conditions was with ready humor. And humor would bring you more ideas. Now what discipline, what department is that? </p><div class="raptive-salon-video hide-if-premium"></div>
+<p>Everyone who knew Postman — and I include perhaps a hundred thousand who only heard him speak — knew him first through humor, which was the reflection in person of the satire in most of his books, each of which is a pamphlet, an essay between covers. “The Disappearance of Childhood” (1982) was satire about the infantilization in American culture. “Amusing Ourselves to Death” (1985) was satire about entertainment and what it was doing to us. “Technopoly” (1993) was satire on the “surrender of culture to technology.” One of the first journals he was associated with was Monocle (long gone), a magazine of political satire, which is where he met Victor Navasky, publisher of the Nation, which is how he came to serve on the Nation’s board, even though he was the world’s worst leftist and couldn’t stomach the right. Of course, in all the satire there was Neil’s sermon, but again: What discipline is that? </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>Postman’s intellectual pose, as well as his poise in public settings, as well as his great gift, which was terribly good humor, came down essentially to this: the trials of a civilized man in a century of barbarism. It later softened into the civilized man in a culture of television. But the barbaric that was in television, between the wicked dots, softened, but still there … well, Postman had the eye for that. He would teach you this angry eye, and that was one reason I hung around NYU and got a Ph.D. He knew what to ignore, when to object. </p>
+<p>“You have to understand, what Americans do is watch television.” I heard this many times. “I am not saying that’s who they are. But that is what they do. Americans … watch … television.” And he would have figures, sometimes, demonstrating it: the number of commercials a child would see betwen 5 and 18 (the number was 675,000 in 1979). But, frankly, he had zero interest in mastering figures about the big machine of commercial TV. He had a big machine of his own, which was simply everything he ever read and learned from wiser heads, all the books he placed against television in order to see it more clearly. One of his essays is titled “Social Science as Moral Theology” (1988). </p>
+<p>Among those I heard him talk about most often were Bertrand Russell, George Orwell, G.K. Chesterton, George Bernard Shaw, Alfred North Whitehead, Sigmund Freud, Karl Marx, Philippe Aries, Jacques Ellul, Rudolph Arnheim, Norbert Elias, Robert Maynard Hutchins, Christopher Lasch, Walter Ong, Eric Havelock, Lewis Mumford, Harold Innis, and of course Marshall McLuhan, whom Postman met in the 1950s, before anyone had ever heard of the Canadian English professor who would write “Understanding Media” (1964). McLuhan always regretted that he had not founded a Ph.D. program like Postman’s, and until the rediscovery of McLuhan by young people of the Internet age, that program helped keep interest in his ideas alive. “The medium is the message,” McLuhan’s most famous line, is not an easy idea to grasp. It just looks that way. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>Neil Postman was easily the best public speaker I ever heard, and most who heard him agreed with that. He never spoke off the cuff, never from notes. He wrote all his speeches in longhand, and would try them on students first, usually revising a few words just to give you the sense that you had participated by listening. He wrote 20 books with only a felt-tipped pen on notebook paper; all sentences crafted by hand. This too was satire, on “progress” in writing instruments. Postman, world-famous media scholar, was famous among students and friends for refusing any technology thought to “improve” something in which he had never requested improvements. A simple rule, with hilarious consequences. He didn’t care if you had a better solution to a problem he never felt was real, and he would make fun of you if you tried to recommend it. </p>
+<p>That is what I mean by the pose of the civilized man, beset by answering machines. The pose is shared by many stand-up comedians, and Neil had that in him. He also had edge. Television, he always said, is inhuman to children because it gives them answers to questions they never asked. It did this for purposes of control. Educational television — “Sesame Street” — was not the alternative; it was the worst offender. This view denied a lot of people, including educated liberals, comfort. To him that was education. </p>
+<p>Postman resented being controlled by technology or bureaucracy, way more than most Americans. He resented the new for retiring an “old” that had no reason to quit. But he thought it funny — and fascinating — that people allowed this manipulation, especially Americans, who were the most open to it. Postman had a big audience and gave many speeches in Germany, where several of his books were bestsellers during the 1980s, in part because there was so much in American life he simply rejected. Thus he wrote with a pen, never used e-mail, owned no computer and had no regrets about never going online. To him it was not a matter of convenience. It was about keeping an independent mind by making independent use of objects. In this way, he taught me and many others to think for ourselves, precisely because we didn’t think as he did. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>Postman’s general philosophy, which was general education, also known as the great-books approach, was made known to me shortly after I enrolled in a graduate program under his chairmanship in 1980. I was there to study the media, and he was at that time a professor of media ecology (a name for his anti-discipline). As he explained to me: “We’re just trying to give people a good liberal arts education.” Which, he further argued, and easily demonstrated himself, was exactly the tool needed to understand the gathering beast: the Media. In an age of specialization, this is not how academic life works. But his did. </p>
+<p>Postman, one should remember, was originally an English teacher. He entered the university in a time of expansion and optimism in public schooling. We were building lots of schools and creating big public universities then. His degree was in English education, from Teachers College at Columbia. From 1959 on, his home was the School of Education at NYU. His original and core readership remained schoolteachers, and I witnessed the same ritual numerous times: A woman in her 40s or 50s would approach after a speech. “Professor Postman, I just want to tell you, I read your book, ‘Teaching as a Subversive Activity’ … That book changed my life.” Often she would have the book with her, and he would sign it … with a felt-tip pen. This made an impression on me. A stray sentence lifted from that book: </p>
+<p>“We must emphasize that the concept, ‘that we must unlearn dead concepts’ is itself new, and so rather incongenial to most who confront it the first time.” </p>
+<p>If Postman was an English teacher, he realized very early that a bigger, brighter and more compelling classroom existed out there, and it would teach your kids no matter how good you were at reaching them. Today this is a commonplace: They get it from television! But in the 1950s, when Postman began serious study, it was a far more original thought: We’re being outtaught by the media. For this he later found a brilliant description. Television, he said, is the first curriculum. School is second. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>There’s no accounting for what you absorb from such a man. For he knew the two secrets of all great teachers, things no teachers college can teach: First, you don’t put knowledge into people, you draw it out. (Which is why personality was his one and only classroom “method.”) Second, if you can manage to conceal, artfully, some crucial part of what you are saying, then young people who are listening really, really hard will make it their business to find you out. And that’s when you can really teach them. I must have heard it a thousand times. “It’s not that simple,” the student says to Postman. Oh? And right there, the drawing out begins. </p>
+<p>There’s no point, he felt, in being an English teacher today — armed with literature and its human testimony — if the conditions for successful teaching are all around us being “disappeared.” (A favorite construction of his.) That’s why he became a media critic. And that is the master image, if there is one, in all of Neil Postman’s writings: either a disappearing we should regret, or a forgetting we have failed to do. </p>
+<p>The greatest sentence he wrote will, I am sure, give comfort at some time in the future. It’s the first sentence in “The Disappearance of Childhood.” “Children are the living messages we send to a time we will not see.” </p>
+<hr><div class="raptive-salon-content hide-if-premium"></div></section>
+                <section class="article__writers mt-14">
+                                <div class="post-417465 writer type-writer status-publish hentry article__writers article__writer-container" data-writer-id="417465">
+
+                                    <div class="writer-bio-ajax-content">
+                        <h3>
+                            <span>By</span>
+                            <a href="https://www.salon.com/writer/jay_rosen">
+                                Jay Rosen                            </a>
+                        </h3>
+                    </div>
+
+                    <template class="writer-bio-template">
+                        <h3>
+                            <span>By</span>
+                            <a href="" class="writer-name-link">
+                            </a>
+                        </h3>
+
+                        <div class="socials" style="display: none;"> <a href="" class="social group/social facebook-link" target="_blank" style="display: none;">
+                                <i class="icon icon-facebook text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                            <a href="" class="social group/social twitter-link" target="_blank" style="display: none;">
+                                <i class="icon icon-twitter text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                            <a href="" class="social group/social instagram-link" target="_blank" style="display: none;">
+                                <i class="icon icon-instagram text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                        </div>
+
+                        <div class="writer-bio-text"></div>
+
+                        <div class="more">
+                            <span>MORE FROM</span>
+                            <a href="" class="writer-more-from-link">
+                            </a>
+                        </div>
+                    </template>
+                            </div>
+            </section>
+            <hr>
+                        
+<section class="article__related" data-post-id="601556" data-terms="">
+    <h2>
+        <span>
+            Related Articles        </span>
+    </h2>
+    <div>
+        <template>
+            <a href="" class="flex min-[501px]:hidden">
+                <div class="attachment__image">
+                    <div class="image">
+                        <img src="https://www.salon.com/app/themes/salon/assets/img/salon-placeholder.webp" decoding="async" fetchpriority="high" alt="Salon placeholder" class="attachment-full size-full">
+                    </div>
+                </div>
+                <h5></h5>
+                <span></span>
+            </a>
+        </template>
+    </div>
+</section>
+            <hr>
+            <div class="dianomi_context hide-if-premium" data-dianomi-context-id="4879"></div>
+        </div>
+        
+<div class="sidebar-col">
+    <div class="dianomi_context hide-if-premium" data-dianomi-context-id="4876"></div>
+            <div class="raptive-salon-sticky-sidebar hide-if-premium"></div>
+    </div>
+    </section>
+</article>
+    </div>
+
+    </main>
+
+    <footer>
+        <ul class="navigation__footer mt-4 text-center"><li class="menu-item"><a href="https://www.salon.com">Home</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about">About</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/staff">Staff</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/contact">Contact</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/policy">Privacy</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/tos">Terms of Service</a></li>
+<li class="menu-item"><a href="https://www.salon.com/archive">Archive</a></li>
+<li class="menu-item"><a href="/premium?utm_source=onsite&amp;utm_medium=organic&amp;utm_campaign=go-ad-free-footer">Go Ad Free</a></li>
+</ul>        <div class="footer__copyright">
+    <p>
+        Copyright © 2026 Salon.com, LLC. Reproduction of material from any Salon pages without written permission is strictly prohibited. SALON ® is registered in the U.S. Patent and Trademark Office as a trademark of Salon.com, LLC. Associated Press articles: Copyright © 2016 The Associated Press. All rights reserved. This material may not be published, broadcast, rewritten or redistributed.    </p>
+    <p>
+        <a href="https://www.salon.com/2026/06/02/best-vpn-services-for-2026/">
+            VPN Providers        </a>
+    </p>
+    <p>
+        <a href="https://www.salon.com/about/dmca">
+            DMCA Policy        </a>
+    </p>
+</div>
+    </footer>
+
+    <div class="modal__alert" role="dialog" aria-modal="true" aria-hidden="true" id="alert-modal">
+    <div></div>
+    <div>
+        <div>
+            
+<div class="modal__close">
+    <button type="button" aria-controls="alert-modal">
+        <i class="icon icon-close-extrabold block w-5 text-xl" ></i>
+    </button>
+</div>
+            <div class="modal__content">
+                <div class="message">
+                    This is an alert message.                </div>
+                <div class="modal__close">
+                    <button type="button" aria-controls="alert-modal">
+                        OK                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp/wp-*.php","/wp/wp-admin/*","/app/uploads/*","/app/*","/app/plugins/*","/app/themes/salon/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script id="global-salon-js-extra">
+var salonSubscriptionTracking = {"eventsEndpoint":"https://www.salon.com/wp-json/salon/v1/subscription-tracking/events","measurementId":"G-7VPPFM7ET6","pageContext":{"contentCategory":"article","currentPlan":null,"isCheckoutPage":false},"pendingSessionIds":[],"bootstrapEvents":[],"approximateBeginCheckout":"1"};
+//# sourceURL=global-salon-js-extra
+</script>
+<script type="module" data-wp-strategy="defer" defer id="global-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/global.js?ver=1.0.31"></script>
+<script type="module" data-wp-strategy="defer" defer id="article-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/article.js?ver=1.0.31"></script>
+<script data-wp-strategy="defer" defer id="ad-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/ad.js?ver=1.0.31"></script>
+<script id="raptive-adblock-detection-js" src="https://www.salon.com/app/themes/salon/assets/js/ad/raptive-adblock-detection.js"></script>
+<script data-cfasync="false" data-abr-mode="essential" id="raptive-adblock-recovery-js" src="https://www.salon.com/app/themes/salon/assets/js/ad/raptive-adblock-recovery.js"></script>
+</body>
+</html>
