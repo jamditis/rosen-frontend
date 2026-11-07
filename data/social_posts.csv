@@ -63657,3 +63657,36 @@ Rare as it seems, it can happen. And did happen, recently. In Serbia. www.cjr.or
 
 @bgrueskin.bsky.social will explain.",FALSE,"Bluesky autonomous batch 2026-11-06 23:33:49; decision: context_only; reason=taxonomy_unresolved. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3mznybsy3qk2m; cid=bafyreid4sdzlzoz6xfkrvdbhufiazuvvuo6pjvkfchk3uy6xntoazoqr5q; record_sha256=5483b63fd26397a57b2f54594a1a2194905b8874ec9dfc75063346de866fa271. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
 BSKY-03609,Reply by Jay Rosen,https://bsky.app/profile/jayrosen.bsky.social/post/3mzo22m6hbc27,Jay Rosen,2026-11-06 18:44:38,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,1,,Yep.,,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,6,0,0,,at://did:plc:a5fwvpvub5e7mxaebuxn3tuu/app.bsky.feed.post/3mzntvjga4s2t,Jay Rosen,,,Public Post,2026-11-06 23:33:49,,,,Yep.,Yep.,FALSE,"Bluesky autonomous batch 2026-11-06 23:33:49; decision: context_only; reason=brief_or_context_dependent_text. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3mzo22m6hbc27; cid=bafyreifhqyvvnaxiabuw7y74d2gdxv7bz55j6bpeuvkkqwqdhkcsduozla; record_sha256=afa57e51b7de403a9357a3c97c514d9138d61821669ef11e5dc516cecda473d8. Context references: at://did:plc:a5fwvpvub5e7mxaebuxn3tuu/app.bsky.feed.post/3mzntvjga4s2t. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
+BSKY-03610,New York Times currently...,https://bsky.app/profile/jayrosen.bsky.social/post/3mzol3jmuic2i,Jay Rosen,2026-11-06 23:49:23,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,6,,"New York Times currently. 
+
+Via @davelevitan.bsky.social",,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,111,13,51,,,Jay Rosen,,,Public Post,2026-11-07 22:21:54,,,,"New York Times currently. 
+
+Via @davelevitan.bsky.social","New York Times currently. 
+
+Via @davelevitan.bsky.social",FALSE,"Bluesky autonomous batch 2026-11-07 22:21:54; decision: context_only; reason=brief_or_context_dependent_text. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3mzol3jmuic2i; cid=bafyreicr4bwm4ss42dfkxjjnpzt7wwqb3dj5km5emxvmonzryx22ndesc4; record_sha256=fdf00d2a80655156b8340a0523362166776d983d1b8f996ef1ed24bf96874232. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
+BSKY-03611,"Thanks, Peter...",https://bsky.app/profile/jayrosen.bsky.social/post/3mzqbjpm33s2n,Jay Rosen,2026-11-07 16:03:41,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,4,,"Thanks, Peter. Will use.",,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,2,0,1,,at://did:plc:m32zvup6ymlg2ajetctci4nw/app.bsky.feed.post/3mzpzrdpbok2k,Jay Rosen,,,Public Post,2026-11-07 22:21:54,,,,"Thanks, Peter. Will use.","Thanks, Peter. Will use.",FALSE,"Bluesky autonomous batch 2026-11-07 22:21:54; decision: context_only; reason=brief_or_context_dependent_text. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3mzqbjpm33s2n; cid=bafyreic6oug4vc3akn5plrmm6sszho2doi2z2rapt4jeqe7rqd5ump6pty; record_sha256=67a1443dba7859c5e3a7f465d7fc6d09df2a0b8cd3a5532bf04f814db0c97ffa. Context references: at://did:plc:m32zvup6ymlg2ajetctci4nw/app.bsky.feed.post/3mzpzrdpbok2k. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
+BSKY-03612,Le  Monde:...,https://bsky.app/profile/jayrosen.bsky.social/post/3mzqc7zirek2n,Jay Rosen,2026-11-07 16:16:09,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,29,,"Le  Monde: 
+
+""Stephen Miller, reactionary ideologue and white supremacist, promoted head of Trump administration."" 
+
+bsky.app/profile/engl...
+
+New York Times:
+
+Trump Elevates Stephen Miller, a Fiery Hardliner, to Chief of Staff",,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,607,192,78,,,Jay Rosen,,,Public Post,2026-11-07 22:21:54,,,,"Le  Monde: 
+
+""Stephen Miller, reactionary ideologue and white supremacist, promoted head of Trump administration."" 
+
+bsky.app/profile/engl...
+
+New York Times:
+
+Trump Elevates Stephen Miller, a Fiery Hardliner, to Chief of Staff","Le  Monde: 
+
+""Stephen Miller, reactionary ideologue and white supremacist, promoted head of Trump administration."" 
+
+bsky.app/profile/engl...
+
+New York Times:
+
+Trump Elevates Stephen Miller, a Fiery Hardliner, to Chief of Staff",FALSE,"Bluesky autonomous batch 2026-11-07 22:21:54; decision: context_only; reason=taxonomy_unresolved. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3mzqc7zirek2n; cid=bafyreicnzj2mygzftmji2y3ued6nqcqomu66bdeurjgzeyla2b2yvys4by; record_sha256=019cd9c2ae76c93b196d14cae63e49f8ff62de4eed49382e3f215d8c452e3573. Context references: at://did:plc:4izzk7jyj5yebyo22zblxby4/app.bsky.feed.post/3mzppfk55bp2y. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
