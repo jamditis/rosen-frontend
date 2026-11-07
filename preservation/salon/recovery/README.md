@@ -20,6 +20,8 @@ The live RadioPublic embed could not be reached from this environment. A saved 2
 
 The MP3 is 52,903,373 bytes, SHA-256 `32f8b73fecda0acdd2e9401ae45c217dcb77b3a9710632209722e91008cab801`. `ffprobe` reports stereo MP3, 44.1 kHz, 2,204.020917 seconds (36:44), within one second of the archived 36:45 display. A complete FFmpeg decode finished without errors. This verifies the file’s structure and its documented identity chain; it is not a full manual listening review.
 
+The upload to GitHub LFS completed successfully. A subsequent independent download through the GitHub contents API returned all 52,903,373 bytes with the same SHA-256; see [`github-storage-readback.json`](github-storage-readback.json). A separate git-lfs batch-fetch attempt returned HTTP 503, so that particular CLI download path was not verified.
+
 The audio is retained with **Git LFS**, keeping the 53 MB payload outside ordinary frontend git objects. Run `git lfs pull` after cloning to obtain the actual audio bytes. The checksum and verifier reject a small LFS pointer as an incomplete offline copy. The article HTML itself remains a separate self-contained text/page capture; play the local MP3 separately.
 
 ## Historical coverage evidence
