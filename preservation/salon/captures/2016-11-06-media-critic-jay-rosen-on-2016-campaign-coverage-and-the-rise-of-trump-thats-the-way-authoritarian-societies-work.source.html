@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <script>
+        const subscriberUser = !!document.cookie.split('; ').find(row => row.startsWith('wordpress_subscriber_user='));
+
+        const userDetails = subscriberUser ? JSON.parse(window.localStorage.getItem('userDetails')) : null;
+        const darkModeEnabled = userDetails ? userDetails?.userPreferences?.darkMode === true : false;
+        const stickyHeaderEnabled = userDetails ? userDetails?.userPreferences?.stickyHeader === true : false;
+
+        // Helper function to read cookies
+        function getCookie(name) {
+            var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+            return v ? v[2] : null;
+        }
+
+        // Check for the 'wordpress_premium_member' cookie
+        const hasPremiumCookie = getCookie('wordpress_premium_member') === '1';
+        const hasPremiumRoleInLS = userDetails
+            && userDetails.userRoles
+            && Array.isArray(userDetails.userRoles)
+            && userDetails.userRoles.includes('premium_member');
+        const isPremium = hasPremiumCookie || hasPremiumRoleInLS;
+
+        if (darkModeEnabled) {
+            document.documentElement.classList.add('dark');
+        }
+
+        if (isPremium) {
+            document.documentElement.classList.add('premium');
+        }
+    </script>
+
+            <!-- START email detection/removal script -->
+        <script>
+            !function(){"use strict";const t={adt_ei:{identityApiKey:"plainText",source:"url",type:"plaintext",priority:1},adt_eih:{identityApiKey:"sha256",source:"urlh",type:"hashed",priority:2},sh_kit:{identityApiKey:"sha256",source:"urlhck",type:"hashed",priority:3}},e=Object.keys(t);function i(t){return function(t){const e=t.match(/((?=([a-z0-9._!#$%+^&*()[\]<>-]+))\2@[a-z0-9._-]+\.[a-z0-9._-]+)/gi);return e?e[0]:""}(function(t){return t.replace(/\s/g,"")}(t.toLowerCase()))}!async function(){const n=new URL(window.location.href),o=n.searchParams;let a=null;const r=Object.entries(t).sort(([,t],[,e])=>t.priority-e.priority).map(([t])=>t);for(const e of r){const n=o.get(e),r=t[e];if(!n||!r)continue;const c=decodeURIComponent(n),d="plaintext"===r.type&&i(c),s="hashed"===r.type&&c;if(d||s){a={value:c,config:r};break}}if(a){const{value:t,config:e}=a;window.adthrive=window.adthrive||{},window.adthrive.cmd=window.adthrive.cmd||[],window.adthrive.cmd.push(function(){window.adthrive.identityApi({source:e.source,[e.identityApiKey]:t},({success:i,data:n})=>{i?window.adthrive.log("info","Plugin","detectEmails",`Identity API called with ${e.type} email: ${t}`,n):window.adthrive.log("warning","Plugin","detectEmails",`Failed to call Identity API with ${e.type} email: ${t}`,n)})})}!function(t,e){const i=new URL(e);t.forEach(t=>i.searchParams.delete(t)),history.replaceState(null,"",i.toString())}(e,n)}()}();
+        </script>
+        <!-- END email detection/removal script -->
+                    <!-- Raptive Head Tag Manual -->
+        <script data-no-optimize="1" data-cfasync="false">
+            (function(w, d) {
+
+                if (isPremium) {
+                    return;
+                }
+
+                w.adthrive = w.adthrive || {};
+                w.adthrive.cmd = w.adthrive.cmd || [];
+                w.adthrive.plugin = 'adthrive-ads-manual';
+                w.adthrive.host = 'ads.adthrive.com';
+                var s = d.createElement('script');
+                s.async = true;
+                s.referrerpolicy = 'no-referrer-when-downgrade';
+                s.src = 'https://' + w.adthrive.host + '/sites/69caa2a59c365653ba27aeb9/ads.min.js?referrer=' + w.encodeURIComponent(w.location.href) + '&cb=' + (Math.floor(Math.random() * 100) + 1);
+                var n = d.getElementsByTagName('script')[0];
+                n.parentNode.insertBefore(s, n);
+            })(window, document);
+        </script>
+        <!-- End of Raptive Head Tag -->
+                    <!-- Dianomi Context Feed -->
+        <script type="text/javascript" id="dianomi_context_script" src="https://www.dianomi.com/js/contextfeed.js"></script>
+        <!-- End Dianomi Context Feed -->
+        
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-MGRKVFC2');</script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google Fonts pre-connect
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://www.salon.com/app/themes/salon/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://www.salon.com/app/themes/salon/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://www.salon.com/app/themes/salon/assets/img/favicon-16x16.png">
+    <link rel="icon" type="image/png" href="https://www.salon.com/app/themes/salon/favicon.ico">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta property="fb:pages" content="120680396518" />
+    <meta property="fb:app_id" content="134091381200152" />
+    <meta name="p:domain_verify" content="afd252c603232fed8ddf2554b144079b"/>
+
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/icomoon.woff" as="font" type="font/woff" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-Bold-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-Oblique-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Georgia-Bold-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/TimesNewRoman-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+
+	<!-- This site is optimized with the Yoast SEO Premium plugin v25.9 (Yoast SEO v25.9) - https://yoast.com/wordpress/plugins/seo/ -->
+	<title>Media critic Jay Rosen on 2016 campaign coverage and the rise of Trump: &quot;That&#039;s the way authoritarian societies work&quot; - Salon.com</title>
+	<meta name="description" content="In an interview, Jay Rosen explores six ways the media can move past bogus neutrality — and rebuild public trust" />
+	<link rel="canonical" href="https://www.salon.com/2016/11/06/media-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work/" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://www.salon.com/2016/11/06/media-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work/?utm_source=website&amp;utm_medium=social&amp;utm_campaign=ogshare&amp;utm_content=og" />
+	<meta property="og:site_name" content="Salon.com" />
+	<meta property="article:publisher" content="120680396518" />
+	<meta property="article:published_time" content="2016-11-06T10:00:00+00:00" />
+	<meta property="article:modified_time" content="2016-11-07T08:04:09+00:00" />
+	<meta property="og:image" content="https://www.salon.com/app/uploads/2016/11/hillary_trump_press.jpg" />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta property="og:image:width" content="1200"/>
+	<meta property="og:image:height" content="628"/>
+	<meta name="author" content="Paul Rosenberg" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:label1" content="Written by" />
+	<meta name="twitter:data1" content="Paul Rosenberg" />
+	<meta name="twitter:label2" content="Est. reading time" />
+	<meta name="twitter:data2" content="16 minutes" />
+	<meta property="article:section" content="All Salon" />
+	<meta property="article:section" content="Elections" />
+	<meta property="article:section" content="Media" />
+	<meta property="article:section" content="News &amp; Politics" />
+	<meta property="article:section" content="Politics" />
+	<meta property="article:tag" content="2016 Presidential Campaign" />
+	<meta property="article:tag" content="Donald Trump" />
+	<meta property="article:tag" content="Elections 2016" />
+	<meta property="article:tag" content="Hillary Clinton" />
+	<meta property="article:tag" content="Jay Rosen" />
+	<meta property="article:tag" content="Media Criticism" />
+	<meta property="article:tag" content="view from nowhere" />
+	<meta property="article:author" content="Paul Rosenberg" />
+	<!-- / Yoast SEO Premium plugin. -->
+
+
+<link rel='stylesheet' id='optinmonster-memberpress-css' href='https://www.salon.com/app/plugins/optinmonster/assets/dist/css/memberpress.min.css?ver=2.16.24' media='all' />
+<link rel='stylesheet' id='mp-theme-css' href='https://www.salon.com/app/plugins/memberpress/css/ui/theme.css?ver=1.12.15' media='all' />
+<style id="classic-theme-styles-inline-css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+
+
+<link rel='stylesheet' id='global-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/global.css?ver=1.0.31' media='all' />
+<link rel='stylesheet' id='article-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/article.css?ver=1.0.31' media='all' />
+<link rel='stylesheet' id='ad-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/ad.css?ver=1.0.31' media='all' />
+<script id="nelio-ab-testing-visitor-type-js" src="https://www.salon.com/app/plugins/nelio-ab-testing/assets/dist/js/visitor-type.js?ver=287e8e4cd3bcff28c95d"></script>
+<script type="application/ld+json">{"@context":"https:\/\/schema.org","@graph":[{"@type":"NewsMediaOrganization","@id":"https:\/\/www.salon.com\/#organization","name":"Salon.com","url":"https:\/\/www.salon.com\/","publishingPrinciples":"https:\/\/www.salon.com\/about","masthead":"https:\/\/www.salon.com\/about\/staff","diversityPolicy":"https:\/\/www.salon.com\/about\/diversity","sameAs":["https:\/\/www.facebook.com\/salon","https:\/\/www.instagram.com\/salonofficial","https:\/\/x.com\/salon","https:\/\/www.instagram.com\/salondotcom\/"],"logo":{"@type":"ImageObject","url":"https:\/\/www.salon.com\/app\/themes\/salon\/assets\/img\/salon-logo.svg"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Homepage","item":{"@type":"Thing","@id":"https:\/\/www.salon.com"}},{"@type":"ListItem","position":2,"name":"Elections Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/category\/elections"}},{"@type":"ListItem","position":3,"name":"Media Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/category\/media"}},{"@type":"ListItem","position":4,"name":"News &amp; Politics Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/category\/news-and-politics"}},{"@type":"ListItem","position":5,"name":"Politics Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/category\/politics"}},{"@type":"ListItem","position":6,"name":"Paul Rosenberg's Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/writer\/paul_rosenberg"}}]},{"@type":"NewsArticle","headline":"Media critic Jay Rosen on 2016 campaign coverage and the rise of Trump: \"That's the way authoritarian societies work\"","url":"https:\/\/www.salon.com\/2016\/11\/06\/media-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work\/","thumbnailUrl":"https:\/\/www.salon.com\/app\/uploads\/2016\/11\/hillary_trump_press-150x150.jpg","alternativeHeadline":"In an interview, Jay Rosen explores six ways the media can move past bogus neutrality \u2014 and rebuild public trust","dateCreated":"2016-11-06T10:00:00+00:00","datePublished":"2016-11-06T10:00:00+00:00","dateModified":"2016-11-07T08:04:09+00:00","articleSection":"All Salon, Elections, Media, News &amp; Politics, Politics","image":["https:\/\/www.salon.com\/app\/uploads\/2016\/11\/hillary_trump_press-150x150.jpg","https:\/\/www.salon.com\/app\/uploads\/2016\/11\/hillary_trump_press-300x199.jpg","https:\/\/www.salon.com\/app\/uploads\/2016\/11\/hillary_trump_press.jpg","https:\/\/www.salon.com\/app\/uploads\/2016\/11\/hillary_trump_press.jpg"],"keywords":"2016 Presidential Campaign, Donald Trump, Elections 2016, Hillary Clinton, Jay Rosen, Media Criticism, view from nowhere","author":[{"@type":"Person","name":"Paul Rosenberg","jobTitle":"Contributing Writer","description":"Paul Rosenberg is a California-based writer\/activist, senior editor for Random Lengths News and columnist for Al Jazeera English. Follow him on Twitter at @PaulHRosenberg. ","url":"https:\/\/www.salon.com\/writer\/paul_rosenberg","sameAs":["https:\/\/x.com\/PaulHRosenberg"]}],"publisher":{"@id":"https:\/\/www.salon.com\/#organization"},"mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.salon.com\/2016\/11\/06\/media-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work\/"},"description":"In an interview, Jay Rosen explores six ways the media can move past bogus neutrality \u2014 and rebuild public trust"}]}</script>
+
+    <!--<script src="https://www.google.com/recaptcha/api.js?render=6LckLQkrAAAAABD30EsnOQxmtgweb-aPZojeUU3v" async defer></script>-->
+    <script>
+        let siteUrl = 'https://www.salon.com';
+        let captchaKey = '6LckLQkrAAAAABD30EsnOQxmtgweb-aPZojeUU3v';
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '134091381200152',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v21.0'
+            });
+            FB.AppEvents.logPageView();
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+      
+<!-- Chartbeat -->
+<script type="text/javascript">
+(function() {
+    
+    let userType = 'anon';
+
+    if (subscriberUser) {
+        
+        if (isPremium) {
+            userType = 'paid';
+        }
+        else {
+            userType = 'lgdin';
+        }
+    }
+
+    let path = window.location.pathname;
+    var _sf_async_config = window._sf_async_config = (window._sf_async_config || {});
+    _sf_async_config.uid = 1614;
+    _sf_async_config.domain = 'salon.com'; //CHANGE THIS TO THE ROOT DOMAIN
+    _sf_async_config.flickerControl = false;
+    _sf_async_config.path = path;
+    _sf_async_config.sections = "Elections, Media, News & Politics, Politics"; // CHANGE THIS TO YOUR SECTION NAME(s)
+    _sf_async_config.authors = "paul_rosenberg"; // CHANGE THIS TO YOUR AUTHOR NAME(s)
+
+    var _cbq = window._cbq = (window._cbq || []);
+    _cbq.push(["_acct", userType]);
+
+    function loadChartbeat() {
+        var e = document.createElement('script');
+        var n = document.getElementsByTagName('script')[0];
+        e.type = 'text/javascript';
+        e.async = true;
+        e.src = '//static.chartbeat.com/js/chartbeat.js';;
+        n.parentNode.insertBefore(e, n);
+    }
+    loadChartbeat();
+})();
+</script>
+<script async src="//static.chartbeat.com/js/chartbeat_mab.js"></script>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="wp-singular post-template-default single single-post postid-772456 single-format-standard wp-theme-salon">
+    <script>
+        if (stickyHeaderEnabled) {
+            document.body.setAttribute('data-fixed', 'true');
+        } else {
+            document.body.removeAttribute('data-fixed');
+        }
+    </script>
+        <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGRKVFC2"
+                      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+        
+            <div class="loader-modal">
+    <div></div>
+</div>
+        <header class="main-header-container">
+            
+<section class="header__mobile">
+    <div>
+        <div class="header__mobile__logo">
+            <a href="https://www.salon.com" aria-label="To Salon Homepage">
+                <img class="-mt-2.5" src="https://www.salon.com/app/themes/salon/assets/img/mobile-logo.svg" width="136" height="40" alt="Salon logo" />
+            </a>
+        </div>
+        <div class="header__mobile__actions">
+            <button class="button__burger group/button__burger text-[#1e1e1e] dark:text-white text-2xl" aria-pressed="false" aria-controls="mobile-menu">
+    <i class="icon icon-burger block group-aria-pressed/button__burger:hidden" ></i>
+    <i class="icon icon-close hidden group-aria-pressed/button__burger:block" ></i>
+</button>
+        </div>
+    </div>
+    <nav
+    class="navigation__mobile"
+    aria-expanded="false"
+    id="mobile-menu"
+>
+    <div>
+        <div class="search__form w-full">
+    <form role="search" method="GET" action="https://www.salon.com/search/">
+        <div>
+                        <label for="search-form-1" class="hidden">Search</label>
+            <div class="relative">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#666666] dark:text-white">
+                    <i class="icon icon-search" ></i>
+                </div>
+                <input type="search" name="s" id="search-form-1" class="block w-full rounded-sm border border-[#a6a6a6] dark:border-white py-2 pr-4 pl-10 text-[#666666] dark:text-white text-base leading-4 placeholder:text-sm placeholder:text-[#666666] dark:placeholder:text-white placeholder:leading-4 outline-0 dark:bg-[#1d1d1d]" placeholder="Search" value="" />
+            </div>
+        </div>
+    </form>
+</div>
+        <div class="menu-burger-menu-container"><ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/life-stories">Life Stories</a></li>
+<li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li>
+<li class="menu-item menu-item-has-children"><a href="#">Reviews</a>
+<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Lifestyle</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/16/navigating-the-new-sober-boom-where-a-persons-sobriety-is-as-unique-as-their-fingerprint/">The New Sober Boom</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/30/secrets-of-a-serial-addict-how-i-got-hooked-on-quitting-over-and-over-again/">Getting Hooked on Quitting</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Education</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2024/03/16/ignorance-and-democracy-capitalisms-long-against-higher-education/">Liberal Arts Cuts Are Dangerous</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/09/16/college-was-necessary-for-me-will-my-own-child-need-it-like-i-did/">Is College Necessary?</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Finance</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/08/26/my-parents-are-deadcan-i-afford-avocado-toast-now/">Dying Parents Costing Millennials Dear</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/09/09/how-did-le-creuset-the-self-described-heirloom-quality-cookware-change-the-cooking-game/">Gen Z Investing In Le Creuset</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Crypto</a>
+	<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Investing</a>
+		<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/03/23/on-thursdays-we-wear-orange-sec-sues-lindsay-lohan-and-others-over-crypto-money-laundering-scam/">SEC vs Celebrity Crypto Promoters</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/04/16/impulsive-psychopaths-like-crypto-dark-personality-traits-increase-bitcoin-enthusiasm_partner/">&#8216;Dark&#8217; Personalities Drawn to BTC</a></li>
+		</ul>
+</li>
+	</ul>
+</li>
+</ul>
+</li>
+</ul></div>        <div id="userMenuContainerMobile">
+                    </div>
+        <div>
+            <div class="navigation__social">
+    <a href="https://x.com/Salon" target="_blank">
+        <i class="icon icon-twitter" ></i>
+    </a>
+    <a href="https://www.instagram.com/salonofficial" target="_blank">
+        <i class="icon icon-instagram" ></i>
+    </a>
+    <a href="https://www.youtube.com/user/SalonDotCom" target="_blank">
+        <i class="icon icon-youtube" ></i>
+    </a>
+    <a href="https://www.facebook.com/salon" target="_blank">
+        <i class="icon icon-facebook" ></i>
+    </a>
+    <a href="https://www.tiktok.com/@salonofficial" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-tiktok" ></i>
+    </a>
+    <a href="https://www.reddit.com/domain/salon.com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-reddit" ></i>
+    </a>
+    <a href="https://www.linkedin.com/company/salon-com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-linkedin" ></i>
+    </a>
+</div>
+        </div>
+    </div>
+</nav>
+</section>
+            
+<section class="header__desktop">
+    <section class="header__desktop__top">
+        <div>
+            <div>
+                <button class="button__burger group/button__burger text-[#1e1e1e] dark:text-white text-2xl" aria-pressed="false" aria-controls="burger-menu">
+    <i class="icon icon-burger block group-aria-pressed/button__burger:hidden" ></i>
+    <i class="icon icon-close hidden group-aria-pressed/button__burger:block" ></i>
+</button>
+                <nav class="navigation__burger" aria-expanded="false" id="burger-menu">
+    <div>
+        <div class="menu-burger-menu-container"><ul class="flex flex-col gap-2"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/life-stories">Life Stories</a></li>
+<li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li>
+<li class="menu-item menu-item-has-children"><a href="#">Reviews</a>
+<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Lifestyle</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/16/navigating-the-new-sober-boom-where-a-persons-sobriety-is-as-unique-as-their-fingerprint/">The New Sober Boom</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/30/secrets-of-a-serial-addict-how-i-got-hooked-on-quitting-over-and-over-again/">Getting Hooked on Quitting</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Education</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2024/03/16/ignorance-and-democracy-capitalisms-long-against-higher-education/">Liberal Arts Cuts Are Dangerous</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/09/16/college-was-necessary-for-me-will-my-own-child-need-it-like-i-did/">Is College Necessary?</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Finance</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/08/26/my-parents-are-deadcan-i-afford-avocado-toast-now/">Dying Parents Costing Millennials Dear</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/09/09/how-did-le-creuset-the-self-described-heirloom-quality-cookware-change-the-cooking-game/">Gen Z Investing In Le Creuset</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Crypto</a>
+	<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Investing</a>
+		<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/03/23/on-thursdays-we-wear-orange-sec-sues-lindsay-lohan-and-others-over-crypto-money-laundering-scam/">SEC vs Celebrity Crypto Promoters</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/04/16/impulsive-psychopaths-like-crypto-dark-personality-traits-increase-bitcoin-enthusiasm_partner/">&#8216;Dark&#8217; Personalities Drawn to BTC</a></li>
+		</ul>
+</li>
+	</ul>
+</li>
+</ul>
+</li>
+</ul></div>    </div>
+</nav>
+            </div>
+        </div>
+        <div>
+            <div class="navigation__social">
+    <a href="https://x.com/Salon" target="_blank">
+        <i class="icon icon-twitter" ></i>
+    </a>
+    <a href="https://www.instagram.com/salonofficial" target="_blank">
+        <i class="icon icon-instagram" ></i>
+    </a>
+    <a href="https://www.youtube.com/user/SalonDotCom" target="_blank">
+        <i class="icon icon-youtube" ></i>
+    </a>
+    <a href="https://www.facebook.com/salon" target="_blank">
+        <i class="icon icon-facebook" ></i>
+    </a>
+    <a href="https://www.tiktok.com/@salonofficial" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-tiktok" ></i>
+    </a>
+    <a href="https://www.reddit.com/domain/salon.com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-reddit" ></i>
+    </a>
+    <a href="https://www.linkedin.com/company/salon-com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-linkedin" ></i>
+    </a>
+</div>
+            <div class="dropdown__user group/dropdown__user relative text-left">
+    <div class="flex justify-center">
+        <button type="button" class="text-[#1e1e1e] dark:text-white group-hover/dropdown__user:text-[#ed2c1d]" id="dropdown-user-2" aria-haspopup="true">
+            <i class="icon icon-user text-2xl" ></i>
+        </button>
+    </div>
+    <div class="absolute right-0 z-10 pt-2 w-56 origin-top-right rounded-md bg-white dark:bg-[#1d1d1d] shadow-lg invisible transition-opacity ease-out delay-100 opacity-0 group-hover/dropdown__user:opacity-100 group-hover/dropdown__user:visible" role="menu" aria-orientation="vertical" aria-labelledby="dropdown-user-2" tabindex="-1">
+        <div role="none" id="userMenuContainer"></div>
+    </div>
+</div>
+        </div>
+    </section>
+    <section class="header__desktop__middle">
+        
+<nav class="navigation__desktop">
+    <div>
+        <div>
+            
+                <ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li><li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li><li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li></ul>            <div class="logo__desktop">
+                <a href="https://www.salon.com" aria-label="To Salon Homepage">
+                    <img src="https://www.salon.com/app/themes/salon/assets/img/salon-logo.svg" width="341" height="100" alt="Salon logo" />
+                </a>
+            </div>
+                <ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li><li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li><li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li></ul>                    </div>
+    </div>
+</nav>
+    </section>
+    <section class="header__desktop__bottom">
+        <div>
+            <div class="search__form w-full">
+    <form role="search" method="GET" action="https://www.salon.com/search/">
+        <div>
+                        <label for="search-form-3" class="hidden">Search</label>
+            <div class="relative">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#666666] dark:text-white">
+                    <i class="icon icon-search" ></i>
+                </div>
+                <input type="search" name="s" id="search-form-3" class="block w-full rounded-sm border border-[#a6a6a6] dark:border-white py-2 pr-4 pl-10 text-[#666666] dark:text-white text-base leading-4 placeholder:text-sm placeholder:text-[#666666] dark:placeholder:text-white placeholder:leading-4 outline-0 dark:bg-[#1d1d1d]" placeholder="Search" value="" />
+            </div>
+        </div>
+    </form>
+</div>
+        </div>
+    </section>
+</section>
+        </header>
+    
+    <div class="raptive-salon-header hide-if-premium"></div>
+
+    <main class="main-container">
+
+<div class="articles">
+            <article id="post-772456" class="single-column post-772456 post type-post status-publish format-standard has-post-thumbnail hentry category-all-salon category-elections category-media category-news-and-politics category-politics tag-2016-presidential-campaign tag-donald-trump tag-elections-2016 tag-hillary-clinton tag-jay-rosen tag-media-criticism tag-view-from-nowhere" data-post-id="772456">
+    <!-- TODO: Add the preview message here ... -->
+    
+<section class="article__title">
+        <h1>Media critic Jay Rosen on 2016 campaign coverage and the rise of Trump: &#8220;That&#8217;s the way authoritarian societies work&#8221;</h1>
+    <h2>In an interview, Jay Rosen explores six ways the media can move past bogus neutrality — and rebuild public trust</h2>
+    <div class="writers">
+                    <div>
+                <div class="by">
+                    <span>By</span>
+                                            <a href="https://www.salon.com/writer/paul_rosenberg">
+                            Paul Rosenberg                        </a>
+                                                            </div>
+                                    <div>
+                        Contributing Writer                    </div>
+                            </div>
+                <div class="date">
+                            <h3>
+                    <span>Published</span>
+                    <time datetime="2016-11-06T05:00:00-05:00">
+                        November 6, 2016 5:00AM (EST)                    </time>
+                </h3>
+                    </div>
+    </div>
+</section>
+    <section class="article__feature">
+    <!-- TODO: Add the featured video here... -->
+        <div class="attachment__image">
+    <div class="image ">
+        <img width="620" height="412" src="https://www.salon.com/app/uploads/2016/11/hillary_trump_press.jpg" class=" attachment-full size-full position-center" alt="(AP/Andrew Harnik/Reuters/Carlo Allegri/Getty/David McNew/Photo montage by Salon)" sizes="(max-width: 620px) 100vw, 620px" decoding="async" fetchpriority="high" srcset="https://www.salon.com/app/uploads/2016/11/hillary_trump_press.jpg 620w, https://www.salon.com/app/uploads/2016/11/hillary_trump_press-300x199.jpg 300w, https://www.salon.com/app/uploads/2016/11/hillary_trump_press-415x275.jpg 415w, https://www.salon.com/app/uploads/2016/11/hillary_trump_press-354x236.jpg 354w" />    </div>
+            <div class="alt-text">
+            (AP/Andrew Harnik/Reuters/Carlo Allegri/Getty/David McNew/Photo montage by Salon)        </div>
+    </div>
+</section>
+    <section class="main">
+        <div>
+            <!-- TODO: Add the functionality for the article sharing here ... -->
+            
+<section class="article__share">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.salon.com%2F2016%2F11%2F06%2Fmedia-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work%2F&#038;utm_source=facebook&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#3a5697]" rel="nofollow">
+    <i class="icon icon-facebook bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#2c4788]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Facebook    </span>
+    </a>
+            <a href="https://x.com/share?url=https%3A%2F%2Fwww.salon.com%2F2016%2F11%2F06%2Fmedia-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work%2F&#038;text=Media+critic+Jay+Rosen+on+2016+campaign+coverage+and+the+rise+of+Trump%3A+%E2%80%9CThat%E2%80%99s+the+way+authoritarian+societies+work%E2%80%9D&#038;utm_source=twitter&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#03a2e0]" rel="nofollow">
+    <i class="icon icon-twitter bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#048cc1]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        X    </span>
+    </a>
+            <a href="https://www.reddit.com/submit?url=https%3A%2F%2Fwww.salon.com%2F2016%2F11%2F06%2Fmedia-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work%2F&#038;title=Media+critic+Jay+Rosen+on+2016+campaign+coverage+and+the+rise+of+Trump%3A+%E2%80%9CThat%E2%80%99s+the+way+authoritarian+societies+work%E2%80%9D&#038;utm_source=reddit&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#ff661e]" rel="nofollow">
+    <i class="icon icon-reddit bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#ea5a16]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Reddit    </span>
+    </a>
+            <a href="mailto:?subject=Media%20critic%20Jay%20Rosen%20on%202016%20campaign%20coverage%20and%20the%20rise%20of%20Trump%3A%20%E2%80%9CThat%E2%80%99s%20the%20way%20authoritarian%20societies%20work%E2%80%9D&#038;body=Check%20out%20this%20article%21%20https%3A%2F%2Fwww.salon.com%2F2016%2F11%2F06%2Fmedia-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work%2F%3Futm_source%3Demail%26utm_medium%3Dsocial%26utm_campaign%3Dsocialbuttons%26utm_content%3Dshare_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#3d4e66]" >
+    <i class="icon icon-email bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#2d394a]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Email    </span>
+    </a>
+        <div class="article__title-badges">
+        <div class="google-preferred-source-container">
+            <a
+                class="google-preferred-source"
+                href="https://www.google.com/preferences/source?q=salon.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Set Salon as a preferred source on Google News"
+                            >
+                <picture
+                    data-light-src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png"
+                    data-dark-src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_dark@2x.png"
+                >
+                    <source srcset="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png" media="(prefers-color-scheme: dark)">
+                    <img
+                        src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png"
+                        alt="Set Salon as a preferred source on Google News"
+                        loading="lazy"
+                        width="676"
+                        height="213"
+                    >
+                </picture>
+            </a>
+        </div>
+    </div>
+    <template id="save-article-button">
+        
+<button type="button" id="saveArticleBtn-7330" onclick="saveArticle(this.id);" class="button__tertiary group/button__tertiary border-2 border-[#5f5f5f] rounded text-[#5f5f5f] text-sm font-bold px-2 py-1 h-8 lowercase flex items-center gap-x-1.5 hover:text-[#e42416] hover:border-[#e42416]">
+            <i class="icon icon-save !h-4 !w-3 text-[#5f5f5f] group-hover/button__tertiary:text-[#e42416] text-base" ></i>
+        <span class="btnLabel">Save</span>
+</button>
+    </template>
+</section>
+            <!-- TODO: Add the editor's note here ... -->
+                        <section class="article__content page-article"><p>This election cycle has been a profound challenge for journalists, not least because the sheer volume and intensity of Donald Trump’s lies and their centrality to his campaign have made it impossible to stick to normal notions of objective coverage. Trump has made war, in effect, on the very <span style="font-weight: 400;">possibility</span><span style="font-weight: 400;"> of objective reporting, and reporters still don’t know what to do about it. </span></p>
+<p><span style="font-weight: 400;">Press critic and NYU journalism professor Jay Rosen — best known for coining the phrase “the view from nowhere” — has been exploring these difficulties over the course of the campaign on his influential </span><a href="http://pressthink.org/" target="_blank" rel="noopener"><span style="font-weight: 400;">Pressthink</span><span style="font-weight: 400;"> blog</span></a>. O<span style="font-weight: 400;">n Oct. 23 he summed it all up with a succinct framework of six ideas on “</span><a href="http://pressthink.org/2016/10/campaign-press-not-neutral-toward/" target="_blank" rel="noopener"><span style="font-weight: 400;">What the campaign press should not be neutral toward</span></a><span style="font-weight: 400;">.” Salon reached out to interview Rosen about this framework, which he argues is already inherent in the nature of journalism as a set of latent values that need to be spelled out. Although framed in terms of media coverage of the 2016 campaign, Rosen’s argument is actually much broader than political journalism. It goes to the heart of what journalism is for, </span><span style="font-weight: 400;">and</span><span style="font-weight: 400;"> what kind of society we want to be.</span></p><div class="raptive-salon-video hide-if-premium"></div>
+<p><span style="font-weight: 400;">A few weeks ago on this site, </span><a href="https://www.salon.com/2016/10/06/hillary-clinton-donald-trump-popularity/" target="_blank" rel="noopener"><span style="font-weight: 400;">I wrote</span></a><span style="font-weight: 400;">, “The purpose of the press in a democracy is to help make a society legible to itself — the whole to its parts and the parts to its whole. The more diverse a society becomes, the more vital this purpose.” </span><span style="font-weight: 400;">That helps orient what follows: Journalism does not exist in a vacuum, nor does it serve Platonic ideals. It exists as a vital organ in the life of the society in which it lives, and it needs to be understood, cared for and defended as if that society’s life depended on it. Because it does.</span></p><div class="raptive-salon-content hide-if-premium"></div>
+<p><b>I’d like to go through the list of things you laid out — and perhaps some examples — to explore what you mean when you say there are not just things journalists </b><b><i>can</i></b><b> do, but also things they have </b><b>an obligation</b><b> to do, in terms of taking non-neutral stands. Let’s start with the first idea you presented: Journalists should be pro-participation.</b></p>
+<p><span style="font-weight: 400;">The premise of election coverage is that we’re equipping people to participate. The first idea I ever tried to present to working journalists — in 1989 in Des Moines, Iowa, at the Associated Press managing editors conference — was that empty streets are bad for editors, meaning that people need journalism when they are participating. If they go out and see live music, they become interested in listings, advertisements for venues and reviews. If they stay home and just watch television, they don’t really need news that much. The whole reason journalism has a public-service core is that people in a democratic society are supposed to be participants, and that goes for lifestyle coverage as much as political coverage.</span></p>
+<p><span style="font-weight: 400;">Since that is a premise, it’s smart to act on that premise, and encourage people to vote. Now of course, you’re encouraging them to vote for who they want to vote for, not for who you want them to vote for. So it’s nonpartisan, except in the sense that when partisans decide that they will undertake a political act discouraging people from voting, that’s something I think journalists can take action against, warn against, come out against, denounce. </span></p><div class="raptive-salon-content hide-if-premium"></div>
+<p><b>You linked to a tweet highlighting Trump questioning the legitimacy of the election, but that’s not the only example you could pull from this cycle, I think.</b></p>
+<p><span style="font-weight: 400;">No, there’s a lot. There was a piece in Bloomberg that talked about the voter suppression strategies, so it’s a live question. In a larger undeclared way, Trump’s trying to discourage participation by making the whole election confusing and depressing — beyond negative, a new frontier in negative. Saying that the opposing candidate should actually be in jail, not even running for president, that’s pretty negative. I don’t know that it’s correct to call it a strategy, in the sense of a thought-through plan, but it does seem like an approach, of discouraging the entire electorate, so that only the most hardcore people vote. And that is anti-democratic.</span></p>
+<p><b>What about the next idea you presented — that journalists should be pro-verification?</b></p>
+<p><span style="font-weight: 400;">This is to me the most obvious thing that journalists should be for. It is the premise of the fact-checking movement, which is a trend in journalism. It’s a pro-verification stance saying, “We’re going to penalize you with bad publicity if you try to present truth claims that cannot be verified.” I think that’s something that should be extended, so it’s not just featured in one corner of the news product, but is central to the way journalists operate.</span></p>
+<p><span style="font-weight: 400;">If journalists can’t be specialists in verification, what can they be expected to uphold? It’s an incredibly elementary thing to me. I think they need to be specialists in verification, and specialists in the vernacular. They have to speak in a public language. Verification is as elementary as speaking in the public language, as opposed to a specialist dialect and insider language.</span></p><div class="raptive-salon-content hide-if-premium"></div>
+<p><b>Examples of this — of false or unverifiable claims — are too numerous to count, right? There are like 20 or 30 every day.</b></p>
+<p><span style="font-weight: 400;">Yes, but sometimes very big claims have to be subjected to verification, too. Not just small ones. Dave Roberts wrote a very good piece about this in 2015, about how fact-checking the way it’s done now only applies to mid-range statements. Really big things don’t get fact-checked, and then things that are too small don’t get fact-checked either, right?  </span></p>
+<p><span style="font-weight: 400;">An example for me would be: Do tax cuts lead to more revenue? It’s not that that has never been fact-checked. It has. But that claim is a pillar, you know? That’s where it becomes really important to be pro-verification </span><i><span style="font-weight: 400;">all</span></i><span style="font-weight: 400;"> the time, about small things, medium-size things and big things.</span></p>
+<p><b>Trickle-down economics claims and global-warming denial seem to me like similarly big long-term examples.</b></p>
+<p><span style="font-weight: 400;">Very big. I think journalists have kind of recognized that, at least with global warming denial — that years of “he said, she said” coverage of that was a default of responsibility. I think that is generally recognized now. And that’s good. </span></p><div class="raptive-salon-content hide-if-premium"></div>
+<p><span style="font-weight: 400;">Also, I tried to introduce this term and it’s not catching on, but maybe in 10 years it will: “verification in reverse.” I think this is a really important development in American politics that is very hard to understand, very hard to explain. So verification is taking something that is debatable and trying to nail it down with facts, right? Verification in reverse is taking something that’s been nailed down and trying to introduce doubt about it. The act of doing that generates a lot of energy, and then you try to empower your political movement with that energy. Of course the claims of the birthers, including Donald Trump, are the best example of that. I don’t know why verification in reverse seems to be so powerful now, and so attractive to certain political actors, but it’s a fascinating question. And when verification in reverse works, my argument is that is a defeat for journalism.</span></p>
+<p><b>All right, let’s move on to your next idea. Why should journalists be pro-deliberation?</b></p>
+<p><span style="font-weight: 400;">Deliberation is a certain kind of public discourse in which, upon a common set of facts, people have different views. And so to me, to be pro-deliberation has two parts. The first is there </span><i><span style="font-weight: 400;">is</span></i><span style="font-weight: 400;"> a common set of facts. It’s not that everybody agrees on all the relevant facts; it’s not that we need complete consensus. But there is a common set of facts possible on most things, and here they are. Another term for that would be “news.” In order to cast an intelligent vote, to participate, we don’t only need to be informed in our private selves, we need to be part of the public conversation. So you need a common set of facts, and then you need diverse views on those facts. </span></p>
+<p><span style="font-weight: 400;">Diverse views, to me, doesn’t mean two sides. That might be a beginning, but it means many sides. And it includes lots of views, including some that may not be so popular, or common. So I think journalists should be much better at providing that kind of discourse, because it kind of follows from the first two. It follows from participation and verification.</span></p><div class="raptive-salon-content hide-if-premium"></div>
+<p><b>It strikes me that trying to do that in the context of this election was an impossible task, if you don’t already have the ethos for it in place.</b></p>
+<p><span style="font-weight: 400;">Yes. It can’t just spring forth in campaign season. So things that are anti-deliberation, or that wreck deliberation, should be resisted. Relentless two-sidedness — that hurts deliberation. </span></p>
+<p><b>OK, what about the next idea: Journalists should be pro-accountability.</b></p>
+<p><span style="font-weight: 400;">If you look at the mission statement or the “About Us” section of <a href="https://www.propublica.org/" target="_blank" rel="noopener">ProPublica</a>, they say, “We do accountability journalism.” Their whole approach is based on the idea of accountability, which means that people who have power, people who are in charge of things, who have a lot of money, who take money for things on the assumption they’re going to spend it wisely — like, for example, the Red Cross, which they did a big exposé about — deserve scrutiny. </span></p>
+<p><span style="font-weight: 400;">That is fundamental to notions like the watchdog press, but it’s also fundamental to what I said earlier about deliberation. We need to know what people in power are doing and planning in order for us to cast an intelligent vote. We need powerful people to take responsibility for their words as well as their actions, and defend them. When power-seekers or power-holders escape from that, that’s something journalists should oppose. I think this is implicit in a lot of routines in journalism; it’s not like I’m importing some kind of foreign idea. I’m trying to bring out a latent idea.</span></p>
+<p><b> But it’s not omnipresent in journalism, right? Part of the reason Trump is where he is comes from media coverage that lies outside this framework of accountability. Most of Trump’s favorable coverage has come from the tabloid press, the entertainment press and the business press, none of which value accountability at their core. </b></p><div class="raptive-salon-content hide-if-premium"></div>
+<p><span style="font-weight: 400;">Right. He is very skilled at exploiting corners in which accountability journalism is really absent. The gossip press, for example.</span></p>
+<p><b>So, the question for the press is this: To what extent can you afford to have pockets of the media that are completely removed from the accountability standard? You don’t have parts of the press that are exempt from punctuation and grammar standards.</b></p>
+<p><span style="font-weight: 400;">That’s the problem. It’s definitely a problem. Ben Smith wrote a piece a few weeks ago, saying that he thinks the MSM — as he called it, I don’t use that expression, he did — did a great job in covering Trump. His reasoning is that if you read the Times investigative pieces about Trump, then the journalists had him pegged, as he put it. But he says in there that the cable networks kind of fell down on the job, and just publicized his rallies and his movement, without a lot of scrutiny. So that would be an example of a journalist saying, “Hey, parts of what we’re doing aren’t working.” He also says in there that the networks should have amplified the reporting done by people in the print tradition. They didn’t do that.</span></p>
+<p><b>OK, so moving on to your next idea: Journalists should be against opacity.</b></p>
+<p><span style="font-weight: 400;">The whole reason we need a free press is because we need society to be legible, as </span><a href="https://www.salon.com/2016/10/06/hillary-clinton-donald-trump-popularity/" target="_blank" rel="noopener"><span style="font-weight: 400;">you wrote in that piece</span></a><span style="font-weight: 400;"> that </span><a href="http://pressthink.org/2016/10/13/tile/trump-threat-press-freedom-yes-goes-beyond/" target="_blank" rel="noopener"><span style="font-weight: 400;">I quoted</span></a><span style="font-weight: 400;">. I think that’s a very powerful idea, a legible society. Because if people look at events and they can’t see any pattern, they look at the world and it doesn’t make sense, they try to pay attention to politics but it’s all opaque, they’re not going to participate. They’re not going to need verified, truthful, lively, current news coverage. An opaque society that remains opaque — opaque power holders, opaque institutions — kills the desire for news at its root. Because why would you need constant news reports if there’s nothing to be understood? That’s the way authoritarian societies work. Everything is so confusing: You can never tell where power lies, because it could be everywhere, and all appearances are deceptive. I think that’s a big problem. </span></p><div class="raptive-salon-content hide-if-premium"></div>
+<p><span style="font-weight: 400;">When you go way, way back, one reason that Jefferson was such an anti-urbanist — he was famous for having this image of a rural, pastoral society, which he called the ideal for a republic, and he had lots of prejudices about that — but one of his ideas was that an industrial urban society, it gets complex really fast. If it’s too complex, it’s too hard for citizens to monitor, and if it’s too hard for them to monitor, then pretty soon the republic isn’t going to work well. It’s almost an argument against excess complexity. </span></p>
+<p><span style="font-weight: 400;">We’ve lost that. We’re way, way beyond that. But if you go back and read Walter Lippmann’s “</span><span style="font-weight: 400;">Public Opinion</span><span style="font-weight: 400;">,” which is in some ways the founding work of media criticism — I did my dissertation on it — this is in there: An opaque society turns citizens into spectators. There’s a connection between entertainment and opacity. When the world is opaque, then spectacle has a new lease on life.</span></p>
+<p><b>Finally, why should journalists be against demagoguery?</b></p>
+<p><span style="font-weight: 400;">This is the hardest one, where I got the most pushback. It’s really easy to just call something demagoguery when you don’t like the argument, which in the minds of my critics makes it useless. But I think there is such a thing is demagoguery, and very often it means relying not just on appeals to fear, but appeals to fear where you can’t verify the “facts” that are being spread. When you combine the notion of appealing to prejudice, fear and ignorance with my earlier imperatives like verification and deliberation and fact-based debate, I think you can begin to isolate when something becomes demagogic. I think it’s important for journalists to be able to do that, and to be clear that this against our values. </span></p><div class="raptive-salon-content hide-if-premium"></div>
+<p><span style="font-weight: 400;">Ben Smith was one of the journalists who said, “Look, describing what Trump is doing as racist is not really a subjective thing. It’s just a description.” I </span><a href="http://pressthink.org/2015/11/i-will-try-to-explain-why-the-trump-candidacy-has-been-so-confounding-to-our-political-press/" target="_blank" rel="noopener"><span style="font-weight: 400;">wrote about this earlier</span></a><span style="font-weight: 400;">, it was </span><a href="https://twitter.com/buzzfeedben/status/674417675813019648" target="_blank" rel="noopener"><span style="font-weight: 400;">a memo he sent</span></a><span style="font-weight: 400;"> to BuzzFeed people where he said, “We’re going to call it racist because that’s what it is.” And I think you could look at that as putting into practice that fifth principle about demagoguery. Because his argument was not, like, I’m parading my opinions around in a newspaper. He was saying, </span><span style="font-weight: 400;">this is</span><span style="font-weight: 400;"> descriptive, and our job is to be descriptive.</span></p>
+<p><span style="font-weight: 400;">I think journalists are on much firmer ground when instead of calling people racist, they call the actions and statements racist. You can say an argument is racist, or you can even say a campaign is racist, if it’s built on a racist appeal. The candidacy could be racist. You don’t have to say the person is.</span></p>
+<p><b>Right. Because that gets into questions of consciousness and intention, that are very important for a person but are more on the private side of that public-private divide. And it’s the public side that journalists should really focus on.</b></p><div class="raptive-salon-content hide-if-premium"></div>
+<p><span style="font-weight: 400;">Yes, journalists should err on the public side, and not just the public side: What is observable, what’s verifiable, what you can have the evidence for. This goes along with a larger belief I have, which I’ve tried to articulate many times, in different things I’ve written. The best way to be trusted these days is not to speak in the voice of God, or to take the view from nowhere, but to combine two more modest approaches. One is, “Here’s where I’m coming from, I don’t have the voice of God. I’m coming from a place like you are. Here’s where I’m coming from.” And also, “Here’s our reporting. Here’s the facts we’re drawing from. Here’s the evidence. Here’s the documents. Don’t believe me? Look for yourself.” Right? Documentation. </span></p>
+<p>So the combination of “Here’s where I’m coming from,” and “Look for yourself,” is more trustworthy than “We’re the professionals, so leave it to us,” or “We have the voice of God,” or “We’re objective,” which are increasingly difficult to trust. Simply insisting on them more and more isn’t going to solve that problem.</p>
+<p><b>One final broader question. American journalism is embedded in American culture, so we have an inhibition against perspectives that view our institutions critically, like the fact that our healthcare system is an outlier, our welfare state is an outlier and our culture, in its degree of religiosity, is an outlier. You don’t have to attack any of these to realize that we’re outliers; it’s something we’ve chosen historically, and if we’re going to choose it consciously, we have to be aware it’s a choice, and there are other possibilities. Far from being elitist, divorced from everyday Americans, most journalists are actually embedded and entangled in the very same unexamined cultural mythos. I’d like to know what you think about that.</b></p><div class="raptive-salon-content hide-if-premium"></div>
+<p><span style="font-weight: 400;">It’s a hard problem, but I do think American journalism has to be American. It’s related to what I said about the vernacular. You have to speak the language of the people you’re trying to inform. Along with that does come some assumptions, maybe even some biases. But under the principle of deliberation, that’s where I think journalism has a positive duty to enlighten us with views from beyond our shores. Certainly, letting people know that the rest of the world does it a different way, or doesn’t think this way, is part of that. I don’t think our journalists always do a good job of that. </span></p>
+<p><span style="font-weight: 400;">Another example would be that other industrial democracies are </span><i><span style="font-weight: 400;">way</span></i><span style="font-weight: 400;"> ahead of us in Internet service, quality of Internet service, which is something people want, and pay a lot for. And it’s amazing to see the differences between the U.S. and the rest of the world on that. You do see that mentioned every once in a while, but I think it’s a big problem. You can say the American media is too American, but I think it has to remain in touch with the country. I think journalism is </span><i><span style="font-weight: 400;">always</span></i><span style="font-weight: 400;"> a reflection of national identity. There’s no other way it could exist. </span></p>
+<p><b>Agreed. But I think part of the function of journalism is to make us aware of possibilities — “a man’s reach should exceed his grasp” kind of thing. It’s not that we stop being who we are, but we strive to get beyond ourselves; and that’s how we become something new. And if America </b><b><i>isn’t</i></b><b> about becoming something new, what is it about?</b></p><div class="raptive-salon-content hide-if-premium"></div>
+<p><span style="font-weight: 400;">Yes, I think there’s a lot to that. It would be smart sometimes for people in newsrooms to ask themselves, “What would be an ideal debate about this problem that we have here in the United States?”And try to imagine what that looks like. And then construct their journalism accordingly. That wouldn’t look like a CNN roundtable.</span></p>
+<p><b>Anything more you’d like to add?</b></p>
+<p><span style="font-weight: 400;">I think there’s going to be a call for some reflection, after the election, on trust and the news media and journalism. Instead of assuming that pandering to the people who hate you is the way to repair the situation, I think it’s more likely that reaffirming these values, and going deep on them, and being stronger for them is the only way, ultimately, to win back trust.</span></p>
+<hr><div class="raptive-salon-content hide-if-premium"></div></section>
+                <section class="article__writers mt-14">
+                                <div class="post-427148 writer type-writer status-publish hentry article__writers article__writer-container" data-writer-id="427148">
+
+                                    <div class="writer-bio-ajax-content">
+                        <h3>
+                            <span>By</span>
+                            <a href="https://www.salon.com/writer/paul_rosenberg">
+                                Paul Rosenberg                            </a>
+                        </h3>
+                    </div>
+
+                    <template class="writer-bio-template">
+                        <h3>
+                            <span>By</span>
+                            <a href="" class="writer-name-link">
+                            </a>
+                        </h3>
+
+                        <div class="socials" style="display: none;"> <a href="" class="social group/social facebook-link" target="_blank" style="display: none;">
+                                <i class="icon icon-facebook text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                            <a href="" class="social group/social twitter-link" target="_blank" style="display: none;">
+                                <i class="icon icon-twitter text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                            <a href="" class="social group/social instagram-link" target="_blank" style="display: none;">
+                                <i class="icon icon-instagram text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                        </div>
+
+                        <div class="writer-bio-text"></div>
+
+                        <div class="more">
+                            <span>MORE FROM</span>
+                            <a href="" class="writer-more-from-link">
+                            </a>
+                        </div>
+                    </template>
+                            </div>
+            </section>
+            <hr>
+                <section class="article__topics">
+        <h2>
+            Related Topics            <span>
+                ------------------------------------------            </span>
+        </h2>
+        <div>
+                            <a href="https://www.salon.com/topic/2016-presidential-campaign" class="delay-400 pointer">
+                    2016 Presidential Campaign                </a>
+                            <a href="https://www.salon.com/topic/donald-trump" class="delay-400 pointer">
+                    Donald Trump                </a>
+                            <a href="https://www.salon.com/topic/elections-2016" class="delay-400 pointer">
+                    Elections 2016                </a>
+                            <a href="https://www.salon.com/topic/hillary-clinton" class="delay-400 pointer">
+                    Hillary Clinton                </a>
+                            <a href="https://www.salon.com/topic/jay-rosen" class="delay-400 pointer">
+                    Jay Rosen                </a>
+                            <a href="https://www.salon.com/topic/media-criticism" class="delay-400 pointer">
+                    Media Criticism                </a>
+                            <a href="https://www.salon.com/topic/view-from-nowhere" class="delay-400 pointer">
+                    View From Nowhere                </a>
+                    </div>
+    </section>
+            
+<section class="article__related" data-post-id="772456" data-terms="2016-presidential-campaign,donald-trump,elections-2016,hillary-clinton,jay-rosen,media-criticism,view-from-nowhere">
+    <h2>
+        <span>
+            Related Articles        </span>
+    </h2>
+    <div>
+        <template>
+            <a href="" class="flex min-[501px]:hidden">
+                <div class="attachment__image">
+                    <div class="image">
+                        <img src="https://www.salon.com/app/themes/salon/assets/img/salon-placeholder.webp" decoding="async" fetchpriority="high" alt="Salon placeholder" class="attachment-full size-full">
+                    </div>
+                </div>
+                <h5></h5>
+                <span></span>
+            </a>
+        </template>
+    </div>
+</section>
+            <hr>
+            <div class="dianomi_context hide-if-premium" data-dianomi-context-id="4879"></div>
+        </div>
+        
+<div class="sidebar-col">
+    <div class="dianomi_context hide-if-premium" data-dianomi-context-id="4876"></div>
+            <div class="raptive-salon-sticky-sidebar hide-if-premium"></div>
+    </div>
+    </section>
+</article>
+    </div>
+
+    </main>
+
+    <footer>
+        <ul class="navigation__footer mt-4 text-center"><li class="menu-item"><a href="https://www.salon.com">Home</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about">About</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/staff">Staff</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/contact">Contact</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/policy">Privacy</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/tos">Terms of Service</a></li>
+<li class="menu-item"><a href="https://www.salon.com/archive">Archive</a></li>
+<li class="menu-item"><a href="/premium?utm_source=onsite&amp;utm_medium=organic&amp;utm_campaign=go-ad-free-footer">Go Ad Free</a></li>
+</ul>        <div class="footer__copyright">
+    <p>
+        Copyright © 2026 Salon.com, LLC. Reproduction of material from any Salon pages without written permission is strictly prohibited. SALON ® is registered in the U.S. Patent and Trademark Office as a trademark of Salon.com, LLC. Associated Press articles: Copyright © 2016 The Associated Press. All rights reserved. This material may not be published, broadcast, rewritten or redistributed.    </p>
+    <p>
+        <a href="https://www.salon.com/2026/06/02/best-vpn-services-for-2026/">
+            VPN Providers        </a>
+    </p>
+    <p>
+        <a href="https://www.salon.com/about/dmca">
+            DMCA Policy        </a>
+    </p>
+</div>
+    </footer>
+
+    <div class="modal__alert" role="dialog" aria-modal="true" aria-hidden="true" id="alert-modal">
+    <div></div>
+    <div>
+        <div>
+            
+<div class="modal__close">
+    <button type="button" aria-controls="alert-modal">
+        <i class="icon icon-close-extrabold block w-5 text-xl" ></i>
+    </button>
+</div>
+            <div class="modal__content">
+                <div class="message">
+                    This is an alert message.                </div>
+                <div class="modal__close">
+                    <button type="button" aria-controls="alert-modal">
+                        OK                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp/wp-*.php","/wp/wp-admin/*","/app/uploads/*","/app/*","/app/plugins/*","/app/themes/salon/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script id="global-salon-js-extra">
+var salonSubscriptionTracking = {"eventsEndpoint":"https://www.salon.com/wp-json/salon/v1/subscription-tracking/events","measurementId":"G-7VPPFM7ET6","pageContext":{"contentCategory":"article","currentPlan":null,"isCheckoutPage":false},"pendingSessionIds":[],"bootstrapEvents":[],"approximateBeginCheckout":"1"};
+//# sourceURL=global-salon-js-extra
+</script>
+<script type="module" data-wp-strategy="defer" defer id="global-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/global.js?ver=1.0.31"></script>
+<script type="module" data-wp-strategy="defer" defer id="article-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/article.js?ver=1.0.31"></script>
+<script data-wp-strategy="defer" defer id="ad-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/ad.js?ver=1.0.31"></script>
+<script id="raptive-adblock-detection-js" src="https://www.salon.com/app/themes/salon/assets/js/ad/raptive-adblock-detection.js"></script>
+<script data-cfasync="false" data-abr-mode="essential" id="raptive-adblock-recovery-js" src="https://www.salon.com/app/themes/salon/assets/js/ad/raptive-adblock-recovery.js"></script>
+</body>
+</html>

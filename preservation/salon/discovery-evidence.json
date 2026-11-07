@@ -1,0 +1,32 @@
+{
+  "evidence": [
+    {
+      "url": "https://www.salon.com/writer/jay_rosen",
+      "retrievedAt": "2026-11-07T00:30:10.019183+00:00",
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/writer/jay_rosen",
+      "contentType": "text/html; charset=UTF-8",
+      "path": "author-index.source.html",
+      "bytes": 38878,
+      "sha256": "91fec0aacbe805721de256b6de33812b5d164680e67ab988e595ca8382f2730b",
+      "listedArticleUrls": [
+        "https://www.salon.com/2003/10/10/postman/",
+        "https://www.salon.com/2006/04/20/mclellan_2/",
+        "https://www.salon.com/2008/01/21/campaign_coverage/",
+        "https://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+      ]
+    },
+    {
+      "url": "https://www.salon.com/2026/11/05/goodbye-from-salon/",
+      "retrievedAt": "2026-11-07T00:30:10.420565+00:00",
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2026/11/05/goodbye-from-salon/",
+      "contentType": "text/html",
+      "path": "closure-announcement.source.html",
+      "bytes": 42340,
+      "sha256": "5599bc2f88441304fe7c66185454c72b563444b8a9a438d15ad0f0be5cb55106"
+    }
+  ],
+  "coverageLimit": "The current publisher author listing, curated archive CSV, and legacy scrape queue are bounded inventories. No exhaustive historical Salon crawl or Wayback recovery has been completed.",
+  "closureAssessment": "Salon announced its publishing model is no longer sustainable in its November 5, 2026 farewell. No offline preservation claim relies on a scheduled domain shutdown date."
+}

@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <script>
+        const subscriberUser = !!document.cookie.split('; ').find(row => row.startsWith('wordpress_subscriber_user='));
+
+        const userDetails = subscriberUser ? JSON.parse(window.localStorage.getItem('userDetails')) : null;
+        const darkModeEnabled = userDetails ? userDetails?.userPreferences?.darkMode === true : false;
+        const stickyHeaderEnabled = userDetails ? userDetails?.userPreferences?.stickyHeader === true : false;
+
+        // Helper function to read cookies
+        function getCookie(name) {
+            var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+            return v ? v[2] : null;
+        }
+
+        // Check for the 'wordpress_premium_member' cookie
+        const hasPremiumCookie = getCookie('wordpress_premium_member') === '1';
+        const hasPremiumRoleInLS = userDetails
+            && userDetails.userRoles
+            && Array.isArray(userDetails.userRoles)
+            && userDetails.userRoles.includes('premium_member');
+        const isPremium = hasPremiumCookie || hasPremiumRoleInLS;
+
+        if (darkModeEnabled) {
+            document.documentElement.classList.add('dark');
+        }
+
+        if (isPremium) {
+            document.documentElement.classList.add('premium');
+        }
+    </script>
+
+            <!-- START email detection/removal script -->
+        <script>
+            !function(){"use strict";const t={adt_ei:{identityApiKey:"plainText",source:"url",type:"plaintext",priority:1},adt_eih:{identityApiKey:"sha256",source:"urlh",type:"hashed",priority:2},sh_kit:{identityApiKey:"sha256",source:"urlhck",type:"hashed",priority:3}},e=Object.keys(t);function i(t){return function(t){const e=t.match(/((?=([a-z0-9._!#$%+^&*()[\]<>-]+))\2@[a-z0-9._-]+\.[a-z0-9._-]+)/gi);return e?e[0]:""}(function(t){return t.replace(/\s/g,"")}(t.toLowerCase()))}!async function(){const n=new URL(window.location.href),o=n.searchParams;let a=null;const r=Object.entries(t).sort(([,t],[,e])=>t.priority-e.priority).map(([t])=>t);for(const e of r){const n=o.get(e),r=t[e];if(!n||!r)continue;const c=decodeURIComponent(n),d="plaintext"===r.type&&i(c),s="hashed"===r.type&&c;if(d||s){a={value:c,config:r};break}}if(a){const{value:t,config:e}=a;window.adthrive=window.adthrive||{},window.adthrive.cmd=window.adthrive.cmd||[],window.adthrive.cmd.push(function(){window.adthrive.identityApi({source:e.source,[e.identityApiKey]:t},({success:i,data:n})=>{i?window.adthrive.log("info","Plugin","detectEmails",`Identity API called with ${e.type} email: ${t}`,n):window.adthrive.log("warning","Plugin","detectEmails",`Failed to call Identity API with ${e.type} email: ${t}`,n)})})}!function(t,e){const i=new URL(e);t.forEach(t=>i.searchParams.delete(t)),history.replaceState(null,"",i.toString())}(e,n)}()}();
+        </script>
+        <!-- END email detection/removal script -->
+                    <!-- Raptive Head Tag Manual -->
+        <script data-no-optimize="1" data-cfasync="false">
+            (function(w, d) {
+
+                if (isPremium) {
+                    return;
+                }
+
+                w.adthrive = w.adthrive || {};
+                w.adthrive.cmd = w.adthrive.cmd || [];
+                w.adthrive.plugin = 'adthrive-ads-manual';
+                w.adthrive.host = 'ads.adthrive.com';
+                var s = d.createElement('script');
+                s.async = true;
+                s.referrerpolicy = 'no-referrer-when-downgrade';
+                s.src = 'https://' + w.adthrive.host + '/sites/69caa2a59c365653ba27aeb9/ads.min.js?referrer=' + w.encodeURIComponent(w.location.href) + '&cb=' + (Math.floor(Math.random() * 100) + 1);
+                var n = d.getElementsByTagName('script')[0];
+                n.parentNode.insertBefore(s, n);
+            })(window, document);
+        </script>
+        <!-- End of Raptive Head Tag -->
+                    <!-- Dianomi Context Feed -->
+        <script type="text/javascript" id="dianomi_context_script" src="https://www.dianomi.com/js/contextfeed.js"></script>
+        <!-- End Dianomi Context Feed -->
+        
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-MGRKVFC2');</script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google Fonts pre-connect
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://www.salon.com/app/themes/salon/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://www.salon.com/app/themes/salon/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://www.salon.com/app/themes/salon/assets/img/favicon-16x16.png">
+    <link rel="icon" type="image/png" href="https://www.salon.com/app/themes/salon/favicon.ico">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta property="fb:pages" content="120680396518" />
+    <meta property="fb:app_id" content="134091381200152" />
+    <meta name="p:domain_verify" content="afd252c603232fed8ddf2554b144079b"/>
+
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/icomoon.woff" as="font" type="font/woff" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-Bold-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-Oblique-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Georgia-Bold-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/TimesNewRoman-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+
+	<!-- This site is optimized with the Yoast SEO Premium plugin v25.9 (Yoast SEO v25.9) - https://yoast.com/wordpress/plugins/seo/ -->
+	<title>Hey, political reporters — get lost! This is not your moment - Salon.com</title>
+	<meta name="description" content="Enough with the &quot;both-sides&quot; phony equivalence drama, please. Now we need beat reporters who actually know stuff" />
+	<link rel="canonical" href="https://www.salon.com/2020/11/11/hey-political-reporters-get-lost-this-is-not-your-moment/" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://www.salon.com/2020/11/11/hey-political-reporters-get-lost-this-is-not-your-moment/?utm_source=website&amp;utm_medium=social&amp;utm_campaign=ogshare&amp;utm_content=og" />
+	<meta property="og:site_name" content="Salon.com" />
+	<meta property="article:publisher" content="120680396518" />
+	<meta property="article:published_time" content="2020-11-11T15:00:01+00:00" />
+	<meta property="article:modified_time" content="2020-11-12T16:28:23+00:00" />
+	<meta property="og:image" content="https://www.salon.com/app/uploads/2020/11/joe-biden-kamala-harris-masks-1105201.jpg" />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta property="og:image:width" content="1200"/>
+	<meta property="og:image:height" content="628"/>
+	<meta name="author" content="Dan Froomkin" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:label1" content="Written by" />
+	<meta name="twitter:data1" content="Dan Froomkin" />
+	<meta name="twitter:label2" content="Est. reading time" />
+	<meta name="twitter:data2" content="8 minutes" />
+	<meta property="article:section" content="All Salon" />
+	<meta property="article:section" content="News &amp; Politics" />
+	<meta property="article:tag" content="commentary" />
+	<meta property="article:tag" content="Donald Trump" />
+	<meta property="article:tag" content="Elections" />
+	<meta property="article:tag" content="Joe Biden" />
+	<meta property="article:tag" content="kamala harris" />
+	<meta property="article:tag" content="Media" />
+	<meta property="article:tag" content="Press Watch" />
+	<meta property="article:author" content="Dan Froomkin" />
+	<!-- / Yoast SEO Premium plugin. -->
+
+
+<link rel='stylesheet' id='optinmonster-memberpress-css' href='https://www.salon.com/app/plugins/optinmonster/assets/dist/css/memberpress.min.css?ver=2.16.24' media='all' />
+<link rel='stylesheet' id='mp-theme-css' href='https://www.salon.com/app/plugins/memberpress/css/ui/theme.css?ver=1.12.15' media='all' />
+<style id="classic-theme-styles-inline-css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+
+
+<link rel='stylesheet' id='global-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/global.css?ver=1.0.31' media='all' />
+<link rel='stylesheet' id='article-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/article.css?ver=1.0.31' media='all' />
+<link rel='stylesheet' id='ad-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/ad.css?ver=1.0.31' media='all' />
+<script id="nelio-ab-testing-visitor-type-js" src="https://www.salon.com/app/plugins/nelio-ab-testing/assets/dist/js/visitor-type.js?ver=287e8e4cd3bcff28c95d"></script>
+<script type="application/ld+json">{"@context":"https:\/\/schema.org","@graph":[{"@type":"NewsMediaOrganization","@id":"https:\/\/www.salon.com\/#organization","name":"Salon.com","url":"https:\/\/www.salon.com\/","publishingPrinciples":"https:\/\/www.salon.com\/about","masthead":"https:\/\/www.salon.com\/about\/staff","diversityPolicy":"https:\/\/www.salon.com\/about\/diversity","sameAs":["https:\/\/www.facebook.com\/salon","https:\/\/www.instagram.com\/salonofficial","https:\/\/x.com\/salon","https:\/\/www.instagram.com\/salondotcom\/"],"logo":{"@type":"ImageObject","url":"https:\/\/www.salon.com\/app\/themes\/salon\/assets\/img\/salon-logo.svg"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Homepage","item":{"@type":"Thing","@id":"https:\/\/www.salon.com"}},{"@type":"ListItem","position":2,"name":"News &amp; Politics Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/category\/news-and-politics"}},{"@type":"ListItem","position":3,"name":"Dan Froomkin's Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/writer\/dan_froomkin"}}]},{"@type":"NewsArticle","headline":"Hey, political reporters \u2014 get lost! This is not your moment","url":"https:\/\/www.salon.com\/2020\/11\/11\/hey-political-reporters-get-lost-this-is-not-your-moment\/","thumbnailUrl":"https:\/\/www.salon.com\/app\/uploads\/2020\/11\/joe-biden-kamala-harris-masks-1105201-150x150.jpg","alternativeHeadline":"Enough with the \"both-sides\" phony equivalence drama, please. Now we need beat reporters who actually know stuff","dateCreated":"2020-11-11T15:00:01+00:00","datePublished":"2020-11-11T15:00:01+00:00","dateModified":"2020-11-12T16:28:23+00:00","articleSection":"All Salon, News &amp; Politics","image":["https:\/\/www.salon.com\/app\/uploads\/2020\/11\/joe-biden-kamala-harris-masks-1105201-150x150.jpg","https:\/\/www.salon.com\/app\/uploads\/2020\/11\/joe-biden-kamala-harris-masks-1105201-300x202.jpg","https:\/\/www.salon.com\/app\/uploads\/2020\/11\/joe-biden-kamala-harris-masks-1105201-1024x691.jpg","https:\/\/www.salon.com\/app\/uploads\/2020\/11\/joe-biden-kamala-harris-masks-1105201.jpg"],"keywords":"commentary, Donald Trump, Elections, Joe Biden, kamala harris, Media, Press Watch","author":[{"@type":"Person","name":"Dan Froomkin","jobTitle":"","description":"<p>Dan Froomkin is Editor of <a href=\"https:\/\/presswatchers.org\/\" target=\"_blank\">Press Watch<\/a>. He wrote the daily White House Watch column for the Washington Post during the George W. Bush administration, then served as Washington bureau chief and senior writer at Huffington Post, covering Barack Obama&#39;s presidency, before working as Washington editor at The Intercept.<\/p>\r\n","url":"https:\/\/www.salon.com\/writer\/dan_froomkin","sameAs":["https:\/\/x.com\/froomkin"]}],"publisher":{"@id":"https:\/\/www.salon.com\/#organization"},"mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.salon.com\/2020\/11\/11\/hey-political-reporters-get-lost-this-is-not-your-moment\/"},"description":"Enough with the \"both-sides\" phony equivalence drama, please. Now we need beat reporters who actually know stuff"}]}</script>
+
+    <!--<script src="https://www.google.com/recaptcha/api.js?render=6LckLQkrAAAAABD30EsnOQxmtgweb-aPZojeUU3v" async defer></script>-->
+    <script>
+        let siteUrl = 'https://www.salon.com';
+        let captchaKey = '6LckLQkrAAAAABD30EsnOQxmtgweb-aPZojeUU3v';
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '134091381200152',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v21.0'
+            });
+            FB.AppEvents.logPageView();
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+      
+<!-- Chartbeat -->
+<script type="text/javascript">
+(function() {
+    
+    let userType = 'anon';
+
+    if (subscriberUser) {
+        
+        if (isPremium) {
+            userType = 'paid';
+        }
+        else {
+            userType = 'lgdin';
+        }
+    }
+
+    let path = window.location.pathname;
+    var _sf_async_config = window._sf_async_config = (window._sf_async_config || {});
+    _sf_async_config.uid = 1614;
+    _sf_async_config.domain = 'salon.com'; //CHANGE THIS TO THE ROOT DOMAIN
+    _sf_async_config.flickerControl = false;
+    _sf_async_config.path = path;
+    _sf_async_config.sections = "News & Politics"; // CHANGE THIS TO YOUR SECTION NAME(s)
+    _sf_async_config.authors = "dan_froomkin"; // CHANGE THIS TO YOUR AUTHOR NAME(s)
+
+    var _cbq = window._cbq = (window._cbq || []);
+    _cbq.push(["_acct", userType]);
+
+    function loadChartbeat() {
+        var e = document.createElement('script');
+        var n = document.getElementsByTagName('script')[0];
+        e.type = 'text/javascript';
+        e.async = true;
+        e.src = '//static.chartbeat.com/js/chartbeat.js';;
+        n.parentNode.insertBefore(e, n);
+    }
+    loadChartbeat();
+})();
+</script>
+<script async src="//static.chartbeat.com/js/chartbeat_mab.js"></script>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="wp-singular post-template-default single single-post postid-837721 single-format-standard wp-theme-salon">
+    <script>
+        if (stickyHeaderEnabled) {
+            document.body.setAttribute('data-fixed', 'true');
+        } else {
+            document.body.removeAttribute('data-fixed');
+        }
+    </script>
+        <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGRKVFC2"
+                      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+        
+            <div class="loader-modal">
+    <div></div>
+</div>
+        <header class="main-header-container">
+            
+<section class="header__mobile">
+    <div>
+        <div class="header__mobile__logo">
+            <a href="https://www.salon.com" aria-label="To Salon Homepage">
+                <img class="-mt-2.5" src="https://www.salon.com/app/themes/salon/assets/img/mobile-logo.svg" width="136" height="40" alt="Salon logo" />
+            </a>
+        </div>
+        <div class="header__mobile__actions">
+            <button class="button__burger group/button__burger text-[#1e1e1e] dark:text-white text-2xl" aria-pressed="false" aria-controls="mobile-menu">
+    <i class="icon icon-burger block group-aria-pressed/button__burger:hidden" ></i>
+    <i class="icon icon-close hidden group-aria-pressed/button__burger:block" ></i>
+</button>
+        </div>
+    </div>
+    <nav
+    class="navigation__mobile"
+    aria-expanded="false"
+    id="mobile-menu"
+>
+    <div>
+        <div class="search__form w-full">
+    <form role="search" method="GET" action="https://www.salon.com/search/">
+        <div>
+                        <label for="search-form-1" class="hidden">Search</label>
+            <div class="relative">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#666666] dark:text-white">
+                    <i class="icon icon-search" ></i>
+                </div>
+                <input type="search" name="s" id="search-form-1" class="block w-full rounded-sm border border-[#a6a6a6] dark:border-white py-2 pr-4 pl-10 text-[#666666] dark:text-white text-base leading-4 placeholder:text-sm placeholder:text-[#666666] dark:placeholder:text-white placeholder:leading-4 outline-0 dark:bg-[#1d1d1d]" placeholder="Search" value="" />
+            </div>
+        </div>
+    </form>
+</div>
+        <div class="menu-burger-menu-container"><ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/life-stories">Life Stories</a></li>
+<li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li>
+<li class="menu-item menu-item-has-children"><a href="#">Reviews</a>
+<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Lifestyle</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/16/navigating-the-new-sober-boom-where-a-persons-sobriety-is-as-unique-as-their-fingerprint/">The New Sober Boom</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/30/secrets-of-a-serial-addict-how-i-got-hooked-on-quitting-over-and-over-again/">Getting Hooked on Quitting</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Education</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2024/03/16/ignorance-and-democracy-capitalisms-long-against-higher-education/">Liberal Arts Cuts Are Dangerous</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/09/16/college-was-necessary-for-me-will-my-own-child-need-it-like-i-did/">Is College Necessary?</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Finance</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/08/26/my-parents-are-deadcan-i-afford-avocado-toast-now/">Dying Parents Costing Millennials Dear</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/09/09/how-did-le-creuset-the-self-described-heirloom-quality-cookware-change-the-cooking-game/">Gen Z Investing In Le Creuset</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Crypto</a>
+	<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Investing</a>
+		<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/03/23/on-thursdays-we-wear-orange-sec-sues-lindsay-lohan-and-others-over-crypto-money-laundering-scam/">SEC vs Celebrity Crypto Promoters</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/04/16/impulsive-psychopaths-like-crypto-dark-personality-traits-increase-bitcoin-enthusiasm_partner/">&#8216;Dark&#8217; Personalities Drawn to BTC</a></li>
+		</ul>
+</li>
+	</ul>
+</li>
+</ul>
+</li>
+</ul></div>        <div id="userMenuContainerMobile">
+                    </div>
+        <div>
+            <div class="navigation__social">
+    <a href="https://x.com/Salon" target="_blank">
+        <i class="icon icon-twitter" ></i>
+    </a>
+    <a href="https://www.instagram.com/salonofficial" target="_blank">
+        <i class="icon icon-instagram" ></i>
+    </a>
+    <a href="https://www.youtube.com/user/SalonDotCom" target="_blank">
+        <i class="icon icon-youtube" ></i>
+    </a>
+    <a href="https://www.facebook.com/salon" target="_blank">
+        <i class="icon icon-facebook" ></i>
+    </a>
+    <a href="https://www.tiktok.com/@salonofficial" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-tiktok" ></i>
+    </a>
+    <a href="https://www.reddit.com/domain/salon.com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-reddit" ></i>
+    </a>
+    <a href="https://www.linkedin.com/company/salon-com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-linkedin" ></i>
+    </a>
+</div>
+        </div>
+    </div>
+</nav>
+</section>
+            
+<section class="header__desktop">
+    <section class="header__desktop__top">
+        <div>
+            <div>
+                <button class="button__burger group/button__burger text-[#1e1e1e] dark:text-white text-2xl" aria-pressed="false" aria-controls="burger-menu">
+    <i class="icon icon-burger block group-aria-pressed/button__burger:hidden" ></i>
+    <i class="icon icon-close hidden group-aria-pressed/button__burger:block" ></i>
+</button>
+                <nav class="navigation__burger" aria-expanded="false" id="burger-menu">
+    <div>
+        <div class="menu-burger-menu-container"><ul class="flex flex-col gap-2"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/life-stories">Life Stories</a></li>
+<li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li>
+<li class="menu-item menu-item-has-children"><a href="#">Reviews</a>
+<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Lifestyle</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/16/navigating-the-new-sober-boom-where-a-persons-sobriety-is-as-unique-as-their-fingerprint/">The New Sober Boom</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/30/secrets-of-a-serial-addict-how-i-got-hooked-on-quitting-over-and-over-again/">Getting Hooked on Quitting</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Education</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2024/03/16/ignorance-and-democracy-capitalisms-long-against-higher-education/">Liberal Arts Cuts Are Dangerous</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/09/16/college-was-necessary-for-me-will-my-own-child-need-it-like-i-did/">Is College Necessary?</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Finance</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/08/26/my-parents-are-deadcan-i-afford-avocado-toast-now/">Dying Parents Costing Millennials Dear</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/09/09/how-did-le-creuset-the-self-described-heirloom-quality-cookware-change-the-cooking-game/">Gen Z Investing In Le Creuset</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Crypto</a>
+	<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Investing</a>
+		<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/03/23/on-thursdays-we-wear-orange-sec-sues-lindsay-lohan-and-others-over-crypto-money-laundering-scam/">SEC vs Celebrity Crypto Promoters</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/04/16/impulsive-psychopaths-like-crypto-dark-personality-traits-increase-bitcoin-enthusiasm_partner/">&#8216;Dark&#8217; Personalities Drawn to BTC</a></li>
+		</ul>
+</li>
+	</ul>
+</li>
+</ul>
+</li>
+</ul></div>    </div>
+</nav>
+            </div>
+        </div>
+        <div>
+            <div class="navigation__social">
+    <a href="https://x.com/Salon" target="_blank">
+        <i class="icon icon-twitter" ></i>
+    </a>
+    <a href="https://www.instagram.com/salonofficial" target="_blank">
+        <i class="icon icon-instagram" ></i>
+    </a>
+    <a href="https://www.youtube.com/user/SalonDotCom" target="_blank">
+        <i class="icon icon-youtube" ></i>
+    </a>
+    <a href="https://www.facebook.com/salon" target="_blank">
+        <i class="icon icon-facebook" ></i>
+    </a>
+    <a href="https://www.tiktok.com/@salonofficial" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-tiktok" ></i>
+    </a>
+    <a href="https://www.reddit.com/domain/salon.com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-reddit" ></i>
+    </a>
+    <a href="https://www.linkedin.com/company/salon-com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-linkedin" ></i>
+    </a>
+</div>
+            <div class="dropdown__user group/dropdown__user relative text-left">
+    <div class="flex justify-center">
+        <button type="button" class="text-[#1e1e1e] dark:text-white group-hover/dropdown__user:text-[#ed2c1d]" id="dropdown-user-2" aria-haspopup="true">
+            <i class="icon icon-user text-2xl" ></i>
+        </button>
+    </div>
+    <div class="absolute right-0 z-10 pt-2 w-56 origin-top-right rounded-md bg-white dark:bg-[#1d1d1d] shadow-lg invisible transition-opacity ease-out delay-100 opacity-0 group-hover/dropdown__user:opacity-100 group-hover/dropdown__user:visible" role="menu" aria-orientation="vertical" aria-labelledby="dropdown-user-2" tabindex="-1">
+        <div role="none" id="userMenuContainer"></div>
+    </div>
+</div>
+        </div>
+    </section>
+    <section class="header__desktop__middle">
+        
+<nav class="navigation__desktop">
+    <div>
+        <div>
+            
+                <ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li><li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li><li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li></ul>            <div class="logo__desktop">
+                <a href="https://www.salon.com" aria-label="To Salon Homepage">
+                    <img src="https://www.salon.com/app/themes/salon/assets/img/salon-logo.svg" width="341" height="100" alt="Salon logo" />
+                </a>
+            </div>
+                <ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li><li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li><li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li></ul>                    </div>
+    </div>
+</nav>
+    </section>
+    <section class="header__desktop__bottom">
+        <div>
+            <div class="search__form w-full">
+    <form role="search" method="GET" action="https://www.salon.com/search/">
+        <div>
+                        <label for="search-form-3" class="hidden">Search</label>
+            <div class="relative">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#666666] dark:text-white">
+                    <i class="icon icon-search" ></i>
+                </div>
+                <input type="search" name="s" id="search-form-3" class="block w-full rounded-sm border border-[#a6a6a6] dark:border-white py-2 pr-4 pl-10 text-[#666666] dark:text-white text-base leading-4 placeholder:text-sm placeholder:text-[#666666] dark:placeholder:text-white placeholder:leading-4 outline-0 dark:bg-[#1d1d1d]" placeholder="Search" value="" />
+            </div>
+        </div>
+    </form>
+</div>
+        </div>
+    </section>
+</section>
+        </header>
+    
+    <div class="raptive-salon-header hide-if-premium"></div>
+
+    <main class="main-container">
+
+<div class="articles">
+            <article id="post-837721" class="single-column post-837721 post type-post status-publish format-standard has-post-thumbnail hentry category-all-salon category-news-and-politics tag-commentary tag-donald-trump tag-elections tag-joe-biden tag-kamala-harris tag-media tag-press-watch" data-post-id="837721">
+    <!-- TODO: Add the preview message here ... -->
+    
+<section class="article__title">
+            <div class="badge">commentary</div>
+        <h1>Hey, political reporters — get lost! This is not your moment</h1>
+    <h2>Enough with the "both-sides" phony equivalence drama, please. Now we need beat reporters who actually know stuff</h2>
+    <div class="writers">
+                    <div>
+                <div class="by">
+                    <span>By</span>
+                                            <a href="https://www.salon.com/writer/dan_froomkin">
+                            Dan Froomkin                        </a>
+                                                            </div>
+                                    <div>
+                                            </div>
+                            </div>
+                <div class="date">
+                            <h3>
+                    <span>Published</span>
+                    <time datetime="2020-11-11T10:00:01-05:00">
+                        November 11, 2020 10:00AM (EST)                    </time>
+                </h3>
+                    </div>
+    </div>
+</section>
+    <section class="article__feature">
+    <!-- TODO: Add the featured video here... -->
+        <div class="attachment__image">
+    <div class="image ">
+        <img width="1692" height="1142" src="https://www.salon.com/app/uploads/2020/11/joe-biden-kamala-harris-masks-1105201.jpg" class=" attachment-full size-full position-center" alt="Former vice-president and Democratic presidential nominee Joe Biden (L) and Senator from California and Democratic vice presidential nominee Kamala Harris greet supporters outside the Chase Center in Wilmington, Delaware, at the conclusion of the Democratic National Convention, held virtually amid the novel coronavirus pandemic, on August 20, 2020. (OLIVIER DOULIERY/AFP via Getty Images)" sizes="(max-width: 1692px) 100vw, 1692px" decoding="async" fetchpriority="high" srcset="https://www.salon.com/app/uploads/2020/11/joe-biden-kamala-harris-masks-1105201.jpg 1692w, https://www.salon.com/app/uploads/2020/11/joe-biden-kamala-harris-masks-1105201-300x202.jpg 300w, https://www.salon.com/app/uploads/2020/11/joe-biden-kamala-harris-masks-1105201-1024x691.jpg 1024w, https://www.salon.com/app/uploads/2020/11/joe-biden-kamala-harris-masks-1105201-768x518.jpg 768w, https://www.salon.com/app/uploads/2020/11/joe-biden-kamala-harris-masks-1105201-1536x1037.jpg 1536w" />    </div>
+            <div class="alt-text">
+            Former vice-president and Democratic presidential nominee Joe Biden (L) and Senator from California and Democratic vice presidential nominee Kamala Harris greet supporters outside the Chase Center in Wilmington, Delaware, at the conclusion of the Democratic National Convention, held virtually amid the novel coronavirus pandemic, on August 20, 2020. (OLIVIER DOULIERY/AFP via Getty Images)        </div>
+    </div>
+</section>
+    <section class="main">
+        <div>
+            <!-- TODO: Add the functionality for the article sharing here ... -->
+            
+<section class="article__share">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.salon.com%2F2020%2F11%2F11%2Fhey-political-reporters-get-lost-this-is-not-your-moment%2F&#038;utm_source=facebook&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#3a5697]" rel="nofollow">
+    <i class="icon icon-facebook bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#2c4788]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Facebook    </span>
+    </a>
+            <a href="https://x.com/share?url=https%3A%2F%2Fwww.salon.com%2F2020%2F11%2F11%2Fhey-political-reporters-get-lost-this-is-not-your-moment%2F&#038;text=Hey%2C+political+reporters+%E2%80%94+get+lost%21+This+is+not+your+moment&#038;utm_source=twitter&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#03a2e0]" rel="nofollow">
+    <i class="icon icon-twitter bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#048cc1]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        X    </span>
+    </a>
+            <a href="https://www.reddit.com/submit?url=https%3A%2F%2Fwww.salon.com%2F2020%2F11%2F11%2Fhey-political-reporters-get-lost-this-is-not-your-moment%2F&#038;title=Hey%2C+political+reporters+%E2%80%94+get+lost%21+This+is+not+your+moment&#038;utm_source=reddit&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#ff661e]" rel="nofollow">
+    <i class="icon icon-reddit bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#ea5a16]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Reddit    </span>
+    </a>
+            <a href="mailto:?subject=Hey%2C%20political%20reporters%20%E2%80%94%20get%20lost%21%20This%20is%20not%20your%20moment&#038;body=Check%20out%20this%20article%21%20https%3A%2F%2Fwww.salon.com%2F2020%2F11%2F11%2Fhey-political-reporters-get-lost-this-is-not-your-moment%2F%3Futm_source%3Demail%26utm_medium%3Dsocial%26utm_campaign%3Dsocialbuttons%26utm_content%3Dshare_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#3d4e66]" >
+    <i class="icon icon-email bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#2d394a]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Email    </span>
+    </a>
+        <div class="article__title-badges">
+        <div class="google-preferred-source-container">
+            <a
+                class="google-preferred-source"
+                href="https://www.google.com/preferences/source?q=salon.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Set Salon as a preferred source on Google News"
+                            >
+                <picture
+                    data-light-src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png"
+                    data-dark-src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_dark@2x.png"
+                >
+                    <source srcset="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png" media="(prefers-color-scheme: dark)">
+                    <img
+                        src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png"
+                        alt="Set Salon as a preferred source on Google News"
+                        loading="lazy"
+                        width="676"
+                        height="213"
+                    >
+                </picture>
+            </a>
+        </div>
+    </div>
+    <template id="save-article-button">
+        
+<button type="button" id="saveArticleBtn-3850" onclick="saveArticle(this.id);" class="button__tertiary group/button__tertiary border-2 border-[#5f5f5f] rounded text-[#5f5f5f] text-sm font-bold px-2 py-1 h-8 lowercase flex items-center gap-x-1.5 hover:text-[#e42416] hover:border-[#e42416]">
+            <i class="icon icon-save !h-4 !w-3 text-[#5f5f5f] group-hover/button__tertiary:text-[#e42416] text-base" ></i>
+        <span class="btnLabel">Save</span>
+</button>
+    </template>
+</section>
+            <!-- TODO: Add the editor's note here ... -->
+            <section class="article__source">
+    <p class="text-sm text-gray-500 italic">
+        This article was co-produced with <a href="https://presswatchers.org/" target="_blank" rel="noopener">Press Watch</a>, an independent site that monitors and critiques American political coverage. Please consider supporting Press Watch by <a href="https://presswatchers.org/donate/" target="_blank" rel="noopener">making a donation</a>.    </p>
+        <div><img src="https://www.salon.com/app/uploads/2020/01/press-watch-01.jpg" alt="" pinger-seen="true"></div>
+    </section>
+            <section class="article__content page-article"><p>Our top political reporters must be exhausted. I suggest they take some time off — like a year or two.</p>
+<p>They are the worst people in the world to be setting the tone for a new presidency at a time of unparalleled challenges.</p>
+<p>What the country needs now is a clean-slate, expertise-respecting, evidence-based, thoroughgoing examination of the policies required to address the pandemic, the crashed economy, climate change, systemic racism, crippling health care costs and our collapsing infrastructure — just for starters.</p>
+<p>But political reporters hate writing about policy, because that demands actual knowledge of the subject matter. They also think it’s boring, that readers don’t care about it, and that it can come dangerously close to the dreaded “<a href="https://presswatchers.org/category/objectivity/">taking of sides</a>.”</p>
+<p>Our top newsrooms should be focused on questions like: What are Biden’s plans? Will they work? If they seem likely to work, what and who is standing in their way?</p>
+<p>Instead, the nation’s top political reporters — addicted to conflict and gamesmanship — find comfort only in storylines where there are two sides they can roughly deem equivalent.</p>
+<p>So during the Trump years, they normalized a highly abnormal presidency — covering him as if he were not wildly incoherent, irrational, racist, thuggish and incompetent. Recognizing the truth would have been tantamount to taking sides against him and the party he had so successfully coopted.</p><div class="raptive-salon-video hide-if-premium"></div>
+<p>In order to even the playing field between two parties that have wildly asymmetrical relationships with reality, political reporters hold Republicans to essentially no standards whatsoever. By contrast, some of the standards they set for Democrats are impossible.</p>
+<p>So now their storyline is that if Joe Biden doesn’t unify the nation, he will have failed.</p>
+<p>Case in point: The latest installment of Washington Post chief correspondent Dan Balz’s master class in the failed school of modern political reporting (<a href="https://presswatchers.org/?s=balz">more examples here</a>) headlined “<a href="https://www.washingtonpost.com/politics/biden-challenges-presidency/2020/11/07/83c40b04-1fe2-11eb-ba21-f2f001f0554b_story.html">Biden promises to unite the country. After this election, is it even possible?</a>“</p><div class="raptive-salon-content hide-if-premium"></div>
+<p>Balz’s article started off with lip service to the actual policy challenges Biden faces:</p>
+<blockquote>
+<p>The issue agenda alone is crushing, from the coronavirus pandemic to a weakened and unequal economy, to the threats posed by climate change, to cries for an overdue reckoning on race and justice. Those are just the top layer of the president-elect’s inbox and together they could consume most of his initial term in office.</p>
+</blockquote>
+<p>But that’s not what really interested him. Biden “ran promising to overcome almost exactly what he will now inherit — both deep division among the people and toxicity in the body politic,” Balz wrote.</p>
+<p>“If he fails in this overriding objective, his presidency could end up in disappointment and stasis.”</p>
+<p>Again, later: “Biden faces a series of obstacles that threaten his ability to unite the country and therefore govern successfully.”</p>
+<p>Balz grudgingly noted that Senate Majority Leader Mitch McConnell might have a bit of a role here: “The posture McConnell adopts toward Biden will go some ways in determining whether the president-elect can begin to make good on his pledge to repair a broken government and show a way out of the rancorous politics of the day.”</p>
+<p>But Balz also warned gravely of the threat from the progressive left, and how Biden will have to “referee an internecine battle at a moment when the president-elect will need as much unity and harmony within the party as possible.”</p>
+<p>Similarly, Associated Press Washington bureau chief Julie Pace set a tone for her stable of reporters with her analysis: “<a href="https://apnews.com/article/election-2020-joe-biden-donald-trump-virus-outbreak-c30573eeaba00d9652a96418bff3bb0f">Biden claims a mandate that will quickly be tested</a>.”</p>
+<p>And over at McClatchy, under the headline “<a href="https://www.mcclatchydc.com/news/politics-government/election/article246926647.html">Biden delivered on defeating Trump. But the honeymoon will be short</a>,” reporters David Catanese and Alex Roarty focused on conflict and optics and process, empty of substance. They wrote:</p>
+<blockquote>
+<p>Following Joe Biden’s drawn-out and hard-fought victory over President Donald Trump, he will immediately face pressure from the left and right about his proposed agenda and the roster of personnel he’ll surround himself with as he prepares to govern a bitterly divided country.</p>
+</blockquote>
+<p>NYU journalism professor Jay Rosen called out some of the problems with the “healing divisions” narrative:</p>
+<p><span class="xmtqIlMkp9KhH2JQLZeEfRnDzbcCAP05gX3YU7W41iOsyrNVuGFTa"></span></p>
+<blockquote class="twitter-tweet" data-width="500" data-dnt="true">
+<p lang="en" dir="ltr">This is why I don't see "healing divisions" as job one. First task is gaining control of the virus so we can have our lives back. Second: halting and reversing the unbuilding of the government. Third: learning to limit the damage of a counter-majoritarian "remained defiant" GOP. <a href="https://t.co/XYYfuNfeD9">https://t.co/XYYfuNfeD9</a></p>
+<p>— Jay Rosen (@jayrosen_nyu) <a href="https://twitter.com/jayrosen_nyu/status/1325214486777618440?ref_src=twsrc%5Etfw">November 7, 2020</a></p></blockquote>
+<p><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+<p>Author Rick Perlstein gave CNN anchor Jake Tapper props for not buying into it:</p>
+<p><span class="UYAKV2esPaXS4GdDIj6NkWOEcFr"></span></p>
+<blockquote class="twitter-tweet" data-width="500" data-dnt="true">
+<p lang="en" dir="ltr">Change I can believe in: heads like Jake tapper are talking like this: "I don't think we need to bend over backwards and pretend that the country moving on and MAGA nation moving on depends upon what Joe Biden does"!</p>
+<p>— Rick Perlstein (@rickperlstein) <a href="https://twitter.com/rickperlstein/status/1325515121037205505?ref_src=twsrc%5Etfw">November 8, 2020</a></p></blockquote>
+<p><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+<p>Indeed, here is Tapper’s <a href="http://archives.cnn.com/TRANSCRIPTS/2011/07/se.21.html">full quote</a> from Saturday evening:</p>
+<blockquote>
+<p>I don’t think we need to bend over backwards and pretend that the country moving on and MAGA nation moving on depends upon what Joe Biden does. Like Joe Biden is going to do what he can. And if a chunk of the leaders of the Republican Party want to drag the nation down with them, that’s up to them. … But he’s going to be governing and they can either join him or get out of the way.</p>
+</blockquote>
+<p>Author Anand Giridharadas was presumably tweeting about the cable news pundit class here, but I think his critique fully extends to political reporters (some of whom, of course, are also cable news pundits). By “not taking sides,” they too often are essentially siding with inertia. And this is no time for inertia.</p><div class="raptive-salon-content hide-if-premium"></div>
+<div class="twitter_tweet_display_box" data-tweet-id="1325576378092318727"></div>
+<h4><strong>Beat reporting, please</strong></h4>
+<p>The people we need to hear from are the beat reporters who know what they’re writing about.</p>
+<p>The most urgent challenge, of course, is the pandemic. Biden’s appointment of a heavy-hitting task force on Monday made headlines everywhere, but health writers like <a href="https://www.statnews.com/2020/11/07/biden-to-start-pandemic-response-immediately/">Lev Facher</a> at STAT News have been digging into Biden’s plans and writing about them evocatively:</p>
+<blockquote>
+<p>Instantly, he will shoulder several herculean tasks, including a massive testing scale-up, restoring the credibility of government scientists, and overseeing the eventual distribution of hundreds of millions of vaccine doses. Perhaps most daunting, in a country plagued by apathy and misinformation: Biden will need to earn the buy-in of the American public.</p>
+<p>Much of the work has already begun. In interviews with STAT, several Biden health advisers described a forthcoming effort to court skeptical mayors and governors, select and vet leaders for key public health agencies, and set a new tone for the nation’s pandemic response, even in the 10 weeks before he takes office. …</p>
+<p>“There are some things he’s going to do right off the bat,” said Nicole Lurie, a Biden campaign adviser who served as the Obama administration’s top pandemic-preparedness official. “He will reach out to Tony Fauci. He will declare his intent to be an active participant in the WHO and in the world. And I believe that in very short order, he’ll be in touch with governors and mayors around the country, listening to what it is that they’ll need to pivot this response.”</p>
+</blockquote>
+<p>(I should point out that <a href="https://presswatchers.org/2020/03/get-political-reporters-off-the-coronavirus-story-because-they-dont-distinguish-between-right-and-wrong/">fully eight months ago</a>, I called for political reporters and editors to cede pandemic coverage to journalists who cover health and science, to better serve the public’s need to understand what needs to be done rather than who’s winning the narrative.)</p>
+<p>Here is AP economics writer <a href="https://apnews.com/article/joe-biden-technology-pandemics-virus-outbreak-financial-markets-ea99dbedb22ae7818c241ce52d0974b0">Josh Boak</a> laying out the problem on his beat:</p>
+<blockquote>
+<p>The once robust recovery has shown signs of gasping after federal aid lapsed. Ten million remain jobless and more layoffs are becoming permanent. The Federal Reserve says factory output dropped.</p>
+<p>Parents cannot return to work as childcare centers have shuttered. Restaurants and local retailers are draining whatever cash reserves are left — with many owners wondering if the next week might be their last. One in six restaurants was already closed in September, according to an industry survey.</p>
+</blockquote>
+<p>The difficulty Biden faces:</p>
+<blockquote>
+<p>He is expected to somehow inject enough aid to sustain workers, businesses and state and local governments, without necessarily having enough congressional partners who share his concerns.</p>
+</blockquote>
+<p>And the possible outcome:</p>
+<blockquote>
+<p>“The risk is that the recovery goes into reverse,” said Gregory Daco, an economist for the consultancy Oxford Economics.</p>
+</blockquote>
+<p>New York Times economic policy reporters <a href="https://www.nytimes.com/2020/11/08/us/politics/biden-economy.html">Alan Rappeport, Jeanna Smialek, Ana Swanson and Jim Tankersley</a> explored a number of steps Biden could take without congressional support:</p>
+<blockquote>
+<p>That includes providing student debt relief, which Ms. Wong said would work as a sort of stimulus by removing the burden of those payments. Mr. Biden could direct the Education secretary to forgive student loans up to a certain amount. …</p>
+<p>The administration could also use executive authority to raise the minimum wage for federal contractors to $15 an hour, she said, providing a pay boost for many thousands of workers.</p>
+</blockquote>
+<p>And here you have three Washington Post environmental reporters — <a href="https://www.washingtonpost.com/climate-environment/2020/11/07/biden-climate-change-monuments/">Juliet Eilperin, Dino Grandoni and Darryl Fears</a> — writing about Biden’s climate change plans:</p>
+<blockquote>
+<p>While some of Biden’s most sweeping programs will encounter stiff resistance from Senate Republicans and conservative attorneys general, the United States is poised to make a 180-degree turn on climate change and conservation policy.</p>
+<p>Biden’s team already has plans on how it will restrict oil and gas drilling on public lands and waters; ratchet up federal mileage standards for cars and SUVs; block pipelines that transport fossil fuels across the country; provide federal incentives to develop renewable power; and mobilize other nations to make deeper cuts in their own carbon emissions. …</p>
+<p>The new administration may be able to broker compromises with key industries that have experienced regulatory whiplash in the past decade, including the auto industry and power sector, while offering tax breaks for renewable energy that remain popular with both parties. And Biden can rebuild diplomatic alliances that will spur foreign countries to pursue more-ambitious carbon reductions.</p>
+</blockquote>
+<p>Obviously, there are some political loose ends here and there that still need to be tied up, so maybe we can keep a few political reporters on call. But it’s time to stop obsessing over the stupid questions Trump has been raising for the last four years, and start addressing the real ones.</p>
+<p>As Mother Jones writer Ari Berman tweeted:</p>
+<p><span class="Dkx1ndXOeig0tlPZAqjmERQvFhs9bwroyLNa2Y3uCVBW46I"></span></p>
+<blockquote class="twitter-tweet" data-width="500" data-dnt="true">
+<p lang="en" dir="ltr">To my fellow members of media: stop asking Republicans if Biden was legitimately elected. This is not a question. HE WAS. People voted in record numbers. Their votes were counted. Biden won. Let’s move on to the huge issues facing this nation</p>
+<p>— Ari Berman (@AriBerman) <a href="https://twitter.com/AriBerman/status/1325828220059607042?ref_src=twsrc%5Etfw">November 9, 2020</a></p></blockquote>
+<p><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+<p> </p>
+<hr><div class="raptive-salon-content hide-if-premium"></div></section>
+                <section class="article__writers mt-14">
+                                <div class="post-420143 writer type-writer status-publish hentry article__writers article__writer-container" data-writer-id="420143">
+
+                                    <div class="writer-bio-ajax-content">
+                        <h3>
+                            <span>By</span>
+                            <a href="https://www.salon.com/writer/dan_froomkin">
+                                Dan Froomkin                            </a>
+                        </h3>
+                    </div>
+
+                    <template class="writer-bio-template">
+                        <h3>
+                            <span>By</span>
+                            <a href="" class="writer-name-link">
+                            </a>
+                        </h3>
+
+                        <div class="socials" style="display: none;"> <a href="" class="social group/social facebook-link" target="_blank" style="display: none;">
+                                <i class="icon icon-facebook text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                            <a href="" class="social group/social twitter-link" target="_blank" style="display: none;">
+                                <i class="icon icon-twitter text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                            <a href="" class="social group/social instagram-link" target="_blank" style="display: none;">
+                                <i class="icon icon-instagram text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                        </div>
+
+                        <div class="writer-bio-text"></div>
+
+                        <div class="more">
+                            <span>MORE FROM</span>
+                            <a href="" class="writer-more-from-link">
+                            </a>
+                        </div>
+                    </template>
+                            </div>
+            </section>
+            <hr>
+                <section class="article__topics">
+        <h2>
+            Related Topics            <span>
+                ------------------------------------------            </span>
+        </h2>
+        <div>
+                            <a href="https://www.salon.com/topic/commentary" class="delay-400 pointer">
+                    Commentary                </a>
+                            <a href="https://www.salon.com/topic/donald-trump" class="delay-400 pointer">
+                    Donald Trump                </a>
+                            <a href="https://www.salon.com/topic/elections" class="delay-400 pointer">
+                    Elections                </a>
+                            <a href="https://www.salon.com/topic/joe-biden" class="delay-400 pointer">
+                    Joe Biden                </a>
+                            <a href="https://www.salon.com/topic/kamala-harris" class="delay-400 pointer">
+                    Kamala Harris                </a>
+                            <a href="https://www.salon.com/topic/media" class="delay-400 pointer">
+                    Media                </a>
+                            <a href="https://www.salon.com/topic/press-watch" class="delay-400 pointer">
+                    Press Watch                </a>
+                    </div>
+    </section>
+            
+<section class="article__related" data-post-id="837721" data-terms="commentary,donald-trump,elections,joe-biden,kamala-harris,media,press-watch">
+    <h2>
+        <span>
+            Related Articles        </span>
+    </h2>
+    <div>
+        <template>
+            <a href="" class="flex min-[501px]:hidden">
+                <div class="attachment__image">
+                    <div class="image">
+                        <img src="https://www.salon.com/app/themes/salon/assets/img/salon-placeholder.webp" decoding="async" fetchpriority="high" alt="Salon placeholder" class="attachment-full size-full">
+                    </div>
+                </div>
+                <h5></h5>
+                <span></span>
+            </a>
+        </template>
+    </div>
+</section>
+            <hr>
+            <div class="dianomi_context hide-if-premium" data-dianomi-context-id="4879"></div>
+        </div>
+        
+<div class="sidebar-col">
+    <div class="dianomi_context hide-if-premium" data-dianomi-context-id="4876"></div>
+            <div class="raptive-salon-sticky-sidebar hide-if-premium"></div>
+    </div>
+    </section>
+</article>
+    </div>
+
+    </main>
+
+    <footer>
+        <ul class="navigation__footer mt-4 text-center"><li class="menu-item"><a href="https://www.salon.com">Home</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about">About</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/staff">Staff</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/contact">Contact</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/policy">Privacy</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/tos">Terms of Service</a></li>
+<li class="menu-item"><a href="https://www.salon.com/archive">Archive</a></li>
+<li class="menu-item"><a href="/premium?utm_source=onsite&amp;utm_medium=organic&amp;utm_campaign=go-ad-free-footer">Go Ad Free</a></li>
+</ul>        <div class="footer__copyright">
+    <p>
+        Copyright © 2026 Salon.com, LLC. Reproduction of material from any Salon pages without written permission is strictly prohibited. SALON ® is registered in the U.S. Patent and Trademark Office as a trademark of Salon.com, LLC. Associated Press articles: Copyright © 2016 The Associated Press. All rights reserved. This material may not be published, broadcast, rewritten or redistributed.    </p>
+    <p>
+        <a href="https://www.salon.com/2026/06/02/best-vpn-services-for-2026/">
+            VPN Providers        </a>
+    </p>
+    <p>
+        <a href="https://www.salon.com/about/dmca">
+            DMCA Policy        </a>
+    </p>
+</div>
+    </footer>
+
+    <div class="modal__alert" role="dialog" aria-modal="true" aria-hidden="true" id="alert-modal">
+    <div></div>
+    <div>
+        <div>
+            
+<div class="modal__close">
+    <button type="button" aria-controls="alert-modal">
+        <i class="icon icon-close-extrabold block w-5 text-xl" ></i>
+    </button>
+</div>
+            <div class="modal__content">
+                <div class="message">
+                    This is an alert message.                </div>
+                <div class="modal__close">
+                    <button type="button" aria-controls="alert-modal">
+                        OK                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp/wp-*.php","/wp/wp-admin/*","/app/uploads/*","/app/*","/app/plugins/*","/app/themes/salon/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script id="global-salon-js-extra">
+var salonSubscriptionTracking = {"eventsEndpoint":"https://www.salon.com/wp-json/salon/v1/subscription-tracking/events","measurementId":"G-7VPPFM7ET6","pageContext":{"contentCategory":"article","currentPlan":null,"isCheckoutPage":false},"pendingSessionIds":[],"bootstrapEvents":[],"approximateBeginCheckout":"1"};
+//# sourceURL=global-salon-js-extra
+</script>
+<script type="module" data-wp-strategy="defer" defer id="global-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/global.js?ver=1.0.31"></script>
+<script type="module" data-wp-strategy="defer" defer id="article-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/article.js?ver=1.0.31"></script>
+<script data-wp-strategy="defer" defer id="ad-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/ad.js?ver=1.0.31"></script>
+<script id="raptive-adblock-detection-js" src="https://www.salon.com/app/themes/salon/assets/js/ad/raptive-adblock-detection.js"></script>
+<script data-cfasync="false" data-abr-mode="essential" id="raptive-adblock-recovery-js" src="https://www.salon.com/app/themes/salon/assets/js/ad/raptive-adblock-recovery.js"></script>
+</body>
+</html>
