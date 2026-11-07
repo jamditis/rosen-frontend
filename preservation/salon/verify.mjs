@@ -12,10 +12,11 @@ const normalize = s => s.normalize('NFKC').replace(/\s+/g, ' ').trim();
 const chars = s => normalize(s).replace(/\s/g, '');
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args:['--no-sandbox'] });
 let failed = false;
-const sources = JSON.parse(await readFile(path.join(root, 'sources.json')));
+const supplemental = Boolean(process.argv[3]);
+const sources = JSON.parse(await readFile(process.argv[3] || path.join(root, 'sources.json')));
 const rows = parse(await readFile(path.join(root, '../../data/archive_records-public.csv'), 'utf8'), { columns: true, skip_empty_lines: true, relax_column_count: true });
 const required = rows.filter(r => { try { return /^(www\.)?salon\.com$/.test(new URL(r.url).hostname); } catch { return false; } });
-for (const row of required) {
+for (const row of required.filter(r => !supplemental || sources.some(s => s.url === r.url))) {
  if (!report.results.some(r => r.url === row.url && r.recordIds.includes(row.id))) throw new Error(`Uncovered archive record: ${row.id}`);
 }
 if (sources.length !== report.results.length || sources.some(s => !report.results.some(r => r.url === s.url))) throw new Error('Capture report does not cover source inventory');
@@ -24,11 +25,11 @@ const discovery = JSON.parse(await readFile(path.join(root, 'discovery-evidence.
 for (const evidence of discovery.evidence) {
  const bytes = await readFile(path.join(root, evidence.path));
  if (bytes.length !== evidence.bytes || createHash('sha256').update(bytes).digest('hex') !== evidence.sha256) throw new Error(`Discovery evidence checksum mismatch: ${evidence.path}`);
- for (const url of evidence.listedArticleUrls || []) {
+ for (const url of (evidence.listedArticleUrls || []).filter(u => !supplemental || sources.some(s => s.url === u))) {
   if (!report.results.some(r => r.url === url && r.author === 'Jay Rosen')) throw new Error(`Uncovered publisher author listing: ${url}`);
  }
 }
-console.log(`Coverage: ${required.length} curated Salon records; ${sources.length} total sources; all publisher author-listing entries`);
+console.log(supplemental ? `Supplemental coverage: all ${sources.length} supplied sources (base inventory checked separately)` : `Coverage: ${required.length} curated Salon records; ${sources.length} total sources; all publisher author-listing entries`);
 try {
  for (const result of report.results) {
   const errors = [];

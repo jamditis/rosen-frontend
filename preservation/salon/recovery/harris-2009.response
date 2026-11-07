@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <script>
+        const subscriberUser = !!document.cookie.split('; ').find(row => row.startsWith('wordpress_subscriber_user='));
+
+        const userDetails = subscriberUser ? JSON.parse(window.localStorage.getItem('userDetails')) : null;
+        const darkModeEnabled = userDetails ? userDetails?.userPreferences?.darkMode === true : false;
+        const stickyHeaderEnabled = userDetails ? userDetails?.userPreferences?.stickyHeader === true : false;
+
+        // Helper function to read cookies
+        function getCookie(name) {
+            var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+            return v ? v[2] : null;
+        }
+
+        // Check for the 'wordpress_premium_member' cookie
+        const hasPremiumCookie = getCookie('wordpress_premium_member') === '1';
+        const hasPremiumRoleInLS = userDetails
+            && userDetails.userRoles
+            && Array.isArray(userDetails.userRoles)
+            && userDetails.userRoles.includes('premium_member');
+        const isPremium = hasPremiumCookie || hasPremiumRoleInLS;
+
+        if (darkModeEnabled) {
+            document.documentElement.classList.add('dark');
+        }
+
+        if (isPremium) {
+            document.documentElement.classList.add('premium');
+        }
+    </script>
+
+            <!-- START email detection/removal script -->
+        <script>
+            !function(){"use strict";const t={adt_ei:{identityApiKey:"plainText",source:"url",type:"plaintext",priority:1},adt_eih:{identityApiKey:"sha256",source:"urlh",type:"hashed",priority:2},sh_kit:{identityApiKey:"sha256",source:"urlhck",type:"hashed",priority:3}},e=Object.keys(t);function i(t){return function(t){const e=t.match(/((?=([a-z0-9._!#$%+^&*()[\]<>-]+))\2@[a-z0-9._-]+\.[a-z0-9._-]+)/gi);return e?e[0]:""}(function(t){return t.replace(/\s/g,"")}(t.toLowerCase()))}!async function(){const n=new URL(window.location.href),o=n.searchParams;let a=null;const r=Object.entries(t).sort(([,t],[,e])=>t.priority-e.priority).map(([t])=>t);for(const e of r){const n=o.get(e),r=t[e];if(!n||!r)continue;const c=decodeURIComponent(n),d="plaintext"===r.type&&i(c),s="hashed"===r.type&&c;if(d||s){a={value:c,config:r};break}}if(a){const{value:t,config:e}=a;window.adthrive=window.adthrive||{},window.adthrive.cmd=window.adthrive.cmd||[],window.adthrive.cmd.push(function(){window.adthrive.identityApi({source:e.source,[e.identityApiKey]:t},({success:i,data:n})=>{i?window.adthrive.log("info","Plugin","detectEmails",`Identity API called with ${e.type} email: ${t}`,n):window.adthrive.log("warning","Plugin","detectEmails",`Failed to call Identity API with ${e.type} email: ${t}`,n)})})}!function(t,e){const i=new URL(e);t.forEach(t=>i.searchParams.delete(t)),history.replaceState(null,"",i.toString())}(e,n)}()}();
+        </script>
+        <!-- END email detection/removal script -->
+                    <!-- Raptive Head Tag Manual -->
+        <script data-no-optimize="1" data-cfasync="false">
+            (function(w, d) {
+
+                if (isPremium) {
+                    return;
+                }
+
+                w.adthrive = w.adthrive || {};
+                w.adthrive.cmd = w.adthrive.cmd || [];
+                w.adthrive.plugin = 'adthrive-ads-manual';
+                w.adthrive.host = 'ads.adthrive.com';
+                var s = d.createElement('script');
+                s.async = true;
+                s.referrerpolicy = 'no-referrer-when-downgrade';
+                s.src = 'https://' + w.adthrive.host + '/sites/69caa2a59c365653ba27aeb9/ads.min.js?referrer=' + w.encodeURIComponent(w.location.href) + '&cb=' + (Math.floor(Math.random() * 100) + 1);
+                var n = d.getElementsByTagName('script')[0];
+                n.parentNode.insertBefore(s, n);
+            })(window, document);
+        </script>
+        <!-- End of Raptive Head Tag -->
+                    <!-- Dianomi Context Feed -->
+        <script type="text/javascript" id="dianomi_context_script" src="https://www.dianomi.com/js/contextfeed.js"></script>
+        <!-- End Dianomi Context Feed -->
+        
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-MGRKVFC2');</script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google Fonts pre-connect
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://www.salon.com/app/themes/salon/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://www.salon.com/app/themes/salon/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://www.salon.com/app/themes/salon/assets/img/favicon-16x16.png">
+    <link rel="icon" type="image/png" href="https://www.salon.com/app/themes/salon/favicon.ico">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta property="fb:pages" content="120680396518" />
+    <meta property="fb:app_id" content="134091381200152" />
+    <meta name="p:domain_verify" content="afd252c603232fed8ddf2554b144079b"/>
+
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/icomoon.woff" as="font" type="font/woff" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-Bold-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-Oblique-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Georgia-Bold-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/TimesNewRoman-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+
+	<!-- This site is optimized with the Yoast SEO Premium plugin v25.9 (Yoast SEO v25.9) - https://yoast.com/wordpress/plugins/seo/ -->
+	<title>Email from John Harris: regrets dispute with Dan Froomkin - Salon.com</title>
+	<meta name="description" content="The then-National Political Editor of the Post revisits his objections to Froomkin&#039;s journalism." />
+	<link rel="canonical" href="https://www.salon.com/2009/06/20/harris_6/" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://www.salon.com/2009/06/20/harris_6/?utm_source=website&amp;utm_medium=social&amp;utm_campaign=ogshare&amp;utm_content=og" />
+	<meta property="og:site_name" content="Salon.com" />
+	<meta property="article:publisher" content="120680396518" />
+	<meta property="article:published_time" content="2009-06-20T17:21:00+00:00" />
+	<meta property="article:modified_time" content="2011-09-25T03:51:26+00:00" />
+	
+	<meta property="og:image:width" content="1200"/>
+	<meta property="og:image:height" content="628"/>
+	<meta name="author" content="Glenn Greenwald" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:label1" content="Written by" />
+	<meta name="twitter:data1" content="Glenn Greenwald" />
+	<meta name="twitter:label2" content="Est. reading time" />
+	<meta name="twitter:data2" content="10 minutes" />
+	<meta property="article:section" content="All Salon" />
+	<meta property="article:section" content="News &amp; Politics" />
+	<meta property="article:section" content="Politics" />
+	<meta property="article:tag" content="WASHINGTON DC" />
+	<meta property="article:author" content="Glenn Greenwald" />
+	<!-- / Yoast SEO Premium plugin. -->
+
+
+<link rel='stylesheet' id='optinmonster-memberpress-css' href='https://www.salon.com/app/plugins/optinmonster/assets/dist/css/memberpress.min.css?ver=2.16.24' media='all' />
+<link rel='stylesheet' id='mp-theme-css' href='https://www.salon.com/app/plugins/memberpress/css/ui/theme.css?ver=1.12.15' media='all' />
+<style id="classic-theme-styles-inline-css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+
+
+<link rel='stylesheet' id='global-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/global.css?ver=1.0.31' media='all' />
+<link rel='stylesheet' id='article-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/article.css?ver=1.0.31' media='all' />
+<link rel='stylesheet' id='ad-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/ad.css?ver=1.0.31' media='all' />
+<script id="nelio-ab-testing-visitor-type-js" src="https://www.salon.com/app/plugins/nelio-ab-testing/assets/dist/js/visitor-type.js?ver=287e8e4cd3bcff28c95d"></script>
+<script type="application/ld+json">{"@context":"https:\/\/schema.org","@graph":[{"@type":"NewsMediaOrganization","@id":"https:\/\/www.salon.com\/#organization","name":"Salon.com","url":"https:\/\/www.salon.com\/","publishingPrinciples":"https:\/\/www.salon.com\/about","masthead":"https:\/\/www.salon.com\/about\/staff","diversityPolicy":"https:\/\/www.salon.com\/about\/diversity","sameAs":["https:\/\/www.facebook.com\/salon","https:\/\/www.instagram.com\/salonofficial","https:\/\/x.com\/salon","https:\/\/www.instagram.com\/salondotcom\/"],"logo":{"@type":"ImageObject","url":"https:\/\/www.salon.com\/app\/themes\/salon\/assets\/img\/salon-logo.svg"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Homepage","item":{"@type":"Thing","@id":"https:\/\/www.salon.com"}},{"@type":"ListItem","position":2,"name":"News &amp; Politics Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/category\/news-and-politics"}},{"@type":"ListItem","position":3,"name":"Politics Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/category\/politics"}},{"@type":"ListItem","position":4,"name":"Glenn Greenwald's Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/writer\/glenn_greenwald"}}]},{"@type":"NewsArticle","headline":"Email from John Harris:  regrets dispute with Dan Froomkin","url":"https:\/\/www.salon.com\/2009\/06\/20\/harris_6\/","thumbnailUrl":false,"alternativeHeadline":"The then-National Political Editor of the Post revisits his objections to Froomkin's journalism.","dateCreated":"2009-06-20T17:21:00+00:00","datePublished":"2009-06-20T17:21:00+00:00","dateModified":"2011-09-25T03:51:26+00:00","articleSection":"All Salon, News &amp; Politics, Politics","image":[false,false,false,false],"keywords":"WASHINGTON DC","author":[{"@type":"Person","name":"Glenn Greenwald","jobTitle":"","description":" Follow Glenn Greenwald on Twitter: <a href=\"http:\/\/twitter.com\/ggreenwald\">@ggreenwald<\/a>.","url":"https:\/\/www.salon.com\/writer\/glenn_greenwald","sameAs":["https:\/\/x.com\/ggreenwald"]}],"publisher":{"@id":"https:\/\/www.salon.com\/#organization"},"mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.salon.com\/2009\/06\/20\/harris_6\/"},"description":"The then-National Political Editor of the Post revisits his objections to Froomkin's journalism."}]}</script>
+
+    <!--<script src="https://www.google.com/recaptcha/api.js?render=6LckLQkrAAAAABD30EsnOQxmtgweb-aPZojeUU3v" async defer></script>-->
+    <script>
+        let siteUrl = 'https://www.salon.com';
+        let captchaKey = '6LckLQkrAAAAABD30EsnOQxmtgweb-aPZojeUU3v';
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '134091381200152',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v21.0'
+            });
+            FB.AppEvents.logPageView();
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+      
+<!-- Chartbeat -->
+<script type="text/javascript">
+(function() {
+    
+    let userType = 'anon';
+
+    if (subscriberUser) {
+        
+        if (isPremium) {
+            userType = 'paid';
+        }
+        else {
+            userType = 'lgdin';
+        }
+    }
+
+    let path = window.location.pathname;
+    var _sf_async_config = window._sf_async_config = (window._sf_async_config || {});
+    _sf_async_config.uid = 1614;
+    _sf_async_config.domain = 'salon.com'; //CHANGE THIS TO THE ROOT DOMAIN
+    _sf_async_config.flickerControl = false;
+    _sf_async_config.path = path;
+    _sf_async_config.sections = "News & Politics, Politics"; // CHANGE THIS TO YOUR SECTION NAME(s)
+    _sf_async_config.authors = "glenn_greenwald"; // CHANGE THIS TO YOUR AUTHOR NAME(s)
+
+    var _cbq = window._cbq = (window._cbq || []);
+    _cbq.push(["_acct", userType]);
+
+    function loadChartbeat() {
+        var e = document.createElement('script');
+        var n = document.getElementsByTagName('script')[0];
+        e.type = 'text/javascript';
+        e.async = true;
+        e.src = '//static.chartbeat.com/js/chartbeat.js';;
+        n.parentNode.insertBefore(e, n);
+    }
+    loadChartbeat();
+})();
+</script>
+<script async src="//static.chartbeat.com/js/chartbeat_mab.js"></script>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="wp-singular post-template-default single single-post postid-652679 single-format-standard wp-theme-salon">
+    <script>
+        if (stickyHeaderEnabled) {
+            document.body.setAttribute('data-fixed', 'true');
+        } else {
+            document.body.removeAttribute('data-fixed');
+        }
+    </script>
+        <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGRKVFC2"
+                      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+        
+            <div class="loader-modal">
+    <div></div>
+</div>
+        <header class="main-header-container">
+            
+<section class="header__mobile">
+    <div>
+        <div class="header__mobile__logo">
+            <a href="https://www.salon.com" aria-label="To Salon Homepage">
+                <img class="-mt-2.5" src="https://www.salon.com/app/themes/salon/assets/img/mobile-logo.svg" width="136" height="40" alt="Salon logo" />
+            </a>
+        </div>
+        <div class="header__mobile__actions">
+            <button class="button__burger group/button__burger text-[#1e1e1e] dark:text-white text-2xl" aria-pressed="false" aria-controls="mobile-menu">
+    <i class="icon icon-burger block group-aria-pressed/button__burger:hidden" ></i>
+    <i class="icon icon-close hidden group-aria-pressed/button__burger:block" ></i>
+</button>
+        </div>
+    </div>
+    <nav
+    class="navigation__mobile"
+    aria-expanded="false"
+    id="mobile-menu"
+>
+    <div>
+        <div class="search__form w-full">
+    <form role="search" method="GET" action="https://www.salon.com/search/">
+        <div>
+                        <label for="search-form-1" class="hidden">Search</label>
+            <div class="relative">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#666666] dark:text-white">
+                    <i class="icon icon-search" ></i>
+                </div>
+                <input type="search" name="s" id="search-form-1" class="block w-full rounded-sm border border-[#a6a6a6] dark:border-white py-2 pr-4 pl-10 text-[#666666] dark:text-white text-base leading-4 placeholder:text-sm placeholder:text-[#666666] dark:placeholder:text-white placeholder:leading-4 outline-0 dark:bg-[#1d1d1d]" placeholder="Search" value="" />
+            </div>
+        </div>
+    </form>
+</div>
+        <div class="menu-burger-menu-container"><ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/life-stories">Life Stories</a></li>
+<li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li>
+<li class="menu-item menu-item-has-children"><a href="#">Reviews</a>
+<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Lifestyle</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/16/navigating-the-new-sober-boom-where-a-persons-sobriety-is-as-unique-as-their-fingerprint/">The New Sober Boom</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/30/secrets-of-a-serial-addict-how-i-got-hooked-on-quitting-over-and-over-again/">Getting Hooked on Quitting</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Education</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2024/03/16/ignorance-and-democracy-capitalisms-long-against-higher-education/">Liberal Arts Cuts Are Dangerous</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/09/16/college-was-necessary-for-me-will-my-own-child-need-it-like-i-did/">Is College Necessary?</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Finance</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/08/26/my-parents-are-deadcan-i-afford-avocado-toast-now/">Dying Parents Costing Millennials Dear</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/09/09/how-did-le-creuset-the-self-described-heirloom-quality-cookware-change-the-cooking-game/">Gen Z Investing In Le Creuset</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Crypto</a>
+	<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Investing</a>
+		<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/03/23/on-thursdays-we-wear-orange-sec-sues-lindsay-lohan-and-others-over-crypto-money-laundering-scam/">SEC vs Celebrity Crypto Promoters</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/04/16/impulsive-psychopaths-like-crypto-dark-personality-traits-increase-bitcoin-enthusiasm_partner/">&#8216;Dark&#8217; Personalities Drawn to BTC</a></li>
+		</ul>
+</li>
+	</ul>
+</li>
+</ul>
+</li>
+</ul></div>        <div id="userMenuContainerMobile">
+                    </div>
+        <div>
+            <div class="navigation__social">
+    <a href="https://x.com/Salon" target="_blank">
+        <i class="icon icon-twitter" ></i>
+    </a>
+    <a href="https://www.instagram.com/salonofficial" target="_blank">
+        <i class="icon icon-instagram" ></i>
+    </a>
+    <a href="https://www.youtube.com/user/SalonDotCom" target="_blank">
+        <i class="icon icon-youtube" ></i>
+    </a>
+    <a href="https://www.facebook.com/salon" target="_blank">
+        <i class="icon icon-facebook" ></i>
+    </a>
+    <a href="https://www.tiktok.com/@salonofficial" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-tiktok" ></i>
+    </a>
+    <a href="https://www.reddit.com/domain/salon.com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-reddit" ></i>
+    </a>
+    <a href="https://www.linkedin.com/company/salon-com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-linkedin" ></i>
+    </a>
+</div>
+        </div>
+    </div>
+</nav>
+</section>
+            
+<section class="header__desktop">
+    <section class="header__desktop__top">
+        <div>
+            <div>
+                <button class="button__burger group/button__burger text-[#1e1e1e] dark:text-white text-2xl" aria-pressed="false" aria-controls="burger-menu">
+    <i class="icon icon-burger block group-aria-pressed/button__burger:hidden" ></i>
+    <i class="icon icon-close hidden group-aria-pressed/button__burger:block" ></i>
+</button>
+                <nav class="navigation__burger" aria-expanded="false" id="burger-menu">
+    <div>
+        <div class="menu-burger-menu-container"><ul class="flex flex-col gap-2"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/life-stories">Life Stories</a></li>
+<li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li>
+<li class="menu-item menu-item-has-children"><a href="#">Reviews</a>
+<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Lifestyle</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/16/navigating-the-new-sober-boom-where-a-persons-sobriety-is-as-unique-as-their-fingerprint/">The New Sober Boom</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/30/secrets-of-a-serial-addict-how-i-got-hooked-on-quitting-over-and-over-again/">Getting Hooked on Quitting</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Education</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2024/03/16/ignorance-and-democracy-capitalisms-long-against-higher-education/">Liberal Arts Cuts Are Dangerous</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/09/16/college-was-necessary-for-me-will-my-own-child-need-it-like-i-did/">Is College Necessary?</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Finance</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/08/26/my-parents-are-deadcan-i-afford-avocado-toast-now/">Dying Parents Costing Millennials Dear</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/09/09/how-did-le-creuset-the-self-described-heirloom-quality-cookware-change-the-cooking-game/">Gen Z Investing In Le Creuset</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Crypto</a>
+	<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Investing</a>
+		<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/03/23/on-thursdays-we-wear-orange-sec-sues-lindsay-lohan-and-others-over-crypto-money-laundering-scam/">SEC vs Celebrity Crypto Promoters</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/04/16/impulsive-psychopaths-like-crypto-dark-personality-traits-increase-bitcoin-enthusiasm_partner/">&#8216;Dark&#8217; Personalities Drawn to BTC</a></li>
+		</ul>
+</li>
+	</ul>
+</li>
+</ul>
+</li>
+</ul></div>    </div>
+</nav>
+            </div>
+        </div>
+        <div>
+            <div class="navigation__social">
+    <a href="https://x.com/Salon" target="_blank">
+        <i class="icon icon-twitter" ></i>
+    </a>
+    <a href="https://www.instagram.com/salonofficial" target="_blank">
+        <i class="icon icon-instagram" ></i>
+    </a>
+    <a href="https://www.youtube.com/user/SalonDotCom" target="_blank">
+        <i class="icon icon-youtube" ></i>
+    </a>
+    <a href="https://www.facebook.com/salon" target="_blank">
+        <i class="icon icon-facebook" ></i>
+    </a>
+    <a href="https://www.tiktok.com/@salonofficial" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-tiktok" ></i>
+    </a>
+    <a href="https://www.reddit.com/domain/salon.com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-reddit" ></i>
+    </a>
+    <a href="https://www.linkedin.com/company/salon-com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-linkedin" ></i>
+    </a>
+</div>
+            <div class="dropdown__user group/dropdown__user relative text-left">
+    <div class="flex justify-center">
+        <button type="button" class="text-[#1e1e1e] dark:text-white group-hover/dropdown__user:text-[#ed2c1d]" id="dropdown-user-2" aria-haspopup="true">
+            <i class="icon icon-user text-2xl" ></i>
+        </button>
+    </div>
+    <div class="absolute right-0 z-10 pt-2 w-56 origin-top-right rounded-md bg-white dark:bg-[#1d1d1d] shadow-lg invisible transition-opacity ease-out delay-100 opacity-0 group-hover/dropdown__user:opacity-100 group-hover/dropdown__user:visible" role="menu" aria-orientation="vertical" aria-labelledby="dropdown-user-2" tabindex="-1">
+        <div role="none" id="userMenuContainer"></div>
+    </div>
+</div>
+        </div>
+    </section>
+    <section class="header__desktop__middle">
+        
+<nav class="navigation__desktop">
+    <div>
+        <div>
+            
+                <ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li><li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li><li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li></ul>            <div class="logo__desktop">
+                <a href="https://www.salon.com" aria-label="To Salon Homepage">
+                    <img src="https://www.salon.com/app/themes/salon/assets/img/salon-logo.svg" width="341" height="100" alt="Salon logo" />
+                </a>
+            </div>
+                <ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li><li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li><li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li></ul>                    </div>
+    </div>
+</nav>
+    </section>
+    <section class="header__desktop__bottom">
+        <div>
+            <div class="search__form w-full">
+    <form role="search" method="GET" action="https://www.salon.com/search/">
+        <div>
+                        <label for="search-form-3" class="hidden">Search</label>
+            <div class="relative">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#666666] dark:text-white">
+                    <i class="icon icon-search" ></i>
+                </div>
+                <input type="search" name="s" id="search-form-3" class="block w-full rounded-sm border border-[#a6a6a6] dark:border-white py-2 pr-4 pl-10 text-[#666666] dark:text-white text-base leading-4 placeholder:text-sm placeholder:text-[#666666] dark:placeholder:text-white placeholder:leading-4 outline-0 dark:bg-[#1d1d1d]" placeholder="Search" value="" />
+            </div>
+        </div>
+    </form>
+</div>
+        </div>
+    </section>
+</section>
+        </header>
+    
+    <div class="raptive-salon-header hide-if-premium"></div>
+
+    <main class="main-container">
+
+<div class="articles">
+            <article id="post-652679" class="single-column post-652679 post type-post status-publish format-standard hentry category-all-salon category-news-and-politics category-politics tag-washington-dc" data-post-id="652679">
+    <!-- TODO: Add the preview message here ... -->
+    
+<section class="article__title">
+        <h1>Email from John Harris:  regrets dispute with Dan Froomkin</h1>
+    <h2>The then-National Political Editor of the Post revisits his objections to Froomkin's journalism.</h2>
+    <div class="writers">
+                    <div>
+                <div class="by">
+                    <span>By</span>
+                                            <a href="https://www.salon.com/writer/glenn_greenwald">
+                            Glenn Greenwald                        </a>
+                                                            </div>
+                                    <div>
+                                            </div>
+                            </div>
+                <div class="date">
+                            <h3>
+                    <span>Published</span>
+                    <time datetime="2009-06-20T13:21:00-04:00">
+                        June 20, 2009 1:21PM (EDT)                    </time>
+                </h3>
+                    </div>
+    </div>
+</section>
+    <section class="article__feature">
+    <!-- TODO: Add the featured video here... -->
+        <div class="attachment__image">
+    <div class="image">
+        <img src="https://www.salon.com/app/themes/salon/assets/img/article-placeholder.webp" alt="Salon Default"/>
+    </div>
+</div>
+    </section>
+    <section class="main">
+        <div>
+            <!-- TODO: Add the functionality for the article sharing here ... -->
+            
+<section class="article__share">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.salon.com%2F2009%2F06%2F20%2Fharris_6%2F&#038;utm_source=facebook&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#3a5697]" rel="nofollow">
+    <i class="icon icon-facebook bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#2c4788]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Facebook    </span>
+    </a>
+            <a href="https://x.com/share?url=https%3A%2F%2Fwww.salon.com%2F2009%2F06%2F20%2Fharris_6%2F&#038;text=Email+from+John+Harris%3A++regrets+dispute+with+Dan+Froomkin&#038;utm_source=twitter&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#03a2e0]" rel="nofollow">
+    <i class="icon icon-twitter bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#048cc1]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        X    </span>
+    </a>
+            <a href="https://www.reddit.com/submit?url=https%3A%2F%2Fwww.salon.com%2F2009%2F06%2F20%2Fharris_6%2F&#038;title=Email+from+John+Harris%3A++regrets+dispute+with+Dan+Froomkin&#038;utm_source=reddit&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#ff661e]" rel="nofollow">
+    <i class="icon icon-reddit bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#ea5a16]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Reddit    </span>
+    </a>
+            <a href="mailto:?subject=Email%20from%20John%20Harris%3A%20%20regrets%20dispute%20with%20Dan%20Froomkin&#038;body=Check%20out%20this%20article%21%20https%3A%2F%2Fwww.salon.com%2F2009%2F06%2F20%2Fharris_6%2F%3Futm_source%3Demail%26utm_medium%3Dsocial%26utm_campaign%3Dsocialbuttons%26utm_content%3Dshare_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#3d4e66]" >
+    <i class="icon icon-email bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#2d394a]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Email    </span>
+    </a>
+        <div class="article__title-badges">
+        <div class="google-preferred-source-container">
+            <a
+                class="google-preferred-source"
+                href="https://www.google.com/preferences/source?q=salon.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Set Salon as a preferred source on Google News"
+                            >
+                <picture
+                    data-light-src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png"
+                    data-dark-src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_dark@2x.png"
+                >
+                    <source srcset="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png" media="(prefers-color-scheme: dark)">
+                    <img
+                        src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png"
+                        alt="Set Salon as a preferred source on Google News"
+                        loading="lazy"
+                        width="676"
+                        height="213"
+                    >
+                </picture>
+            </a>
+        </div>
+    </div>
+    <template id="save-article-button">
+        
+<button type="button" id="saveArticleBtn-2723" onclick="saveArticle(this.id);" class="button__tertiary group/button__tertiary border-2 border-[#5f5f5f] rounded text-[#5f5f5f] text-sm font-bold px-2 py-1 h-8 lowercase flex items-center gap-x-1.5 hover:text-[#e42416] hover:border-[#e42416]">
+            <i class="icon icon-save !h-4 !w-3 text-[#5f5f5f] group-hover/button__tertiary:text-[#e42416] text-base" ></i>
+        <span class="btnLabel">Save</span>
+</button>
+    </template>
+</section>
+            <!-- TODO: Add the editor's note here ... -->
+                        <section class="article__content page-article"><p>
+    <strong>[updated below - Update II – Update III (Sunday)]<br></strong>
+  </p>
+<p>As Jay Rosen explained so well in <a href="https://www.salon.com/opinion/greenwald/2009/06/19/washpost/index1.html">my interview with him yesterday</a>, <em>The Washington Post</em>‘s firing of Dan Froomkin had its roots in a very revealing 2006 crusade against Froomkin, led by <em>The Post</em>‘s then-National Political Editor (and now <em>Politico</em> Editor-in-Chief) John Harris, insisting that Froomkin was not a real reporter but only a liberal ideologue opinionist.  At the time, Rosen wrote a <a href="http://journalism.nyu.edu/pubzone/weblogs/pressthink/2005/12/13/frm_qa.html">comprehensive piece on this dispute</a>, which included an interview with Harris that was scathing in its criticisms of Froomkin, and Rosen elaborated on that event in my interview with him yesterday.</p>
+<p>Today, I received the following email from Harris, in which he expresses regret and even seems to acknowledge error in leading that crusade:</p>
+<blockquote>
+<p>Glenn,</p>
+<p>This is a quick note on your recent items on Dan Froomkin’s ouster from the Post.</p>
+<p>I blundered four years ago in allowing myself to have an overwrought public disagreement with Dan over what now seems (and if I was thinking clearly at the time would have seemed then) an insanely narow [<em>sic</em>] issue–i.e., whether his column was appropriately labeled.</p>
+<p>I don’t want any current references to that now ancient episode to obscure my actual view of Dan and his work. I think he is a distinctive and valuable voice on the presidency and on journalism. I particularly admire the entpreneurialism <em>[sic]</em> he has shown in his career–using the power of the Web to build a community of followers and create his own franchise.</p>
+<p>This was actually my view at the time, though it got lost in the smoke when I got indignant over a couple points that seem distant now. But my view has strengthened in the years since, with more appreciation of how the Web is changing journalism and how enterprising writers thrive in this new environment.</p>
+<p>It’s been nearly three years since I have had anything to do with decision-making at the Post, and I have no insight into what prompted he and the Post to part ways.</p>
+<p>But he had some impressive achievements there, and I hope he’ll find the right home for his voice soon.</p>
+<p>Best,</p>
+<p>John Harris</p>
+</blockquote>
+<p>This sentiment is understandable and seems sincere:  nobody wants to be seen as the prime culprit in someone’s firing.  And it is true that the way in which journalists view online commentary (and online commentators) has changed over the past several years.  Whereas “blogs” were once viewed as filthy, unworthy, irrelevant interlopers by many establishment journalists and their management, most of them now operate ”blogs” themselves and view them as a vital part of their business plan.  That’s particularly true for <em>Politico</em>, and so it’s believable that Harris has changed his views since 2006 (when he was at the <em>Post</em>) regarding the value of someone like Froomkin (and perhaps Harris could put actions behind his expression of regret by offering to carry Froomkin’s column, which would surely be a superb journalistic and business addition to <em>Politico</em>).</p><div class="raptive-salon-video hide-if-premium"></div>
+<p>That said, I strongly disagree with Harris’ characterization of the dispute he and other <em>Post</em> reporters had with Froomkin as “narrow.”  That controversy was actually fundamental, as it highlighted how most establishment media figures understand the role of “journalist.”   It also revealed how <a href="http://campaignsilo.firedoglake.com/2009/06/19/froomkin-v-washington-post-the-battle-continues/">petrified media figures were (and remain) of being criticized by conservatives</a> (read the quotes in the linked post expressing that fear, including from Harris), and how eager they were in the Bush era to refrain from real journalism in order to keep the administration and the Right generally pleased and satisfied — even (or especially) if it meant refraining from reporting honestly on the Bush administration.  That is why I have devoted so much focus to this episode over the last few days.  And, as Rosen notes, the media have never come to terms with their conduct during the Bush era, never admitted it, never even bothered to conduct a debate about it — except, as <a href="http://www.oliverwillis.com/2008/05/28/david-gregory-rewrites-history-says-the-press-did-a-good-job-on-iraq/">David Gregory</a>, <a href="https://www.salon.com/opinion/greenwald/2008/05/28/gibson/">Brian Williams and Charlie Gibson</a> do, to defend it. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>That’s why this Froomkin firing is so revealing.  The fact that one of the very few people to practice real adversarial journalism in the Bush era was decreed not to be a real “journalist” — and has now been fired by the <em>Post</em> — is one of the most illustrative episodes of the past several years regarding what the real function of the establishment media is.  Along those lines, Harris might want to consider also acknowledging that Froomkin was absolutely right when insisting (and Harris wrong when doubting) that Froomkin was not acting as “liberal opinionist” when criticizing Bush, but rather, was as an ”accountability journalist” because he was merely pointing out <strong>facts<em>, </em></strong>and would subject the actions and claims of a Democratic president to the same journalistic scrutiny.  <a href="http://www.washingtonmonthly.com/archives/individual/2009_06/018675.php">Froomkin’s tenacious criticisms of Obama</a> leave no doubt about that. </p>
+<p>The ultimate meaning of Froomkin’s firing was <a href="http://krugman.blogs.nytimes.com/2009/06/19/the-froomkin-firing/">captured nicely yesterday by Paul Krugman</a>, who incorporated long-standing blog critiques into his analysis:</p>
+<blockquote>
+<p>On the face of it, it’s a puzzling decision. Aside from the excellence of Froomkin’s work, he’s popular with readers. On sheer business grounds, why drop him? . . .</p>
+<p>Here’s how I see things: many people in the news media, especially at the managerial level, decided a long time ago that movement conservatism was The Future — and that the sensible thing, whether or not you yourself were a conservative, was to go with the wave.  .  .  .</p>
+<p>And anyone who didn’t treat the right with great respect, who didn’t get with the program, was a flake, a moonbat. . . . Now, you might think that the way things turned out — the total failure of movement conservatism in government, and the abrupt, humiliating end to the Permanent Republican Majority — would lead to some soul-searching. But that’s not how human nature works. Instead, <strong>it became more urgent than ever to assert that those who didn’t get with the program were flakes and moonbats, not worthy of being listened to, while those who believed in the right to the bitter end were “serious”.</strong></p>
+<p>Thus we still live in an era in which you have to have been wrong to be respectable. <strong>You’re not considered serious about national security unless you were for invading Iraq; you’re not considered a serious political analyst unless you spent the last 3 years of the Bush administration predicting a Republican comeback; you’re not considered a serious economic analyst unless you dismissed the idea that the Bush Boom, such as it was, rested on a housing bubble.</strong></p>
+<p>That’s why the firing of Dan Froomkin now makes a perverse sort of sense. As long as the right was in power, he was in effect the Post’s designated moonbat, someone who attracted readers but didn’t threaten the self-esteem of the self-perceived serious people at the paper.  <strong>But now he looks like someone who was right when the serious people were wrong — and that means he has to go.</strong></p>
+</blockquote>
+<p>It makes perfect sense that one of the people to whom Krugman’s critique applies most — <em>Washington Post</em> Editorial Page Editor Fred Hiatt — is the one with ultimate responsibility for the Froomkin firing.  Froomkin is the anti-Hiatt:  someone who was right about the Bush administration and neoconservatives; who performed the real functions of journalism; and, most of all, sees himself as an outside check on, rather than a loyal servant to, establishment power.  If you were Fred Hiatt, wouldn’t you also be eager to see Dan Froomkin fired and disappeared from sight, for exactly the reasons Krugman wrote?</p>
+<p> </p>
+<p><u><strong>UPDATE</strong></u>:  One likely benefit of the Froomkin firing is that it highlights the principal and <a href="http://firedoglake.com/2007/05/15/hey-brady-how-you-doin/">long-standing</a> editorial function of Fred Hiatt, Donald Graham and the <em>Post</em>:  to justify and defend Bush radicalism and lawbreaking and promote neoconservatism.  Along those lines, the <em>Post </em>today has <a href="http://www.washingtonpost.com/wp-dyn/content/article/2009/06/19/AR2009061903116.html">an Editorial</a> condemning the recent decision of a federal judge who is a Bush-43-appointee (a fact the Editorial omits) allowing a lawsuit brought by Jose Padilla against John Yoo to proceed (I wrote about that decision <a href="https://www.salon.com/opinion/greenwald/2009/06/14/various_items/index.html">here</a> — see Item 5).  As a result of memos written by Yoo, Padilla — an American citizen — was imprisoned for years without charges, <strong>without any access to the outside world (including a lawyer</strong><strong>)</strong>, and <a href="http://glenngreenwald.blogspot.com/2006/10/bush-administrations-torture-of-us.html">was brutally abused</a>. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>But to the <em>Post</em>, Yoo’s authorizing that conduct was a mere good faith legal dispute for which (as always) there should be no accountability.  That’s one of the <em>Post</em>‘s primary goals in life:  to defend Bush officials from any consequences of their actions, even when those actions violate core Constitutional guarantees and criminal statutes.  Froomkin, a vigorous proponent of accountability (and vocal critic of Obama for blocking such accountability) was completely anathema to that mission.</p>
+<p>Along those lines, Andrew Sullivan — who <a href="http://andrewsullivan.theatlantic.com/the_daily_dish/2009/06/the-purging-of-froomkin-ctd.html">has been criticizing neoconservative dogma</a> and the <em>Post</em>‘s allegiance to it for the role it played in Froomkin’s firing — is <a href="http://andrewsullivan.theatlantic.com/the_daily_dish/2009/06/the-antisemite-card-again.html">predictably being smeared</a> as an “anti-semite” by the <a href="http://www.commentarymagazine.com/blogs/index.php/rubin/70661">usual manipulators of that term</a>.  Andrew rightly notes that “these vile smears are designed to police the discourse some more,” but it’s so striking how nobody cares anymore about these smears because they’ve been so overused and are so transparently dumb (Andrew himself dismisses them as “tedious,” and that’s all they are). </p>
+<p>Everyone knows what neocons are.  Everyone knows that “neocons” are not tantamount to “Jews.”  <a href="https://www.salon.com/opinion/greenwald/2007/12/12/ajc_poll/">Most Jews reject neoconservative ideology</a>.  Some of the <a href="https://www.salon.com/opinion/greenwald/2008/07/02/israel_iran/">leading</a> and <a href="http://www.philipweiss.org/mondoweiss/2009/06/weekly-standard-accuses-sullivan-of-antisemitism-.html">most scathing critics</a> of neoconservatism are Jews.  Many leading neocons — Dick Cheney — are not Jewish.  Depicting criticisms of “neocons” as “anti-Semitism” is every bit as manipulative as applying that term to those who criticize Israel.  Neoconservatism is a radical, deceitful and destructive ideology and nobody is going to be deterred from aggressively pointing that out because <em>Weekly Standard</em><em>,</em> <em>National Review</em>, <em>Commentary</em> and <a href="http://www.washingtonpost.com/wp-dyn/content/article/2009/03/11/AR2009031103384.html"><em>The Washington Post</em> Editorial Page</a> casually toss around the word “anti-Semite” in order to intimidate people out of that criticism.  Those people and that tactic are far too discredited for that to work with anyone.  It doesn’t inspire fear — only pity and contempt.  That <em>The Post</em> is a <a href="https://www.salon.com/opinion/greenwald/2009/06/19/washington_post/index.html">leading house organ for neoconservative opinion</a> is an important fact and screeching “anti-Semitism” at anyone who points it out will achieve nothing.</p><div class="raptive-salon-content hide-if-premium"></div>
+<p> </p>
+<p><u><strong>UPDATE II</strong></u>:  Jane Hamsher <a href="http://campaignsilo.firedoglake.com/2009/06/20/froomkins-traffic/">makes some important points</a> about the relationship between <em>The Washington Post</em>, Froomkin and online traffic.</p>
+<p>And regarding the trite right-wing “anti-semitism” attacks on Sullivan for his criticisms of the <em>Post</em>‘s conduct here, Gator90 sarcastically <a href="http://letters.www.salon.com/opinion/greenwald/2009/06/20/harris/permalink/5dc5019472c77ab00ed5a60423017c2e.html">writes in comments</a>:  ”Because nothing screams ‘Anti-Semitism’ like criticizing a newspaper for firing a Jewish journalist.”  They use the ”anti-semitism” smear so constantly and reflexively that they no longer even bother to see if it makes basic logical sense.</p>
+<p> </p>
+<p><u><strong>UPDATE III</strong></u>:  Referencing the <a href="http://blog.niemanwatchdog.org/?p=53">Froomkin essay</a> I <a href="https://www.salon.com/opinion/greenwald/2009/06/19/washpost/index.html">posted the other day</a> on the (abdicated) duty of journalists to ”call bullshit” on government officials, Law Professor Kevin Jon Heller <a href="http://opiniojuris.org/2009/06/19/froomkin-lord-carlile-and-us-political-journalism/">recounts a conversation he had this week</a> with a high British government official:</p>
+<blockquote>
+<p>It’s difficult not to feel despair at the increasing banality of journalism in the US.  A couple of days ago, I had the privilege of spending the evening with <a href="http://en.wikipedia.org/wiki/Alex_Carlile,_Baron_Carlile_of_Berriew">Lord Carlile of Berriew</a>, who has served as the UK’s <a href="http://security.homeoffice.gov.uk/legislation/independent-review-legislation/">Independent Reviewer of Terrorism Legislation since 9/11</a>.  He has no binding authority, but he insisted that <strong>his power to “name and shame” gives him a great deal of actual influence over the content of antiterrorism legislation.</strong> And indeed, it seems clear that many of the UK’s imperfect antiterrorism laws would have been far less perfect but for his efforts.</p>
+<p>I found Lord Carlile’s discussion of his “soft power” fascinating, so I asked him why he thinks <strong>the power to name-and-shame has almost no effect in the United States</strong>, where those who are named as the intellectual authors of repressive legislation feel no shame and suffer no consequences for their actions.  <strong>He gave a very simple answer: journalists.</strong> I won’t repeat some of the words that he used to describe just how pathetic he considers US political journalism, but it’s clear that he believes it has <strong>completely abdicated its duty to — as Froomkin describes it — call bullshit on the government.</strong></p>
+</blockquote>
+<p>There are many reasons why establishment media discussions of our political conflicts are so incomplete, distorted, vapid and unsatisfying.  But one significant reason is that one of the most important causes of our decayed political culture is a topic which is excluded almost completely from those discussions:  namely, the central role the establishment media itself  — with its uncritical and loyal subservience to political power — plays in enabling and protecting that decay.</p>
+<hr><div class="raptive-salon-content hide-if-premium"></div></section>
+                <section class="article__writers mt-14">
+                                <div class="post-420356 writer type-writer status-publish hentry article__writers article__writer-container" data-writer-id="420356">
+
+                                    <div class="writer-bio-ajax-content">
+                        <h3>
+                            <span>By</span>
+                            <a href="https://www.salon.com/writer/glenn_greenwald">
+                                Glenn Greenwald                            </a>
+                        </h3>
+                    </div>
+
+                    <template class="writer-bio-template">
+                        <h3>
+                            <span>By</span>
+                            <a href="" class="writer-name-link">
+                            </a>
+                        </h3>
+
+                        <div class="socials" style="display: none;"> <a href="" class="social group/social facebook-link" target="_blank" style="display: none;">
+                                <i class="icon icon-facebook text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                            <a href="" class="social group/social twitter-link" target="_blank" style="display: none;">
+                                <i class="icon icon-twitter text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                            <a href="" class="social group/social instagram-link" target="_blank" style="display: none;">
+                                <i class="icon icon-instagram text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                        </div>
+
+                        <div class="writer-bio-text"></div>
+
+                        <div class="more">
+                            <span>MORE FROM</span>
+                            <a href="" class="writer-more-from-link">
+                            </a>
+                        </div>
+                    </template>
+                            </div>
+            </section>
+            <hr>
+                <section class="article__topics">
+        <h2>
+            Related Topics            <span>
+                ------------------------------------------            </span>
+        </h2>
+        <div>
+                            <a href="https://www.salon.com/topic/washington-dc" class="delay-400 pointer">
+                    WASHINGTON DC                </a>
+                    </div>
+    </section>
+            
+<section class="article__related" data-post-id="652679" data-terms="washington-dc">
+    <h2>
+        <span>
+            Related Articles        </span>
+    </h2>
+    <div>
+        <template>
+            <a href="" class="flex min-[501px]:hidden">
+                <div class="attachment__image">
+                    <div class="image">
+                        <img src="https://www.salon.com/app/themes/salon/assets/img/salon-placeholder.webp" decoding="async" fetchpriority="high" alt="Salon placeholder" class="attachment-full size-full">
+                    </div>
+                </div>
+                <h5></h5>
+                <span></span>
+            </a>
+        </template>
+    </div>
+</section>
+            <hr>
+            <div class="dianomi_context hide-if-premium" data-dianomi-context-id="4879"></div>
+        </div>
+        
+<div class="sidebar-col">
+    <div class="dianomi_context hide-if-premium" data-dianomi-context-id="4876"></div>
+            <div class="raptive-salon-sticky-sidebar hide-if-premium"></div>
+    </div>
+    </section>
+</article>
+    </div>
+
+    </main>
+
+    <footer>
+        <ul class="navigation__footer mt-4 text-center"><li class="menu-item"><a href="https://www.salon.com">Home</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about">About</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/staff">Staff</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/contact">Contact</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/policy">Privacy</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/tos">Terms of Service</a></li>
+<li class="menu-item"><a href="https://www.salon.com/archive">Archive</a></li>
+<li class="menu-item"><a href="/premium?utm_source=onsite&amp;utm_medium=organic&amp;utm_campaign=go-ad-free-footer">Go Ad Free</a></li>
+</ul>        <div class="footer__copyright">
+    <p>
+        Copyright © 2026 Salon.com, LLC. Reproduction of material from any Salon pages without written permission is strictly prohibited. SALON ® is registered in the U.S. Patent and Trademark Office as a trademark of Salon.com, LLC. Associated Press articles: Copyright © 2016 The Associated Press. All rights reserved. This material may not be published, broadcast, rewritten or redistributed.    </p>
+    <p>
+        <a href="https://www.salon.com/2026/06/02/best-vpn-services-for-2026/">
+            VPN Providers        </a>
+    </p>
+    <p>
+        <a href="https://www.salon.com/about/dmca">
+            DMCA Policy        </a>
+    </p>
+</div>
+    </footer>
+
+    <div class="modal__alert" role="dialog" aria-modal="true" aria-hidden="true" id="alert-modal">
+    <div></div>
+    <div>
+        <div>
+            
+<div class="modal__close">
+    <button type="button" aria-controls="alert-modal">
+        <i class="icon icon-close-extrabold block w-5 text-xl" ></i>
+    </button>
+</div>
+            <div class="modal__content">
+                <div class="message">
+                    This is an alert message.                </div>
+                <div class="modal__close">
+                    <button type="button" aria-controls="alert-modal">
+                        OK                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp/wp-*.php","/wp/wp-admin/*","/app/uploads/*","/app/*","/app/plugins/*","/app/themes/salon/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script id="global-salon-js-extra">
+var salonSubscriptionTracking = {"eventsEndpoint":"https://www.salon.com/wp-json/salon/v1/subscription-tracking/events","measurementId":"G-7VPPFM7ET6","pageContext":{"contentCategory":"article","currentPlan":null,"isCheckoutPage":false},"pendingSessionIds":[],"bootstrapEvents":[],"approximateBeginCheckout":"1"};
+//# sourceURL=global-salon-js-extra
+</script>
+<script type="module" data-wp-strategy="defer" defer id="global-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/global.js?ver=1.0.31"></script>
+<script type="module" data-wp-strategy="defer" defer id="article-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/article.js?ver=1.0.31"></script>
+<script data-wp-strategy="defer" defer id="ad-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/ad.js?ver=1.0.31"></script>
+<script id="raptive-adblock-detection-js" src="https://www.salon.com/app/themes/salon/assets/js/ad/raptive-adblock-detection.js"></script>
+<script data-cfasync="false" data-abr-mode="essential" id="raptive-adblock-recovery-js" src="https://www.salon.com/app/themes/salon/assets/js/ad/raptive-adblock-recovery.js"></script>
+</body>
+</html>
+<!-- Cached by Salon Static Cache on 2026-11-06 09:21:47 -->

@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:og="http://ogp.me/ns#" 
+	xmlns:fb="http://www.facebook.com/2008/fbml">
+<head profile="http://gmpg.org/xfn/11">
+<title>  Jay Rosen - Salon.com</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <!-- Meta Info from Old Site -->
+    <meta name="title" content="Jay Rosen" >
+<meta name="description" content="Jay Rosen is chairman of the Journalism Department at New York University and author of &quot;What Are Journalists For?&quot; (1999, Yale University Press).  This originally appeared on his weblog, &lt;a target=&quot;new&quot; href=&quot;http://journalism.nyu.edu/pubzone/weblogs/pressthink/ &quot;&gt;PressThink.&lt;/a&gt;" />
+<meta name="keywords" content="Jay Rosen, salon, salon.com, writer, author, stories, articles" />
+<link rel="canonical" href="http://www.salon.com/writer/jay_rosen" />
+
+<meta property="og:title" content="Jay Rosen" />
+<meta property="og:url" content="http://www.salon.com/writer/jay_rosen/" />
+<meta property="og:image" content="http://www.salon.com/content/themes/salon/images/ui/ID_salonTile.gif" />
+<meta property="og:description" content="Jay Rosen is chairman of the Journalism Department at New York University and author of &quot;What Are Journalists For?&quot; (1999, Yale University Press).  This originally appeared on his weblog, &lt;a target=&quot;new&quot; href=&quot;http://journalism.nyu.edu/pubzone/weblogs/pressthink/ &quot;&gt;PressThink.&lt;/a&gt;" />
+<meta property="og:type" content="article" />
+<meta property="fb:admins" content="21500228" />
+<meta property="fb:app_id" content="114477658586677" />
+
+
+    <link rel='index' title='Salon.com' href='http://www.salon.com/' />
+    <link rel="alternate" type="application/rss+xml" title="Salon.com RSS Feed" href="http://www.salon.com/feed/" />
+    <link rel="pingback" href="http://www.salon.com/xmlrpc.php" />
+    <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.salon.com/xmlrpc.php?rsd" />
+    <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.salon.com/wp-includes/wlwmanifest.xml" />
+    <!-- End Meta Info from Old Site -->
+
+
+    <link rel='stylesheet' href='/combo/css?fonts/Didot/didot.css&typography.css&resets.css&mainNav.css&top-bar.css&left-sidebars.css&right-sidebars.css&style.css&grid.css&ver=47' /><script type='text/javascript' src='/combo/js?yui/yui-min.js&oop/oop-min.js&event-custom-base/event-custom-base-min.js&dom-core/dom-core-min.js&dom-base/dom-base-min.js&selector-native/selector-native-min.js&selector/selector-min.js&node-core/node-core-min.js&node-base/node-base-min.js&event-base/event-base-min.js&event-base-ie/event-base-ie-min.js&dom-style-ie/dom-style-ie-min.js&event-delegate/event-delegate-min.js&node-event-delegate/node-event-delegate-min.js&pluginhost-base/pluginhost-base-min.js&pluginhost-config/pluginhost-config-min.js&node-pluginhost/node-pluginhost-min.js&dom-style/dom-style-min.js&dom-screen/dom-screen-min.js&node-screen/node-screen-min.js&node-style/node-style-min.js&cookie/cookie-min.js&event-custom-complex/event-custom-complex-min.js&intl/intl-min.js&slnm/utils/set-browser-css.js&plugins/salon-login/js/salon-user.js&slnm/apps/salon-ads.js&slnm/slnm.js&slnm/modules/salon-modules.js&ver=47' ></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+
+<div class="topAdWrapper" xmlns="http://www.w3.org/1999/html">
+    </div>
+<div class="topBarWrapper">
+    <aside class="topBar">
+
+        <div class="container_12">
+            <p class="homeWrapper">
+                <a href="http://www.salon.com" class="home" title="Home page">Go to home page</a>
+            </p>
+
+            <!-- Default State -->
+            <a href="#" class="salonLogin register">Register</a>
+            <a href="#" class="salonLogin signIn"> Sign in</a>
+
+            <!-- Logged in State -->
+            <span class="salonUserName no-write hide">Welcome, </span>
+            <span class="salonUserName hide"></span>
+            <a href="#" class="salonLogout hide">Logout</a>
+
+            <ul class="rightMenu">
+                <li>
+                            <a
+            data-service="twitterFollowers"
+                            data-screen-name="salon"
+                        href="http://www.twitter.com/salon"
+            data-share-url="http://www.twitter.com/salon"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton twitterFollowers count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                        </li>
+                <li class="facebookLike count">
+                            <a
+            data-service="facebookLike"
+                        href="http://www.facebook.com/salon"
+            data-share-url="http://www.facebook.com/salon"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton facebookLike count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                        </li>
+                <li class="flyOut hotTopics">
+                    <span class="title">Hot Topics</span>
+                    <ul class="flyOutMenu">
+                        <li>
+                            <div>
+                                <h3>Hot Topics</h3>
+                                <ul>				<li><a href="/topic/gun_control">Gun Control</a></li>				<li><a href="/topic/politics">Politics</a></li>				<li><a href="/topic/aurora_shooting">Aurora shooting</a></li>				<li><a href="/topic/tv">TV</a></li>				<li><a href="/topic/television">Television</a></li>				<li><a href="/topic/james_holmes">james holmes</a></li>				<li><a href="/topic/from_the_wires">From the Wires</a></li>				<li><a href="/topic/guns">Guns</a></li>				<li><a href="/topic/mitt_romney">Mitt Romney</a></li>				<li><a href="/topic/globalpost">GlobalPost</a></li></ul>                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="flyOut rss">
+                    <span class="title">RSS</span>
+                    <ul class="flyOutMenu">
+                        <li>
+                            <div>
+                                <h3>RSS Feeds</h3>
+                                <form class="copy-form">
+                                    <a class="shareButton rss" href="http://www.salon.com/feed/">
+                                        <span class="shareIcon"></span>
+                                        Main RSS feed
+                                    </a>
+                                                                            <a class="shareButton rss" href="http://www.salon.com/writer/jay_rosen/feed/">
+                                            <span class="shareIcon"></span>
+                                            Jay Rosen RSS feed
+                                        </a>
+                                                                    </form>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="flyOut updates">
+                    <span class="title">Updates</span>
+                    <ul class="flyOutMenu">
+                        <li>
+                            <div>
+                                <h3>Get Email Updates</h3>
+                                <form action="https://sub.salon.com/newsletter/subscribe/" method="post">
+                                    <input placeholder="First Name" name="first_name"/>
+                                    <input placeholder="Last Name" name="last_name"/>
+                                    <input placeholder="Email Address" name="email"/>
+                                    <input name="text_html" value="html" type="hidden"/>
+                                    <input type="submit" value="Get Email Updates"/>
+                                </form>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="search">
+                    <form action="http://www.google.com/search" target="_blank">
+                        <input name="q" value="site:salon.com" type="hidden"/>
+                        <input name="q" placeholder="Enter search term"/>
+                        <input class="override" type="submit" value="search"/>
+                    </form>
+                </li>
+            </ul>
+
+        </div>
+
+    </aside>
+</div>
+
+<div class="container_12 pageWrapper">
+
+
+<div class="container_12 masthead">
+
+<div class="grid_6">
+
+    <header class="headContainer">
+
+        <hgroup>
+            <h1 class="logo">
+                <a href="http://www.salon.com">SALON</a>
+            </h1>
+        </hgroup>
+		        <nav>
+			<ul class="mainNav">
+			                <li class="news flyOut">
+					<a class="section-title" href="http://www.salon.com/category/news/">News</a>
+                    				</li>
+			                <li class="politics flyOut">
+					<a class="section-title" href="http://www.salon.com/category/politics/">Politics</a>
+                    					<ul class="nav first flyOutMenu">
+                        <li>
+                            <div class="container">
+                                <h2>
+                                    politics                                </h2>
+                                								<div class="topics">
+                                    										<a href="http://www.salon.com/topic/elections_2012/">Election 2012</a>
+																			<a href="http://www.salon.com/topic/opening_shot/">Opening Shot</a>
+																			<a href="http://www.salon.com/topic/occupy/">Occupy</a>
+									                                </div>
+																                                <div class="authors">
+                                    <ul>
+                                        										<li><a href="http://www.salon.com/writer/alex_pareene/">Alex Pareene</a></li>
+                                    											<li><a href="http://www.salon.com/writer/andrew_leonard/">Andrew Leonard</a></li>
+                                    											<li><a href="http://www.salon.com/writer/david_sirota/">David Sirota</a></li>
+                                    											<li><a href="http://www.salon.com/writer/glenn_greenwald/">Glenn Greenwald</a></li>
+                                    											<li><a href="http://www.salon.com/writer/irin_carmon/">Irin Carmon</a></li>
+                                    											<li><a href="http://www.salon.com/writer/joan_walsh/">Joan Walsh</a></li>
+                                    											<li><a href="http://www.salon.com/writer/steve_kornacki/">Steve Kornacki</a></li>
+                                    											<li><a href="http://www.salon.com/writer/natasha_lennard/">Natasha Lennard</a></li>
+                                    											<li><a href="http://www.salon.com/writer/alex_seitz_wald/">Alex Seitz-Wald</a></li>
+                                    										</ul>
+                                </div>
+								                            </div>
+                        </li>
+                    </ul>
+                					</li>
+			                <li class="entertainment flyOut">
+					<a class="section-title" href="http://www.salon.com/category/arts/">Entertainment</a>
+                    					<ul class="nav first flyOutMenu">
+                        <li>
+                            <div class="container">
+                                <h2>
+                                    entertainment                                </h2>
+                                								<div class="topics">
+                                    										<a href="http://www.salon.com/topic/books/">Books</a>
+																			<a href="http://www.salon.com/topic/movies/">Movies</a>
+																			<a href="http://www.salon.com/topic/music/">Music</a>
+																			<a href="http://www.salon.com/topic/tv/">TV</a>
+									                                </div>
+																                                <div class="authors">
+                                    <ul>
+                                        										<li><a href="http://www.salon.com/writer/andrew_ohehir/">Andrew O'Hehir</a></li>
+                                    											<li><a href="http://www.salon.com/writer/laura_miller/">Laura Miller</a></li>
+                                    											<li><a href="http://www.salon.com/writer/mary_elizabeth_williams/">Mary Elizabeth Williams</a></li>
+                                    											<li><a href="http://www.salon.com/writer/willa_paskin/">Willa Paskin</a></li>
+                                    										</ul>
+                                </div>
+								                            </div>
+                        </li>
+                    </ul>
+                					</li>
+			                <li class="life flyOut">
+					<a class="section-title" href="http://www.salon.com/category/life/">Life</a>
+                    					<ul class="nav first flyOutMenu">
+                        <li>
+                            <div class="container">
+                                <h2>
+                                    life                                </h2>
+                                								<div class="topics">
+                                    										<a href="http://www.salon.com/topic/dream_city/">Dream City</a>
+																			<a href="http://www.salon.com/topic/life_stories/">Life Stories</a>
+																			<a href="http://www.salon.com/topic/love_and_sex/">Love & Sex</a>
+																			<a href="http://www.salon.com/topic/parenting/">Parenting</a>
+									                                </div>
+																                                <div class="authors">
+                                    <ul>
+                                        										<li><a href="http://www.salon.com/writer/cary_tennis/">Cary Tennis</a></li>
+                                    											<li><a href="http://www.salon.com/writer/mary_elizabeth_williams/">Mary Elizabeth Williams</a></li>
+                                    											<li><a href="http://www.salon.com/writer/tracy_clark_flory/">Tracy Clark-Flory</a></li>
+                                    											<li><a href="http://www.salon.com/writer/will_doig/">Will Doig</a></li>
+                                    										</ul>
+                                </div>
+								                            </div>
+                        </li>
+                    </ul>
+                					</li>
+						</ul> 
+        </nav>	
+			</header>
+</div>
+
+<div class="mastheadRight">
+    </div>
+
+</div>
+
+
+    <div class="container_12 pageContents">
+
+        <section class="grid_10 omega push_2 mainContent">
+		
+			<div class="mainInner">
+                <div class="topAdWrapper">
+                    <div data-position-name='Top' class='adPosition loading leaderBoard Top flex monitor height'></div>                </div>
+			
+			<div class="topicTop black">
+			<div class="grid_10 alpha omega">
+				                    <div class="writerHead">
+				        <h1>
+                            Jay Rosen				        </h1>
+                                                                        <div class="shareButtons">
+                            <a href='http://www.salon.com/writer/jay_rosen/feed/' class='rss shareButton' target='_blank'><span class='shareIcon'></span></a>                        </div>
+                    </div>
+                            </div>
+			<div class="clear"></div>
+				<div class="clear"></div>
+			</div>
+
+				<div class="grid_6 alpha omega">
+				
+					<div class="articleInner">
+			            
+                    
+                    <span class="dateline">
+                        <span class="toLocalTime" data-tlt-epoch-time="1343241900">Wednesday, Jul 25, 2012 6:45 PM UTC</span>                    </span>
+
+                    <h1><a href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/">Don&#8217;t bust bogus &#8220;hype&#8221;</a></h1>
+					<h2>Why Salon's article on Reddit's Aurora reporting ticked me off</h2>
+					
+					<span class='byline'>By <A href='http://www.salon.com/writer/jay_rosen/' rel='author'>Jay Rosen</A></span>
+                        <ul 
+        class="shareTools" 
+        data-share-link="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/" 
+        data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+        data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+    >
+        <li>
+                    <a
+            data-service="facebookLike"
+                        href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-share-url="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton facebookLike count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="facebookSend"
+                        href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-share-url="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton facebookSend count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="twitterTweets"
+                        href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-share-url="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton twitterTweets count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <!--
+        <li>
+                    <a
+            data-service="reddit"
+                        href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-share-url="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton reddit"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="stumbleupon"
+                        href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-share-url="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton stumbleupon"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        -->
+        <li>
+                    <a
+            data-service="email"
+                        href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-share-url="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton email"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li class="flyOut shareAll shareButtonBox">
+                            <span class="shareAllWrapper">
+                                <span>more</span>
+                            </span>
+            <ul class="flyOutMenu">
+                <li class="shareAllContent">
+                    <h3>All Share Services</h3>
+                    <div>
+                        <input placeholder="Start typing to search for share service" class="quickRefine"/>
+                    </div>
+                    <div class="shareButtonsHolder">
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <li class="hide">
+            <a href="#" class="flyOutShareToolsButton template">
+                <span class="shareIcon"></span>
+                <span class="shareText"></span>
+            </a>
+        </li>
+    </ul>
+    
+                    <p class="topics">
+                        Topics: <a href="http://www.salon.com/topic/media_criticism/" rel="tag">Media Criticism</a>, <a href="http://www.salon.com/topic/reddit/" rel="tag">Reddit</a>                    </p>
+
+                    <a title="Don't bust bogus "hype"" href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"/><img alt="Don't bust bogus "hype"" title="Don't bust bogus "hype"" src="http://media.salon.com/2012/07/adult_friend_finder_rect-460x307.jpg"/></a><span class="caption">James Holmes' photo from his Adult Friend Finder profile.      </span>			<div class="articleContent">
+                    
+					<p>My journalism day began with a groan when I read <a href="http://www.salon.com/2012/07/24/hold_the_reddit_hype/">&#8220;Hold the Reddit Hype&#8221;</a> by Michael Barthel. (&#8220;The site broke important Aurora news, but &#8216;crowdsourced&#8217; journalism is as sensational and market-driven as the MSM.&#8221;)</p><p>I have been <a href="http://www.salon.com/writer/jay_rosen/">an occasional Salon author</a>, as well as a reader, for a very long time. A loyalist, but today ticked off. So I wrote to Salon editor Kerry Lauerman. &#8220;This piece is so far below Salon&#8217;s standards,&#8221; I said &#8230;</p><div class="toggle-group target hideOnInit" data-toggle-group="story-12964090"><blockquote><p>You cannot come out with an article suggesting that Salon is going to clear away the hype surrounding Reddit and citizen journalism without showing us what the hype is, where we can find it, and at least some indication that it has volume and velocity. The single example trend piece isn&#8217;t Salon journalism, is it? But in this case it&#8217;s even worse, because <a href="http://gigaom.com/2012/07/22/learning-from-this-weeks-crash-course-in-citizen-journalism/">the</a> <a href="http://gigaom.com/2012/07/22/learning-from-this-weeks-crash-course-in-citizen-journalism/">Matt Ingram article</a> Salon uses here to suggest that there is a wave of hype actually makes a very modest claim. It says that citizens journalists &#8220;may not replace the traditional journalism we’re used to, but they are certainly going to help.&#8221; That&#8217;s hype? That&#8217;s excess enthusiasm? Really? Since when? There is no other evidence presented by the author that we&#8217;re about to swallow these overblown claims about Reddit and citizen journalism. Lines like &#8220;Why do we insist on the superiority of citizen journalism?&#8221; are credibility crushing if you don&#8217;t have anyone in this piece insisting on the superiority of citizen journalism!</p></blockquote><p>I also sent Kerry a link to <a href="http://www.facebook.com/jayrosen/posts/312861105476738">my Facebook post</a>. It expressed a similar irritation. (My Facebook page is <a href="http://www.facebook.com/jayrosen">public</a>.)</p><blockquote><p>This drives me up the freakin&#8217; wall. Salon decides that Reddit and &#8220;citizen journalism&#8221; are getting a swelled head about themselves and rides to the rescue! Salon will de-mystify and cut through the hype after the Aurora shootings. And then the one article Salon decides to push against is a very calm assessment: the opposite of hype! It simply says that citizens journalists &#8220;may not replace the traditional journalism we’re used to, but they are certainly going to help.&#8221; Wow. And that&#8217;s supposed to be an example of getting carried away with the promise of citizen journalism? That&#8217;s why we need Salon to stride in, sort things out and be the adult here?</p>
+<p>In a rather long piece no other evidence is presented that we are about to be swept away in a fit of misplaced enthusiasm. And so this article, presenting itself as a hype-buster, is actually an <em>example</em> of hype. It tries to get us to worry about a wave of overblown claims for Reddit and citizen journalism and then fails to deliver the wave. It says, for example: &#8220;Why, then, do we insist on the superiority of citizen journalism?&#8221; even though no one in the article is insisting. That is cheap and pathetic, Salon.</p></blockquote><p>I once tried to give a name to the kind of article that I think &#8220;Hold the Reddit Hype&#8221; is: the <a href="http://www.wired.com/geekdad/2011/03/ipads-are-not-a-miracle-for-autism-geekdad-opinion/all/1#comment-169745032">linkless hype buster</a>, a mini-genre that has provoked me to foul temper before.</p><blockquote><p>You have presented yourself as a courageous contrarian to &#8221;it&#8217;s a miracle!&#8221; claims, but these claims are not presented in your column. We&#8217;re just supposed to know about them.</p></blockquote><p>Where I agree with Salon&#8217;s editors and Michael Barthel: claiming too much for crowd- or amateur-driven journalism is a good way of defeating it. Acknowledging its limitations is vital, one of the first things we have to do. Don&#8217;t get carried away! But here&#8217;s the problem. The linkless hype buster <em>is</em> a form of hype. It is getting carried away.</p><p>Crowdsourcing, <a href="http://www.wired.com/wired/archive/14.06/crowds.html">as Wired&#8217;s Jeff Howe said</a>, is taking a job once done in house and outsourcing it to &#8230; the crowd. Open call-style. Only under limited conditions is this advisable! Everyone should learn what these limits are. &#8220;The Wisdom of Crowds,&#8221; James Surowiecki&#8217;s phrase, was born as a limited concept. <a href="http://en.wikipedia.org/wiki/The_Wisdom_of_Crowds#Four_elements_required_to_form_a_wise_crowd">Crowds are wise only under certain conditions</a>.</p><p>I have a personal stake in the subject, including the claims we make about participatory journalism. Crowdsourcing and citizen journalism, pro-am and open journalism are things I care about and write about. I&#8217;m not satisfied that we&#8217;re making the progress we should be making with these forms. Last year, I <a href="http://pressthink.org/2011/06/from-write-us-a-post-to-fill-out-this-form-progress-in-pro-am-journalism/">gave a talk</a> at the Personal Democracy Forum about it. “We’re not as far along as we should be. I’d give us a C-minus.” The other grades I listed back up some of Michael Barthel&#8217;s observations.</p><blockquote><p>Pro-am accountability and monitoring systems: C<br />
+Comment threads supply knowledge that improves reporting: C-<br />
+Pro-am election coverage: C-</p>
+<p>Crowd-funded reporting projects: D<br />
+“My readers know more than I do” beat reporting: D</p>
+<p>Domain knowledge experts who blog work together with beat reporters: F<br />
+Integrating amateur systems like iReport with pro newsrooms: F<br />
+Pro-am editorial agenda-setting: F<br />
+Pro-am fact checking networks: F<br />
+Pro-am investigative journalism: F<br />
+Globally distributed pro-am reporting on global problems: F</p></blockquote><p>So yeah, let&#8217;s not get carried away. I don&#8217;t think the world is in that much danger from hopes misplaced on Reddit or crowdsourced journalism. Salon doesn&#8217;t need the hype-busting jive at all for these pieces. Just tell us what the many can do better than the few, try to locate it when you can, and also what the few obviously do better than the many. Try to locate <em>that</em> when you can. The limits of crowd power, the story of when and where and <em>exactly why</em> we need pros with good judgment: I want Salon to bring me all of that.</p><p>And skepticism toward the wonderfulness of everything Web.</p></div>            <a
+                class="toggle-group trigger remember refreshAds gaTrackPageEvent"
+                data-toggle-group="story-12964090"
+                href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            >
+                <span class="continueReading offText">Continue Reading</span>
+                <span class="onText">Close</span>
+                        <script type="json/config" class="jsonConfig">
+            {"slots":{"1":["pageTitle","Don't bust bogus \"hype\"",3],"2":["pageType","article cr-link",3],"3":["author","Jay Rosen",3]}}
+        </script>
+            </a>			</div>
+                                                                <ul 
+        class="shareTools" 
+        data-share-link="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/" 
+        data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+        data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+    >
+        <li>
+                    <a
+            data-service="facebookLike"
+                        href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-share-url="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton facebookLike count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="facebookSend"
+                        href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-share-url="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton facebookSend count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="twitterTweets"
+                        href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-share-url="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton twitterTweets count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <!--
+        <li>
+                    <a
+            data-service="reddit"
+                        href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-share-url="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton reddit"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="stumbleupon"
+                        href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-share-url="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton stumbleupon"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        -->
+        <li>
+                    <a
+            data-service="email"
+                        href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-share-url="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/"
+            data-headline="Don&#8217;t bust bogus &#8220;hype&#8221;"
+            data-thumbnail="http://media.salon.com/2012/07/adult_friend_finder_rect-300x200.jpg"
+            class="shareButton email"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li class="flyOut shareAll shareButtonBox">
+                            <span class="shareAllWrapper">
+                                <span>more</span>
+                            </span>
+            <ul class="flyOutMenu">
+                <li class="shareAllContent">
+                    <h3>All Share Services</h3>
+                    <div>
+                        <input placeholder="Start typing to search for share service" class="quickRefine"/>
+                    </div>
+                    <div class="shareButtonsHolder">
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <li class="hide">
+            <a href="#" class="flyOutShareToolsButton template">
+                <span class="shareIcon"></span>
+                <span class="shareText"></span>
+            </a>
+        </li>
+    </ul>
+                        
+    <ul class="utils">        <li>
+                   <a title="Read the comments" href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/#comments">
+            Comments
+       </a>
+        </li>        <li>
+            <a title="Go to the permalink" href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/">
+                Permalink
+            </a>
+        </li><li><a onclick="salonPop(&apos;http://www.salon.com/2012/07/25/dont_bust_bogus_hype/print/&apos;,50,50); return false;" href="http://www.salon.com/2012/07/25/dont_bust_bogus_hype/print/" title="Print This Post" rel="nofollow">Print</a>
+</li>        <li>
+            <a title="Right click and copy the shortened URL" href="http://salon.com/a/sAAAAAA" rel="nofollow">
+                Short URL
+            </a>
+        </li>
+    </ul>
+                    
+                    
+                    <span class="dateline">
+                        <span class="toLocalTime" data-tlt-epoch-time="1200947580">Monday, Jan 21, 2008 8:33 PM UTC</span>                    </span>
+
+                    <h1><a href="http://www.salon.com/2008/01/21/campaign_coverage/">Why campaign coverage sucks</a></h1>
+					<h2>Horse-race journalism works for journalists and fails the public.</h2>
+					
+					<span class='byline'>By <A href='http://www.salon.com/writer/jay_rosen/' rel='author'>Jay Rosen</A></span>
+                        <ul 
+        class="shareTools" 
+        data-share-link="http://www.salon.com/2008/01/21/campaign_coverage/" 
+        data-headline="Why campaign coverage sucks"
+        data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+    >
+        <li>
+                    <a
+            data-service="facebookLike"
+                        href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-share-url="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-headline="Why campaign coverage sucks"
+            data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+            class="shareButton facebookLike count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="facebookSend"
+                        href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-share-url="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-headline="Why campaign coverage sucks"
+            data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+            class="shareButton facebookSend count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="twitterTweets"
+                        href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-share-url="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-headline="Why campaign coverage sucks"
+            data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+            class="shareButton twitterTweets count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <!--
+        <li>
+                    <a
+            data-service="reddit"
+                        href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-share-url="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-headline="Why campaign coverage sucks"
+            data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+            class="shareButton reddit"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="stumbleupon"
+                        href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-share-url="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-headline="Why campaign coverage sucks"
+            data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+            class="shareButton stumbleupon"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        -->
+        <li>
+                    <a
+            data-service="email"
+                        href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-share-url="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-headline="Why campaign coverage sucks"
+            data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+            class="shareButton email"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li class="flyOut shareAll shareButtonBox">
+                            <span class="shareAllWrapper">
+                                <span>more</span>
+                            </span>
+            <ul class="flyOutMenu">
+                <li class="shareAllContent">
+                    <h3>All Share Services</h3>
+                    <div>
+                        <input placeholder="Start typing to search for share service" class="quickRefine"/>
+                    </div>
+                    <div class="shareButtonsHolder">
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <li class="hide">
+            <a href="#" class="flyOutShareToolsButton template">
+                <span class="shareIcon"></span>
+                <span class="shareText"></span>
+            </a>
+        </li>
+    </ul>
+    
+                    <p class="topics">
+                        Topics: <a href="http://www.salon.com/topic/2008_elections/" rel="tag">2008 Elections</a>                    </p>
+
+                    <a title="Why campaign coverage sucks" href="http://www.salon.com/2008/01/21/campaign_coverage/"/><img alt="Why campaign coverage sucks" title="Why campaign coverage sucks" src="http://media.salon.com/2008/01/why_campaign_coverage_sucks.jpg"/></a>			<div class="articleContent">
+                    
+					<p>Just so you know, &#8220;the media&#8221; has no mind. It cannot make decisions. Which means it does not &#8220;get behind&#8221; candidates. It does not decide to oppose your guy&#8230; or gal. Nor does it &#8220;buy&#8221; this line or &#8220;swallow&#8221; that one. It is a beast without a brain. Most of the time, it doesn&#8217;t know what it&#8217;s doing. <b> </p><p>1. The Herd of Independent Minds</b> </p><p>This does not mean you cannot blame the media for things. Go right ahead! Brainless beasts at large in public life can do plenty of damage; and later on &#8212; when people ask, &#8220;What happened here?&#8221; &#8212; it sometimes does make sense to say&#8230; <i>the beast did this</i>. It&#8217;s known as &#8220;the pack&#8221; in political journalism, but I prefer &#8220;the herd of independent minds&#8221; (from Harold Rosenberg, 1959) because I think it&#8217;s more descriptive of the dynamic. Mark Halperin of Time&#8217;s <a href="http://thepage.time.com/">The Page</a> (more about him later) calls the beast The Gang of 500. But gangs have leaders, which means a mind. </p><p>That&#8217;s more than you can say about the media. </p><div class="toggle-group target hideOnInit" data-toggle-group="story-2002741"><p>Now, the pack, lacking a brain, almost had a heart attack when Hillary Clinton won the <a href="http://dir.salon.com/topics/new_hampshire/">New Hampshire</a> primary, since they had told us Obama would run away with it because the pollsters told them the same thing. The near-heart attack wasn&#8217;t triggered by a bad prediction, which can happen to anyone, but rather by some spectacular wreckage in the reality-making machinery of political journalism. The top players had begun to report on the Obama wave of victories before there was any Obama wave of victories. The campaign narrative had gotten needlessly &#8212; one could say mindlessly &#8212; ahead of itself, as when stories about anticipated outcomes in the New Hampshire vote reverberated into <a href="http://dir.salon.com/topics/2008_election/">campaigns</a> said to be preparing for those outcomes even before New Hampshire voted. </p><p>
+<blockquote>&#8220;PORTSMOUTH, N.H. &#8212; Key campaign officials may be replaced. She may start calling herself the underdog. Donors would receive pleas that it is do-or-die time. And her political strategy could begin mirroring that of Rudolph W. Giuliani, a Republican rival&#8230;&#8221;</p><p>That&#8217;s <a href="http://www.nytimes.com/2008/01/08/us/politics/08clinton.html?ex=1357448400&#038;en=3a78006e84106983&#038;ei=5118&#038;partner=rssaol&#038;emc=rss">Patrick Healy</a> in the New York Times the day of the New Hampshire primary, reporting on what would happen, according to nameless campaign insiders, if events about to unfold that day validated previous reports about what was likely to unfold that day. Healy&#8217;s best defense would be: Wait a minute, people with the Clinton campaign actually told me those things. They turned out to be premature and wrong. I didn&#8217;t make it up! </p><p>Which is true. But when actual facts are used in the construction of news fictions &#8212; and reports about the moves to be made in Hillaryland after Obama won Iowa, New Hampshire, and South Carolina were precisely that, a news fiction &#8212; your story can be accurate, well-edited, within genre conventions, and, at the same time, deeply un-informational, not to mention wrong. In fact, accurate news about the race that subtracts from our understanding of it is one of the quirky features of chronic mindlessness in campaign media. </p><p>By mindless I generally mean: No one&#8217;s in charge, or &#8220;the process&#8221; is. Conventional forms thrive, even if few believe they work. Routines master people. The way it&#8217;s been done &#8220;chooses&#8221; the way it shall be done. </p><p>Independent bloggers, who should have more distance from the pack mind (and often do) were not necessarily better on this score. Greg Sargent of TPM Media &#8212; the <a href="http://www.cjr.org/feature/the_josh_marshall_plan.php">blog empire<a> run by political journalist Josh Marshall &#8212; reported <a href="http://tpmelectioncentral.com/2008/01/some_hillary_insiders_worry_about_staying_in_past_new_hampshire_others_urge_her_to_fight_on.php">as follows</a> on January 7th: &#8220;Camp Hillary insiders who have been with her a very long time, such as Patti Solis Doyle, are worried about the long term damage that could be done to Hillary if she decides to fight on after a New Hampshire loss, though there&#8217;s no indication they are yet urging an exit.&#8221; Doyle was said to be alarmed about damage to Clinton&#8217;s Senate career from staying in the race amid a humiliating string of defeats. </p>
+<p>Campaign news in the subjunctive isn&#8217;t really news. And primary losses don&#8217;t especially need to come at us pre-reacted-to, especially when there is plenty of time to air those reactions once any &#8220;string of defeats&#8221; actually happens. But while an individual mind in the press corps is quite capable of realizing this, the herd is not. </p>
+<p>A good example would be an MSNBC program I saw just before the New Hampshire voting, where Dan Abrams asked his panel &#8212; including Rachel Maddow, Pat Buchanan, and himself &#8212; what each thought the final vote would be. The guests should have said, &#8220;How do we know? We&#8217;re not New Hampshire voters, or professional pollsters.&#8221; That would be intelligent &#8212; and accurate. But they did something mindless instead. Each took a few points off the polls everyone else in the pack was reading and gave a &#8220;personal&#8221; prediction &#8212; Obama by 4, Obama by 7. </p>
+<p>Okay, so it&#8217;s not a big offense &#8212; but I didn&#8217;t say it was. I said it was an illustration of routine mindlessness. That&#8217;s when on-air journalism is dumber than the journalists who are on air. </p>
+<p>Greg Sargent &#8212; a smart reporter, quite aware of the absurdities the pack produces &#8212; can, without great difficulty, dial back the use of nameless advisers pre-reacting to things that may not occur. (<a href="http://talkingpointsmemo.com/archives/063477.php">This post</a> from his boss, Josh Marshall, suggests it may happen.) But the fact remains that his account, defining reactions-before-the-fact as news, was within the existing rules of journalism, relied upon by hundreds of other reporters adding their stories to the larger narrative. There&#8217;s nothing to prevent those rules from being changed, of course. Nothing, except for the fact that the media has no mind and so can&#8217;t easily change it. </p>
+<p><b>2. Convergence of Judgment</b> </p>
+<p>Because we have evolved a way of talking about the news media that fails to recognize this very basic fact &#8212; no mind! can&#8217;t decide a thing! &#8212; everyone is free to grant more intentionality to the organism than reasonably exists. Here are just a few samples from recent weeks: </p>
+<p><a href="http://www.washingtonpost.com/wp-dyn/content/discussion/2007/12/14/DI2007121401501.html">Howard Kurtz</a> of the Washington Post: &#8220;The media have decided, fairly or unfairly, that Iowa was Edwards&#8217;s best shot at winning the nomination.&#8221; </p>
+<p><a href="http://www.crooksandliars.com/2007/11/04/take-my-media-please/">John Amato</a>, Crooks and Liars: &#8220;The media will treat Democrats much harsher than Republicans from here on in.&#8221; </p>
+<p><a href="http://harpers.org/archive/2008/01/hbc-90002103">Ken Silverstein</a>, Harpers: &#8220;Another factor in Obama&#8217;s favor is (just as the Clinton campaign claims) that the media seems to be strongly in his corner.&#8221; </p>
+<p>Blogger <a href="http://tomwatson.typepad.com/tom_watson/2008/01/the-sexist-medi.html">Tom Watson</a>: &#8220;At the start of the campaign, I didn&#8217;t think the national media could possibly be successful in an anti-woman campaign against a Democrat.&#8221; </p>
+<p><a href="http://www.openleft.com/showDiary.do?diaryId=2934">Chris Bowers</a> at Open Left: &#8220;OK, The Media Hates Clinton-But Why?&#8221; </p>
+<p>I think we know why people speak this way. We use collective nouns, even when they mash way too much together, because, despite all the flattening and collapsing, there is some rough justice in saying, &#8220;The media loves Obama right now.&#8221; We know we&#8217;re speaking imperfectly, or metaphorically, but we also know we&#8217;re observing something that&#8217;s really happening. </p>
+<p>And that&#8217;s fine, normal, human even. Nonetheless, it&#8217;s important to remember: The media has no mind. It might appear to decide things, but if no one takes responsibility for &#8220;Edwards must win Iowa,&#8221; then it&#8217;s not really a decision the media made, but a convergence of judgment among people who may instantly converge around a different judgment if it turns out that Edwards isn&#8217;t done after failing to win Iowa. </p>
+<p>That&#8217;s pretty mindless. Strangely, though, the argument that the media has no mind serves almost no one&#8217;s agenda, with one exception, ably represented by Jon Stewart, but including all who satirize the news and the news criers, exposing their collective mindlessness and making it almost&#8230; enjoyable. </p>
+<p><b>3. &#8220;We have special insight&#8221;</b> </p>
+<p>John Harris and Jim VandeHei, formerly of the Washington Post, are the top editors of <a href="http://www.politico.com/">The Politico</a>, a new newspaper-and-web operation that only does politics. After the New Hampshire screw-up, which they called a &#8220;debacle&#8221; and a &#8220;humiliation,&#8221; Harris and VandeHei <a href="http://www.politico.com/news/stories/0108/7822.html">asked themselves</a> why their profession, political reporting, &#8220;supposedly devoted to depicting reality, obsesses about so many story lines that turn out to be fiction.&#8221; </p>
+<p>This is an excellent question and it&#8217;s admirable that they don&#8217;t mince words in framing it. &#8220;The loser &#8212; not just of Tuesday&#8217;s primary but of the 2008 campaign cycle so far &#8212; was us,&#8221; they write. That would be the pack, &#8220;&#8230;the community of reporters, pundits and prognosticators who so confidently &#8212; and so rashly &#8212; stake our reputations on the illusion that we understand politics and have special insight that allows us to predict the behavior of voters.&#8221; </p>
+<p>A key point: &#8220;we have special insight.&#8221; The current generation of political reporters has based its bid for election-year authority on its <a href="http://journalism.nyu.edu/pubzone/weblogs/pressthink/2004/01/03/inside_baseball.html">horse race</a> and handicapping skills. But reporters actually have no such skills. Think: what does a Howard Fineman (Newsweek, MSNBC) know about politics in America? I mean, what would you logically turn to him for? It&#8217;s got to be: Who&#8217;s ahead, what&#8217;s the strategy, and how are the insiders sizing up the contest? That&#8217;s supposedly his expertise, if he has any expertise; and if he doesn&#8217;t have any expertise, then what is he doing on my television screen, night after night, talking about politics? </p>
+<p>Even if Fineman and company had it, the ability to handicap the race is a pretty bogus skill set. Who cares if you are good at anticipating events that will unroll in clear fashion without you? Why do we need people who know how this is going to play out in South Carolina when we can just wait for the voters to play it out themselves? </p>
+<p>Among the &#8220;bogus narratives&#8221; the campaign press has developed so far, the Politico editors chose three to illustrate their humiliation. John McCain&#8217;s &#8220;collapse&#8221; in the summer of 2007, which meant we could write him off; Mike Huckabee&#8217;s win in Iowa, where the candidate without an organization took a state where electoral success, we were assured, was all about organization; and Obama&#8217;s &#8220;change the tone in politics&#8221; campaign which, according to the Gang, was not going to be in tune with the voters&#8217; rawer, more partisan feelings in &#8217;08. All three were a bust, suggesting political journalists have no special insight into: How is this going to play out? What they have are cheap, portable routines in which you ask that kind of question, and try to get ahead of the race. This, too, is what I mean by mindlessness. </p>
+<p>&#8220;If journalists were candidates, there would be insurmountable pressure for us to leave the race,&#8221; say Harris and VandeHei about their sorry-ass performance in &#8217;08. But they&#8217;re at sea in trying to explain why such things happen. They blame addiction to the game of politics, journalists and their sources hanging out too much together, and personal bias among reporters unconsciously rooting for the candidate who is more fun to cover. Those are certainly three factors. Another 23 could be listed without running out of plausible reasons, because what they&#8217;re really grappling with is routine mindlessness in their institution. Explaining that is a bit harder. </p>
+<p><b>4. &#8220;Removed from the experience&#8221;</b> </p>
+<p>A much better attempt was this short and consistently to the point <a href="http://www.thenation.com/blogs/campaignmatters?bid=45&#038;pid=266436">entry</a> by Christopher Hayes of the Nation magazine: &#8220;WHY CAMPAIGN COVERAGE SO OFTEN SUCKS.&#8221; He starts with something that is known to everyone in the pack: Campaign reporting is an essay in fear. </p>
+<p>
+<blockquote>&#8220;Reporting at events like this is exciting and invigorating, but it&#8217;s also terrifying. I&#8217;ve done it now a number of times at conventions and such, and in the past I was pretty much alone the entire time. I didn&#8217;t know any other reporters, so I kept to myself and tried to navigate the tangle of schedules and parking lots and hotels and event venues. It&#8217;s daunting and the whole time you think: &#8216;Am I missing something? What&#8217;s going? Oh man, I should go interview that guy in the parka with the fifteen buttons on his hat.&#8217; You fear getting lost, or missing some important piece of news, or making an ass out of yourself when you have to muster up that little burst of confidence it takes to walk up to a stranger and start asking them questions.&#8221;</p></blockquote>
+<p>Whereas he had once thought of it as a rookie&#8217;s experience, this year he learned that the fear never goes away. &#8220;Veteran reporters are just as panicked about getting lost or missing something, just as confused about who to talk to. This why reporters move in packs. It&#8217;s like the first week of freshman orientation, when you hopped around to parties in groups of three dozen, because no one wanted to miss something or knew where anything was.&#8221; </p>
+<p>It is rare to find a campaign correspondent who is inner-directed, with a vision of how to report on the election season that sends her off on <a href="http://journalism.nyu.edu/pubzone/weblogs/pressthink/2004/02/29/off_grid.html">her own</a>. Campaign reporters tend to be massively other-directed. The reality-check is what the rest of the press is doing &#8212; and the Web makes it far easier to check. Mindless. </p>
+<p>&#8220;When you go to one of these events as a reporter, there&#8217;s part of you that&#8217;s aware that you don&#8217;t really belong there,&#8221; writes Hayes. </p>
+<p>&#8220;You&#8217;re an outsider, standing on the edges observing the people who are there doing the actual stuff of politics: listening to a candidate, cheering, participating. So reporters run with that distance: they crack wise, they kibbitz in the back, they play up their detachment. That leads to coverage that is often weirdly condescending and removed from the experience of politics.&#8221; </p>
+<p><i>Removed from the experience.</i> Well, yeah. That is the number one virtue of horse-race reporting and the <a href="http://journalism.nyu.edu/pubzone/weblogs/pressthink/2004/01/23/press_player.html">inside baseball</a> mentality: speed of removal from the immediate experience. Hayes thinks the &#8220;worst features of campaign reporting&#8221; can be traced back to the &#8220;psychological defenses that reporters erect to deal with their insecurities.&#8221; First line of defense: pack behavior. A second is what the Politico guys said: &#8220;the illusion that we understand politics&#8221; and with our special insight can predict the behavior of voters, anticipate a turn in the narrative, divine a winning strategy. </p>
+<p>Maybe this illusion is reproduced for us because it is fear-reducing for them to mount the horse-race production. </p>
+<p><b>5. Under the influence.</b> </p>
+<p>In November, Mark Halperin of Time, who is both a student of pack behavior and a creature of the pack, <a href="http://www.nytimes.com/2007/11/25/opinion/25halperin.html?_r=2&#038;oref=slogin&#038;oref=slogin">wrote</a> a revealing op-ed piece about this &#8220;illusion that we understand.&#8221; He said he had been under the influence of Richard Ben Cramer&#8217;s massive and fascinating book, &#8220;What It Takes,&#8221; about the 1988 battle for the White House. Halperin wrote: </p>
+<p>&#8220;I&#8217;m not alone. The book&#8217;s thesis &#8212; that prospective presidents are best evaluated by their ability to survive the grueling quadrennial coast-to-coast test of endurance required to win the office &#8212; has shaped the universe of political coverage. </p>
+<p>&#8220;Voters are bombarded with information about which contender has &#8216;what it takes&#8217; to be the best candidate. Who can deliver the most stirring rhetoric? Who can build the most attractive facade? Who can mount the wiliest counterattack? Whose life makes for the neatest story? Our political and media culture reflects and drives an obsession with who is going to win, rather than who should win.&#8221; </p>
+<p>Right there, Halperin identifies the roots of mindlessness in campaign coverage: All right, press team, when that door opens, I want you go out there and find out for us&#8230; WHO IS GOING TO WIN? </p>
+<p>That&#8217;s the baseline question. But how good a question is it? </p>
+<p>The only decent definition of &#8220;information&#8221; I know of states that it is a measure of uncertainty reduced. But voters are the ones who reduce uncertainty in elections. They can do it pretty well themselves, without the help of horse-race journalists. Halperin once thought it fine to obsess over &#8220;the race,&#8221; because he considered the race a good proxy for the leadership test we&#8217;re supposed to be conducting during the now-well-more-than-a-year it takes to elect a new president. </p>
+<p>&#8220;But now I think I was wrong,&#8221; he writes. George W. Bush passed his horse-race test and flunked the leadership test once in office. So did Bill Clinton, Halperin says. Both were good campaigners and strategists. Their weaknesses only became glaring to the pack when they were in office, he argues. </p>
+<p>Let me say it again: Reporters have no special insight into how elections will turn out. According to Halperin, a thesis that has &#8220;shaped the universe of political coverage&#8221; is false; the rigors of the race do not produce good outcomes. So what does the pack do now? &#8220;Well, we pause, take a deep breath and resist. At least sometimes&#8230; we can try to keep from getting sucked in by it all.&#8221; </p>
+<p>This is the same limp remedy Harris and VandeHei offered. They know they&#8217;re stuck with horse-race journalism. They know what a mindless beast it can be &#8212; and what a mindless beast they can be. And, above all else, they know they&#8217;re not going to change it. After all, they are it. Glenn Greenwald of Salon was right to <a href="http://www.salon.com/opinion/greenwald/2008/01/09/matthews/index.html">point to</a> this exchange between NBC&#8217;s Tom Brokaw and Chris Matthews as the results from New Hampshire came in&#8230; </p>
+<p>&#8220;BROKAW: You know what I think we&#8217;re going to have to do? </p>
+<p>&#8220;MATTHEWS: Yes sir? </p>
+<p>&#8220;BROKAW: Wait for the voters to make their judgment. </p>
+<p>&#8220;MATTHEWS: Well what do we do then in the days before the ballot? We must stay home, I guess.&#8221; </p>
+<p>Matthews was being the realist: Without who&#8217;s-going-to-win, &#8220;we&#8221; might as well stay home. Brokaw (now long retired as the face of the NBC brand) gave him an apt warning in response: &#8220;The people out there are going to begin to make judgments about us if we don&#8217;t begin to temper that temptation to constantly try to get ahead of what the voters are deciding.&#8221; But he was speaking as if the media had a mind and could shift course. </p>
+<p><b>6. Less innocence, more politics.</b> </p>
+<p>Let&#8217;s see if we can bring these strands together. I&#8217;ve been picking at the weaknesses of horse-race coverage, but to really understand it we need to appreciate its practical strengths. </p>
+<p>Who&#8217;s-gonna-win is portable, reusable from cycle to cycle, and easily learned by newcomers to the press pack. Journalists believe it brings readers to the page and eyeballs to the screen. It &#8220;works&#8221; regardless of who the candidates are, or where the nation is in historical time. No expertise is actually needed to operate it. In that sense, it is economical. (And when everyone gets the winner wrong the &#8220;surprise&#8221; becomes a good story for a few days.) Who&#8217;s going to win &#8212; and what&#8217;s their strategy &#8212; plays well on television, because it generates an endless series of puzzles toward which journalists can gesture as they display their savviness, which is the <a href="http://journalism.nyu.edu/pubzone/weblogs/pressthink/2007/08/14/rove_and_press.html">unofficial religion</a> of the mainstream press. </p>
+<p>But the biggest advantage of horse-race journalism is that it permits reporters and pundits to &#8220;play up their detachment.&#8221; Focusing on the race advertises the political innocence of the press because &#8220;who&#8217;s gonna win?&#8221; is not an ideological question. By asking it you reaffirm that yours is not an ideological profession. This is experienced as pleasure by a lot of mainstream journalists. Ever noticed how spirits lift when the pundit roundtable turns from the Middle East or the looming recession to the horse race, and there&#8217;s an opportunity for sizing up the candidates? To be manifestly agenda-less is journalistic bliss. Of course, since trying to get ahead of the voters can affect how voters view the candidates, the innocence, too, is an illusion. But a potent one. </p>
+<p>Imagine if we had them all &#8212; the whole Gang of 500 &#8212; in a room and we asked them (off the record): How many of you feel roughly qualified to be Secretary of State? Ted Koppel having retired, no hands would go up. Secretary of the Treasury? No hands. White House Chief of Staff? Maybe one or two would raise a hand. Qualified to be President? No one would dare say <i>that</i>. Strategist for a presidential campaign? I&#8217;d say at least 200 hands would shoot up. Reporters identify with those guys &#8212; the behind-the-scenes message senders &#8212; and they cultivate the same knowledge. </p>
+<p>What a waste! Journalists ought to be bringing new knowledge into the system, as Charlie Savage and the Boston Globe <a href="http://www.boston.com/news/nation/articles/2007/12/22/candidates_on_executive_power_a_full_spectrum/?page=1%2522%253Esent%20out%20a%20questionnaire">did</a> in December. They gave the presidential candidates a detailed questionnaire on the limits of executive branch power and nine candidates responded. This is a major issue that any candidate for president should have to address, given the massive build-up of presidential power engineered by George W. Bush and Dick Cheney. We desperately need to know what the contenders for the presidency intend to do &#8212; continue the build-up or roll it back? &#8212; but we won&#8217;t know unless the issue is injected into the campaign. </p>
+<p>Now, that&#8217;s both a political and a journalistic act. And where does the authority for doing such things come from? There is actually no good answer to that within the press system as it stands, and so the beast would never go there. </p>
+<p>The Globe&#8217;s questionnaire grew out of Savage&#8217;s earlier <a href="http://journalism.nyu.edu/pubzone/weblogs/pressthink/2007/09/12/savage_nrrt.html">reporting</a> on the &#8220;unitary executive&#8221; and the drive to create an &#8220;unfettered presidency.&#8221; (See this <a href="http://www.pbs.org/wgbh/pages/frontline/cheney/interviews/savage.html">PBS interview</a> with Savage; also, contrast the Globe&#8217;s treatment with more of a throwaway <a href="http://www.nytimes.com/2007/12/30/us/politics/30issuesC.html?ref=politics">effort</a> from the New York Times.) Here, the job of the campaign press is not to preempt the voters&#8217; decision by asking endlessly, and predicting constantly, who&#8217;s going to win. The job is to make certain that what needs to be discussed will be discussed in time to make a difference &#8212; and then report on that. </p>
+<p><font face="times new roman, times, serif" size="1" color="#999999">- &#8211; - &#8211; - &#8211; - &#8211; - &#8211; - -</font></p>
+<p><i>This article originally appeared on <a href="http://www.tomdispatch.com/">TomDispatch.com</a>.</i></p>
+</div>            <a
+                class="toggle-group trigger remember refreshAds gaTrackPageEvent"
+                data-toggle-group="story-2002741"
+                href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            >
+                <span class="continueReading offText">Continue Reading</span>
+                <span class="onText">Close</span>
+                        <script type="json/config" class="jsonConfig">
+            {"slots":{"1":["pageTitle","Why campaign coverage sucks",3],"2":["pageType","article cr-link",3],"3":["author","Jay Rosen",3]}}
+        </script>
+            </a>			</div>
+                                                                <ul 
+        class="shareTools" 
+        data-share-link="http://www.salon.com/2008/01/21/campaign_coverage/" 
+        data-headline="Why campaign coverage sucks"
+        data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+    >
+        <li>
+                    <a
+            data-service="facebookLike"
+                        href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-share-url="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-headline="Why campaign coverage sucks"
+            data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+            class="shareButton facebookLike count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="facebookSend"
+                        href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-share-url="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-headline="Why campaign coverage sucks"
+            data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+            class="shareButton facebookSend count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="twitterTweets"
+                        href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-share-url="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-headline="Why campaign coverage sucks"
+            data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+            class="shareButton twitterTweets count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <!--
+        <li>
+                    <a
+            data-service="reddit"
+                        href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-share-url="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-headline="Why campaign coverage sucks"
+            data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+            class="shareButton reddit"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="stumbleupon"
+                        href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-share-url="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-headline="Why campaign coverage sucks"
+            data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+            class="shareButton stumbleupon"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        -->
+        <li>
+                    <a
+            data-service="email"
+                        href="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-share-url="http://www.salon.com/2008/01/21/campaign_coverage/"
+            data-headline="Why campaign coverage sucks"
+            data-thumbnail="http://media.salon.com/2008/01/why_campaign_coverage_sucks-300x200.jpg"
+            class="shareButton email"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li class="flyOut shareAll shareButtonBox">
+                            <span class="shareAllWrapper">
+                                <span>more</span>
+                            </span>
+            <ul class="flyOutMenu">
+                <li class="shareAllContent">
+                    <h3>All Share Services</h3>
+                    <div>
+                        <input placeholder="Start typing to search for share service" class="quickRefine"/>
+                    </div>
+                    <div class="shareButtonsHolder">
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <li class="hide">
+            <a href="#" class="flyOutShareToolsButton template">
+                <span class="shareIcon"></span>
+                <span class="shareText"></span>
+            </a>
+        </li>
+    </ul>
+                        
+    <ul class="utils">        <li>
+                    <span class="commentBubble">
+            <a title="Read the comments" href="http://www.salon.com/2008/01/21/campaign_coverage/#comments">
+                57
+            </a>
+        </span>       <a title="Read the comments" href="http://www.salon.com/2008/01/21/campaign_coverage/#comments">
+            Comments
+       </a>
+        </li>        <li>
+            <a title="Go to the permalink" href="http://www.salon.com/2008/01/21/campaign_coverage/">
+                Permalink
+            </a>
+        </li><li><a onclick="salonPop(&apos;http://www.salon.com/2008/01/21/campaign_coverage/print/&apos;,50,50); return false;" href="http://www.salon.com/2008/01/21/campaign_coverage/print/" title="Print This Post" rel="nofollow">Print</a>
+</li>        <li>
+            <a title="Right click and copy the shortened URL" href="http://salon.com/a/sAAAAAA" rel="nofollow">
+                Short URL
+            </a>
+        </li>
+    </ul>
+                    
+                    
+                    <span class="dateline">
+                        <span class="toLocalTime" data-tlt-epoch-time="1145548920">Thursday, Apr 20, 2006 4:02 PM UTC</span>                    </span>
+
+                    <h1><a href="http://www.salon.com/2006/04/20/mclellan_2/">Nullifying the press</a></h1>
+					<h2>The Bush team served up Scott McClellan's stolid stonewalling as the perfect device to humiliate and demote the media. And reporters played along.</h2>
+					
+					<span class='byline'>By <A href='http://www.salon.com/writer/jay_rosen/' rel='author'>Jay Rosen</A></span>
+                        <ul 
+        class="shareTools" 
+        data-share-link="http://www.salon.com/2006/04/20/mclellan_2/" 
+        data-headline="Nullifying the press"
+        data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+    >
+        <li>
+                    <a
+            data-service="facebookLike"
+                        href="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-share-url="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-headline="Nullifying the press"
+            data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+            class="shareButton facebookLike count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="facebookSend"
+                        href="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-share-url="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-headline="Nullifying the press"
+            data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+            class="shareButton facebookSend count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="twitterTweets"
+                        href="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-share-url="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-headline="Nullifying the press"
+            data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+            class="shareButton twitterTweets count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <!--
+        <li>
+                    <a
+            data-service="reddit"
+                        href="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-share-url="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-headline="Nullifying the press"
+            data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+            class="shareButton reddit"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="stumbleupon"
+                        href="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-share-url="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-headline="Nullifying the press"
+            data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+            class="shareButton stumbleupon"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        -->
+        <li>
+                    <a
+            data-service="email"
+                        href="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-share-url="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-headline="Nullifying the press"
+            data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+            class="shareButton email"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li class="flyOut shareAll shareButtonBox">
+                            <span class="shareAllWrapper">
+                                <span>more</span>
+                            </span>
+            <ul class="flyOutMenu">
+                <li class="shareAllContent">
+                    <h3>All Share Services</h3>
+                    <div>
+                        <input placeholder="Start typing to search for share service" class="quickRefine"/>
+                    </div>
+                    <div class="shareButtonsHolder">
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <li class="hide">
+            <a href="#" class="flyOutShareToolsButton template">
+                <span class="shareIcon"></span>
+                <span class="shareText"></span>
+            </a>
+        </li>
+    </ul>
+    
+                    <p class="topics">
+                                            </p>
+
+                    <a title="Nullifying the press" href="http://www.salon.com/2006/04/20/mclellan_2/"/><img alt="Nullifying the press" title="Nullifying the press" src="http://media.salon.com/2006/04/nullifying_the_press.jpg"/></a>			<div class="articleContent">
+                    
+					<p>Scott McClellan was a different kind of press secretary, sent to do a different job than the one people had done from that podium before. Instead of grouping him with a succession of other White House spokesmen, a line to which he does not belong, we have to take McClellan&#8217;s job, call it a piece of the puzzle, and place it alongside other pieces until we recognize the larger political strategy he was a part of.</p><p>He&#8217;s gone; the policy &#8212; strategic noncommunication &#8212; may still be in place.</p><p>First, McClellan was a necessary figure in what I have called <a target="new" href="http://journalism.nyu.edu/pubzone/weblogs/pressthink/2005/07/16/rll_back.html">&#8220;rollback&#8221;</a> &#8212; the attempt to downgrade the press as a player within the executive branch, to make it less important in running the White House and governing the country. It had once been accepted wisdom that by carefully &#8220;feeding the beast&#8221; an administration would be rewarded with better coverage in the long run. Rollback, the policy for which McClellan signed on, means not feeding but starving the beast, while reducing its effectiveness as an interlocutor with the president and demonstrating to all that the fourth estate is a <a target="new" href="http://www.newyorker.com/fact/content/?040119fa_fact2">joke.</a></p><div class="toggle-group target hideOnInit" data-toggle-group="story-1456756"><p>As Nick Madigan of the Baltimore Sun <a target="new" href="http://www.baltimoresun.com/news/opinion/ideas/bal-id.whiteout16,0,3278247.story">wrote</a> this week, &#8220;No matter what the question, the president, his press secretary and other officials usually manage to deliver their position of the day without obstruction.&#8221; That&#8217;s part of rollback.</p><p>&#8220;Back &#8216;em up, starve &#8216;em down, and drive up their negatives&#8221; is how I summarized it in my post, <a target="new" href="http://journalism.nyu.edu/pubzone/weblogs/pressthink/2005/07/16/rll_back.html">Rollback</a> (July 16, 2005). &#8220;I believe the ultimate goal is to enhance executive power and maximize the president&#8217;s freedom of maneuver &#8212; not only in policy-making, and warfare, but on the terrain of fact itself.&#8221;</p><p>And I still believe that. So this is the first thing to understand about McClellan and the job he was given by Bush. He wasn&#8217;t put there to brief the White House press but to frustrate, and belittle it, and provoke journalists into discrediting themselves on TV. The very premise of a White House &#8220;communications&#8221; office gets in the way of understanding the strategy that prevailed from July 2003, when McClellan took over from <a href="http://dir.salon.com/story/news/feature/2003/05/19/ari/print.html">Ari Fleischer,</a> until this week, when he announced his <a target="new" href="http://www.washingtonpost.com/wp-dyn/content/article/2006/04/19/AR2006041900897.html">resignation.</a></p><p>McClellan&#8217;s specialty was noncommunication; what&#8217;s remarkable about him as a choice for press secretary is that he had no special talent for <em>explaining</em> Bush&#8217;s policies to the world. In fact, he usually made things less clear by talking about them. We have to assume that this is the way the president wanted it; and if we do assume that it forces us to ask: Why use a bad explainer and a rotten communicator as your spokesman before the entire world? Isn&#8217;t that just dumb &#8212; and bad politics? Wouldn&#8217;t it be suicidal in a media-driven age with its 24-hour news cycle?</p><p>You would think so, but if the goal is to skate through unquestioned &#8212; because the gaps in your explanations are so large to start with &#8212; then to refuse to explain is a demonstration of raw presidential power. (As in &#8220;never apologize, never explain.&#8221;) So this is another reason McClellan was there. Not to be persuasive, but to refute the assumption that there was anyone the White House needed or wanted to persuade &#8212; least of all the press! Politics demands assent on one hand and attack on the other. (And those are your choices with Bush and Rove: Assent or be attacked.) The very notion of persuasion conceded more to democratic politics than the Bush forces wanted to concede.</p><p>The same goes for spin. Anyone who talks about McClellan &#8220;spinning&#8221; the press has got the wrong idea. The premise of spin is that by artful restatement the facts can be made to look better for the president. But McClellan&#8217;s speaking style is artless in the extreme. He&#8217;s terrible at spin, but it didn&#8217;t detract from the job he was there to do.</p><p>While claiming to hate spin, journalists grasp that the very practice of it is an implied credit to their profession; it means they&#8217;re important! By sticking someone up there who is inept at it, you downgrade the press to <em>unspun: why bother? </em></p><p>McClellan went through the motions of spin sometimes. But he was far more comfortable with robotic repetition of some empty formula he had decided on in advance, like &#8220;We are focused on the priorities that the American people care most about and getting things done.&#8221; His favorite word was &#8220;again,&#8221; as in, &#8220;Again, David, the president is focused on &#8230;&#8221; That isn&#8217;t spin. That&#8217;s running out the clock.</p><p>Spinning is improvisational. It requires you to think on your feet. McClellan was terrible at that too: wooden and unconvincing. He was not a phrase-maker, and he had no natural eloquence. Grace under pressure? No, that would concede that the reporters pressing their questions are legitimate actors. And so under pressure McClellan got more excruciatingly thick-headed and often belligerent, provoking belligerence back.</p><p>In what sense are these qualifications for the job of press secretary? Well, McClellan was there to make executive power more <em>illegible,</em> which is the way Bush, Dick Cheney (especially Cheney) and Karl Rove want it. Being inarticulate in public is basic to that goal. Bush himself is that way when he&#8217;s not reading from a script. And as Madigan noted, Bush&#8217;s &#8220;aversion to detailed questions is palpable.&#8221;</p><p>Michael Wolff, in an effective <a target="new" href="http://www.vanityfair.com/commentary/content/articles/060417roco03">profile</a> of McClellan for Vanity Fair, noticed this. &#8220;Because Scott couldn&#8217;t talk, he wouldn&#8217;t be able to say anything for himself,&#8221; Wolff writes. &#8220;His lack of verbal acumen, his lack of dexterity with a subordinate clause, becomes another part of the way to control the White House message in a White House obsessed with such control.&#8221;</p><p>As Wolff notes, &#8220;He wouldn&#8217;t be able to cozy up to the press. That requires a serving-two-masters deftness. A special tonal range. A wink. A nod. An emphasis. A surgical use of modifiers, so that I say what I have to say in such a way that we all understand what I mean to say. A little Kabukiness.&#8221; There has been none of that &#8220;tonal range&#8221; under McClellan. The results are ugly, but the public ugliness is a clue.</p><p> Wolff continues, &#8220;McClellan himself, as though having some terrible social disability, has, standing miserably in the press briefing room every day, become a kick-me archetype. He&#8217;s Piggy in &#8216;Lord of the Flies&#8217;: a living victim, whose reason for being is, apparently, to shoulder public ridicule and pain (or, come to think of it, he&#8217;s Squealer from &#8216;Animal Farm&#8217;). He&#8217;s the person nobody would ever choose to be.&#8221; </p><p>Right, the jerk at the podium. Ari Fleischer could stonewall with ease, but he wasn&#8217;t willing to be that jerk. (Plus, he had a twinkle in his eye when in a tough spot: no good.) And so the full development of rollback and the illegible White House had to wait for McClellan, the true-blue Texan and total Bush loyalist &#8212; considered &#8220;family&#8221; <a target="new" href="http://www.time.com/time/nation/article/0,8599,1185015,00.html">according</a> to Time&#8217;s Mike Allen.</p><p>Now all this is humiliating for the press to have to endure but here the architects of rollback made a shrewd bet. This is how I explained it to John Harris, political editor of the Washington Post, in our <a target="new" href="http://www.huffingtonpost.com/jay-rosen/what-if-bush-changed-the_b_16046.html">aborted interview</a> on these subjects: &#8220;In my view, the White House withdrew from a consensus understanding of how the executive branch had to deal with journalists. It correctly guessed that if it changed the game on you, you wouldn&#8217;t develop a new game of your own, or be able to react.&#8221;</p><p>And of course they didn&#8217;t.</p><p>The era of news management lasted 40 years &#8212; from 1963, when the networks first began their 30-minute nightly broadcasts, to 2003, when McClellan, Bush, Cheney and Rove proved there are other ways. Replace news management with press nullification. Drop the persuasion model in favor of the politics of assent. Choose noncommunication to demonstrate that you ought not to be questioned. (It only helps our enemies.)</p><p>Bush made no secret of his preference for government by assent. That&#8217;s why he created the <a target="new" href="http://www.washingtonpost.com/wp-dyn/articles/A7880-2005Feb8.html">Bush &#8220;bubble,&#8221;</a> a remarkable practice in which the White House routinely prevented nonbelievers from attending the president&#8217;s speeches and asking questions of him in public. (It&#8217;s now being relaxed somewhat.)</p><p>Other parts of the Bush presidency that fit in the puzzle with McClellan&#8217;s hapless style:</p><ul>
+<li> The fixing of facts around the policy in the run-up to the war in Iraq; the cherry-picking and manipulation of intelligence;</li>
+</ul><ul>
+<li> The expansion of executive secrecy and the conversion of public knowledge back into classified data;</li>
+</ul><ul>
+<li> The routine refusal to provide Congress with information required for meaningful oversight, which is itself a casualty of this White House;</li>
+</ul><ul>
+<li>The criminalization of reporting practices in the prosecution of journalists for unauthorized leaks;</li>
+</ul><ul>
+<li> Dick Cheney&#8217;s conviction that executive power had been encroached upon after Vietnam and Watergate, and needed to be reclaimed: from Congress, from the press, from the pressure of public opinion itself;</li>
+</ul><ul>
+<li>The new &#8220;stealth&#8221; model for the vice presidency that Cheney and Bush created, in which the V.P.&#8217;s schedule is secret and the press often doesn&#8217;t know where he is.</li>
+</ul><p>Put it all together and what do we have? In calling recently for Watergate-style Senate hearings on the Bush presidency, Carl Bernstein (also in Vanity Fair) <a target="new" href="http://www.vanityfair.com/commentary/content/articles/060417roco03">wrote</a> as follows:</p><p>&#8220;The first fundamental question that needs to be answered by and about the president, the vice president, and their political and national-security aides &#8230; is whether lying, disinformation, misinformation, and manipulation of information have been a basic matter of policy &#8212; used to overwhelm dissent; to hide troublesome truths and inconvenient data from the press, public, and Congress; and to defend the president and his actions when he and they have gone awry or utterly failed.&#8221;</p><p>It&#8217;s a good question. But I don&#8217;t think it&#8217;s fundamental enough. McClellan was a cog in a machine for making the executive power more opaque, and the presidency itself less dialogic. (Fewer questions, no answers unless under subpoena.) We have to understand how this system works and why it has appeared now.</p><p>Bush and his staff did something new, I would even say visionary, when they decided to &#8220;manage&#8221; the news by shutting down those portions of the presidency where the president can be asked the difficult but necessary questions he loathes so much. Scott McClellan, I believe, was sent into the briefing room to shut off that tap even while he stood there and took the beatings.</p><p>The intended result: a presidency <em>that is less questioned</em> in the eyes of the world. That&#8217;s not news management; it&#8217;s a new balance of power between them and us. </p><p><i>This piece first appeared on Jay Rosen&#8217;s <a target="new" href="http://journalism.nyu.edu/pubzone/weblogs/pressthink/">PressThink blog,</a> from which it is reprinted with permission.</i> </p></div>            <a
+                class="toggle-group trigger remember refreshAds gaTrackPageEvent"
+                data-toggle-group="story-1456756"
+                href="http://www.salon.com/2006/04/20/mclellan_2/"
+            >
+                <span class="continueReading offText">Continue Reading</span>
+                <span class="onText">Close</span>
+                        <script type="json/config" class="jsonConfig">
+            {"slots":{"1":["pageTitle","Nullifying the press",3],"2":["pageType","article cr-link",3],"3":["author","Jay Rosen",3]}}
+        </script>
+            </a>			</div>
+                                                                <ul 
+        class="shareTools" 
+        data-share-link="http://www.salon.com/2006/04/20/mclellan_2/" 
+        data-headline="Nullifying the press"
+        data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+    >
+        <li>
+                    <a
+            data-service="facebookLike"
+                        href="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-share-url="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-headline="Nullifying the press"
+            data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+            class="shareButton facebookLike count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="facebookSend"
+                        href="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-share-url="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-headline="Nullifying the press"
+            data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+            class="shareButton facebookSend count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="twitterTweets"
+                        href="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-share-url="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-headline="Nullifying the press"
+            data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+            class="shareButton twitterTweets count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <!--
+        <li>
+                    <a
+            data-service="reddit"
+                        href="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-share-url="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-headline="Nullifying the press"
+            data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+            class="shareButton reddit"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="stumbleupon"
+                        href="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-share-url="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-headline="Nullifying the press"
+            data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+            class="shareButton stumbleupon"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        -->
+        <li>
+                    <a
+            data-service="email"
+                        href="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-share-url="http://www.salon.com/2006/04/20/mclellan_2/"
+            data-headline="Nullifying the press"
+            data-thumbnail="http://media.salon.com/2006/04/nullifying_the_press-300x200.jpg"
+            class="shareButton email"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li class="flyOut shareAll shareButtonBox">
+                            <span class="shareAllWrapper">
+                                <span>more</span>
+                            </span>
+            <ul class="flyOutMenu">
+                <li class="shareAllContent">
+                    <h3>All Share Services</h3>
+                    <div>
+                        <input placeholder="Start typing to search for share service" class="quickRefine"/>
+                    </div>
+                    <div class="shareButtonsHolder">
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <li class="hide">
+            <a href="#" class="flyOutShareToolsButton template">
+                <span class="shareIcon"></span>
+                <span class="shareText"></span>
+            </a>
+        </li>
+    </ul>
+                        
+    <ul class="utils">        <li>
+                    <span class="commentBubble">
+            <a title="Read the comments" href="http://www.salon.com/2006/04/20/mclellan_2/#comments">
+                14
+            </a>
+        </span>       <a title="Read the comments" href="http://www.salon.com/2006/04/20/mclellan_2/#comments">
+            Comments
+       </a>
+        </li>        <li>
+            <a title="Go to the permalink" href="http://www.salon.com/2006/04/20/mclellan_2/">
+                Permalink
+            </a>
+        </li><li><a onclick="salonPop(&apos;http://www.salon.com/2006/04/20/mclellan_2/print/&apos;,50,50); return false;" href="http://www.salon.com/2006/04/20/mclellan_2/print/" title="Print This Post" rel="nofollow">Print</a>
+</li>        <li>
+            <a title="Right click and copy the shortened URL" href="http://salon.com/a/sAAAAAA" rel="nofollow">
+                Short URL
+            </a>
+        </li>
+    </ul>
+                    
+                    
+                    <span class="dateline">
+                        <span class="toLocalTime" data-tlt-epoch-time="1065814200">Friday, Oct 10, 2003 7:30 PM UTC</span>                    </span>
+
+                    <h1><a href="http://www.salon.com/2003/10/10/postman/">Neil Postman: A civilized man in a century of barbarism</a></h1>
+					<h2>A former student remembers a teacher who never stopped raking the worlds of Big Media and technology with his savage wit.</h2>
+					
+					<span class='byline'>By <A href='http://www.salon.com/writer/jay_rosen/' rel='author'>Jay Rosen</A></span>
+                        <ul 
+        class="shareTools" 
+        data-share-link="http://www.salon.com/2003/10/10/postman/" 
+        data-headline="Neil Postman: A civilized man in a century of barbarism"
+        data-thumbnail=""
+    >
+        <li>
+                    <a
+            data-service="facebookLike"
+                        href="http://www.salon.com/2003/10/10/postman/"
+            data-share-url="http://www.salon.com/2003/10/10/postman/"
+            data-headline="Neil Postman: A civilized man in a century of barbarism"
+            data-thumbnail=""
+            class="shareButton facebookLike count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="facebookSend"
+                        href="http://www.salon.com/2003/10/10/postman/"
+            data-share-url="http://www.salon.com/2003/10/10/postman/"
+            data-headline="Neil Postman: A civilized man in a century of barbarism"
+            data-thumbnail=""
+            class="shareButton facebookSend count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="twitterTweets"
+                        href="http://www.salon.com/2003/10/10/postman/"
+            data-share-url="http://www.salon.com/2003/10/10/postman/"
+            data-headline="Neil Postman: A civilized man in a century of barbarism"
+            data-thumbnail=""
+            class="shareButton twitterTweets count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <!--
+        <li>
+                    <a
+            data-service="reddit"
+                        href="http://www.salon.com/2003/10/10/postman/"
+            data-share-url="http://www.salon.com/2003/10/10/postman/"
+            data-headline="Neil Postman: A civilized man in a century of barbarism"
+            data-thumbnail=""
+            class="shareButton reddit"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="stumbleupon"
+                        href="http://www.salon.com/2003/10/10/postman/"
+            data-share-url="http://www.salon.com/2003/10/10/postman/"
+            data-headline="Neil Postman: A civilized man in a century of barbarism"
+            data-thumbnail=""
+            class="shareButton stumbleupon"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        -->
+        <li>
+                    <a
+            data-service="email"
+                        href="http://www.salon.com/2003/10/10/postman/"
+            data-share-url="http://www.salon.com/2003/10/10/postman/"
+            data-headline="Neil Postman: A civilized man in a century of barbarism"
+            data-thumbnail=""
+            class="shareButton email"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li class="flyOut shareAll shareButtonBox">
+                            <span class="shareAllWrapper">
+                                <span>more</span>
+                            </span>
+            <ul class="flyOutMenu">
+                <li class="shareAllContent">
+                    <h3>All Share Services</h3>
+                    <div>
+                        <input placeholder="Start typing to search for share service" class="quickRefine"/>
+                    </div>
+                    <div class="shareButtonsHolder">
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <li class="hide">
+            <a href="#" class="flyOutShareToolsButton template">
+                <span class="shareIcon"></span>
+                <span class="shareText"></span>
+            </a>
+        </li>
+    </ul>
+    
+                    <p class="topics">
+                                            </p>
+
+                    			<div class="articleContent">
+                    
+					<p>I have no count, but I sense a dwindling number of people in the academic world who are unclassifiable. Neil Postman, who died Sunday, was one, and now we can say he will always be one. Such figures &#8212; with reputation but no real discipline &#8212; have a tendency to make people think. Postman had that. </p><p>He was expert in nothing. Therefore nothing was off limits. Therefore one&#8217;s mind was always at risk, from a joke, a headline, an idea, a person walking through the door. The only way to respond to such strange conditions was with ready humor. And humor would bring you more ideas. Now what discipline, what department is that? </p><p>Everyone who knew Postman &#8212; and I include perhaps a hundred thousand who only heard him speak &#8212; knew him first through humor, which was the reflection in person of the satire in most of his books, each of which is a pamphlet, an essay between covers. &#8220;The Disappearance of Childhood&#8221; (1982) was satire about the infantilization in American culture. &#8220;Amusing Ourselves to Death&#8221; (1985) was satire about entertainment and what it was doing to us. &#8220;Technopoly&#8221; (1993) was satire on the &#8220;surrender of culture to technology.&#8221; One of the first journals he was associated with was Monocle (long gone), a magazine of political satire, which is where he met Victor Navasky, publisher of the Nation, which is how he came to serve on the Nation&#8217;s board, even though he was the world&#8217;s worst leftist and couldn&#8217;t stomach the right. Of course, in all the satire there was Neil&#8217;s sermon, but again: What discipline is that? </p><div class="toggle-group target hideOnInit" data-toggle-group="story-1179444"><p>Postman&#8217;s intellectual pose, as well as his poise in public settings, as well as his great gift, which was terribly good humor, came down essentially to this: the trials of a civilized man in a century of barbarism. It later softened into the civilized man in a culture of television. But the barbaric that was in television, between the wicked dots, softened, but still there &#8230; well, Postman had the eye for that. He would teach you this angry eye, and that was one reason I hung around NYU and got a Ph.D. He knew what to ignore, when to object. </p><p>&#8220;You have to understand, what Americans do is watch television.&#8221; I heard this many times. &#8220;I am not saying that&#8217;s who they are. But that is what they do. Americans &#8230; watch &#8230; television.&#8221; And he would have figures, sometimes, demonstrating it: the number of commercials a child would see betwen 5 and 18 (the number was 675,000 in 1979). But, frankly, he had zero interest in mastering figures about the big machine of commercial TV. He had a big machine of his own, which was simply everything he ever read and learned from wiser heads, all the books he placed against television in order to see it more clearly. One of his essays is titled &#8220;Social Science as Moral Theology&#8221; (1988). </p><p>Among those I heard him talk about most often were Bertrand Russell, George Orwell, G.K. Chesterton, George Bernard Shaw, Alfred North Whitehead, Sigmund Freud, Karl Marx, Philippe Aries, Jacques Ellul, Rudolph Arnheim, Norbert Elias, Robert Maynard Hutchins, Christopher Lasch, Walter Ong, Eric Havelock, Lewis Mumford, Harold Innis, and of course Marshall McLuhan, whom Postman met in the 1950s, before anyone had ever heard of the Canadian English professor who would write &#8220;Understanding Media&#8221; (1964). McLuhan always regretted that he had not founded a Ph.D. program like Postman&#8217;s, and until the rediscovery of McLuhan by young people of the Internet age, that program helped keep interest in his ideas alive. &#8220;The medium is the message,&#8221; McLuhan&#8217;s most famous line, is not an easy idea to grasp. It just looks that way. </p><p>Neil Postman was easily the best public speaker I ever heard, and most who heard him agreed with that. He never spoke off the cuff, never from notes. He wrote all his speeches in longhand, and would try them on students first, usually revising a few words just to give you the sense that you had participated by listening. He wrote 20 books with only a felt-tipped pen on notebook paper; all sentences crafted by hand. This too was satire, on &#8220;progress&#8221; in writing instruments. Postman, world-famous media scholar, was famous among students and friends for refusing any technology thought to &#8220;improve&#8221; something in which he had never requested improvements. A simple rule, with hilarious consequences. He didn&#8217;t care if you had a better solution to a problem he never felt was real, and he would make fun of you if you tried to recommend it. </p><p>That is what I mean by the pose of the civilized man, beset by answering machines. The pose is shared by many stand-up comedians, and Neil had that in him. He also had edge. Television, he always said, is inhuman to children because it gives them answers to questions they never asked. It did this for purposes of control. Educational television &#8212; &#8220;Sesame Street&#8221; &#8212; was not the alternative; it was the worst offender. This view denied a lot of people, including educated liberals, comfort. To him that was education. </p><p>Postman resented being controlled by technology or bureaucracy, way more than most Americans. He resented the new for retiring an &#8220;old&#8221; that had no reason to quit. But he thought it funny &#8212; and fascinating &#8212; that people allowed this manipulation, especially Americans, who were the most open to it. Postman had a big audience and gave many speeches in Germany, where several of his books were bestsellers during the 1980s, in part because there was so much in American life he simply rejected. Thus he wrote with a pen, never used e-mail, owned no computer and had no regrets about never going online. To him it was not a matter of convenience. It was about keeping an independent mind by making independent use of objects. In this way, he taught me and many others to think for ourselves, precisely because we didn&#8217;t think as he did. </p><p>Postman&#8217;s general philosophy, which was general education, also known as the great-books approach, was made known to me shortly after I enrolled in a graduate program under his chairmanship in 1980. I was there to study the media, and he was at that time a professor of media ecology (a name for his anti-discipline). As he explained to me: &#8220;We&#8217;re just trying to give people a good liberal arts education.&#8221; Which, he further argued, and easily demonstrated himself, was exactly the tool needed to understand the gathering beast: the Media. In an age of specialization, this is not how academic life works. But his did. </p><p>Postman, one should remember, was originally an English teacher. He entered the university in a time of expansion and optimism in public schooling. We were building lots of schools and creating big public universities then. His degree was in English education, from Teachers College at Columbia. From 1959 on, his home was the School of Education at NYU. His original and core readership remained schoolteachers, and I witnessed the same ritual numerous times: A woman in her 40s or 50s would approach after a speech. &#8220;Professor Postman, I just want to tell you, I read your book, &#8216;Teaching as a Subversive Activity&#8217; &#8230; That book changed my life.&#8221; Often she would have the book with her, and he would sign it &#8230; with a felt-tip pen. This made an impression on me. A stray sentence lifted from that book: </p><p>&#8220;We must emphasize that the concept, &#8216;that we must unlearn dead concepts&#8217; is itself new, and so rather incongenial to most who confront it the first time.&#8221; </p><p>If Postman was an English teacher, he realized very early that a bigger, brighter and more compelling classroom existed out there, and it would teach your kids no matter how good you were at reaching them. Today this is a commonplace: They get it from television! But in the 1950s, when Postman began serious study, it was a far more original thought: We&#8217;re being outtaught by the media. For this he later found a brilliant description. Television, he said, is the first curriculum. School is second. </p><p>There&#8217;s no accounting for what you absorb from such a man. For he knew the two secrets of all great teachers, things no teachers college can teach: First, you don&#8217;t put knowledge into people, you draw it out. (Which is why personality was his one and only classroom &#8220;method.&#8221;) Second, if you can manage to conceal, artfully, some crucial part of what you are saying, then young people who are listening really, really hard will make it their business to find you out. And that&#8217;s when you can really teach them. I must have heard it a thousand times. &#8220;It&#8217;s not that simple,&#8221; the student says to Postman. Oh? And right there, the drawing out begins. </p><p>There&#8217;s no point, he felt, in being an English teacher today &#8212; armed with literature and its human testimony &#8212; if the conditions for successful teaching are all around us being &#8220;disappeared.&#8221; (A favorite construction of his.) That&#8217;s why he became a media critic. And that is the master image, if there is one, in all of Neil Postman&#8217;s writings: either a disappearing we should regret, or a forgetting we have failed to do. </p><p>The greatest sentence he wrote will, I am sure, give comfort at some time in the future. It&#8217;s the first sentence in &#8220;The Disappearance of Childhood.&#8221; &#8220;Children are the living messages we send to a time we will not see.&#8221; </p></div>            <a
+                class="toggle-group trigger remember refreshAds gaTrackPageEvent"
+                data-toggle-group="story-1179444"
+                href="http://www.salon.com/2003/10/10/postman/"
+            >
+                <span class="continueReading offText">Continue Reading</span>
+                <span class="onText">Close</span>
+                        <script type="json/config" class="jsonConfig">
+            {"slots":{"1":["pageTitle","Neil Postman: A civilized man in a century of barbarism",3],"2":["pageType","article cr-link",3],"3":["author","Jay Rosen",3]}}
+        </script>
+            </a>			</div>
+                                                                <ul 
+        class="shareTools" 
+        data-share-link="http://www.salon.com/2003/10/10/postman/" 
+        data-headline="Neil Postman: A civilized man in a century of barbarism"
+        data-thumbnail=""
+    >
+        <li>
+                    <a
+            data-service="facebookLike"
+                        href="http://www.salon.com/2003/10/10/postman/"
+            data-share-url="http://www.salon.com/2003/10/10/postman/"
+            data-headline="Neil Postman: A civilized man in a century of barbarism"
+            data-thumbnail=""
+            class="shareButton facebookLike count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="facebookSend"
+                        href="http://www.salon.com/2003/10/10/postman/"
+            data-share-url="http://www.salon.com/2003/10/10/postman/"
+            data-headline="Neil Postman: A civilized man in a century of barbarism"
+            data-thumbnail=""
+            class="shareButton facebookSend count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="twitterTweets"
+                        href="http://www.salon.com/2003/10/10/postman/"
+            data-share-url="http://www.salon.com/2003/10/10/postman/"
+            data-headline="Neil Postman: A civilized man in a century of barbarism"
+            data-thumbnail=""
+            class="shareButton twitterTweets count"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                            <span class="shareCountWrap">
+                    <span class="shareCount"></span>
+                </span>
+                    </a>
+                </li>
+        <!--
+        <li>
+                    <a
+            data-service="reddit"
+                        href="http://www.salon.com/2003/10/10/postman/"
+            data-share-url="http://www.salon.com/2003/10/10/postman/"
+            data-headline="Neil Postman: A civilized man in a century of barbarism"
+            data-thumbnail=""
+            class="shareButton reddit"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li>
+                    <a
+            data-service="stumbleupon"
+                        href="http://www.salon.com/2003/10/10/postman/"
+            data-share-url="http://www.salon.com/2003/10/10/postman/"
+            data-headline="Neil Postman: A civilized man in a century of barbarism"
+            data-thumbnail=""
+            class="shareButton stumbleupon"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        -->
+        <li>
+                    <a
+            data-service="email"
+                        href="http://www.salon.com/2003/10/10/postman/"
+            data-share-url="http://www.salon.com/2003/10/10/postman/"
+            data-headline="Neil Postman: A civilized man in a century of barbarism"
+            data-thumbnail=""
+            class="shareButton email"
+         >
+            <span class="shareButtonBox">
+                <span class="shareIcon"></span>
+            </span>
+                    </a>
+                </li>
+        <li class="flyOut shareAll shareButtonBox">
+                            <span class="shareAllWrapper">
+                                <span>more</span>
+                            </span>
+            <ul class="flyOutMenu">
+                <li class="shareAllContent">
+                    <h3>All Share Services</h3>
+                    <div>
+                        <input placeholder="Start typing to search for share service" class="quickRefine"/>
+                    </div>
+                    <div class="shareButtonsHolder">
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <li class="hide">
+            <a href="#" class="flyOutShareToolsButton template">
+                <span class="shareIcon"></span>
+                <span class="shareText"></span>
+            </a>
+        </li>
+    </ul>
+                        
+    <ul class="utils">        <li>
+                   <a title="Be the first to comment!" href="http://www.salon.com/2003/10/10/postman/#comments">
+            Comments
+       </a>
+        </li>        <li>
+            <a title="Go to the permalink" href="http://www.salon.com/2003/10/10/postman/">
+                Permalink
+            </a>
+        </li><li><a onclick="salonPop(&apos;http://www.salon.com/2003/10/10/postman/print/&apos;,50,50); return false;" href="http://www.salon.com/2003/10/10/postman/print/" title="Print This Post" rel="nofollow">Print</a>
+</li>        <li>
+            <a title="Right click and copy the shortened URL" href="http://salon.com/a/sAAAAAA" rel="nofollow">
+                Short URL
+            </a>
+        </li>
+    </ul>
+                    			            					</div>
+				
+				</div>
+			
+				<div class="grid_4 rightSidebar">
+
+					
+                    <div class="bannerWrapper alpha omega">
+                        <div data-position-name='Right' class='adPosition loading halfPage Right flex height'></div>                    </div>
+
+                    <div class="customSidebar">
+	
+	
+	<h2>Recommendations</h2><div class="fbookRecommendations widget"><iframe src="http://www.facebook.com/plugins/recommendations.php?site=www.salon.com&amp;max_age=3&amp;width=300&amp;height=300&amp;header=false&amp;colorscheme=light&amp;font=arial&amp;border_color" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:300px; height:300px;" allowTransparency="true"></iframe></div>
+</div>
+                    <div class="bannerWrapper alpha omega">
+                        <div data-position-name='x10' class='adPosition loading halfPage x10 flex height follow'></div>                    </div>
+
+
+                </div>
+				
+				<div class="clear"></div>
+
+				<div class="contentFootContainer">
+    <div class="bannerWrapper">
+        <div data-position-name='Bottom' class='adPosition loading leaderBoard Bottom '></div>    </div>
+    		<nav>
+			 <a href="http://www.salon.com/about/">About</a> | <a href="http://www.salon.com/about/advertise/">Advertising</a> | <a href="http://www.salon.com/about/contact/">Contact</a> | <a href="http://www.salon.com/about/corrections/">Corrections</a> | <a href="http://www.salon.com/about/contact/">Help</a> | <a href="http://www.salon.com/about/policy/">Privacy</a> | <a href="http://www.salon.com/about/tos/">Terms of Service</a> | <a href="http://techtips.salon.com">TechTips</a> 		</nav>
+		</div>
+			
+			
+			</div>
+		
+		</section>
+
+        <aside class="grid_2 leftSidebar">
+            <div data-position-name='Frame1' class='adPosition loading leftShoulder Frame1 '></div>
+            		<div class="current-posts">
+			<h2>Current Stories</h2>
+		
+			 
+			<article class="story">
+                                    <a title="Living under the gun" href="http://www.salon.com/2012/07/25/living_under_the_gun_salpar/">
+                         <img src="http://media.salon.com/2012/07/Screen-Shot-2012-07-25-at-4.30.13-PM-186x124.png" alt="Living under the gun" title="Living under the gun" />
+                    </a>
+                                <h3>
+                    <a title="Living under the gun" href="http://www.salon.com/2012/07/25/living_under_the_gun_salpar/">
+                        Living under the gun                    </a>
+				</h3>
+				<p>
+					<a class="sectionLink" href="http://www.salon.com/category/news/">News.</a> Following the Colorado shooting, Bill Moyers looks at the cost of America's obsession with guns				</p>
+			</article>
+			 
+			<article class="story">
+                                    <a title="Obama&#8217;s small steps on guns" href="http://www.salon.com/2012/07/26/obamas_small_steps_on_guns/">
+                         <img src="http://media.salon.com/2012/07/obama-urban-league-16x9-186x124.png" alt="Obama&#8217;s small steps on guns" title="Obama&#8217;s small steps on guns" />
+                    </a>
+                                <h3>
+                    <a title="Obama&#8217;s small steps on guns" href="http://www.salon.com/2012/07/26/obamas_small_steps_on_guns/">
+                        Obama&#8217;s small steps on guns                    </a>
+				</h3>
+				<p>
+					<a class="sectionLink" href="http://www.salon.com/category/politics/">Politics.</a> In his toughest remarks yet, he tells the Urban League "AK 47s belong on the battlefield of war not on the streets"				</p>
+			</article>
+			 
+			<article class="story">
+                                    <a title="&#8220;Planet of Snail&#8221;: An unforgettable love story" href="http://www.salon.com/2012/07/26/planet_of_snail_an_unforgettable_love_story/">
+                         <img src="http://media.salon.com/2012/07/planet_of_snail_rect-186x124.jpg" alt="&#8220;Planet of Snail&#8221;: An unforgettable love story" title="&#8220;Planet of Snail&#8221;: An unforgettable love story" />
+                    </a>
+                                <h3>
+                    <a title="&#8220;Planet of Snail&#8221;: An unforgettable love story" href="http://www.salon.com/2012/07/26/planet_of_snail_an_unforgettable_love_story/">
+                        &#8220;Planet of Snail&#8221;: An unforgettable love story                    </a>
+				</h3>
+				<p>
+					<a class="sectionLink" href="http://www.salon.com/category/arts/">Entertainment.</a> She's tiny and he's both deaf and blind -- and the story of their marriage is the movie romance of the year				</p>
+			</article>
+			 
+			<article class="story">
+                                    <a title="When the fires came for us" href="http://www.salon.com/2012/07/26/when_the_fires_came_for_us/">
+                         <img src="http://media.salon.com/2012/07/fire_stairs_rect-186x124.jpg" alt="When the fires came for us" title="When the fires came for us" />
+                    </a>
+                                <h3>
+                    <a title="When the fires came for us" href="http://www.salon.com/2012/07/26/when_the_fires_came_for_us/">
+                        When the fires came for us                    </a>
+				</h3>
+				<p>
+					<a class="sectionLink" href="http://www.salon.com/category/life/">Life.</a> I thought our home in Colorado was safe. But as flames devoured the state, we found ourselves in a national tragedy				</p>
+			</article>
+					</div>
+		<div class='smr-widget'>
+			<h2>Most Read</h2>
+			<ul>
+			<li class='smr-post'>
+				<a href='http://www.salon.com/2012/07/22/jason_alexanders_amazing_gun_rant/' class="gaTrackLinkEvent" data-ga-track-json="[&quot;mostread&quot;,&quot;click&quot;,&quot;Jason Alexander&#039;s amazing gun rant&quot;]" title='Jason Alexander&#039;s amazing gun rant'>
+					<span class='thumbWrap'>
+						<img width="186" height="124" src="http://media.salon.com/2012/07/RTR24ZC32-186x124.jpg" class="attachment-186x124 wp-post-image" alt="U.S. actor Jason Alexander attends a news conference in Jerusalem" title="U.S. actor Jason Alexander attends a news conference in Jerusalem" />
+					</span>
+					Jason Alexander's amazing gun rant
+				</a>
+				<span class='byline'><A href='http://www.origin.railrode.net/writer/salon_staff/' rel='author'>Salon Staff</A></span>
+			     </li>
+			     <li class='smr-post'>
+				<a href='http://www.salon.com/2012/07/24/right_wingers_food_companies_salpart/' class="gaTrackLinkEvent" data-ga-track-json="[&quot;mostread&quot;,&quot;click&quot;,&quot;Right-wing food companies&quot;]" title='Right-wing food companies'>
+					<span class='thumbWrap'>
+						<img width="186" height="124" src="http://media.salon.com/2012/07/storyimages_1342818623_chickfila-186x124.jpg" class="attachment-186x124 wp-post-image" alt="storyimages_1342818623_chickfila" title="storyimages_1342818623_chickfila" />
+					</span>
+					Right-wing food companies
+				</a>
+				<span class='byline'><A href='http://www.origin.railrode.net/writer/lauren_kelley/' rel='author'>Lauren Kelley</A>, <A href="http://www.alternet.org/">Alternet</A></span>
+			     </li>
+			     <li class='smr-post'>
+				<a href='http://www.salon.com/2012/07/24/every_woman_should_travel_alone/' class="gaTrackLinkEvent" data-ga-track-json="[&quot;mostread&quot;,&quot;click&quot;,&quot;Every woman should travel alone&quot;]" title='Every woman should travel alone'>
+					<span class='thumbWrap'>
+						<img width="186" height="124" src="http://media.salon.com/2012/07/solo_travel_rect1-186x124.jpg" class="attachment-186x124 wp-post-image" alt="A photo of the author on the Alaskan Highway." title="solo_travel_rect" />
+					</span>
+					Every woman should travel alone
+				</a>
+				<span class='byline'><A href='http://www.origin.railrode.net/writer/sarah_hepola/' rel='author'>Sarah Hepola</A></span>
+			     </li>
+			     <li class='smr-post'>
+				<a href='http://www.salon.com/2012/07/25/the_value_of_tom_friedman/' class="gaTrackLinkEvent" data-ga-track-json="[&quot;mostread&quot;,&quot;click&quot;,&quot;The value of Tom Friedman&quot;]" title='The value of Tom Friedman'>
+					<span class='thumbWrap'>
+						<img width="186" height="124" src="http://media.salon.com/2012/07/friedman-rect-186x124.png" class="attachment-186x124 wp-post-image" alt="Journalist Thomas Friedman moderates a plenary session on strengthening market-based solutions during the Clinton Global Initiative in New York" title="friedman rect" />
+					</span>
+					The value of Tom Friedman
+				</a>
+				<span class='byline'><A href='http://www.origin.railrode.net/writer/glenn_greenwald/' rel='author'>Glenn Greenwald</A></span>
+			     </li>
+			     <li class='smr-post'>
+				<a href='http://www.salon.com/2012/07/25/our_anglo_saxon_heritage_really/' class="gaTrackLinkEvent" data-ga-track-json="[&quot;mostread&quot;,&quot;click&quot;,&quot;Our \&quot;Anglo-Saxon heritage\&quot;? Really?&quot;]" title='Our &quot;Anglo-Saxon heritage&quot;? Really?'>
+					<span class='thumbWrap'>
+						<img width="186" height="124" src="http://media.salon.com/2012/07/romney-australia.jpeg-186x124.jpg" class="attachment-186x124 wp-post-image" alt="Mitt Romney" title="Mitt Romney" />
+					</span>
+					Our "Anglo-Saxon heritage"? Really?
+				</a>
+				<span class='byline'><A href='http://www.origin.railrode.net/writer/joan_walsh/' rel='author'>Joan Walsh</A></span>
+			     </li>
+			     </ul>		<div class="columnists">
+			<h2>Voices</h2>
+			<ul>
+								<li><a href="http://www.salon.com/writer/alex_pareene/">Alex Pareene</a></li>
+								<li><a href="http://www.salon.com/writer/alex_seitz_wald/">Alex Seitz-Wald</a></li>
+								<li><a href="http://www.salon.com/writer/andrew_leonard/">Andrew Leonard</a></li>
+								<li><a href="http://www.salon.com/writer/andrew_ohehir/">Andrew O'Hehir</a></li>
+								<li><a href="http://www.salon.com/writer/cary_tennis/">Cary Tennis</a></li>
+								<li><a href="http://www.salon.com/writer/david_sirota/">David Sirota</a></li>
+								<li><a href="http://www.salon.com/writer/glenn_greenwald/">Glenn Greenwald</a></li>
+								<li><a href="http://www.salon.com/writer/irin_carmon/">Irin Carmon</a></li>
+								<li><a href="http://www.salon.com/writer/joan_walsh/">Joan Walsh</a></li>
+								<li><a href="http://www.salon.com/writer/laura_miller/">Laura Miller</a></li>
+								<li><a href="http://www.salon.com/writer/mary_elizabeth_williams/">Mary Elizabeth Williams</a></li>
+								<li><a href="http://www.salon.com/writer/natasha_lennard/">Natasha Lennard</a></li>
+								<li><a href="http://www.salon.com/writer/steve_kornacki/">Steve Kornacki</a></li>
+								<li><a href="http://www.salon.com/writer/tracy_clark_flory/">Tracy Clark-Flory</a></li>
+								<li><a href="http://www.salon.com/writer/will_doig/">Will Doig</a></li>
+								<li><a href="http://www.salon.com/writer/willa_paskin/">Willa Paskin</a></li>
+							</ul>
+		</div>
+		        </aside>
+		
+		<div class="clear"></div>	
+	
+	</div>
+
+	<div id="footer" class="container_12">
+
+		Copyright &copy; 2012 Salon Media Group, Inc. Reproduction of material from any Salon pages without written permission is strictly prohibited.<br /><br />
+
+		SALON &reg; is registered in the U.S. Patent and Trademark Office as a trademark of Salon Media Group Inc.<br /><br />
+
+		Associated Press articles: Copyright © 2012 The Associated Press. All rights reserved. This material may not be published, broadcast, rewritten or redistributed.<br /><br />
+	
+	</div>
+           <div class="trackingCode hide">
+
+                    <script type="json/config" class="gaTrackingConfig">
+            {"slots":{"1":["pageTitle","Jay Rosen",3],"2":["pageType","writer page",3]}}
+        </script>            <!-- comScore Tag -->
+            <noscript>
+                <img src="http://b.scorecardresearch.com/p?c1=2&c2=6662697&c3=&c4=&c5=&c6=&c15=&cj=1" style="display: none;" border="0" height="1" width="1" />
+            </noscript>
+                <!-- End comScore Tag -->
+
+            <!-- Quantcast Tag -->
+            <noscript>
+                <div style="display: none;"><img src="//pixel.quantserve.com/pixel/p-88O9JRUYuy_46.gif" height="1" width="1" alt="Quantcast"/></div>
+            </noscript>
+            <!-- End Quantcast tag -->
+
+                        <!-- START Parse.ly Include: Standard -->
+                <div id="parsely-root" style="display: none">
+                    <a id="parsely-cfg" data-parsely-site="salon.com"
+                        href="http://parsely.com">Powered by the Parse.ly Publisher Platform (P3).
+                    </a>
+                </div>
+            <!-- END Parse.ly Include -->
+                    </div>
+            <div
+        class="adContainer"
+        data-query="Jay+Rosen"
+        data-sitepage="www.salon.com/writer/jay_rosen/index.html"
+    >
+        <script>
+            if(window.slnm && slnm.groups){
+                slnm.groups.init( slnm.config.yui.groups["salon-ad-modules"] );
+                slnm.groups.initAll();
+            }
+        </script>
+
+
+        <div class="Bottom hide">
+            <script>
+                slnm.ads.initInlinePosition("Bottom");
+            </script>
+        </div>
+        <div class="TopLeft hide">
+            <script>
+                slnm.ads.initInlinePosition("TopLeft");
+            </script>
+        </div>
+        <div class="Top hide">
+            <script>
+                slnm.ads.initInlinePosition("Top");
+            </script>
+        </div>
+        <div class="Top2 hide">
+            <script>
+                slnm.ads.initInlinePosition("Top2");
+            </script>
+        </div>
+        <div class="Top3 hide">
+            <script>
+                slnm.ads.initInlinePosition("Top3");
+            </script>
+        </div>
+        <div class="Frame1 hide">
+            <script>
+                slnm.ads.initInlinePosition("Frame1");
+            </script>
+        </div>
+        <div class="Right hide">
+            <script>
+                slnm.ads.initInlinePosition("Right");
+            </script>
+        </div>
+        <div class="Right2 hide">
+            <script>
+                slnm.ads.initInlinePosition("Right2");
+            </script>
+        </div>
+        <div class="x10 hide">
+            <script>
+                slnm.ads.initInlinePosition("x10");
+            </script>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

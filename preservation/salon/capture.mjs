@@ -16,7 +16,7 @@ const root = path.dirname(fileURLToPath(import.meta.url));
 const output = path.resolve(process.argv[2] || path.join(root, 'captures'));
 await mkdir(output, { recursive: true });
 if ((await readdir(output)).length) throw new Error('Capture output must be empty; choose a new directory to preserve existing copies');
-const sources = JSON.parse(await readFile(path.join(root, 'sources.json')));
+const sources = JSON.parse(await readFile(process.argv[3] || path.join(root, 'sources.json')));
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium',
   proxy: process.env.HTTPS_PROXY ? { server: process.env.HTTPS_PROXY } : undefined,
   args: ['--no-sandbox'] });

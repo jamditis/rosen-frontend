@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <script>
+        const subscriberUser = !!document.cookie.split('; ').find(row => row.startsWith('wordpress_subscriber_user='));
+
+        const userDetails = subscriberUser ? JSON.parse(window.localStorage.getItem('userDetails')) : null;
+        const darkModeEnabled = userDetails ? userDetails?.userPreferences?.darkMode === true : false;
+        const stickyHeaderEnabled = userDetails ? userDetails?.userPreferences?.stickyHeader === true : false;
+
+        // Helper function to read cookies
+        function getCookie(name) {
+            var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+            return v ? v[2] : null;
+        }
+
+        // Check for the 'wordpress_premium_member' cookie
+        const hasPremiumCookie = getCookie('wordpress_premium_member') === '1';
+        const hasPremiumRoleInLS = userDetails
+            && userDetails.userRoles
+            && Array.isArray(userDetails.userRoles)
+            && userDetails.userRoles.includes('premium_member');
+        const isPremium = hasPremiumCookie || hasPremiumRoleInLS;
+
+        if (darkModeEnabled) {
+            document.documentElement.classList.add('dark');
+        }
+
+        if (isPremium) {
+            document.documentElement.classList.add('premium');
+        }
+    </script>
+
+            <!-- START email detection/removal script -->
+        <script>
+            !function(){"use strict";const t={adt_ei:{identityApiKey:"plainText",source:"url",type:"plaintext",priority:1},adt_eih:{identityApiKey:"sha256",source:"urlh",type:"hashed",priority:2},sh_kit:{identityApiKey:"sha256",source:"urlhck",type:"hashed",priority:3}},e=Object.keys(t);function i(t){return function(t){const e=t.match(/((?=([a-z0-9._!#$%+^&*()[\]<>-]+))\2@[a-z0-9._-]+\.[a-z0-9._-]+)/gi);return e?e[0]:""}(function(t){return t.replace(/\s/g,"")}(t.toLowerCase()))}!async function(){const n=new URL(window.location.href),o=n.searchParams;let a=null;const r=Object.entries(t).sort(([,t],[,e])=>t.priority-e.priority).map(([t])=>t);for(const e of r){const n=o.get(e),r=t[e];if(!n||!r)continue;const c=decodeURIComponent(n),d="plaintext"===r.type&&i(c),s="hashed"===r.type&&c;if(d||s){a={value:c,config:r};break}}if(a){const{value:t,config:e}=a;window.adthrive=window.adthrive||{},window.adthrive.cmd=window.adthrive.cmd||[],window.adthrive.cmd.push(function(){window.adthrive.identityApi({source:e.source,[e.identityApiKey]:t},({success:i,data:n})=>{i?window.adthrive.log("info","Plugin","detectEmails",`Identity API called with ${e.type} email: ${t}`,n):window.adthrive.log("warning","Plugin","detectEmails",`Failed to call Identity API with ${e.type} email: ${t}`,n)})})}!function(t,e){const i=new URL(e);t.forEach(t=>i.searchParams.delete(t)),history.replaceState(null,"",i.toString())}(e,n)}()}();
+        </script>
+        <!-- END email detection/removal script -->
+                    <!-- Raptive Head Tag Manual -->
+        <script data-no-optimize="1" data-cfasync="false">
+            (function(w, d) {
+
+                if (isPremium) {
+                    return;
+                }
+
+                w.adthrive = w.adthrive || {};
+                w.adthrive.cmd = w.adthrive.cmd || [];
+                w.adthrive.plugin = 'adthrive-ads-manual';
+                w.adthrive.host = 'ads.adthrive.com';
+                var s = d.createElement('script');
+                s.async = true;
+                s.referrerpolicy = 'no-referrer-when-downgrade';
+                s.src = 'https://' + w.adthrive.host + '/sites/69caa2a59c365653ba27aeb9/ads.min.js?referrer=' + w.encodeURIComponent(w.location.href) + '&cb=' + (Math.floor(Math.random() * 100) + 1);
+                var n = d.getElementsByTagName('script')[0];
+                n.parentNode.insertBefore(s, n);
+            })(window, document);
+        </script>
+        <!-- End of Raptive Head Tag -->
+                    <!-- Dianomi Context Feed -->
+        <script type="text/javascript" id="dianomi_context_script" src="https://www.dianomi.com/js/contextfeed.js"></script>
+        <!-- End Dianomi Context Feed -->
+        
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-MGRKVFC2');</script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google Fonts pre-connect
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://www.salon.com/app/themes/salon/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://www.salon.com/app/themes/salon/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://www.salon.com/app/themes/salon/assets/img/favicon-16x16.png">
+    <link rel="icon" type="image/png" href="https://www.salon.com/app/themes/salon/favicon.ico">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta property="fb:pages" content="120680396518" />
+    <meta property="fb:app_id" content="134091381200152" />
+    <meta name="p:domain_verify" content="afd252c603232fed8ddf2554b144079b"/>
+
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/icomoon.woff" as="font" type="font/woff" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-Bold-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Helvetica-Oblique-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/Georgia-Bold-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://www.salon.com/app/themes/salon/dist/assets/TimesNewRoman-subset.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+
+	<!-- This site is optimized with the Yoast SEO Premium plugin v25.9 (Yoast SEO v25.9) - https://yoast.com/wordpress/plugins/seo/ -->
+	<title>Salon Radio: Anthrax edition - Salon.com</title>
+	<meta name="description" content="Two experts -- one in bioweapons and one in journalism -- explore the numerous, still unanswered questions in the anthrax case." />
+	<link rel="canonical" href="https://www.salon.com/2008/08/08/anthrax_5/" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://www.salon.com/2008/08/08/anthrax_5/?utm_source=website&amp;utm_medium=social&amp;utm_campaign=ogshare&amp;utm_content=og" />
+	<meta property="og:site_name" content="Salon.com" />
+	<meta property="article:publisher" content="120680396518" />
+	<meta property="article:published_time" content="2008-08-08T16:54:00+00:00" />
+	<meta property="article:modified_time" content="2011-09-25T22:35:07+00:00" />
+	<meta property="og:image" content="http://www.accountabilitynowpac.com/images/SBF-150x100h.jpg" />
+	<meta property="og:image:width" content="1200"/>
+	<meta property="og:image:height" content="628"/>
+	<meta name="author" content="Glenn Greenwald" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:label1" content="Written by" />
+	<meta name="twitter:data1" content="Glenn Greenwald" />
+	<meta name="twitter:label2" content="Est. reading time" />
+	<meta name="twitter:data2" content="32 minutes" />
+	<meta property="article:section" content="All Salon" />
+	<meta property="article:section" content="News &amp; Politics" />
+	<meta property="article:section" content="Politics" />
+	<meta property="article:tag" content="WASHINGTON DC" />
+	<meta property="article:author" content="Glenn Greenwald" />
+	<!-- / Yoast SEO Premium plugin. -->
+
+
+<link rel='stylesheet' id='optinmonster-memberpress-css' href='https://www.salon.com/app/plugins/optinmonster/assets/dist/css/memberpress.min.css?ver=2.16.24' media='all' />
+<link rel='stylesheet' id='mp-theme-css' href='https://www.salon.com/app/plugins/memberpress/css/ui/theme.css?ver=1.12.15' media='all' />
+<style id="classic-theme-styles-inline-css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+
+
+<link rel='stylesheet' id='global-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/global.css?ver=1.0.31' media='all' />
+<link rel='stylesheet' id='article-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/article.css?ver=1.0.31' media='all' />
+<link rel='stylesheet' id='ad-salon-css' href='https://www.salon.com/app/themes/salon/dist/assets/ad.css?ver=1.0.31' media='all' />
+<script id="nelio-ab-testing-visitor-type-js" src="https://www.salon.com/app/plugins/nelio-ab-testing/assets/dist/js/visitor-type.js?ver=287e8e4cd3bcff28c95d"></script>
+<script type="application/ld+json">{"@context":"https:\/\/schema.org","@graph":[{"@type":"NewsMediaOrganization","@id":"https:\/\/www.salon.com\/#organization","name":"Salon.com","url":"https:\/\/www.salon.com\/","publishingPrinciples":"https:\/\/www.salon.com\/about","masthead":"https:\/\/www.salon.com\/about\/staff","diversityPolicy":"https:\/\/www.salon.com\/about\/diversity","sameAs":["https:\/\/www.facebook.com\/salon","https:\/\/www.instagram.com\/salonofficial","https:\/\/x.com\/salon","https:\/\/www.instagram.com\/salondotcom\/"],"logo":{"@type":"ImageObject","url":"https:\/\/www.salon.com\/app\/themes\/salon\/assets\/img\/salon-logo.svg"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Homepage","item":{"@type":"Thing","@id":"https:\/\/www.salon.com"}},{"@type":"ListItem","position":2,"name":"News &amp; Politics Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/category\/news-and-politics"}},{"@type":"ListItem","position":3,"name":"Politics Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/category\/politics"}},{"@type":"ListItem","position":4,"name":"Glenn Greenwald's Articles","item":{"@type":"Thing","@id":"https:\/\/www.salon.com\/writer\/glenn_greenwald"}}]},{"@type":"NewsArticle","headline":"Salon Radio:  Anthrax edition","url":"https:\/\/www.salon.com\/2008\/08\/08\/anthrax_5\/","thumbnailUrl":false,"alternativeHeadline":"Two experts -- one in bioweapons and one in journalism -- explore the numerous, still unanswered questions in the anthrax case.","dateCreated":"2008-08-08T16:54:00+00:00","datePublished":"2008-08-08T16:54:00+00:00","dateModified":"2011-09-25T22:35:07+00:00","articleSection":"All Salon, News &amp; Politics, Politics","image":[false,false,false,false],"keywords":"WASHINGTON DC","author":[{"@type":"Person","name":"Glenn Greenwald","jobTitle":"","description":" Follow Glenn Greenwald on Twitter: <a href=\"http:\/\/twitter.com\/ggreenwald\">@ggreenwald<\/a>.","url":"https:\/\/www.salon.com\/writer\/glenn_greenwald","sameAs":["https:\/\/x.com\/ggreenwald"]}],"publisher":{"@id":"https:\/\/www.salon.com\/#organization"},"mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.salon.com\/2008\/08\/08\/anthrax_5\/"},"description":"Two experts -- one in bioweapons and one in journalism -- explore the numerous, still unanswered questions in the anthrax case."}]}</script>
+
+    <!--<script src="https://www.google.com/recaptcha/api.js?render=6LckLQkrAAAAABD30EsnOQxmtgweb-aPZojeUU3v" async defer></script>-->
+    <script>
+        let siteUrl = 'https://www.salon.com';
+        let captchaKey = '6LckLQkrAAAAABD30EsnOQxmtgweb-aPZojeUU3v';
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '134091381200152',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v21.0'
+            });
+            FB.AppEvents.logPageView();
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+      
+<!-- Chartbeat -->
+<script type="text/javascript">
+(function() {
+    
+    let userType = 'anon';
+
+    if (subscriberUser) {
+        
+        if (isPremium) {
+            userType = 'paid';
+        }
+        else {
+            userType = 'lgdin';
+        }
+    }
+
+    let path = window.location.pathname;
+    var _sf_async_config = window._sf_async_config = (window._sf_async_config || {});
+    _sf_async_config.uid = 1614;
+    _sf_async_config.domain = 'salon.com'; //CHANGE THIS TO THE ROOT DOMAIN
+    _sf_async_config.flickerControl = false;
+    _sf_async_config.path = path;
+    _sf_async_config.sections = "News & Politics, Politics"; // CHANGE THIS TO YOUR SECTION NAME(s)
+    _sf_async_config.authors = "glenn_greenwald"; // CHANGE THIS TO YOUR AUTHOR NAME(s)
+
+    var _cbq = window._cbq = (window._cbq || []);
+    _cbq.push(["_acct", userType]);
+
+    function loadChartbeat() {
+        var e = document.createElement('script');
+        var n = document.getElementsByTagName('script')[0];
+        e.type = 'text/javascript';
+        e.async = true;
+        e.src = '//static.chartbeat.com/js/chartbeat.js';;
+        n.parentNode.insertBefore(e, n);
+    }
+    loadChartbeat();
+})();
+</script>
+<script async src="//static.chartbeat.com/js/chartbeat_mab.js"></script>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="wp-singular post-template-default single single-post postid-650284 single-format-standard wp-theme-salon">
+    <script>
+        if (stickyHeaderEnabled) {
+            document.body.setAttribute('data-fixed', 'true');
+        } else {
+            document.body.removeAttribute('data-fixed');
+        }
+    </script>
+        <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGRKVFC2"
+                      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+        
+            <div class="loader-modal">
+    <div></div>
+</div>
+        <header class="main-header-container">
+            
+<section class="header__mobile">
+    <div>
+        <div class="header__mobile__logo">
+            <a href="https://www.salon.com" aria-label="To Salon Homepage">
+                <img class="-mt-2.5" src="https://www.salon.com/app/themes/salon/assets/img/mobile-logo.svg" width="136" height="40" alt="Salon logo" />
+            </a>
+        </div>
+        <div class="header__mobile__actions">
+            <button class="button__burger group/button__burger text-[#1e1e1e] dark:text-white text-2xl" aria-pressed="false" aria-controls="mobile-menu">
+    <i class="icon icon-burger block group-aria-pressed/button__burger:hidden" ></i>
+    <i class="icon icon-close hidden group-aria-pressed/button__burger:block" ></i>
+</button>
+        </div>
+    </div>
+    <nav
+    class="navigation__mobile"
+    aria-expanded="false"
+    id="mobile-menu"
+>
+    <div>
+        <div class="search__form w-full">
+    <form role="search" method="GET" action="https://www.salon.com/search/">
+        <div>
+                        <label for="search-form-1" class="hidden">Search</label>
+            <div class="relative">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#666666] dark:text-white">
+                    <i class="icon icon-search" ></i>
+                </div>
+                <input type="search" name="s" id="search-form-1" class="block w-full rounded-sm border border-[#a6a6a6] dark:border-white py-2 pr-4 pl-10 text-[#666666] dark:text-white text-base leading-4 placeholder:text-sm placeholder:text-[#666666] dark:placeholder:text-white placeholder:leading-4 outline-0 dark:bg-[#1d1d1d]" placeholder="Search" value="" />
+            </div>
+        </div>
+    </form>
+</div>
+        <div class="menu-burger-menu-container"><ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/life-stories">Life Stories</a></li>
+<li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li>
+<li class="menu-item menu-item-has-children"><a href="#">Reviews</a>
+<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Lifestyle</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/16/navigating-the-new-sober-boom-where-a-persons-sobriety-is-as-unique-as-their-fingerprint/">The New Sober Boom</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/30/secrets-of-a-serial-addict-how-i-got-hooked-on-quitting-over-and-over-again/">Getting Hooked on Quitting</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Education</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2024/03/16/ignorance-and-democracy-capitalisms-long-against-higher-education/">Liberal Arts Cuts Are Dangerous</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/09/16/college-was-necessary-for-me-will-my-own-child-need-it-like-i-did/">Is College Necessary?</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Finance</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/08/26/my-parents-are-deadcan-i-afford-avocado-toast-now/">Dying Parents Costing Millennials Dear</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/09/09/how-did-le-creuset-the-self-described-heirloom-quality-cookware-change-the-cooking-game/">Gen Z Investing In Le Creuset</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Crypto</a>
+	<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Investing</a>
+		<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/03/23/on-thursdays-we-wear-orange-sec-sues-lindsay-lohan-and-others-over-crypto-money-laundering-scam/">SEC vs Celebrity Crypto Promoters</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/04/16/impulsive-psychopaths-like-crypto-dark-personality-traits-increase-bitcoin-enthusiasm_partner/">&#8216;Dark&#8217; Personalities Drawn to BTC</a></li>
+		</ul>
+</li>
+	</ul>
+</li>
+</ul>
+</li>
+</ul></div>        <div id="userMenuContainerMobile">
+                    </div>
+        <div>
+            <div class="navigation__social">
+    <a href="https://x.com/Salon" target="_blank">
+        <i class="icon icon-twitter" ></i>
+    </a>
+    <a href="https://www.instagram.com/salonofficial" target="_blank">
+        <i class="icon icon-instagram" ></i>
+    </a>
+    <a href="https://www.youtube.com/user/SalonDotCom" target="_blank">
+        <i class="icon icon-youtube" ></i>
+    </a>
+    <a href="https://www.facebook.com/salon" target="_blank">
+        <i class="icon icon-facebook" ></i>
+    </a>
+    <a href="https://www.tiktok.com/@salonofficial" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-tiktok" ></i>
+    </a>
+    <a href="https://www.reddit.com/domain/salon.com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-reddit" ></i>
+    </a>
+    <a href="https://www.linkedin.com/company/salon-com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-linkedin" ></i>
+    </a>
+</div>
+        </div>
+    </div>
+</nav>
+</section>
+            
+<section class="header__desktop">
+    <section class="header__desktop__top">
+        <div>
+            <div>
+                <button class="button__burger group/button__burger text-[#1e1e1e] dark:text-white text-2xl" aria-pressed="false" aria-controls="burger-menu">
+    <i class="icon icon-burger block group-aria-pressed/button__burger:hidden" ></i>
+    <i class="icon icon-close hidden group-aria-pressed/button__burger:block" ></i>
+</button>
+                <nav class="navigation__burger" aria-expanded="false" id="burger-menu">
+    <div>
+        <div class="menu-burger-menu-container"><ul class="flex flex-col gap-2"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li>
+<li class="menu-item"><a href="https://www.salon.com/category/life-stories">Life Stories</a></li>
+<li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li>
+<li class="menu-item menu-item-has-children"><a href="#">Reviews</a>
+<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Lifestyle</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/16/navigating-the-new-sober-boom-where-a-persons-sobriety-is-as-unique-as-their-fingerprint/">The New Sober Boom</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/12/30/secrets-of-a-serial-addict-how-i-got-hooked-on-quitting-over-and-over-again/">Getting Hooked on Quitting</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Education</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2024/03/16/ignorance-and-democracy-capitalisms-long-against-higher-education/">Liberal Arts Cuts Are Dangerous</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/09/16/college-was-necessary-for-me-will-my-own-child-need-it-like-i-did/">Is College Necessary?</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Finance</a>
+	<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/08/26/my-parents-are-deadcan-i-afford-avocado-toast-now/">Dying Parents Costing Millennials Dear</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2023/09/09/how-did-le-creuset-the-self-described-heirloom-quality-cookware-change-the-cooking-game/">Gen Z Investing In Le Creuset</a></li>
+	</ul>
+</li>
+<li class="menu-item menu-item-has-children"><a href="#">Crypto</a>
+	<ul>
+<li class="menu-item menu-item-has-children"><a href="#">Investing</a>
+		<ul>
+<li class="menu-item"><a href="https://www.salon.com/2023/03/23/on-thursdays-we-wear-orange-sec-sues-lindsay-lohan-and-others-over-crypto-money-laundering-scam/">SEC vs Celebrity Crypto Promoters</a></li>
+<li class="menu-item"><a href="https://www.salon.com/2022/04/16/impulsive-psychopaths-like-crypto-dark-personality-traits-increase-bitcoin-enthusiasm_partner/">&#8216;Dark&#8217; Personalities Drawn to BTC</a></li>
+		</ul>
+</li>
+	</ul>
+</li>
+</ul>
+</li>
+</ul></div>    </div>
+</nav>
+            </div>
+        </div>
+        <div>
+            <div class="navigation__social">
+    <a href="https://x.com/Salon" target="_blank">
+        <i class="icon icon-twitter" ></i>
+    </a>
+    <a href="https://www.instagram.com/salonofficial" target="_blank">
+        <i class="icon icon-instagram" ></i>
+    </a>
+    <a href="https://www.youtube.com/user/SalonDotCom" target="_blank">
+        <i class="icon icon-youtube" ></i>
+    </a>
+    <a href="https://www.facebook.com/salon" target="_blank">
+        <i class="icon icon-facebook" ></i>
+    </a>
+    <a href="https://www.tiktok.com/@salonofficial" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-tiktok" ></i>
+    </a>
+    <a href="https://www.reddit.com/domain/salon.com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-reddit" ></i>
+    </a>
+    <a href="https://www.linkedin.com/company/salon-com" target="_blank" class="salon-lg:hidden">
+        <i class="icon icon-linkedin" ></i>
+    </a>
+</div>
+            <div class="dropdown__user group/dropdown__user relative text-left">
+    <div class="flex justify-center">
+        <button type="button" class="text-[#1e1e1e] dark:text-white group-hover/dropdown__user:text-[#ed2c1d]" id="dropdown-user-2" aria-haspopup="true">
+            <i class="icon icon-user text-2xl" ></i>
+        </button>
+    </div>
+    <div class="absolute right-0 z-10 pt-2 w-56 origin-top-right rounded-md bg-white dark:bg-[#1d1d1d] shadow-lg invisible transition-opacity ease-out delay-100 opacity-0 group-hover/dropdown__user:opacity-100 group-hover/dropdown__user:visible" role="menu" aria-orientation="vertical" aria-labelledby="dropdown-user-2" tabindex="-1">
+        <div role="none" id="userMenuContainer"></div>
+    </div>
+</div>
+        </div>
+    </section>
+    <section class="header__desktop__middle">
+        
+<nav class="navigation__desktop">
+    <div>
+        <div>
+            
+                <ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/news-and-politics">News &amp; Politics</a></li><li class="menu-item"><a href="https://www.salon.com/category/culture">Culture</a></li><li class="menu-item"><a href="https://www.salon.com/category/food">Food</a></li></ul>            <div class="logo__desktop">
+                <a href="https://www.salon.com" aria-label="To Salon Homepage">
+                    <img src="https://www.salon.com/app/themes/salon/assets/img/salon-logo.svg" width="341" height="100" alt="Salon logo" />
+                </a>
+            </div>
+                <ul class="menu"><li class="menu-item"><a href="https://www.salon.com/category/science-and-health">Science &amp; Health</a></li><li class="menu-item"><a href="https://www.salon.com/category/money">Money</a></li><li class="menu-item"><a href="https://www.salon.com/tv">Video</a></li></ul>                    </div>
+    </div>
+</nav>
+    </section>
+    <section class="header__desktop__bottom">
+        <div>
+            <div class="search__form w-full">
+    <form role="search" method="GET" action="https://www.salon.com/search/">
+        <div>
+                        <label for="search-form-3" class="hidden">Search</label>
+            <div class="relative">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#666666] dark:text-white">
+                    <i class="icon icon-search" ></i>
+                </div>
+                <input type="search" name="s" id="search-form-3" class="block w-full rounded-sm border border-[#a6a6a6] dark:border-white py-2 pr-4 pl-10 text-[#666666] dark:text-white text-base leading-4 placeholder:text-sm placeholder:text-[#666666] dark:placeholder:text-white placeholder:leading-4 outline-0 dark:bg-[#1d1d1d]" placeholder="Search" value="" />
+            </div>
+        </div>
+    </form>
+</div>
+        </div>
+    </section>
+</section>
+        </header>
+    
+    <div class="raptive-salon-header hide-if-premium"></div>
+
+    <main class="main-container">
+
+<div class="articles">
+            <article id="post-650284" class="single-column post-650284 post type-post status-publish format-standard hentry category-all-salon category-news-and-politics category-politics tag-washington-dc" data-post-id="650284">
+    <!-- TODO: Add the preview message here ... -->
+    
+<section class="article__title">
+        <h1>Salon Radio:  Anthrax edition</h1>
+    <h2>Two experts -- one in bioweapons and one in journalism -- explore the numerous, still unanswered questions in the anthrax case.</h2>
+    <div class="writers">
+                    <div>
+                <div class="by">
+                    <span>By</span>
+                                            <a href="https://www.salon.com/writer/glenn_greenwald">
+                            Glenn Greenwald                        </a>
+                                                            </div>
+                                    <div>
+                                            </div>
+                            </div>
+                <div class="date">
+                            <h3>
+                    <span>Published</span>
+                    <time datetime="2008-08-08T12:54:00-04:00">
+                        August 8, 2008 12:54PM (EDT)                    </time>
+                </h3>
+                    </div>
+    </div>
+</section>
+    <section class="article__feature">
+    <!-- TODO: Add the featured video here... -->
+        <div class="attachment__image">
+    <div class="image">
+        <img src="https://www.salon.com/app/themes/salon/assets/img/article-placeholder.webp" alt="Salon Default"/>
+    </div>
+</div>
+    </section>
+    <section class="main">
+        <div>
+            <!-- TODO: Add the functionality for the article sharing here ... -->
+            
+<section class="article__share">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.salon.com%2F2008%2F08%2F08%2Fanthrax_5%2F&#038;utm_source=facebook&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#3a5697]" rel="nofollow">
+    <i class="icon icon-facebook bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#2c4788]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Facebook    </span>
+    </a>
+            <a href="https://x.com/share?url=https%3A%2F%2Fwww.salon.com%2F2008%2F08%2F08%2Fanthrax_5%2F&#038;text=Salon+Radio%3A++Anthrax+edition&#038;utm_source=twitter&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#03a2e0]" rel="nofollow">
+    <i class="icon icon-twitter bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#048cc1]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        X    </span>
+    </a>
+            <a href="https://www.reddit.com/submit?url=https%3A%2F%2Fwww.salon.com%2F2008%2F08%2F08%2Fanthrax_5%2F&#038;title=Salon+Radio%3A++Anthrax+edition&#038;utm_source=reddit&#038;utm_medium=social&#038;utm_campaign=socialbuttons&#038;utm_content=share_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#ff661e]" rel="nofollow">
+    <i class="icon icon-reddit bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#ea5a16]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Reddit    </span>
+    </a>
+            <a href="mailto:?subject=Salon%20Radio%3A%20%20Anthrax%20edition&#038;body=Check%20out%20this%20article%21%20https%3A%2F%2Fwww.salon.com%2F2008%2F08%2F08%2Fanthrax_5%2F%3Futm_source%3Demail%26utm_medium%3Dsocial%26utm_campaign%3Dsocialbuttons%26utm_content%3Dshare_button" class="button__share group/button__share flex items-center bg-[#5f5f5f] rounded text-white hover:text-white hover:no-underline h-8 max-w-[115px] min-[801px]:w-full transition-colors relative hover:bg-[#3d4e66]" >
+    <i class="icon icon-email bg-[#797777] fill-white max-w-9 !w-9 shrink-0 !h-full flex justify-center items-center rounded min-[801px]:rounded-tl min-[801px]:rounded-bl group-hover/button__share:bg-[#2d394a]" ></i>
+    <span class="text-[13px] text-center w-full hidden min-[801px]:inline">
+        Email    </span>
+    </a>
+        <div class="article__title-badges">
+        <div class="google-preferred-source-container">
+            <a
+                class="google-preferred-source"
+                href="https://www.google.com/preferences/source?q=salon.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Set Salon as a preferred source on Google News"
+                            >
+                <picture
+                    data-light-src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png"
+                    data-dark-src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_dark@2x.png"
+                >
+                    <source srcset="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png" media="(prefers-color-scheme: dark)">
+                    <img
+                        src="https://www.salon.com/app/themes/salon/assets/img/google_preferred_source_badge_light@2x.png"
+                        alt="Set Salon as a preferred source on Google News"
+                        loading="lazy"
+                        width="676"
+                        height="213"
+                    >
+                </picture>
+            </a>
+        </div>
+    </div>
+    <template id="save-article-button">
+        
+<button type="button" id="saveArticleBtn-1544" onclick="saveArticle(this.id);" class="button__tertiary group/button__tertiary border-2 border-[#5f5f5f] rounded text-[#5f5f5f] text-sm font-bold px-2 py-1 h-8 lowercase flex items-center gap-x-1.5 hover:text-[#e42416] hover:border-[#e42416]">
+            <i class="icon icon-save !h-4 !w-3 text-[#5f5f5f] group-hover/button__tertiary:text-[#e42416] text-base" ></i>
+        <span class="btnLabel">Save</span>
+</button>
+    </template>
+</section>
+            <!-- TODO: Add the editor's note here ... -->
+                        <section class="article__content page-article"><p><b>(updated below)</b> </p>
+<p> <a href="http://www.accountabilitynowpac.com" target="_blank" rel="noopener"><img decoding="async" src="http://www.accountabilitynowpac.com/images/SBF-150x100h.jpg" alt="Become a StrangeBedfellow!" style="border: 1px solid black"></a></p>
+<p>[<b>see <a href="https://www.salon.com/opinion/greenwald/2008/08/08/accountability/index.html">post below</a> for information on the Accountability Money Bomb</b>] </p>
+<p></p><div style="float: left;width: 75px;margin-right: 8px"><img decoding="async" class="wp-image-10013803" src="http://media.www.salon.com/2008/08/ggradio_23.gif"></div>
+
+<p>__________________________ </p>
+<p>Initially, a moment of grieving is in order over the first tragedy suffered by our new <i>Salon Radio</i> Show. On Wednesday night, I had a 45-minute discussion with MIT Professor Noam Chomsky on wide-ranging matters, which was scheduled to run today, but a technical glitch destroyed all but the last six minutes of the recording. I won’t bother trying to describe my reaction when I discovered this, but I will have Professor Chomsky on again once our still-evolving recording methods are stabilized. </p>
+<p>Instead, I was able to have two separate discussions today regarding various aspects of the anthrax case. Those can be heard by clicking PLAY at the bottom of the post. The more one considers and examines what the FBI disclosed, the more questions that are raised. I spoke today with:</p><div class="raptive-salon-video hide-if-premium"></div>
+<ul>
+<li><b>Dr. Gigi Kwik Gronvall</b>, an immunologist with the Center for Biosecurity at the University of Pittsburgh’s Medical Center, an Assistant Professor of Medicine at the University of Pittsburgh, and Associate Editor of the quarterly journal <i>Biosecurity and Bioterrorism</i>. That interview lasted roughly 20 minutes (the transcript is <a href="https://www.salon.com/opinion/greenwald/radio/2008/08/08/anthrax/index2.html">here</a>). 
+<p>We discussed the impossibility of assessing the scientific validity of the FBI’s assertions in the Ivins case due to their ongoing concealment of the underlying scientific data relevant to those claims; the numerous scientific gaps in the FBI’s public disclosure of its case; and the multiple other private and public institutions where anthrax of the type sent by the attacker could very well be produced — such as the Dugway Proving Ground in Utah and Battelle Laboarties (which, speaking of circumstantial evidence, is owned <a href="http://www.battelleventures.com/">by a company</a> — Battelle Ventures, LLC — headquartered in Princeton, NJ, where the FBI says all anthrax letters were sent). </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>The now-forgotten though seemingly quite significant Judy Miller <i>NYT</i> article I discussed with Dr. Gronvall — one that was published on September 4, 2001 and which reported that “the United States has embarked on a program of secret research on biological weapons that, some officials say, tests the limits of the global treaty banning such weapons” and “earlier this year, administration officials said, <b>the Pentagon drew up plans to engineer genetically a potentially more potent variant of the bacterium that causes anthrax</b>” and “Among the facilities likely to be open to inspection under the draft agreement would be the West Jefferson, Ohio, laboratory of the Battelle Memorial Institute, a <b>military contractor that has been selected to create the genetically altered anthrax”</b> — can be read <a href="http://online.sfsu.edu/~rone/GEessays/germtreatylimits.html">here</a>. The highly secretive private/public bioresearch industry — both in the U.S. and throughout the world — is vast and contains numerous locales capable of producing high-grade anthrax strains. As Dr. Gronvall points out, the FBI has said nothing about how — even if it were able to match the strain Bruce Ivins used at Ft. Detrick to the anthrax sent in the letters — it was able to eliminate these other sources.</p></li>
+
+<li><b>Jay Rosen</b>, current Professor of Journalism at NYU and former Chair of NYU’s Journalism Department, regarding ABC News’ bentonite story and the numerous reasons why Brian Ross’ self-defense is so unconvincing and, at times, quite ludicrous (Professor Rosen wrote about that story <a href="http://journalism.nyu.edu/pubzone/weblogs/pressthink/2008/08/04/abcnews_qs.html">here</a> and <a href="http://journalism.nyu.edu/pubzone/weblogs/pressthink/2008/08/07/ross_replies.html">here</a>); that discussion lasted roughly 15 minutes and the transcript can be read <a href="https://www.salon.com/opinion/greenwald/radio/2008/08/08/anthrax/index1.html">here</a>, and see more on the ABC/bentonite matter <a href="http://bloggasm.com/should-abc-news-reveal-its-anonymous-sources-2">here</a>.</li>
+</ul>
+<p>As a result of all of these glaring holes in the FBI’s scientific claims — to say nothing of the even <a href="http://anthraxvaccine.blogspot.com/2008/08/more-than-100-people-had-access.html">even more obvious holes</a> in its <a href="http://anthraxvaccine.blogspot.com/2008/08/beyond-reasonable-doubt.html">circumstantial claims</a> — even establishment media organs from across the ideological spectrum agree on one thing: that what the FBI selectively disclosed on Wednesday is — given the FBI’s history, its one-sided disclosures, and the magnitude of this matter — nowhere near sufficient to conclusively convince a rational person that the FBI’s accusations are accurate, and a genuine, independent investigation is therefore necessary:</p>
+<p> <a href="http://online.wsj.com/article/SB121815232028622395.html?mod=opinion_main_review_and_outlooks"><i>Wall St. Journal Editorial Page, today</i></a>:</p>
+<blockquote><p>To resolve any remaining doubts, <b>independent parties need to review all the evidence</b>, especially the scientific forensics. The FBI has so far only released its summary of the evidence, along with interpretative claims. This is an opportunity for Congress to conduct legitimate oversight, instead of the usual partisan showtrials. After so long and so many missteps, the FBI’s declaration of victory needs to be tried in the court of public opinion — not least to restore public confidence in its credibility.</p></blockquote>
+<p><a href="http://www.washingtonpost.com/wp-dyn/content/article/2008/08/06/AR2008080602794.html"><i>The Washington Post Editorial, 8/7/2008</i></a>:</p>
+<blockquote><p>But as compelling as the allegations contained in the affidavits are, they have not been subjected to the rigors of a criminal trial, where Mr. Ivins might have called witnesses, explained seemingly bizarre behavior, questioned scientific methods used to identify the anthrax strain and attempted to impeach government witnesses. . . . Although it would be no substitute for the testing of a judicial trial, <b>an independent third party should be tapped to perform that task, weighing the validity of government allegations and analyzing the legitimacy of government conclusions</b>. Such a third party could also examine allegations that the FBI hounded Mr. Ivins; if the allegations are unfounded, an independent assessment would benefit the agency. . . . The government may have gotten its man. <b>A thorough review of the evidence will help the victims, the public and Bruce Ivins’s family know whether, in fact, it did</b>.</p></blockquote>
+<p><a href="http://www.nytimes.com/2008/08/08/opinion/08fri2.html?scp=10&amp;sq=Bruce%20Ivins&amp;st=cse"><i>New York Times Editorial</i>, 8/7/2008</a>:</p>
+<blockquote><p>The F.B.I. seems convinced that it has finally solved the long-festering case of who mailed the anthrax letters that killed five people in 2001. Yet its description of the evidence pointing to a mentally disturbed Army bioweapons expert as the sole culprit <b>leaves us uncertain about whether investigators have pulled off a brilliant coup after a bumbling start — or are prematurely declaring victory, despite a lack of hard, incontrovertible proof</b>. . . . </p>
+<p>None of the investigators’ major assertions, however, have been tested in cross-examination or evaluated by outside specialists. It is imperative that federal officials <b>make public all of their data so independent experts can judge whether the mailed anthrax was indeed identical to Dr. Ivins’s supply and only that supply</b>. </p>
+<p> It is also critical for officials to explain more fully how they eliminated the many other people with access to the material. . . . <b>But there is no direct evidence of his guilt</b>. No witness who saw him pouring powdered anthrax into envelopes. No anthrax spores in his house or cars. No confession to a colleague or in a suicide note. No physical evidence tying him to the site in Princeton, N.J., from which the letters are believed to have been mailed. . . . </p>
+<p>The bureau, unfortunately, has a history of building circumstantial cases that seem compelling at first but ultimately fall apart. <b>Congress will need to probe the adequacy of this investigation — and to insist that federal officials release as much evidence as possible</b>, so the public can be assured they really did get the right person this time.</p></blockquote>
+<p>When Colin Powell, in 2003, went before the U.N. and made an extremely selective presentation of evidence which the Government claimed constituted proof that Iraq possessed WMDs, enormous numbers of people <a href="http://glenngreenwald.blogspot.com/2006/11/only-fool-or-possibly-frenchman-could.html">swooned that he had made an extremely compelling case</a>, notwithstanding the fact that the Government alone possessed the relevant evidence, Bush officials were only selectively releasing what they had, and nobody was able to assess the validity of the claims because the underlying evidence remained concealed. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>It’s extraordinary how so many people learned nothing from that as they rush now to declare that the FBI has presented a persuasive case that Bruce Ivins was the anthrax attacker and acted alone. In light of the FBI’s history, and in light of the glaring deficiencies in every aspect of the FBI’s case, what minimally rational person would think they could form an opinion about Ivins’ guilt without a full airing of all the evidence — not just what the FBI has cherry-picked — along with a full-scale and independent investigation? That is why <a href="https://www.salon.com/opinion/greenwald/2008/08/08/accountability/index.html">Accountability Now has chosen as one of its first campaigns</a> an ad campaign airing of all the unresolved questions in the anthrax case and highlighting the need for such an investigation.</p>
+<p><a href="http://www.accountabilitynowpac.com" target="_blank" rel="noopener"><img decoding="async" src="http://www.accountabilitynowpac.com/images/SBF-468x60d.jpg" alt="Become a StrangeBedfellow and Hold Washington Accountable!" style="border: 1px solid black"></a></p>
+<p><b><u>UPDATE</u></b>: I’m on NPR’s <i>On the Media</i> Show this weekend discussing the media’s coverage of the anthrax case, including the ABC/bentonite story and the media’s reporting on the Ivins accusations. A portion of that interview can be heard <a href="http://www.onthemedia.org/transcripts/2008/08/08/01">here</a>. Local listings for the show are <a href="http://www.npr.org/schedule/index.php?prgId=26">here</a>.</p>
+<p><b>Glenn Greenwald</b>: My guest today is Jay Rosen, who is a professor of journalism at New York University, and for quite some time was the chairman of the journalism department there as well. Thanks so much for joining me this morning. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p> <b>Jay Rosen</b>: Thank you, Glenn. </p>
+<p> <b>GG</b>: I wanted to discuss with you the matter of ABC News and Brian Ross’s reporting on the anthrax case, and specifically their claims to have discovered the government sources that told them that bentonite had been discovered back in 2001. You wrote a piece earlier this week about what you thought their obligations were and then wrote a follow-up piece in light of some of the responses that Brian Ross gave in an interview a couple of days ago with Media Bistro. So let’s begin by having you just summarize what you thought were the important journalistic issues raised by the reporting of the story in the first place that caused you to write about it. </p>
+<p> <b>JR</b>: Well, I thought it was very important that they had never corrected what they reported in 2001. I thought it was extremely significant that they said to you that they had corrected it, and I thought it was important that they had never gone back and looked at what went wrong by reporting such an explosive story at such an explosive time. So the issue to me was one of basic accountability and not letting ABC simply get away as if this were all ancient history that nobody cared about. That’s why I wrote what I wrote and that’s why I responded to your post at Salon with my own. </p>
+<p> <b>GG</b>: Now, let’s look at, for a moment, what Brian Ross said in the interview that he gave which was somewhat consistent though a little more detailed than what ABC had told me last year – and that I had heard from people who were involved in that story, actually, on background – which was this claim that they had heard from some scientists that there was some brown material detectable by the eye under the microscope in the anthrax, which in turn lead them to believe that that was indicative of bentonite. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>That there were no chemical tests that revealed that, that they hadn’t even conducted the test yet, but they ran to ABC based on this brown substance, told them there was bentonite and ABC ran with the extraordinarily flamboyant claim that tests had confirmed the presence of bentonite, and that was indicative, or even a smoking gun, of Iraq’s involvement in the anthrax attacks. Now, let’s suppose everything Brian Ross said about that is true, that that’s the way it happened. Let’s just suppose that for a minute. Even by their own reckoning, they got the story wrong because there was no bentonite in the anthrax. Even their own sources ultimately concluded that there wasn’t. What is a news organization’s obligation just in principle, in general, when they get story of that magnitude that wrong? </p>
+<p> <b>JR</b>: Well, let me say one thing first. I think Ross and others at ABC would not exactly say they got it wrong. They would say, at the time, we were right because we accurately reported what our sources were saying, and they were credible sources. </p>
+<p> Now, when they get a story wrong like that, their obligation is first of all to go on the air and say, we were wrong. And then, internally, they have to look at why they got it wrong and whether they got it wrong because they were simply the victims of bad luck, or of malevolent sources, or shoddy practices, because it could be any of those three. So I would think those are their basic obligations. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p> <b>GG</b>: Right. Now, one of the things that they claimed last year was that they fulfilled that obligation, because on November 1st 2001, Brian Ross went on the air and Peter Jennings at the end of a long segment, said, oh, what about this whole matter with the bentonite and Brian Ross said, well, actually the White House today told us that despite initial tests that confirmed bentonite or suggested bentonite, subsequent tests have ruled it out. </p>
+<p> Now, the way that I look at that is that if you look at what they were saying from the very first time that they ran with the story, back on October 26, in every single instance they talked about it, they pointed out that the White House had denied their reports, that the White House was claiming all along, that there was no bentonite. So saying that the White House denied the report wasn’t anything new. It was essentially what they were saying. </p>
+<p>And if you look at how people have written about the bentonite story subsequent even to that November 1st discussion that Peter Jennings and Brian Ross had, nobody understood that as a retraction. People continued to point to that story as evidence of Iraqi involvement. No-one has ever called that a retraction or written about how ABC retracted their story, or corrected it or anything else. Do you perceive that to be anywhere near adequate in terms of fulfilling their obligation to account to the public and whether they say they got it right originally or not, it was ultimately a factually false claim, the finding of bentonite. Do you consider that to be a discharge of their responsibilities? </p><div class="raptive-salon-content hide-if-premium"></div>
+<p><b>JR</b>: No. Not even close. In fact, it’s the most ludicrous part of ABC’s defense. You have to go back to October 26, they had this report ready, saying that scientists believe they have found bentonite in the anthrax. And just before air, the White House calls, and says, no bentonite. And we have to look at that because the White House didn’t call and say, hold your story or we’re not sure, or gee, there’s some confusion here. They said: no bentonite. So, instead of pulling back, taking the weekend, looking at this conflict, and deciding what to report, they just went to air. </p>
+<p> Then, from October 26 through November 1st, they sort of ritualistically reported the White House denials while promoting, bentonite found in the anthrax, several times. Then on November 1st, they just switched the emphasis, from reporting ritualistic denials to leading with the denials. According to Ross and ABC, that constitutes a correction. That is just pathetically weak and lame. They obviously didn’t want to go on the air and say how wrong they were, and they didn’t want to look at why they were so wrong either. So that part is actually the weakest part of what they are saying and it doesn’t pass any sort of smell test. </p>
+<p><b>GG</b>: Right. Now here’s the problem that I have even the claim that they’re making, without being privy to who these sources are and what was really being discussed – one can only speculate about how accurate the rendition is that ABC is offering – but the way that this works is, as I understand it from many, many sources, including a couple who were directly involved, is that the first thing you do is do a visual inspection of the anthrax under a microscope. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>But then very quickly thereafter, you do a chemical test that reveals whether for example there’s aluminum, which is the tell tale sign of bentonite, and that those chemical tests were done almost immediately, and that is how Ari Fleischer and the White House was so sure there was no bentonite, because those tests, which were conducted almost immediately, very quickly revealed there was probably silicon added to the spores, but not bentonite. And so, even if it’s true, that at the very first stage of the first couple hours, there was some belief on the part of these sources that there was bentonite because they saw something brown – day after day after day, when Brian Ross is going on the air, what was clear was that those claims were disproven by the actual chemical tests. </p>
+<p>Which means he either never went back to his sources and said, why is the White House so definitive here in saying that these chemical tests show there’s no bentonite, or he did go back and his sources continued to insist that there was bentonite even by the time it was clear there wasn’t. </p>
+<p> And that’s why to me, it’s not just a matter of being convinced that, well the sources were acting in good faith, and believed what they were saying and they just turned out to be wrong. It’s seems pretty clear that during a substantial part of the time when they were making this claim, the evidence was definitive that it was wrong, and they either made the claim anyway, knowing it was false, or they just kept making it recklessly, and to me that really raises a more significant question about what ABC’s responsibility is, beyond just what would happen normally if their sources in good faith got a story wrong. Do you see that, do you consider that ABC’s rendition is convincing? </p><div class="raptive-salon-content hide-if-premium"></div>
+<p> <b>JR</b>: I think you’re on the right track, that they were being reckless during this period, and just to add some detail to that, on October 29th, on an ABC News report that’s still online, we find Ross and team reporting this: White House spokesman Ari Fleischer had denied that bentonite was found on the letters but another senior White House official backed off Fleischer’s comments, saying, at this point, there does not appear to be bentonite. Think about what he’s trying to do there – he’s trying to introduce doubt within the White House itself, by counter-posing an on-the-record statement from the White House press secretary, that is definitive – no bentonite – with an off-the-record statement from somebody else in the White House, saying, not that there is bentonite, but at this point there does not appear to be bentonite. So the contrast is between no bentonite, and there does not appear to be bentonite, and Ross is trying to kind of get a wedge in there and create some doubt that obviously, to me, in retrospect, is an attempt to maintain his story. </p>
+<p> And the reason is probably – I’m just guessing – but it’s probably simply ego and pride and unwillingness to admit an error and the fact that they had rushed their story on October 26 and should have been more cautious. But, the fact that they don’t want to go back and look at it now, is really part of something much bigger that I hope we’ll talk about, which is the general reluctance to examine what happened in those years within the press. </p>
+<p> <b>GG</b>: Let’s move to that, because the other part of this story, the Brian Ross story – that I haven’t focused on as much because it’s really more subjective than is the objective fact that there was no bentonite – is that notion that had there been bentonite, that that would have been some signature of the Iraqi biological weapons program, whereas Peter Jennings called it a smoking gun, that people were likely… When they depicted, when they described the story, they called it a chemical additive known as bentonite, and made it seem it was though it was some super-exotic desert germ that Saddam Hussein’s Dr. Germ had concocted in a government lab, and of course as we now know it’s a very common clay, it’s found throughout the world, it’s the clumping agent used in cat litter, and the idea that even had bentonite been there, that would have been some sort of compelling evidence of Iraqi involvement is itself absurd. And yet it was part and parcel of the media’s behavior at that time, to sort of feed the hysteria surrounding Iraq and Saddam Hussein that of course persisted for a couple of years and to this day has never really been meaningfully examined. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p> There’s been an editor’s note in the New York Times that was extremely narrow in scope about the stories that they got wrong, but very little examination on the part of the media. What is your view of that failure to examine their own role in the events of the last seven years? </p>
+<p> <b>JR</b>: Well, this is a subject on which I probably feel the biggest gulf between myself and the professional class of, let’s say, national reporters and editors and producers. Because in the minds of most of the people who work in big league journalism in New York and Washington, they have done this to death. And they’re way past the point of examining their own performance in the run-up to the war. And from my point of view, they haven’t even started. </p>
+<p> Now, it’s true that the New York Times tried to look at its own performance and there were some good things about that and there were some weak things about that. And Howard Kurtz and the Washington Post did do an investigation of how the Washington Post had performed. But as far as I know there has been nothing even remotely like that at any of the three networks. And clearly they feel that this is long since past and there is going to be no investigation. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p> And I think that’s not only an outrage but it’s a mistake from their point of view. I think in the long run their failure to examine this is going to hurt them. Not only because they could learn some important lessons for the next time a national crisis like this comes around, but they really need to get into what sorts of habits and assumptions and culture permitted the collapse of the watchdog press. </p>
+<p> In my own view, the watchdog press died under Bush. We may have a watchdog press again some day, it could be reborn. But it died. And really the only way we’re going to know that full story is through some kind of, almost like a media truth and reconciliation commission, which I have no hope for. But without that kind of effort like that, we’re simply not going to know, and for the government to have gone through the 9/11 Commission, the Senate Select Intelligence Committee examinations, and a number of other things that Congress has done, none of which are totally adequate, but for the government to have that, and for the news media to have done nothing, is a major mistake for the watchdog press. </p>
+<p> <b>GG</b>: Absolutely. I mean, what’s most discouraging about the prospect of if that will ever happen is if you talk to many establishment journalists, certainly media executives, one could probably say most, they don’t even recognize that there’s a problem. They think of it as the Judy Miller problem, that if anything is confined to one or two bad apples, and they’ll say thing condescendingly like, well of course we could have done things better, we always want to strive for perfection, but on the whole I think we did a good job. So without that recognition that there’s a problem even, which is non-existent, that what explains their lack of self-reflection. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p> <b>JR</b>: That’s what I mean. It’s like we’re on the other side of the Moon from them on this particular issue. </p>
+<p> <b>GG</b>: Yeah, both in terms of the premises and the proposed conclusions. Well, Jay, thanks so much for taking the time this morning, I think it was really enlightening and I found it interesting, and I think listeners will as well. </p>
+<p> <b>JR</b>: My pleasure and thanks for the work you do. </p>
+<p> [Transcript courtesy of Thames Valley Transcribe] </p>
+<p><b>Glenn Greenwald</b>: I’m joined today by Dr. Gigi Gronvall, who’s an immunologist with the Center for Biosecurity at the University of Pittsburgh Medical Center. She’s also an assistant professor of medicine at the University of Pittsburgh, and the associate editor of the quarterly journal <span style="font-style: italic">Biosecurity and Bioterrorism</span>. Thanks very much for joining me today.</p>
+<p><b>Dr. Gigi Gronvall</b>: Thank you very much.</p>
+<p><b>Greenwald</b>: Now, I want to begin by asking you about a <span style="font-style: italic">Washington Post</span> article this morning, which actually quotes the director of your Center, Tara O’Toole, as follows, and I’m first reading from the article:</p>
+<blockquote><p>Bioweapons experts said they were unimpressed by the government’s description of the DNA link between the anthrax in the letters and spores in a flask in Ivins’ lab. </p>
+<p>“There is not enough scientific evidence to make an evaluation of the science the FBI used in this investigation,” said Tara O’Toole, who heads the Center for Biosecurity at the University of Pittsburgh.</p></blockquote>
+<p>Do you agree with that assessment, and if you do can you talk about why?</p>
+<p><b>Gronvall</b>: In the documents that the FBI released, they basically made assertions about the conclusions of the science that they had done. But they didn’t actually present it for analysis. So, it’s hard to say whether or not the science, to evaluation the science when really none was put out there to evaluate. It was an assertion that they had made this link. But there was no data. I think that is what she was getting at. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>There are a couple of issues. Even the way the science was done – I’m sure the science was done very well – but then it’s the conclusions from what the data tells you and how that leads to assertions in the investigation. I think scientists would like to see the data, then they would know the uncertainties in the data, what other issues there are, and can the assertions that the FBI, do they rest on some solid data? Can they make those assertions based on the data they have?</p>
+<p><b>Greenwald</b>: So, given the current state of what it is that they released, is it fair to say that a scientist would be essentially incapable of assessing one way or the other whether the conclusions asserted by the FBI are in fact valid or subject to questions or criticisms or flaws in the reasoning?</p>
+<p><b>Gronvall</b>: Yeah, I think on a broad level – they didn’t present anything so it’s really hard to comment on it. You can develop a list of questions about it, but broadly, it’s hard to poke holes at something that hasn’t been offered.</p><div class="raptive-salon-content hide-if-premium"></div>
+<p><b>Greenwald</b>: Right. Now, one of their principal claims that’s presented in conclusory fashion, is that there’s a strain of anthrax that was sent in all of the letters, which is RMR-1029, that they say is identical to the strain of anthrax that was used in a particular flask under Dr. Ivins’ control at Fort Detrick. Can you talk to whether it’s possible, given the current state of science and molecular analysis, to pinpoint an anthrax strain, not just to a particular flask, but in a way that eliminates the possibility that that same strain exists in other places?</p>
+<p><b>Gronvall</b>: Right. This is a good example of what I’m trying to say. The way the science is done – I’m sure – it’s amazing, right? This is something that couldn’t have been done 10 years ago, where you could find out that exactly that strain is duplicated in different places. You just wouldn’t have the complete knowledge that you could today. But what that doesn’t tell you is, does that exact strain exist in other places they didn’t check? What is the level of uncertainty? What are the other – without knowing what the mutations were in this RMR-1029 and without knowing what sort of expansive testing they did, of other strains, it’s hard to say that this is it, this is the only one. </p>
+<p>The science may have been done well, but how it was used – because science is basically a tool to help you answer these questions in this case. Is the assertion valid? Even if that flask, the anthrax in that flask matches what was in the letters, does that mean it doesn’t also match a field somewhere in Texas? You have to show that data to both include other possible leads, and also exclude a whole bunch.</p><div class="raptive-salon-content hide-if-premium"></div>
+<p><b>Greenwald</b>: Right. Do you agree, at least based on what the FBI has thus far unveiled, that there’s nothing in what they’ve disclosed that suggests how they’ve done that or even whether they’ve done that?</p>
+<p><b>Gronvall</b>: Right. Right. That is true.</p>
+<p><b>Greenwald</b>: I want to ask you a question specifically about anthrax, and perhaps it’s beyond the ken of your expertise and maybe it isn’t. But one of the things has been so striking from the beginning of the entire anthrax episode is that, although there’s been some conflicting reports about what exactly the grade of anthrax that was sent, there’s been a consensus, I think, that the anthrax that was sent, especially to Senators Daschle and Leahy, were dangerous and alarming, because they were prepared in such a way as to enable them to be airborne. </p>
+<p>In fact, some of the scientists from the FBI and elsewhere have said that what was so alarming about it was that it was actually difficult to even examine it under the microscope, because it would essentially disperse so quickly. Now, regardless of whether it was weaponized, or aerosolized, or whatever the strain was, given the properties that have been described by virtually everybody who has examined this, is it possible that you could work with anthrax of the that type without having spores on your clothes, or in the immediate environment of wherever it is that you’re working with the anthrax?</p>
+<p><b>Gronvall</b>: You know, there’s so many what-if’s here. Just to get to your first point, basically how was it prepared and was it weaponized, and if it was or wasn’t, what was done to it, how dangerous, how floaty really was it. It’s really hard to say without directly being in the investigation, and they didn’t report any of that. Whether it would be possible to work with it if it was extremely volatile, extremely airborne and floaty as it’s been described without getting it on you and on other things. They didn’t present what they tested and if they found anything, although one would presume if they found something they would say so. </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>I think the bigger question at least from my perspective in the science policy realm, is how difficult was it to do. Did they reverse engineer this process? And learn what exactly did it take to make this anthrax, and was it difficult? Did it require special equipment? I don’t really consider a lyophilizer to be special equipment. And this has really big implications for the threat of bioterrorism. Bruce Ivins did not have training in weapons labs back when the US was making biological weapons. He worked in research and if he was able to make a very very good weapon, then that has implications for how another person could pull off this kind of attack.</p>
+<p><b>Greenwald</b>: I just want to follow up on what you just alluded to with regards to research programs that used to exist in the United States for the production of actual biological weapons. One of the areas that I think has been new to a lot of people who have been looking into this anthrax matter, and I know it’s been new to me, is actually how sprawling anthrax research is beyond just what takes place at Fort Detrick. There’s the Dugway Proving Ground in Utah that’s a US Army facility, and then there’s a whole kind of private network of anthrax research that takes place at corporations that are fairly secretive like Battelle Laboratories and other places.</p>
+<p><b>Gronvall</b>: And then there’s all the universities as well.</p>
+<p><b>Greenwald</b>: Right. So, can you talk about whether the type of anthrax that has been variously described – and I know there’s some conflicts – what kind of the range of strain that has been described, that was, say, sent to Daschle and Leahy, which were considered the most dangerous. Whether there are other institutions both private and public, beyond Fort Detrick, capable of producing that kind of anthrax and whether there’s research and other work undertaken there that would enable someone to have access to strains of that type?</p><div class="raptive-salon-content hide-if-premium"></div>
+<p><b>Gronvall</b>: That’s kind of what I was trying, what the FBI, if they don’t make public the details of how they think this anthrax was created, to make what into the envelopes, if they don’t make that public – and you can imagine why they would not want to – I hope that they do brief people who should know about it, it really does have an implication for the threat. It’s not just that anthrax is worked in all these companies here and laboratories here. Anthrax is found in laboratories all over the world. And it’s more, even outside of the laboratories. This strain found its way into a laboratory because it killed a cow in Texas. You can find anthrax in the soil in the US and many, many other places. So, it’s out there. It’s a question now of how difficult was it and there’s been a lot of conjecture about how difficult it was to create whatever the anthrax, whatever weaponization techniques, or none, went into those letters. It’s an important question because if it turns out that it was easy, then that adds a lot more urgency on the other side – how you respond to an anthrax attack. This is pretty limited in scope, and it was still extremely dangerous. It’s a vulnerability that we’re not prepared to address.</p>
+<p><b>Greenwald</b>: Right.</p>
+<p><b>Gronvall</b>: I know a lot of people, at least a lot of people I’ve talked to, feel, why are we working on this at all if it was this easy to make or if it could be used as a weapon, why is it in all these places? The fact is it’s everywhere, so if we don’t do research on this, if we don’t take measures to make ourselves prepared for an attack, it’s not going to go away, the threat is not going to go away if we’re not looking at it.</p>
+<p><b>Greenwald</b>: Well, just to follow up on that, to be a little more specific about what I have in mind. There’s a now overlooked story by Judy Miller among other <span style="font-style: italic">New York Times </span>reporters which was published on September 4th, 2001, a week before the 9/11 attacks, which is why it ultimately ended up getting lost, that you’re probably familiar with. But it grew out of her book on biological warfare. And what it reported was, and this is the first sentence, quote: “Over the past several years, the United States has embarked on a program of secret research on biological weapons that some of officials say test the limits of the global treaty banning such weapons.” </p><div class="raptive-salon-content hide-if-premium"></div>
+<p>And it goes on to describe that the Pentagon drew up plans to engineer genetically a more potent variant of the bacterium that causes anthrax and specifically lists Battelle and other places as a military contractor that has been selected to create the genetically altered anthrax. It just seems that we know so little about what this whole industry does, for reasons that you suggested earlier might be legitimate in terms of secrecy, but how far were we or are we skirting the limits of, or that line between research into vaccines and the manufacture of biological weapons, and how widespread is that research that kind of skirts that line?</p>
+<p><b>Gronvall</b>: Doing research on a vaccine does not have to cross any of those lines. But I think where it gets much more tricky and how it gets close to at least what I think Judy Miller was talking about, in the passage you mentioned, is the threat assessment piece. I think there’s Project Bacchus that you’re referring to, which was a project to see if there were any signatures involved in making the biological weapons. And a group of people made a simulate – so they weren’t actually working with the anthrax, they were working with a <span style="font-style: italic">sotillus</span>, I think – and the conclusion was there wasn’t any unconventional signature for a biological weapons facility, nothing they could pinpoint the way that you can pinpoint a nuclear weapons program. So, threat assessment is a very complicated problem that requires a lot of oversight and requires a lot of checks and balances. That is the mission, one of the missions of NBACC, National Biodefense Analysis &amp; Countermeasures and then there’s another ‘C’ in there somewhere (<i>Transcriptionist’s note: ‘National Biodefense Analysis &amp; Countermeasures Center’</i>) but this piece of making a vaccine does not have to be secret. And a lot of work is published openly now in making vaccines or diagnostics and so – I don’t know how to answer your question but to say that it doesn’t have to be thus.</p>
+<p><b>Greenwald</b>: Right. Well, I think, the bottom line is that a lot of people seem to be rushing to try and conclude that the FBI’s case here is persuasive, and people can make their own assessments as to the circumstantial evidence, even though it’s still a very one-sided presentation, since nobody has been able to see that either. But I think it’s important to underscore that the scientific claims are nothing more than conclusions, and hopefully they’ll be pressured to disclose the underlying data so that people like you can dig in to it and tell us how valid or persuasive those conclusions really are since it lies at the heart of the what FBI here is claiming.</p>
+<p>So I want to really thank you for taking the time, it was really illuminating, and I appreciate your talking to me today.</p>
+<p><b>Gronvall</b>: Okay, thanks.</p>
+<p> [<span style="font-style: italic">Transcript courtesy of </span><a href="http://www.tvtrans.ca/" target="_blank" rel="noopener">Thames Valley Transcribe</a>]</p>
+<hr><div class="raptive-salon-content hide-if-premium"></div></section>
+                <section class="article__writers mt-14">
+                                <div class="post-420356 writer type-writer status-publish hentry article__writers article__writer-container" data-writer-id="420356">
+
+                                    <div class="writer-bio-ajax-content">
+                        <h3>
+                            <span>By</span>
+                            <a href="https://www.salon.com/writer/glenn_greenwald">
+                                Glenn Greenwald                            </a>
+                        </h3>
+                    </div>
+
+                    <template class="writer-bio-template">
+                        <h3>
+                            <span>By</span>
+                            <a href="" class="writer-name-link">
+                            </a>
+                        </h3>
+
+                        <div class="socials" style="display: none;"> <a href="" class="social group/social facebook-link" target="_blank" style="display: none;">
+                                <i class="icon icon-facebook text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                            <a href="" class="social group/social twitter-link" target="_blank" style="display: none;">
+                                <i class="icon icon-twitter text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                            <a href="" class="social group/social instagram-link" target="_blank" style="display: none;">
+                                <i class="icon icon-instagram text-white h-5 w-5 flex items-center justify-center duration-[250ms] group-hover/social:scale-125" ></i>
+                            </a>
+                        </div>
+
+                        <div class="writer-bio-text"></div>
+
+                        <div class="more">
+                            <span>MORE FROM</span>
+                            <a href="" class="writer-more-from-link">
+                            </a>
+                        </div>
+                    </template>
+                            </div>
+            </section>
+            <hr>
+                <section class="article__topics">
+        <h2>
+            Related Topics            <span>
+                ------------------------------------------            </span>
+        </h2>
+        <div>
+                            <a href="https://www.salon.com/topic/washington-dc" class="delay-400 pointer">
+                    WASHINGTON DC                </a>
+                    </div>
+    </section>
+            
+<section class="article__related" data-post-id="650284" data-terms="washington-dc">
+    <h2>
+        <span>
+            Related Articles        </span>
+    </h2>
+    <div>
+        <template>
+            <a href="" class="flex min-[501px]:hidden">
+                <div class="attachment__image">
+                    <div class="image">
+                        <img src="https://www.salon.com/app/themes/salon/assets/img/salon-placeholder.webp" decoding="async" fetchpriority="high" alt="Salon placeholder" class="attachment-full size-full">
+                    </div>
+                </div>
+                <h5></h5>
+                <span></span>
+            </a>
+        </template>
+    </div>
+</section>
+            <hr>
+            <div class="dianomi_context hide-if-premium" data-dianomi-context-id="4879"></div>
+        </div>
+        
+<div class="sidebar-col">
+    <div class="dianomi_context hide-if-premium" data-dianomi-context-id="4876"></div>
+            <div class="raptive-salon-sticky-sidebar hide-if-premium"></div>
+    </div>
+    </section>
+</article>
+    </div>
+
+    </main>
+
+    <footer>
+        <ul class="navigation__footer mt-4 text-center"><li class="menu-item"><a href="https://www.salon.com">Home</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about">About</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/staff">Staff</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/contact">Contact</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/policy">Privacy</a></li>
+<li class="menu-item"><a href="https://www.salon.com/about/tos">Terms of Service</a></li>
+<li class="menu-item"><a href="https://www.salon.com/archive">Archive</a></li>
+<li class="menu-item"><a href="/premium?utm_source=onsite&amp;utm_medium=organic&amp;utm_campaign=go-ad-free-footer">Go Ad Free</a></li>
+</ul>        <div class="footer__copyright">
+    <p>
+        Copyright © 2026 Salon.com, LLC. Reproduction of material from any Salon pages without written permission is strictly prohibited. SALON ® is registered in the U.S. Patent and Trademark Office as a trademark of Salon.com, LLC. Associated Press articles: Copyright © 2016 The Associated Press. All rights reserved. This material may not be published, broadcast, rewritten or redistributed.    </p>
+    <p>
+        <a href="https://www.salon.com/2026/06/02/best-vpn-services-for-2026/">
+            VPN Providers        </a>
+    </p>
+    <p>
+        <a href="https://www.salon.com/about/dmca">
+            DMCA Policy        </a>
+    </p>
+</div>
+    </footer>
+
+    <div class="modal__alert" role="dialog" aria-modal="true" aria-hidden="true" id="alert-modal">
+    <div></div>
+    <div>
+        <div>
+            
+<div class="modal__close">
+    <button type="button" aria-controls="alert-modal">
+        <i class="icon icon-close-extrabold block w-5 text-xl" ></i>
+    </button>
+</div>
+            <div class="modal__content">
+                <div class="message">
+                    This is an alert message.                </div>
+                <div class="modal__close">
+                    <button type="button" aria-controls="alert-modal">
+                        OK                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp/wp-*.php","/wp/wp-admin/*","/app/uploads/*","/app/*","/app/plugins/*","/app/themes/salon/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script id="global-salon-js-extra">
+var salonSubscriptionTracking = {"eventsEndpoint":"https://www.salon.com/wp-json/salon/v1/subscription-tracking/events","measurementId":"G-7VPPFM7ET6","pageContext":{"contentCategory":"article","currentPlan":null,"isCheckoutPage":false},"pendingSessionIds":[],"bootstrapEvents":[],"approximateBeginCheckout":"1"};
+//# sourceURL=global-salon-js-extra
+</script>
+<script type="module" data-wp-strategy="defer" defer id="global-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/global.js?ver=1.0.31"></script>
+<script type="module" data-wp-strategy="defer" defer id="article-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/article.js?ver=1.0.31"></script>
+<script data-wp-strategy="defer" defer id="ad-salon-js" src="https://www.salon.com/app/themes/salon/dist/assets/ad.js?ver=1.0.31"></script>
+<script id="raptive-adblock-detection-js" src="https://www.salon.com/app/themes/salon/assets/js/ad/raptive-adblock-detection.js"></script>
+<script data-cfasync="false" data-abr-mode="essential" id="raptive-adblock-recovery-js" src="https://www.salon.com/app/themes/salon/assets/js/ad/raptive-adblock-recovery.js"></script>
+</body>
+</html>
+<!-- Cached by Salon Static Cache on 2026-11-06 08:40:36 -->
