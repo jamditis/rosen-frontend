@@ -1,0 +1,28 @@
+[
+  {
+    "url": "https://www.salon.com/2008/08/08/anthrax_5/",
+    "recordIds": [],
+    "discoveredIn": [
+      "https://bradblog.com/?p=6260"
+    ],
+    "scope": "Salon Radio interview with Jay Rosen",
+    "legacyUrl": "https://www.salon.com/opinion/greenwald/radio/2008/08/08/anthrax/index1.html"
+  },
+  {
+    "url": "https://www.salon.com/2009/06/19/washpost/",
+    "recordIds": [],
+    "discoveredIn": [
+      "https://www.salon.com/2009/06/20/harris_6/"
+    ],
+    "scope": "Salon Radio interview with Jay Rosen",
+    "legacyUrl": "https://www.salon.com/opinion/greenwald/2009/06/19/washpost/index1.html"
+  },
+  {
+    "url": "https://www.salon.com/2017/05/06/press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral/",
+    "recordIds": [],
+    "discoveredIn": [
+      "https://www.salon.com/2017/05/06/is-trump-really-building-a-fascist-regime-or-is-it-all-just-showmanship-either-way-the-threat-to-democracy-is-real/"
+    ],
+    "scope": "Extended interview with Jay Rosen"
+  }
+]

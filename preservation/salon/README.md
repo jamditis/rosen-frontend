@@ -1,5 +1,7 @@
 # Salon offline preservation
 
+**Recovery update:** The original eight-item package below is now supplemented by [three more verified interviews and the recovered Berkeleyside recording](recovery/README.md): 11 article PDFs and 11 self-contained HTML copies total. Run `node preservation/salon/verify-recovery.mjs` to check both batches and the audio. The 53 MB MP3 uses Git LFS; run `git lfs pull` when cloning.
+
 Captured and verified on November 7, 2026 (UTC), after Salon's [November 5 farewell](https://www.salon.com/2026/11/05/goodbye-from-salon/).
 
 All four Salon URLs in `data/archive_records-public.csv` have a retained PDF and self-contained SingleFile HTML here. The inventory also covers every article currently listed on [Salon’s Jay Rosen author page](https://www.salon.com/writer/jay_rosen), plus the related Salon Radio interview from the legacy scrape queue: eight distinct articles total, four authored by Rosen and four interviews or related coverage.
@@ -60,4 +62,4 @@ node preservation/salon/verify.mjs /tmp/salon-new-capture
 
 This package verifies the eight identified article bodies, including all currently listed Rosen-authored Salon pieces. The publisher author page, curated CSV, and legacy scrape queue are bounded inventories; they do not prove that every historical Salon contribution has survived or is indexed. An exhaustive historical Salon/Wayback discovery pass remains outstanding. The four newly discovered items are preserved here without assigning new canonical record IDs or inventing curator summaries.
 
-Embedded audio/video files are not downloaded. In particular, the 2009 Salon Radio interview and 2017 interview page may have media that requires separate recovery; this package preserves the article text available on the retrieved pages. External link destinations and related articles are not recursively archived. No Drive deposit, independent second storage copy, public archive submission, or reuse license is claimed.
+The original eight-item capture batch did not download embedded audio/video. The [recovery supplement](recovery/README.md) now retains the 2017 Berkeleyside recording separately; the January and June 2009 Salon Radio audio and the May 2017 embedded video remain unresolved, with exact request receipts recorded. The article text and available transcripts are preserved. External link destinations and related articles are not recursively archived. No Drive deposit, independent second storage copy, public archive submission, or reuse license is claimed.

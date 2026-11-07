@@ -1,0 +1,174 @@
+{
+  "tool": "SingleFile CLI 2.25.0 core with Playwright",
+  "sourceCommit": "bd37624b6e313b716ed267bd400bc5a74096491a",
+  "results": [
+    {
+      "url": "https://www.salon.com/2008/08/08/anthrax_5/",
+      "recordIds": [],
+      "discoveredIn": [
+        "https://bradblog.com/?p=6260"
+      ],
+      "scope": "Salon Radio interview with Jay Rosen",
+      "legacyUrl": "https://www.salon.com/opinion/greenwald/radio/2008/08/08/anthrax/index1.html",
+      "capturedAt": "2026-11-07T02:24:52.924Z",
+      "files": [
+        {
+          "path": "2008-08-08-anthrax_5.source.html",
+          "mediaType": "text/html",
+          "bytes": 84761,
+          "sha256": "d902d8ec65f7d87df81dcafcf39fc91508d8e2d95c35119fdb90d7a92152b73d"
+        },
+        {
+          "path": "2008-08-08-anthrax_5.html",
+          "mediaType": "text/html",
+          "bytes": 338842,
+          "sha256": "4a24fb74ba44d8d39223c3d4ed32b43c64ad5ae26926271204addb220e3b6142"
+        },
+        {
+          "path": "2008-08-08-anthrax_5.txt",
+          "mediaType": "text/plain",
+          "bytes": 37139,
+          "sha256": "75cc3cb36d4e776dad4cdcd7efff4b6c0a96023c448315b912918155064fae08"
+        },
+        {
+          "path": "2008-08-08-anthrax_5.pdf",
+          "mediaType": "application/pdf",
+          "bytes": 73032,
+          "sha256": "bdf5fd8b3cb982df8aeb247b7f937782ddced9f49f9af4e8cc0916e718eb3068"
+        }
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2008/08/08/anthrax_5/",
+      "title": "Salon Radio: Anthrax edition",
+      "author": "Glenn Greenwald",
+      "publishedAt": "2008-08-08T16:54:00+00:00",
+      "articleTextSha256": "89305b809857b343b53c5745063431d8755468a56cd5e793f04a88e9a3433536",
+      "articleCharacters": 36673,
+      "paragraphCount": 82,
+      "offlineHtml": {
+        "verified": true,
+        "paragraphsMatched": 82,
+        "externalRequests": []
+      },
+      "pdf": {
+        "verified": true,
+        "allSourceLinesMatched": true,
+        "kind": "article-text-derivative"
+      },
+      "status": "verified"
+    },
+    {
+      "url": "https://www.salon.com/2009/06/19/washpost/",
+      "recordIds": [],
+      "discoveredIn": [
+        "https://www.salon.com/2009/06/20/harris_6/"
+      ],
+      "scope": "Salon Radio interview with Jay Rosen",
+      "legacyUrl": "https://www.salon.com/opinion/greenwald/2009/06/19/washpost/index1.html",
+      "capturedAt": "2026-11-07T02:25:03.935Z",
+      "files": [
+        {
+          "path": "2009-06-19-washpost.source.html",
+          "mediaType": "text/html",
+          "bytes": 90821,
+          "sha256": "c98b08d99de8bef2545578fbc21604a452a0e6f35317be32df6c4ca799e6feea"
+        },
+        {
+          "path": "2009-06-19-washpost.html",
+          "mediaType": "text/html",
+          "bytes": 363843,
+          "sha256": "b96ae90e3e6a245278c5a4009c5e03efb410ed032c450f459fc063696989793c"
+        },
+        {
+          "path": "2009-06-19-washpost.txt",
+          "mediaType": "text/plain",
+          "bytes": 36974,
+          "sha256": "acdc826757c2b9e8e0c171f2290706d71b37e6ebc677e7df52eafd29de1f0d00"
+        },
+        {
+          "path": "2009-06-19-washpost.pdf",
+          "mediaType": "application/pdf",
+          "bytes": 74224,
+          "sha256": "866015ce3a3ed5e687d5f1715584411ade51cee7d5823891e875af49b2eebb71"
+        }
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2009/06/19/washpost/",
+      "title": "The Washington Post, Dan Froomkin and the establishment media",
+      "author": "Glenn Greenwald",
+      "publishedAt": "2009-06-19T16:20:00+00:00",
+      "articleTextSha256": "4d0993eef386acf84629ab215dd4f60970577a00a79e30b30d0decd06a7ed718",
+      "articleCharacters": 36257,
+      "paragraphCount": 91,
+      "offlineHtml": {
+        "verified": true,
+        "paragraphsMatched": 91,
+        "externalRequests": []
+      },
+      "pdf": {
+        "verified": true,
+        "allSourceLinesMatched": true,
+        "kind": "article-text-derivative"
+      },
+      "status": "verified"
+    },
+    {
+      "url": "https://www.salon.com/2017/05/06/press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral/",
+      "recordIds": [],
+      "discoveredIn": [
+        "https://www.salon.com/2017/05/06/is-trump-really-building-a-fascist-regime-or-is-it-all-just-showmanship-either-way-the-threat-to-democracy-is-real/"
+      ],
+      "scope": "Extended interview with Jay Rosen",
+      "capturedAt": "2026-11-07T02:23:36.102Z",
+      "files": [
+        {
+          "path": "2017-05-06-press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral.source.html",
+          "mediaType": "text/html",
+          "bytes": 70224,
+          "sha256": "3675a49436f82b1a77c40a1264b006c0e52bdde91d62c1ed4d0a3ec38d9f5e57"
+        },
+        {
+          "path": "2017-05-06-press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral.html",
+          "mediaType": "text/html",
+          "bytes": 609195,
+          "sha256": "b4c97262bdc5f5da637e9af2bf6a591ad84dc61eeddb62e200e48ef185ecd31b"
+        },
+        {
+          "path": "2017-05-06-press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral.txt",
+          "mediaType": "text/plain",
+          "bytes": 17835,
+          "sha256": "1d6f9b95328482e0b28ca096c34c6b17037e57a0dd9dfc54d795221f31b5e594"
+        },
+        {
+          "path": "2017-05-06-press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral.pdf",
+          "mediaType": "application/pdf",
+          "bytes": 57922,
+          "sha256": "3a487a3d3cd297b99b356a7ee63df31db7c1ad7641ac9ef900bac7a8f86b9797"
+        }
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2017/05/06/press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral/",
+      "title": "Press critic Jay Rosen on how and why the media is normalizing Trump: \u201cThe need to be truthful conflicts with the duty to appear neutral\u201d",
+      "author": "Paul Rosenberg",
+      "publishedAt": "2017-05-06T19:00:00+00:00",
+      "articleTextSha256": "e5bc3b4acddcfca36c90aeff86e93aefd8e481c41e57b3f468d716f273eeb48d",
+      "articleCharacters": 17348,
+      "paragraphCount": 39,
+      "offlineHtml": {
+        "verified": true,
+        "paragraphsMatched": 39,
+        "externalRequests": []
+      },
+      "pdf": {
+        "verified": true,
+        "allSourceLinesMatched": true,
+        "kind": "article-text-derivative"
+      },
+      "status": "verified"
+    }
+  ],
+  "receiptSources": [
+    "../initial-capture-attempt.json",
+    "../corrected-capture-attempt.json"
+  ]
+}

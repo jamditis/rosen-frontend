@@ -1,0 +1,13 @@
+{
+  "method": "GitHub contents API download_url readback",
+  "bytes": 52903373,
+  "sha256": "32f8b73fecda0acdd2e9401ae45c217dcb77b3a9710632209722e91008cab801",
+  "httpStatus": 200,
+  "repository": "jamditis/rosen-frontend",
+  "ref": "preserve/salon-recovery-2026-11-07",
+  "commit": "2a2308e09c4afa10941429d91d1ce6cc1e452d9a",
+  "path": "preservation/salon/recovery/media/2017-09-14-berkeleyside-jay-rosen.mp3",
+  "completedAt": "2026-11-07T02:31:59.107240+00:00",
+  "verification": "Complete downloaded bytes independently matched the local media receipt SHA-256 and size.",
+  "cliReadbackLimitation": "An independent git-lfs fetch request to the batch endpoint returned HTTP 503. The subsequent GitHub contents-API download_url readback succeeded and returned all 52,903,373 audio bytes."
+}

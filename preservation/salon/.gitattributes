@@ -1,3 +1,6 @@
 # Preserve response and artifact bytes across checkouts for fixity verification.
 captures/** -text -whitespace linguist-generated=true
 *.source.html -text -whitespace linguist-generated=true
+recovery/*.response -text -whitespace linguist-generated=true
+recovery/captures/** -text -whitespace linguist-generated=true
+recovery/media/*.mp3 filter=lfs diff=lfs merge=lfs -text

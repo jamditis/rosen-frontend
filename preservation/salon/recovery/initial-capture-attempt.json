@@ -1,0 +1,88 @@
+{
+  "tool": "SingleFile CLI 2.25.0 core with Playwright",
+  "sourceCommit": "bd37624b6e313b716ed267bd400bc5a74096491a",
+  "results": [
+    {
+      "url": "https://www.salon.com/opinion/greenwald/radio/2008/08/08/anthrax/index1.html",
+      "recordIds": [],
+      "discoveredIn": [
+        "https://bradblog.com/?p=6260"
+      ],
+      "scope": "Salon Radio interview with Jay Rosen",
+      "capturedAt": "2026-11-07T02:23:33.000Z",
+      "files": [],
+      "httpStatus": 410,
+      "finalUrl": "https://www.salon.com/opinion/greenwald/radio/2008/08/08/anthrax/index1.html",
+      "status": "failed",
+      "error": "HTTP 410"
+    },
+    {
+      "url": "https://www.salon.com/opinion/greenwald/2009/06/19/washpost/index1.html",
+      "recordIds": [],
+      "discoveredIn": [
+        "https://www.salon.com/2009/06/20/harris_6/"
+      ],
+      "scope": "Salon Radio interview with Jay Rosen",
+      "capturedAt": "2026-11-07T02:23:34.552Z",
+      "files": [],
+      "httpStatus": 410,
+      "finalUrl": "https://www.salon.com/opinion/greenwald/2009/06/19/washpost/index1.html",
+      "status": "failed",
+      "error": "HTTP 410"
+    },
+    {
+      "url": "https://www.salon.com/2017/05/06/press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral/",
+      "recordIds": [],
+      "discoveredIn": [
+        "https://www.salon.com/2017/05/06/is-trump-really-building-a-fascist-regime-or-is-it-all-just-showmanship-either-way-the-threat-to-democracy-is-real/"
+      ],
+      "scope": "Extended interview with Jay Rosen",
+      "capturedAt": "2026-11-07T02:23:36.102Z",
+      "files": [
+        {
+          "path": "2017-05-06-press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral.source.html",
+          "mediaType": "text/html",
+          "bytes": 70224,
+          "sha256": "3675a49436f82b1a77c40a1264b006c0e52bdde91d62c1ed4d0a3ec38d9f5e57"
+        },
+        {
+          "path": "2017-05-06-press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral.html",
+          "mediaType": "text/html",
+          "bytes": 609195,
+          "sha256": "b4c97262bdc5f5da637e9af2bf6a591ad84dc61eeddb62e200e48ef185ecd31b"
+        },
+        {
+          "path": "2017-05-06-press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral.txt",
+          "mediaType": "text/plain",
+          "bytes": 17835,
+          "sha256": "1d6f9b95328482e0b28ca096c34c6b17037e57a0dd9dfc54d795221f31b5e594"
+        },
+        {
+          "path": "2017-05-06-press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral.pdf",
+          "mediaType": "application/pdf",
+          "bytes": 57922,
+          "sha256": "3a487a3d3cd297b99b356a7ee63df31db7c1ad7641ac9ef900bac7a8f86b9797"
+        }
+      ],
+      "httpStatus": 200,
+      "finalUrl": "https://www.salon.com/2017/05/06/press-critic-jay-rosen-on-how-and-why-the-media-is-normalizing-trump-the-need-to-be-truthful-conflicts-with-the-duty-to-appear-neutral/",
+      "title": "Press critic Jay Rosen on how and why the media is normalizing Trump: “The need to be truthful conflicts with the duty to appear neutral”",
+      "author": "Paul Rosenberg",
+      "publishedAt": "2017-05-06T19:00:00+00:00",
+      "articleTextSha256": "e5bc3b4acddcfca36c90aeff86e93aefd8e481c41e57b3f468d716f273eeb48d",
+      "articleCharacters": 17348,
+      "paragraphCount": 39,
+      "offlineHtml": {
+        "verified": true,
+        "paragraphsMatched": 39,
+        "externalRequests": []
+      },
+      "pdf": {
+        "verified": true,
+        "allSourceLinesMatched": true,
+        "kind": "article-text-derivative"
+      },
+      "status": "verified"
+    }
+  ]
+}
