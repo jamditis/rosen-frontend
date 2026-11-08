@@ -122,7 +122,8 @@ export function assertJayGeneratedThreadEvidence(
 
 /**
  * Add exceptions only for new published thread containers whose member chain is
- * fully supported by the canonical Jay Rosen Bluesky source rows.
+ * fully supported by the canonical Jay Rosen Bluesky source rows, and drop the
+ * exceptions of THREAD containers that are no longer published.
  */
 export function registerSourceSupportedGeneratedThreads(
   holdPolicy,
@@ -131,6 +132,16 @@ export function registerSourceSupportedGeneratedThreads(
   const policy = structuredClone(holdPolicy);
   if (!Array.isArray(policy.generatedPublishedRecordIds)) {
     throw new Error('graph hold policy has no generatedPublishedRecordIds array');
+  }
+  // A thread container leaves publication when it loses its admitted members,
+  // and its exception would then be stale. Only THREAD exceptions are pruned:
+  // any other stale exception is left for validation to stop on.
+  const publishedIds = new Set(publishedRecords.map(record => text(record.id)));
+  const removed = policy.generatedPublishedRecordIds
+    .filter(id => THREAD_ID_PATTERN.test(text(id)) && !publishedIds.has(text(id)));
+  if (removed.length > 0) {
+    const retired = new Set(removed);
+    policy.generatedPublishedRecordIds = policy.generatedPublishedRecordIds.filter(id => !retired.has(id));
   }
   const registered = new Set(policy.generatedPublishedRecordIds);
   const sourceIds = new Set([...archiveRows, ...socialRows].map(row => text(row.id)).filter(Boolean));
@@ -153,7 +164,7 @@ export function registerSourceSupportedGeneratedThreads(
     registered.add(record.id);
     added.push(record.id);
   }
-  return { policy, added };
+  return { policy, added, removed };
 }
 
 export function newlyCapturedRecordIdsFromReport(report) {
@@ -276,6 +287,7 @@ export async function refreshSocialReleaseArtifacts(
 
   return {
     generatedThreadsAdded: registration.added,
+    generatedThreadsRemoved: registration.removed,
     censusChanges: census.changes,
     graph: validation,
   };
@@ -300,6 +312,7 @@ async function main() {
   const result = await refreshSocialReleaseArtifacts(repositoryRoot, parseArgs(process.argv.slice(2)));
   console.log(
     `Social release artifacts refreshed: ${result.generatedThreadsAdded.length} generated threads registered, `
+    + `${result.generatedThreadsRemoved.length} unpublished threads pruned, `
     + `${result.censusChanges.length} census changes, ${result.graph.publishedRecords} published records validated.`,
   );
 }

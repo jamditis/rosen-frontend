@@ -313,7 +313,7 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 9. Apply `publication` and `includeReplies` in `filteredRecords`, or stop parsing them from the URL.
 10. Retry a stewardship run once after `stale_remote_head` by rebasing onto the new `origin/main`.
 11. Treat zero endpoint divergence as a warning in `refresh-social-release-artifacts.mjs`, not as a thrown error. Fixed (the refresh asks the census for zero divergence as a warning and logs it; curator scripts keep it as a problem, and the committed-registry tests in `npm test` still flag it at PR time).
-12. Prune `generatedPublishedRecordIds` entries in the refresh when the record is no longer published.
+12. Prune `generatedPublishedRecordIds` entries in the refresh when the record is no longer published. Fixed (the refresh drops THREAD exceptions whose container is no longer published; a stale non-thread exception is still left for validation to stop on).
 13. Add the pending-journal check to the JS CSV writers in `data/fixes/` and `data/lib/python-csv-maintenance.js`.
 14. Exclude `failed` rows from `get_processed_ids` so that the batch runner retries them.
 15. Return a failure instead of `skipped` from `push_full_release` when the job expects SFTP secrets. Fixed (`submit-record.yml` sets `ROSEN_REQUIRE_TRANSFER=1`, so missing settings fail the push by name and the row stays `archived`).
