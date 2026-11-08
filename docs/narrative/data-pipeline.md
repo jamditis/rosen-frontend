@@ -65,7 +65,6 @@ A practical reference for contributors working on Jay Rosen's Internet Archive d
 | `poetry run python src/rosen_scraper/key_concepts_updater.py --reset-progress` | Start from beginning |
 | `poetry run python src/rosen_scraper/key_concepts_updater.py --force-reprocess` | Reprocess existing data |
 | `poetry run python src/rosen_scraper/analyze_key_concepts.py` | Analyze concept distribution |
-| `poetry run python scripts/backfill/bulk_reprocessor.py` | Bulk reprocess URLs |
 | `poetry run python scripts/diagnostics/data_deduper.py` | Normalize multi-value fields |
 | `poetry run python scripts/diagnostics/data_improver.py` | Refresh metadata from raw text |
 | `poetry run python scripts/backfill/backfill_worker.py` | Fill missing `pull_quote`/`raw_text` |
@@ -97,7 +96,7 @@ Work through these in order. Each step validates a layer of the pipeline before 
 1. Export or create the local CSV worklist described above, then run a limited
    ingest from `backend/` with `PROCESS_START_ROW` and `PROCESS_END_ROW`, or
    invoke the article processor manually.
-2. For bulk reprocessing, use `poetry run python scripts/backfill/bulk_reprocessor.py` only after confirming validation logic works. Start with a handful of URLs.
+2. There is no live bulk reprocessor. `bulk_reprocessor.py` moved to `archived/scripts/backend-oneoffs/` in #855; reprocess in bounded batches with the tools above.
 
 ### Priority C: resume key concepts processing
 
@@ -384,7 +383,7 @@ The existing `test_*.py` files are interactive smoke scripts. There is no automa
 
 ### Logic duplication
 
-`scripts/backfill/bulk_reprocessor.py` re-implements ID generation, enrichment, and sheet-writing logic found in `src/rosen_scraper/workflow.py`. Changes to one path can drift from the other.
+`bulk_reprocessor.py` re-implemented ID generation, enrichment, and sheet-writing logic found in `src/rosen_scraper/workflow.py`. It was archived in #855, so that drift risk is gone.
 
 ### Configuration surface
 
@@ -408,7 +407,7 @@ Actionable improvements, roughly prioritized:
 
 4. **Wrap Gemini calls with retry/backoff.** Add explicit error classes and optional caching so transient outages don't wipe runs. Evaluate batching requests or using a local model fallback for taxonomy tagging.
 
-5. **Consolidate shared helpers.** Extract ID generation, enrichment, and sheet writes into a dedicated module so the streaming workflow and `bulk_reprocessor.py` stay in sync.
+5. **Consolidate shared helpers.** Extract ID generation, enrichment, and sheet writes into a dedicated module so every writer shares one copy.
 
 6. **Pin dependency versions.** Document the `poetry run playwright install` step. Clarify whether both `google-generativeai` and `google-genai` are needed. Drop unused packages.
 

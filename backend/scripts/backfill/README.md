@@ -5,7 +5,6 @@
 | `date_backfill.py` | `publication_date` | Google Sheets |
 | `backfill_missing_dates.py` | `publication_date` | `data/archive_records-public.csv` |
 | `backfill_worker.py` | `pull_quote`, `raw_text` | Google Sheets |
-| `bulk_reprocessor.py` | every AI field | Google Sheets |
 | `date_extraction.py` | nothing; shared URL date parser | — |
 
 ## Publication-date backfill
@@ -91,3 +90,8 @@ poetry run python -m scripts.backfill.backfill_worker
 `backfill_missing_dates.py` moved here from `backend/scripts/`. It stays a
 separate file because it is a different job: it writes hand-checked dates into
 the repository CSV, while `date_backfill.py` infers dates into Google Sheets.
+
+`bulk_reprocessor.py` moved to `archived/scripts/backend-oneoffs/` on
+2026-11-08 ([#855](https://github.com/jamditis/rosen-frontend/issues/855)). It
+had no callers, and the batch-maintenance design already ruled it too
+destructive to run unattended.

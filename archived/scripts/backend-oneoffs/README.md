@@ -65,3 +65,21 @@ abandoned and broken:
 
 Taken together, it could not have run successfully in a long time. Kept for
 provenance, not reuse. Do not run it.
+
+## Unused tools: `bulk_reprocessor.py` and `backfill_summaries_sumy.py`
+
+Both moved here on 2026-11-08 ([#855](https://github.com/jamditis/rosen-frontend/issues/855),
+triage step 6 of [#189](https://github.com/jamditis/rosen-frontend/issues/189)) after the
+curator approved it. Neither had a caller anywhere in the pipeline.
+
+- `bulk_reprocessor.py` (from `backend/scripts/backfill/`) rewrote every AI field for
+  the whole archive in Google Sheets. It has no checkpoint, and the batch-maintenance
+  design (`docs/plans/2026-05-29-batch-maintenance-runner-design.md`) ruled it too
+  destructive to run unattended. It also copied ID generation and sheet writes from
+  `src/rosen_scraper/workflow.py`, so the two could drift.
+- `backfill_summaries_sumy.py` (from `backend/scripts/`) filled short or missing
+  summaries with extractive sumy summaries. Summaries now come from the Gemini
+  pipeline and `data/authored-excerpts.csv`.
+
+Both import from paths that do not resolve from here. Kept for provenance, not reuse.
+Do not run them.
