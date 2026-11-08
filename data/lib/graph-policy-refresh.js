@@ -253,25 +253,14 @@ function restate(note, pattern, replacement, label, problems) {
  * @param {object[]} options.relationshipRows current extracted_relationships rows
  * @param {object[]} options.entityRows current extracted_entities rows
  * @param {string} options.asOfDate the date to stamp, as YYYY-MM-DD
- * @param {'problem'|'warning'} [options.zeroDivergence] where to report a type
- *   whose endpointDivergence has reached zero rows. Curator runs keep the
- *   default, 'problem'. The automated release refresh passes 'warning', so the
- *   flip waits for a curator instead of failing every release.
- * @returns {{registry: object, changes: string[], problems: string[], warnings: string[]}}
+ * @returns {{registry: object, changes: string[], problems: string[]}}
  */
-export function refreshRelationshipTypeCensus(
-  registry,
-  { relationshipRows, entityRows, asOfDate, zeroDivergence = 'problem' },
-) {
-  if (zeroDivergence !== 'problem' && zeroDivergence !== 'warning') {
-    throw new Error(`zeroDivergence must be "problem" or "warning", not ${zeroDivergence}`);
-  }
+export function refreshRelationshipTypeCensus(registry, { relationshipRows, entityRows, asOfDate }) {
   const entityTypeById = new Map(entityRows.map((row) => [row.entity_id, row.entity_type]));
   const entityNameById = new Map(entityRows.map((row) => [row.entity_id, row.entity_name]));
   const grouped = rowsByType(relationshipRows);
   const changes = [];
   const problems = [];
-  const warnings = [];
 
   for (const [name, entry] of Object.entries(registry.types || {})) {
     const typeRows = grouped.get(name) || [];
@@ -284,7 +273,7 @@ export function refreshRelationshipTypeCensus(
         const violating = violatingRows(typeRows, entry, entityTypeById);
         if (!violating.length) {
           // Enforcing the type is now possible, but that is a curator ruling.
-          (zeroDivergence === 'warning' ? warnings : problems).push(
+          problems.push(
             `${name}: no row diverges any more, so endpointEnforcement can be flipped to "enforced" and this block removed`,
           );
         } else {
@@ -368,7 +357,7 @@ export function refreshRelationshipTypeCensus(
     }
   }
 
-  return { registry, changes, problems, warnings };
+  return { registry, changes, problems };
 }
 
 export default {

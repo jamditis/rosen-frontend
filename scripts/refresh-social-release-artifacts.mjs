@@ -185,20 +185,6 @@ export function newlyCapturedRecordIdsFromReport(report) {
   return recordIds;
 }
 
-/**
- * Fail the release on a census problem. A type whose divergence reached zero is
- * only a warning: enforcing it is a curator ruling, and until it is made the
- * registry block stays as it was and still describes a deferred type.
- */
-export function assertCensusReady(census, warn = message => console.warn(message)) {
-  for (const warning of census.warnings || []) {
-    warn(`refresh social artifacts: relationship census warning: ${warning}`);
-  }
-  if (census.problems.length > 0) {
-    throw new Error(`refresh social artifacts: relationship census needs review: ${census.problems.join('; ')}`);
-  }
-}
-
 async function readJson(filePath) {
   return JSON.parse(await readFile(filePath, 'utf8'));
 }
@@ -255,9 +241,10 @@ export async function refreshSocialReleaseArtifacts(
     relationshipRows,
     entityRows,
     asOfDate,
-    zeroDivergence: 'warning',
   });
-  assertCensusReady(census);
+  if (census.problems.length > 0) {
+    throw new Error(`refresh social artifacts: relationship census needs review: ${census.problems.join('; ')}`);
+  }
 
   const dataset = await loadRepositoryGraphDataset(root);
   dataset.policy.generatedPublishedRecordIds = registration.policy.generatedPublishedRecordIds;
