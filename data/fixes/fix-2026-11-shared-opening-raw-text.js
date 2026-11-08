@@ -31,6 +31,7 @@
  * Usage: node data/fixes/fix-2026-11-shared-opening-raw-text.js [--dry-run]
  */
 import { readFileSync, writeFileSync, renameSync } from 'node:fs';
+import { assertNoPendingCapture } from '../lib/pending-capture.js';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -119,6 +120,7 @@ function main() {
     console.log('Dry run: nothing written.');
     return;
   }
+  assertNoPendingCapture(RECORDS_PATH);
   const tmp = `${RECORDS_PATH}.tmp`;
   writeFileSync(tmp, text, 'utf-8');
   renameSync(tmp, RECORDS_PATH);

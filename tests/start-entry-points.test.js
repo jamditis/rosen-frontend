@@ -146,7 +146,9 @@ describe('Start here entry points', () => {
     assert.ok(viewStateImport, 'App.js must retain its view-state import');
     assert.deepEqual(
       viewStateImport[1].split(',').map((name) => name.trim()).filter(Boolean).sort(),
-      ['parseViewState', 'viewStateToUrl'],
+      // defaultFilters predates the privacy release; a new helper goes in its
+      // own module (see services/historyFilters.js), never in this list.
+      ['defaultFilters', 'parseViewState', 'viewStateToUrl'],
       'transition-safe App.js imports only the view-state exports shared by the previous release',
     );
     assert.equal(

@@ -560,3 +560,68 @@ class TestBuildExtractionPrompt:
         prompt = build_extraction_prompt("Test post", "BSKY-003")
         # Should show at least some ID prefix examples
         assert "P0" in prompt or "P00" in prompt
+
+
+def _post(post_id):
+    return {
+        "id": post_id,
+        "raw_text": "Jay Rosen on the view from nowhere and its long shadow.",
+        "word_count": "11",
+        "likes": "10",
+        "reposts": "3",
+    }
+
+
+class _StubCsv:
+    def __init__(self, posts):
+        self.posts = posts
+
+    def read_social_posts(self):
+        return list(self.posts)
+
+
+def _extractor(tmp_path, posts):
+    from rosen_scraper.extraction_db import ExtractionDB
+
+    extractor = BatchEntityExtractor.__new__(BatchEntityExtractor)
+    extractor.db = ExtractionDB(tmp_path / "extraction.db")
+    extractor.csv_service = _StubCsv(posts)
+    return extractor
+
+
+class TestFailedExtractionRetry:
+    """Failed rows are retried on a later run, but once per run at most."""
+
+    def test_failed_post_is_loaded_again(self, tmp_path):
+        extractor = _extractor(tmp_path, [_post("BSKY-1"), _post("BSKY-2")])
+        extractor.db.mark_processed("BSKY-1", entity_count=1)
+        extractor.db.mark_processed("BSKY-2", status="failed", error_msg="outage")
+
+        batch = extractor.load_unprocessed_posts(batch_size=10, tier=1)
+
+        assert [post["id"] for post in batch] == ["BSKY-2"]
+
+    def test_auto_mode_does_not_resubmit_a_post_that_failed_this_run(
+        self, tmp_path, monkeypatch
+    ):
+        extractor = _extractor(tmp_path, [_post("BSKY-1")])
+        submitted = []
+
+        def submit_batch(posts):
+            submitted.append([post["id"] for post in posts])
+            if len(submitted) > 3:
+                raise AssertionError("auto mode resubmitted a failing post")
+            return f"batch-{len(submitted)}"
+
+        def process_batch_results(batch_id):
+            extractor.db.mark_processed("BSKY-1", status="failed", error_msg="bad")
+
+        extractor.submit_batch = submit_batch
+        extractor.check_batch_status = lambda batch_id: {"status": "ended"}
+        extractor.process_batch_results = process_batch_results
+        extractor._print_progress = lambda: None
+        monkeypatch.setattr(_mod.time, "sleep", lambda seconds: None)
+
+        extractor.run_auto(batch_size=10, poll_interval=0, tier=1)
+
+        assert submitted == [["BSKY-1"]]

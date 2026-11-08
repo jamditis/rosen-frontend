@@ -11,12 +11,18 @@ design.md`` "Stuck-row sweeper"):
 
     submitted   > 30 min  → re-dispatch with original URL
     processing  > 1 hr    → re-dispatch with original URL
-    archived    > 24 hr   → re-dispatch with sentinel URL (forces SFTP retry)
+    archived    > 24 hr   → re-dispatch with sentinel URL (forces SFTP retry),
+                            at most MAX_ARCHIVED_RETRIES times per row
 
 Terminal statuses (``live``, ``committed``, ``error``, ``duplicate``,
 ``no URL``, ``invalid URL``) are never touched regardless of age. ``committed``
 marks a record whose data is appended but whose live push (SFTP) is not
 configured on this runner -- retrying it would never make it live (#414).
+
+A row whose ``submit-record.yml`` run is still queued or running is skipped,
+because the release FIFO can hold a run for hours. The row number comes from
+the run title (``run-name`` in that workflow). If the run listing fails, or an
+active run's title names no row, nothing is dispatched on that tick.
 
 The dedup check in ``submit-record.yml`` step 2 guarantees the sweep is
 idempotent: An existing canonical record is published again without scraping,
@@ -42,10 +48,11 @@ import json
 import logging
 import os
 import pathlib
+import re
 import sys
 import time
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import requests
 
@@ -74,6 +81,18 @@ _THRESHOLDS = {
 # Sentinel URL prefix shared with process_submission.py — the consumer there
 # short-circuits scrape/categorize/append and only runs the SFTP step.
 SENTINEL_URL_PREFIX = "https://example.com/sweep-noop-"
+
+# Sentinel retries allowed for one ``archived`` row. A failed sentinel run
+# writes ``[sweep attempt N]`` at the start of the row's error cell (column H);
+# the sweeper reads it back and stops once N reaches this limit. Clearing the
+# error cell re-arms the row. Five retries span about 2.5 hours of ticks.
+MAX_ARCHIVED_RETRIES = 5
+_ATTEMPT_MARKER = re.compile(r"^\[sweep attempt (\d+)\]")
+
+
+def _attempts_from_error(error: str) -> int:
+    match = _ATTEMPT_MARKER.match((error or "").strip())
+    return int(match.group(1)) if match else 0
 
 
 # ---------- Sheet ingestion -------------------------------------------------
@@ -106,7 +125,7 @@ def fetch_rows() -> List[Dict[str, Any]]:
 
     Returns a list of dicts, one per data row (header excluded). Keys:
     ``sheet_row`` (1-indexed), ``timestamp``, ``url``, ``title``, ``notes``,
-    ``status``, ``record_id``.
+    ``status``, ``record_id``, ``error``.
     """
     sheet_id = os.environ.get("SHEET_ID", "").strip()
     if not sheet_id:
@@ -141,12 +160,82 @@ def fetch_rows() -> List[Dict[str, Any]]:
                 # row[4] = column E (reserved); row[5] = F status.
                 "status": (row[5] or "").strip(),
                 "record_id": (row[6] or "").strip(),
+                # H holds the last error, and the sentinel attempt marker.
+                "error": (row[7] or "").strip(),
             }
         )
     return out
 
 
 # ---------- Workflow dispatch ----------------------------------------------
+
+# Run states in which a submit-record.yml run has not finished yet. Same list
+# as ACTIVE_STATUSES in .github/scripts/wait-release-turn.mjs.
+_ACTIVE_RUN_STATUSES = ("requested", "queued", "pending", "waiting", "in_progress")
+
+# submit-record.yml sets ``run-name: Submit record for row <sheet_row>``. The
+# runs API does not return dispatch inputs, so the title is the only place a
+# listed run names its queue row.
+_RUN_TITLE_ROW = re.compile(r"\bfor row (\d+)\s*$")
+
+
+def _github_headers(token: str) -> Dict[str, str]:
+    return {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+
+def _row_from_run_title(title: str):
+    match = _RUN_TITLE_ROW.search(title or "")
+    return int(match.group(1)) if match else None
+
+
+def list_active_submission_rows() -> Tuple[Set[int], int]:
+    """Return queue rows that have a queued or running submit-record.yml run.
+
+    Returns ``(rows, unattributed)``: ``unattributed`` counts active runs whose
+    title names no row (for example a run started before ``run-name``
+    existed). Raises on any API failure so the caller can fail closed.
+    """
+    token = os.environ.get("GITHUB_TOKEN", "").strip()
+    repo = os.environ.get("GITHUB_REPO", "").strip()
+    if not token or not repo:
+        raise RuntimeError("GITHUB_TOKEN and GITHUB_REPO must be set")
+    workflow = os.environ.get("GITHUB_WORKFLOW_FILENAME", "submit-record.yml")
+    url = f"https://api.github.com/repos/{repo}/actions/workflows/{workflow}/runs"
+    rows: Set[int] = set()
+    unattributed = 0
+    seen = set()
+    for status in _ACTIVE_RUN_STATUSES:
+        for page in range(1, 11):
+            resp = requests.get(
+                url,
+                headers=_github_headers(token),
+                params={"status": status, "per_page": 100, "page": page},
+                timeout=20,
+            )
+            if not 200 <= resp.status_code < 300:
+                raise RuntimeError(
+                    f"listing {status} runs returned {resp.status_code}: "
+                    f"{resp.text[:300]}"
+                )
+            runs = resp.json().get("workflow_runs") or []
+            for run in runs:
+                if run.get("id") in seen:
+                    continue
+                seen.add(run.get("id"))
+                row = _row_from_run_title(run.get("display_title", ""))
+                if row is None:
+                    unattributed += 1
+                else:
+                    rows.add(row)
+            if len(runs) < 100:
+                break
+        else:
+            raise RuntimeError(f"more than 1000 {status} runs; refusing to guess")
+    return rows, unattributed
 
 
 def dispatch_workflow(inputs: Dict[str, Any]) -> Dict[str, Any]:
@@ -165,11 +254,7 @@ def dispatch_workflow(inputs: Dict[str, Any]) -> Dict[str, Any]:
         f"https://api.github.com/repos/{repo}/actions/workflows/"
         f"{workflow}/dispatches"
     )
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
+    headers = _github_headers(token)
     payload = {"ref": ref, "inputs": {k: str(v) for k, v in inputs.items()}}
     resp = requests.post(url, headers=headers, json=payload, timeout=20)
     return {
@@ -200,23 +285,31 @@ def _parse_ts(ts: str):
     return parsed
 
 
-def _age_seconds(ts: str) -> float:
+def _age_seconds(ts: str) -> Optional[float]:
+    """Age of column A in seconds, or None when it cannot be parsed."""
     parsed = _parse_ts(ts)
     if parsed is None:
-        return -1.0
+        return None
     return (datetime.now(timezone.utc) - parsed).total_seconds()
 
 
-def _is_stuck(status: str, age: float) -> bool:
+def _is_stuck(status: str, age: Optional[float]) -> bool:
     threshold = _THRESHOLDS.get(status)
     if threshold is None:
         return False
+    # An unparseable column A (for example a hand edit) would otherwise hide
+    # the row for good. Retrying is safe: dedup, the in-flight check and the
+    # archived retry cap all still apply.
+    if age is None:
+        return True
     return age >= threshold
 
 
-def _humanize(seconds: float) -> str:
+def _humanize(seconds: Optional[float]) -> str:
+    if seconds is None:
+        return "unparseable timestamp"
     if seconds < 0:
-        return "unknown"
+        return "in the future"
     if seconds < 60:
         return f"{seconds:.0f}s"
     if seconds < 3600:
@@ -235,7 +328,24 @@ def sweep() -> Dict[str, int]:
         "terminal": 0,
         "dispatched": 0,
         "failed": 0,
+        "in_flight": 0,
+        "retry_exhausted": 0,
     }
+    # Look up active runs once, before the first dispatch, so the answer is
+    # not muddied by runs this sweep starts. A failed lookup blocks every
+    # dispatch: a duplicate run costs a full-site push, a skipped tick costs
+    # 30 minutes.
+    active_rows: Set[int] = set()
+    active_error = None
+    unattributed = 0
+    if any(_is_stuck(row["status"], _age_seconds(row["timestamp"])) for row in rows):
+        try:
+            active_rows, unattributed = list_active_submission_rows()
+        except Exception as exc:  # noqa: BLE001 — fail closed below
+            active_error = str(exc)
+            logger.error(
+                f"could not list active submit runs, dispatching nothing: {exc}"
+            )
     sheet_id = os.environ.get("SHEET_ID", "").strip()
     sheet_tab = os.environ.get("SHEET_TAB", "Sheet1").strip() or "Sheet1"
 
@@ -246,21 +356,50 @@ def sweep() -> Dict[str, int]:
             counts["terminal"] += 1
             continue
         age = _age_seconds(row["timestamp"])
+        if age is None:
+            logger.warning(
+                f"row {sheet_row}: column A timestamp {row['timestamp']!r} "
+                f"cannot be parsed; treating the {status} row as stuck"
+            )
         if not _is_stuck(status, age):
             counts["fresh"] += 1
             logger.info(
                 f"row {sheet_row}: {status}={_humanize(age)}, fresh, " "skipping"
             )
             continue
+        if active_error is not None or unattributed or sheet_row in active_rows:
+            counts["in_flight"] += 1
+            if active_error is not None:
+                reason = "active-run lookup failed"
+            elif sheet_row in active_rows:
+                reason = "a submit run for this row is queued or running"
+            else:
+                reason = f"{unattributed} active submit run(s) name no row"
+            logger.info(
+                f"row {sheet_row}: {status}={_humanize(age)}, {reason}, skipping"
+            )
+            continue
         dispatch_url = row["url"]
         title = row["title"]
         notes = row["notes"]
         if status == "archived":
+            attempts = _attempts_from_error(row.get("error", ""))
+            if attempts >= MAX_ARCHIVED_RETRIES:
+                counts["retry_exhausted"] += 1
+                logger.error(
+                    f"row {sheet_row}: archived after {attempts} sentinel "
+                    "retries, not retrying; fix the transfer and clear column H "
+                    "to retry"
+                )
+                continue
             # No-op submission: scrape/categorize/append are skipped; only
             # SFTP runs. The sentinel timestamp keeps each retry unique in
             # the Action run history without affecting dedup (the consumer
-            # short-circuits before the dedup check).
-            dispatch_url = f"{SENTINEL_URL_PREFIX}{int(time.time())}"
+            # short-circuits before the dedup check). The attempt suffix tells
+            # the run which number to write back if it fails.
+            dispatch_url = (
+                f"{SENTINEL_URL_PREFIX}{int(time.time())}-attempt-{attempts + 1}"
+            )
             title = title or f"(sweep-noop for row {sheet_row})"
         # raw_text is intentionally absent: the queue sheet has no raw_text
         # column yet (fetch_rows reads only A:H), so a row originally submitted

@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from 'fs';
+import { assertNoPendingCapture } from '../lib/pending-capture.js';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 
@@ -27,6 +28,7 @@ const columns = [
 ];
 
 const output = stringify(deduped, { header: true, columns });
+assertNoPendingCapture(CSV_PATH);
 writeFileSync(CSV_PATH, output);
 
 console.log(`Before: ${records.length} rows`);

@@ -237,7 +237,7 @@ Use a URL on the RFC 6761 `.invalid` TLD — DNS resolution always fails, so `is
    Or open the CSV in a spreadsheet and copy a URL from the `url` column.
 
 5. Same dispatch flow with that URL.
-6. **Expected**: No scrape, append, new ID, or commit. The existing record is published again before sheet writeback records `status='duplicate'` and the Action goes green. A transfer failure retains `archived` for retry. A runner without transfer configuration reports `committed` instead of claiming publication.
+6. **Expected**: No scrape, append, new ID, or commit. The existing record is published again before sheet writeback records `status='duplicate'` and the Action goes green. A transfer failure retains `archived` for retry. `submit-record.yml` sets `ROSEN_REQUIRE_TRANSFER=1`, so a missing transfer secret is a transfer failure: the run fails, names the unset settings, and leaves the row `archived`. Only a runner without that flag and without transfer configuration reports `committed` instead of claiming publication.
 
 ### Smoke 3 — new URL, full pipeline
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.70';
+import { html } from '../html.js?v=3.8.71';
 import {
   AlertTriangle,
   Archive,
@@ -25,17 +25,17 @@ import {
   Wrench,
   X,
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.70';
-import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.8.70';
-import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.8.70';
-import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.8.70';
-import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.8.70';
-import DesktopStartPanel from './DesktopStartPanel.js?v=3.8.70';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.71';
+import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.8.71';
+import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.8.71';
+import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.8.71';
+import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.8.71';
+import DesktopStartPanel from './DesktopStartPanel.js?v=3.8.71';
 import {
   DESKTOP_TOOL_LINKS,
   getDesktopApp,
   getReadyDesktopApps,
-} from './desktopRegistry.js?v=3.8.70';
+} from './desktopRegistry.js?v=3.8.71';
 import {
   DESKTOP_LAYOUT_STORAGE_KEY,
   activateDesktopWindow,
@@ -47,7 +47,7 @@ import {
   nextVisibleDesktopWindow,
   parseDesktopLayout,
   serializeDesktopLayout,
-} from './desktopWindowState.js?v=3.8.70';
+} from './desktopWindowState.js?v=3.8.71';
 
 const ICONS = {
   archive: Archive,
@@ -177,7 +177,7 @@ const DesktopShell = ({
     const link = document.createElement('link');
     link.id = stylesheetId;
     link.rel = 'stylesheet';
-    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.8.70');
+    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.8.71');
     link.addEventListener('error', () => {
       setStatusMessage('Desktop styling could not load. All destinations remain available.');
     }, { once: true });
@@ -805,8 +805,12 @@ const DesktopShell = ({
   const closeWindow = (app) => {
     if (dragSessionRef.current?.app.id === app.id) cancelWindowDrag();
     if (moveControlsAppId === app.id) closeMoveControls(app.id, false);
+    // Write through a functional updater so a queued update, such as a
+    // drag-end position, is applied first and not dropped. The render-time
+    // layout only picks the window to select next, which depends on which
+    // windows are open and how they stack, not on their positions.
+    setLayout((current) => closeDesktopWindow(current, app.id, shellAppIds));
     const nextLayout = closeDesktopWindow(layout, app.id, shellAppIds);
-    setLayout(nextLayout);
     setStatusMessage(`Closed ${app.label}.`);
     if (activeAppId === app.id) {
       onSelectApp?.(nextVisibleDesktopWindow(nextLayout) || null);
@@ -820,8 +824,12 @@ const DesktopShell = ({
   const minimizeWindow = (app) => {
     if (dragSessionRef.current?.app.id === app.id) cancelWindowDrag();
     if (moveControlsAppId === app.id) closeMoveControls(app.id, false);
+    // Write through a functional updater so a queued update, such as a
+    // drag-end position, is applied first and not dropped. The render-time
+    // layout only picks the window to select next, which depends on which
+    // windows are open and how they stack, not on their positions.
+    setLayout((current) => minimizeDesktopWindow(current, app.id, shellAppIds));
     const nextLayout = minimizeDesktopWindow(layout, app.id, shellAppIds);
-    setLayout(nextLayout);
     setStatusMessage(`Minimized ${app.label}. Use its taskbar button to restore it.`);
     if (activeAppId === app.id) {
       onSelectApp?.(nextVisibleDesktopWindow(nextLayout, app.id) || null);

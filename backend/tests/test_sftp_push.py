@@ -142,6 +142,54 @@ class TestMissingConfig:
         assert "password" in result["error"].lower()
 
 
+class TestRequiredTransfer:
+    """A job that declares the transfer required must not report it skipped.
+
+    ``skipped`` makes the submission terminal (``committed``), so a renamed or
+    missing secret would otherwise park every row without a retry.
+    """
+
+    def _clear(self, monkeypatch):
+        for key in (
+            "ROSEN_SFTP_HOST",
+            "ROSEN_SFTP_USER",
+            "ROSEN_SFTP_SITE_PATH",
+            "ROSEN_SFTP_REMOTE_PATH",
+            "ROSEN_SFTP_PASSWORD",
+            "ROSEN_SFTP_KEY_PATH",
+            "ROSEN_TRANSFER_PROTOCOL",
+        ):
+            monkeypatch.delenv(key, raising=False)
+
+    def test_missing_config_fails_when_required(self, monkeypatch):
+        self._clear(monkeypatch)
+        monkeypatch.setenv("ROSEN_SFTP_HOST", "ftp.example.com")
+        monkeypatch.setenv("ROSEN_REQUIRE_TRANSFER", "1")
+
+        result = sftp_push.push_full_release()
+
+        assert result["ok"] is False
+        assert result["skipped"] is False
+        assert "ROSEN_SFTP_USER" in result["error"]
+        assert "ROSEN_SFTP_SITE_PATH" in result["error"]
+        assert "ROSEN_SFTP_HOST" not in result["error"]
+
+    def test_missing_config_still_skips_when_not_required(self, monkeypatch):
+        self._clear(monkeypatch)
+        monkeypatch.delenv("ROSEN_REQUIRE_TRANSFER", raising=False)
+
+        result = sftp_push.push_full_release()
+
+        assert result["ok"] is True
+        assert result["skipped"] is True
+
+    def test_submit_workflow_requires_the_transfer(self):
+        workflow = (
+            _BACKEND.parent / ".github" / "workflows" / "submit-record.yml"
+        ).read_text(encoding="utf-8")
+        assert "ROSEN_REQUIRE_TRANSFER: '1'" in workflow
+
+
 class TestStagingPreflight:
     """Staging dir state is validated before we open any SSH connection."""
 

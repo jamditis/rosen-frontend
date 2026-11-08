@@ -30,6 +30,7 @@
  * Re-runs are a no-op.
  */
 import { readFileSync, writeFileSync, renameSync } from 'node:fs';
+import { assertNoPendingCapture } from '../lib/pending-capture.js';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -166,6 +167,7 @@ function main() {
   for (const change of changed) console.log(`${change.id}: "${change.before}" -> "${change.after}"`);
   console.log(`${changed.length} related_to cells ${DRY_RUN ? 'would change' : 'changed'}`);
   if (DRY_RUN || changed.length === 0) return;
+  assertNoPendingCapture(RECORDS_PATH);
   const tmp = `${RECORDS_PATH}.tmp`;
   writeFileSync(tmp, text, 'utf-8');
   renameSync(tmp, RECORDS_PATH);

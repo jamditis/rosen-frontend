@@ -91,22 +91,91 @@ export function selectPublishableThreadCandidates(candidates) {
   ));
 }
 
+function tombstoneRecord(entry) {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+    throw new Error('thread tombstone must be an object');
+  }
+  const keys = Object.keys(entry).sort();
+  if (keys.length !== 2 || keys[0] !== 'id' || keys[1] !== 'root') {
+    throw new Error('thread tombstone must have exactly id and root');
+  }
+  const record = { id: entry.id, thread_data: { thread_id: entry.root } };
+  threadRootId(record);
+  return record;
+}
+
+/**
+ * Validate the committed tombstone file (`data/thread-id-tombstones.json`).
+ * Returns its retired entries in file order.
+ */
+export function parseThreadTombstones(state) {
+  if (!state || typeof state !== 'object' || Array.isArray(state)) {
+    throw new Error('thread tombstone file must be an object');
+  }
+  const keys = Object.keys(state).sort();
+  if (keys.length !== 2 || keys[0] !== 'retired' || keys[1] !== 'version' || state.version !== 1) {
+    throw new Error('thread tombstone file must be { version: 1, retired: [] }');
+  }
+  assertRecordList(state.retired, 'retired');
+  const seen = new Set();
+  for (const entry of state.retired) {
+    tombstoneRecord(entry);
+    if (seen.has(entry.id)) throw new Error(`duplicate thread tombstone ${entry.id}`);
+    seen.add(entry.id);
+  }
+  return state.retired;
+}
+
+/**
+ * Append every THREAD id that the prior artifact published and this export
+ * does not. The list only grows: an id stays reserved for its root even if
+ * that root is published again later. Entries are sorted by id.
+ */
+export function retireDroppedThreadIds({
+  priorRuntimeRecords,
+  publishedThreadRecords,
+  tombstones,
+}) {
+  assertRecordList(priorRuntimeRecords, 'priorRuntimeRecords');
+  assertRecordList(publishedThreadRecords, 'publishedThreadRecords');
+  assertRecordList(tombstones, 'tombstones');
+  const byId = new Map();
+  for (const entry of tombstones) {
+    tombstoneRecord(entry);
+    byId.set(entry.id, { id: entry.id, root: entry.root });
+  }
+  const published = new Set(publishedThreadRecords.map(record => record?.id));
+  for (const record of priorRuntimeRecords) {
+    if (published.has(record?.id)) continue;
+    const root = threadRootId(record);
+    const existing = byId.get(record.id);
+    if (existing && existing.root !== root) {
+      throw new Error(`${record.id} maps to both ${existing.root} and ${root}`);
+    }
+    byId.set(record.id, { id: record.id, root });
+  }
+  return [...byId.values()].sort((left, right) => compareStableText(left.id, right.id));
+}
+
 /**
  * Assign stable container IDs to detected Bluesky thread roots.
  *
- * The prior runtime artifact is the identity registry. Current source THREAD
- * rows also reserve their IDs. Known roots keep their prior ID. New roots get
- * monotonically increasing IDs in root-ID order, so input order cannot change
- * the result.
+ * The prior runtime artifact is the identity registry for published threads.
+ * Current source THREAD rows also reserve their IDs, and so do tombstones of
+ * threads that have dropped out of publication. Known roots keep their ID.
+ * New roots get monotonically increasing IDs in root-ID order, so input order
+ * cannot change the result.
  */
 export function assignStableThreadIds({
   priorRuntimeRecords,
   sourceThreadRecords,
   detectedRootIds,
+  retiredThreadIds = [],
 }) {
   assertRecordList(priorRuntimeRecords, 'priorRuntimeRecords');
   assertRecordList(sourceThreadRecords, 'sourceThreadRecords');
   assertRecordList(detectedRootIds, 'detectedRootIds');
+  assertRecordList(retiredThreadIds, 'retiredThreadIds');
 
   const rootByThreadId = new Map();
   const threadIdByRoot = new Map();
@@ -133,6 +202,7 @@ export function assignStableThreadIds({
 
   for (const record of priorRuntimeRecords) register(record);
   for (const record of sourceThreadRecords) register(record);
+  for (const entry of retiredThreadIds) register(tombstoneRecord(entry));
 
   const currentRoots = new Set();
   for (const rootId of detectedRootIds) {

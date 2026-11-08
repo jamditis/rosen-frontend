@@ -11,6 +11,8 @@ import {
   changedPaths,
   finalizePublication,
   postFailedReceipt,
+  RETRY_UNSAFE_PATH,
+  rebaseOntoRemoteHead,
   run,
   runPreparation,
   stageCensusCommit,
@@ -603,4 +605,180 @@ it('settles distinct historical source aliases associated with one published rec
   });
   assert.equal(receipt.admitted, 2);
   assert.equal(receipt.records.length, 2);
+});
+
+describe('a stewardship run retries once after main moves', () => {
+  function staleHead() {
+    const error = new Error('origin/main moved after the tested checkout');
+    error.errorClass = 'stale_remote_head';
+    return error;
+  }
+
+  it('rebuilds the whole candidate on the new head and publishes it', () => {
+    let publishes = 0;
+    const ops = preparation({
+      capture: () => { ops.calls.push('capture'); return report(); },
+      publishChangedRelease: () => {
+        publishes += 1;
+        ops.calls.push(`publish:${publishes}`);
+        if (publishes === 1) throw staleHead();
+        return { canonicalCommit: PUBLISHED, releaseVersion: '3.8.38' };
+      },
+      rebaseOntoRemoteHead: () => ops.calls.push('rebase'),
+    });
+    const result = runPreparation(ops);
+    assert.equal(result.phase, 'pushed');
+    assert.equal(result.errorClass, null);
+    assert.deepEqual(ops.calls, ['capture', 'publish:1', 'rebase', 'capture', 'publish:2', 'persist:pushed']);
+  });
+
+  it('retries a zero-row recovery through the same gates on the new head', () => {
+    let validations = 0;
+    const ops = preparation({
+      capture: () => report(0),
+      verifyLive: () => { throw new Error('live bytes differ'); },
+      validateRecoveryRelease: () => {
+        validations += 1;
+        if (validations === 1) throw staleHead();
+      },
+      rebaseOntoRemoteHead: () => ops.calls.push('rebase'),
+    });
+    assert.equal(runPreparation(ops).phase, 'recovery_ready');
+    assert.equal(validations, 2);
+    assert.deepEqual(ops.calls, ['rebase', 'persist:recovery_ready']);
+  });
+
+  it('fails without a second retry when main moves again', () => {
+    const ops = preparation({
+      publishChangedRelease: () => { ops.calls.push('publish'); throw staleHead(); },
+      rebaseOntoRemoteHead: () => ops.calls.push('rebase'),
+    });
+    assert.throws(() => runPreparation(ops), /origin\/main moved/);
+    assert.equal(ops.state.phase, 'failed');
+    assert.equal(ops.state.errorClass, 'stale_remote_head');
+    assert.deepEqual(ops.calls, ['publish', 'rebase', 'publish', 'persist:failed']);
+    assert.equal(ops.outputs.get('needs_deploy'), 'false');
+  });
+
+  it('fails without retrying when the new head cannot be rebuilt safely', () => {
+    const ops = preparation({
+      publishChangedRelease: () => { ops.calls.push('publish'); throw staleHead(); },
+      rebaseOntoRemoteHead: () => {
+        const error = new Error('main moved with release tooling changes');
+        error.errorClass = 'stale_remote_head';
+        throw error;
+      },
+    });
+    assert.throws(() => runPreparation(ops), /release tooling changes/);
+    assert.equal(ops.state.errorClass, 'stale_remote_head');
+    assert.deepEqual(ops.calls, ['publish', 'persist:failed']);
+  });
+
+  it('does not retry other failures', () => {
+    const ops = preparation({
+      publishChangedRelease: () => { ops.calls.push('publish'); throw new Error('tests failed'); },
+      rebaseOntoRemoteHead: () => ops.calls.push('rebase'),
+    });
+    assert.throws(() => runPreparation(ops), /tests failed/);
+    assert.deepEqual(ops.calls, ['publish', 'persist:failed']);
+  });
+});
+
+describe('rebasing a stale stewardship checkout', () => {
+  function remoteFixture(t) {
+    const origin = gitFixture(t, {
+      'data/social_posts.csv': 'id\nBSKY-00001\n',
+      'version.json': '{"version":"3.8.37"}\n',
+    });
+    gitCommand(origin, ['branch', '-M', 'main']);
+    const startCommit = gitCommand(origin, ['rev-parse', 'HEAD']);
+    const work = fs.mkdtempSync(path.join(process.env.TMPDIR || '/tmp', 'rosen-publisher-work-'));
+    t.after(() => fs.rmSync(work, { recursive: true, force: true }));
+    execFileSync('git', ['clone', '-q', origin, work]);
+    gitCommand(work, ['config', 'user.name', 'Joe Amditis']);
+    gitCommand(work, ['config', 'user.email', '6799804+jamditis@users.noreply.github.com']);
+    gitCommand(work, ['checkout', '-q', '--detach', 'origin/main']);
+    // The first attempt's release commit, tested only against the old head.
+    fs.writeFileSync(path.join(work, 'data/social_posts.csv'), 'id\nBSKY-00001\nBSKY-00002\n');
+    gitCommand(work, ['commit', '-q', '-am', 'data: publish source stewardship update']);
+    fs.writeFileSync(path.join(work, 'data/stray.json'), '{}\n');
+    const temporary = fs.mkdtempSync(path.join(process.env.TMPDIR || '/tmp', 'rosen-publisher-temp-'));
+    t.after(() => fs.rmSync(temporary, { recursive: true, force: true }));
+    const paths = {
+      reportPath: path.join(temporary, 'bluesky-batch-report.json'),
+      pressThinkReportPath: path.join(temporary, 'pressthink-batch-report.json'),
+      snapshotDir: path.join(temporary, 'bluesky-source-snapshot'),
+    };
+    fs.writeFileSync(paths.reportPath, '{}\n');
+    fs.mkdirSync(paths.snapshotDir);
+    return {
+      origin, work, paths, startCommit,
+      state: { ...state(), startCommit, canonicalCommit: startCommit },
+    };
+  }
+
+  function moveMain(origin, file, content) {
+    fs.mkdirSync(path.dirname(path.join(origin, file)), { recursive: true });
+    fs.writeFileSync(path.join(origin, file), content);
+    gitCommand(origin, ['add', '--all']);
+    gitCommand(origin, ['commit', '-q', '-m', 'someone else merged']);
+    return gitCommand(origin, ['rev-parse', 'HEAD']);
+  }
+
+  it('resets to the new main, clears the first attempt and moves its reports aside', (t) => {
+    const fixture = remoteFixture(t);
+    const newHead = moveMain(fixture.origin, 'docs/note.md', 'merged\n');
+    const executed = [];
+    rebaseOntoRemoteHead(fixture.work, fixture.paths, fixture.state, {
+      execute: (_root, command, args) => executed.push([command, ...args].join(' ')),
+    });
+    assert.equal(gitCommand(fixture.work, ['rev-parse', 'HEAD']), newHead);
+    assert.equal(gitCommand(fixture.work, ['status', '--porcelain']), '');
+    assert.equal(fs.readFileSync(path.join(fixture.work, 'data/social_posts.csv'), 'utf8'), 'id\nBSKY-00001\n');
+    assert.deepEqual(executed, ['git lfs pull']);
+    assert.equal(fixture.state.startCommit, newHead);
+    assert.equal(fixture.state.canonicalCommit, newHead);
+    assert.equal(fixture.state.releaseVersion, '3.8.37');
+    assert.equal(fs.existsSync(fixture.paths.reportPath), false);
+    assert.equal(fs.existsSync(fixture.paths.snapshotDir), false);
+    assert.equal(fs.existsSync(`${fixture.paths.reportPath}.stale-1`), true);
+    assert.equal(fs.existsSync(`${fixture.paths.snapshotDir}.stale-1`), true);
+  });
+
+  for (const file of [
+    'package-lock.json',
+    'backend/poetry.lock',
+    '.github/scripts/bluesky-stewardship-publisher.mjs',
+    'scripts/bump-version.mjs',
+    'workers/source-discovery/src/source-manifest.js',
+  ]) {
+    it(`refuses to retry when main changed ${file}`, (t) => {
+      const fixture = remoteFixture(t);
+      const before = gitCommand(fixture.work, ['rev-parse', 'HEAD']);
+      moveMain(fixture.origin, file, 'changed\n');
+      assert.throws(
+        () => rebaseOntoRemoteHead(fixture.work, fixture.paths, fixture.state, {
+              execute: () => {},
+        }),
+        (error) => error.errorClass === 'stale_remote_head' && /release tooling/.test(error.message),
+      );
+      assert.equal(gitCommand(fixture.work, ['rev-parse', 'HEAD']), before);
+      assert.equal(fixture.state.startCommit, fixture.startCommit);
+    });
+  }
+});
+
+it('refuses a retry when main changed any module the running publisher imported', () => {
+  // The retry reuses the modules already loaded in memory, so every local
+  // import of the publisher must be on the unsafe list.
+  const publisherDir = path.join(root, '.github/scripts');
+  const source = fs.readFileSync(path.join(publisherDir, 'bluesky-stewardship-publisher.mjs'), 'utf8');
+  const localImports = [...source.matchAll(/^import[^;]*?from '(\.{1,2}\/[^']+)';/gms)]
+    .map((match) => path.relative(root, path.resolve(publisherDir, match[1])).split(path.sep).join('/'));
+  assert.ok(localImports.length > 0);
+  for (const file of localImports) {
+    assert.ok(RETRY_UNSAFE_PATH.test(file), `${file} is imported by the publisher but a retry would not refuse a change to it`);
+  }
+  assert.equal(RETRY_UNSAFE_PATH.test('data/social_posts.csv'), false);
+  assert.equal(RETRY_UNSAFE_PATH.test('scripts/refresh-social-release-artifacts.mjs'), false);
 });

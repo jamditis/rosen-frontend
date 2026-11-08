@@ -11,6 +11,7 @@
  */
 
 import { readFileSync, writeFileSync } from 'fs';
+import { assertNoPendingCapture } from '../lib/pending-capture.js';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 
@@ -127,6 +128,7 @@ console.log(`Total summaries available: ${Object.keys(SUMMARIES).length}`);
 if (!DRY_RUN) {
   const columns = Object.keys(records[0]);
   const output = stringify(records, { header: true, columns });
+  assertNoPendingCapture(csvPath);
   writeFileSync(csvPath, output);
   console.log(`\nWrote ${csvPath}`);
 } else {

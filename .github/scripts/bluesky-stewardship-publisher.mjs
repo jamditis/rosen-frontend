@@ -39,6 +39,7 @@ const RELEASE_DATA_PATHS = new Set([
   'data/archive-embeddings.json',
   'data/archive_records-public.csv',
   'data/record-id-sequence.json',
+  'data/thread-id-tombstones.json',
   'data/extracted_entities.csv',
   'data/extracted_relationships.csv',
   'data/archive-social-embeddings.bin',
@@ -426,45 +427,79 @@ export function runPreparation({
   validateRecoveryRelease,
   persist,
   emit = () => {},
+  rebaseOntoRemoteHead,
 }) {
   state.dryRun = dryRun;
-  try {
-    const report = validateReport(capture());
-    state.report = report;
-
-    if (dryRun) {
-      verifyLive();
-      state.phase = 'dry_run';
-      state.liveVerified = true;
-    } else if (report.canonical.rows_appended === 0 && !articleReport(report)?.changed) {
-      try {
-        verifyLive();
-        state.phase = 'no_change';
-        state.liveVerified = true;
-      } catch (liveError) {
-        validateRecoveryRelease(liveError);
-        state.phase = 'recovery_ready';
-        state.liveVerified = false;
+  let retried = false;
+  while (true) {
+    try {
+      return prepareOnce({
+        dryRun, state, capture, verifyLive, publishChangedRelease, validateRecoveryRelease, persist, emit,
+      });
+    } catch (error) {
+      // When main moves under a tested candidate, nothing has been pushed. Rebuild
+      // the candidate from a fresh capture on the new head and run every gate
+      // again, once. A second move, or a head that cannot be rebuilt safely, fails.
+      if (dryRun || retried || error.errorClass !== 'stale_remote_head' || !rebaseOntoRemoteHead) {
+        state.phase = dryRun ? 'dry_run_failed' : 'failed';
+        state.errorClass = text(error.errorClass) || (dryRun ? 'dry_run_failed' : 'prepare_failed');
+        persist(state);
+        emitPreparationOutputs(state, emit);
+        throw error;
       }
-    } else {
-      const release = publishChangedRelease(report);
-      state.phase = 'pushed';
-      state.canonicalCommit = release.canonicalCommit;
-      state.releaseVersion = release.releaseVersion;
+      retried = true;
+      try {
+        rebaseOntoRemoteHead();
+      } catch (rebaseError) {
+        state.phase = 'failed';
+        state.errorClass = text(rebaseError.errorClass) || 'prepare_failed';
+        persist(state);
+        emitPreparationOutputs(state, emit);
+        throw rebaseError;
+      }
+    }
+  }
+}
+
+function prepareOnce({
+  dryRun,
+  state,
+  capture,
+  verifyLive,
+  publishChangedRelease,
+  validateRecoveryRelease,
+  persist,
+  emit,
+}) {
+  const report = validateReport(capture());
+  state.report = report;
+
+  if (dryRun) {
+    verifyLive();
+    state.phase = 'dry_run';
+    state.liveVerified = true;
+  } else if (report.canonical.rows_appended === 0 && !articleReport(report)?.changed) {
+    try {
+      verifyLive();
+      state.phase = 'no_change';
+      state.liveVerified = true;
+    } catch (liveError) {
+      validateRecoveryRelease(liveError);
+      state.phase = 'recovery_ready';
       state.liveVerified = false;
     }
-
-    state.errorClass = null;
-    persist(state);
-    emitPreparationOutputs(state, emit);
-    return state;
-  } catch (error) {
-    state.phase = dryRun ? 'dry_run_failed' : 'failed';
-    state.errorClass = text(error.errorClass) || (dryRun ? 'dry_run_failed' : 'prepare_failed');
-    persist(state);
-    emitPreparationOutputs(state, emit);
-    throw error;
+  } else {
+    const release = publishChangedRelease(report);
+    state.phase = 'pushed';
+    state.canonicalCommit = release.canonicalCommit;
+    state.releaseVersion = release.releaseVersion;
+    state.liveVerified = false;
   }
+
+  state.errorClass = null;
+  persist(state);
+  emitPreparationOutputs(state, emit);
+  return state;
 }
 
 function captureBatch(root, paths, dryRun) {
@@ -505,6 +540,64 @@ function assertRemoteHeadUnchanged(root, startCommit, gitCommand = git) {
     error.errorClass = 'stale_remote_head';
     throw error;
   }
+}
+
+// A retry runs this already-loaded publisher, the modules it imports and the
+// installed dependencies against the new head. If main changed any of them, the
+// retry would test something other than what a fresh run would, so it is
+// refused. Keep the module paths in step with this file's local imports.
+export const RETRY_UNSAFE_PATH = /^(?:package(?:-lock)?\.json$|backend\/(?:poetry\.lock|pyproject\.toml)$|\.gitattributes$|\.lfsconfig$|\.github\/|scripts\/bump-version\.mjs$|workers\/source-discovery\/src\/)/;
+
+function moveAside(file) {
+  if (!fs.existsSync(file)) return;
+  let attempt = 1;
+  while (fs.existsSync(`${file}.stale-${attempt}`)) attempt += 1;
+  fs.renameSync(file, `${file}.stale-${attempt}`);
+}
+
+/**
+ * Reset a checkout whose candidate went stale onto the new origin/main, so the
+ * whole candidate can be captured, built and tested again from that head.
+ */
+export function rebaseOntoRemoteHead(root, paths, state, {
+  execute = run,
+  gitCommand = git,
+} = {}) {
+  const refuse = (message) => {
+    const error = new Error(message);
+    error.errorClass = 'stale_remote_head';
+    return error;
+  };
+  gitCommand(root, ['fetch', 'origin', 'main']);
+  const newHead = gitCommand(root, ['rev-parse', 'origin/main']);
+  if (!SHA.test(newHead)) throw refuse('origin/main did not resolve to a commit');
+  try {
+    gitCommand(root, ['merge-base', '--is-ancestor', state.startCommit, newHead]);
+  } catch {
+    throw refuse('origin/main no longer contains the tested start commit');
+  }
+  const changed = gitCommand(root, ['diff', '--name-only', '--no-renames', state.startCommit, newHead])
+    .split('\n').map(text).filter(Boolean);
+  const unsafe = changed.filter((file) => RETRY_UNSAFE_PATH.test(file));
+  if (unsafe.length > 0) {
+    throw refuse(`origin/main moved with release tooling changes, not retrying: ${unsafe.join(', ')}`);
+  }
+
+  console.log(`origin/main moved to ${newHead}; rebuilding the candidate there once.`);
+  gitCommand(root, ['reset', '--hard', newHead]);
+  gitCommand(root, ['clean', '-fd']);
+  execute(root, 'git', ['lfs', 'pull']);
+  if (gitCommand(root, ['status', '--porcelain'])) {
+    throw refuse('the checkout is not clean after moving to the new origin/main');
+  }
+  // The capture adapters refuse to overwrite an earlier report or snapshot.
+  for (const file of [paths.reportPath, paths.pressThinkReportPath, paths.snapshotDir]) {
+    moveAside(file);
+  }
+  state.startCommit = newHead;
+  state.canonicalCommit = newHead;
+  state.releaseVersion = readJson(path.join(root, 'version.json')).version;
+  state.report = emptyReport(new Date().toISOString());
 }
 
 export function validateRecoveryRelease(root, state, {
@@ -577,6 +670,7 @@ function prepare(root) {
     validateRecoveryRelease: () => validateRecoveryRelease(root, state),
     persist: (nextState) => writeJson(paths.statePath, nextState),
     emit: output,
+    rebaseOntoRemoteHead: () => rebaseOntoRemoteHead(root, paths, state),
   });
   if (ARTICLE_SOURCE_IDS.includes(state.sourceId) && !dryRun) {
     const published = new Set(readJson(path.join(root, 'data/archive-data.json')).records.map(record => record.id));

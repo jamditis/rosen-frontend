@@ -173,7 +173,7 @@ def enrich_data(
     # Set new schema fields with defaults
     data.setdefault("collection_id", generate_collection_id(data, url))
     data.setdefault("permissions", determine_permissions(data, url))
-    data.setdefault("verified", False)  # Default to unverified, can be updated later
+    data.setdefault("verified", "FALSE")  # Default to unverified, can be updated later
     data.setdefault("notes", "")  # Empty notes by default
 
     return data

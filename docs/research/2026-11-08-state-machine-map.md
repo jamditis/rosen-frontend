@@ -38,7 +38,7 @@ The input came from three readers. I opened the cited files and checked each ent
 | R1 | Record ID high-water sequence | implicit | `RECORD-*` namespace | valid N, reserved N+1, gap, invalid (fail closed), locked, blocked by journal | `data/record-id-sequence.json` + `.lock` | `backend/scripts/record_id_sequence.py:21-96` |
 | R2 | Capture transaction journal | implicit | one PressThink / publisher-feed batch | clean, journal written, partly rolled forward, committed, blocked | `preservation/*/versions.jsonl.pending.json`, CSV `.bak` | `backend/scripts/pressthink_transaction.py:54-136`; `backend/scripts/pressthink_batch_update.py:472-524` |
 | R3 | Source version chain | explicit | one upstream source identity | linked, review, retired, (missing, report only) | `preservation/*/versions.jsonl` | `backend/scripts/pressthink_batch_update.py:209-226,260-283,302-460` |
-| R4 | THREAD-* id registry | implicit | one Bluesky thread root | unregistered, registered, dropped | `data/archive-data.json` (prior artifact) | `data/lib/thread-id-allocator.js:85-92,102-165`; `data/export-archive-data.js:220-236` |
+| R4 | THREAD-* id registry | implicit | one Bluesky thread root | unregistered, registered, dropped | `data/archive-data.json` (prior artifact), `data/thread-id-tombstones.json` | `data/lib/thread-id-allocator.js:85-92,102-165`; `data/export-archive-data.js:220-236` |
 | R5 | Record publication flags | implicit | one archive record | unverified (hidden), verified+needs_review, verified reviewed, filtered, published | CSV `verified`, `needs_review`, `low_confidence` | `data/export-archive-data.js:115-118,160-166,1027-1032`; `backend/scripts/process_submission.py:1003-1013`; `backend/scripts/pressthink_batch_update.py:252-254` |
 | R6 | Graph validation holds | explicit | relationship row / hold / generated id | accepted, held, rejected; hold active/obsolete/stale | `data/graph-validation-holds.json` | `scripts/validate-graph-data.mjs:721-735,770-780,815-826`; `scripts/refresh-social-release-artifacts.mjs:127-157,239` |
 | R7 | Relationship-type registry | explicit | one relationship type | accepted/deferred; enforced/reviewed/deferred | `data/relationship-type-registry.json` | `data/lib/graph-policy-refresh.js:258-300`; `scripts/refresh-social-release-artifacts.mjs:234-236` |
@@ -101,7 +101,7 @@ stateDiagram-v2
   NotStarted --> Loading: navigate to record route
   Loading --> Loaded
   Loading --> Error
-  Error --> [*]: full reload only
+  Error --> Loading: try again (no reload)
 ```
 
 ### F6 cache tiers
@@ -109,8 +109,9 @@ stateDiagram-v2
 ```mermaid
 stateDiagram-v2
   [*] --> VersionCheck
-  VersionCheck --> IdbLookup: done or 4 s timeout
-  IdbLookup --> Served: fresh entry (maybe old deploy key)
+  VersionCheck --> IdbLookup: done
+  VersionCheck --> Network: 4 s timeout (cache tiers skipped)
+  IdbLookup --> Served: fresh entry
   IdbLookup --> WebStorage: miss / stale
   WebStorage --> Network: miss (core is always too big)
   Network --> Served: stored in IDB
@@ -138,7 +139,8 @@ stateDiagram-v2
 stateDiagram-v2
   [*] --> Installing: new sw.js bytes
   Installing --> Activating: skipWaiting (always)
-  Activating --> Active: delete old caches, claim
+  Activating --> Active: delete old caches (keep newest previous static cache while old windows are open), claim
+  Active --> Active: navigation after old windows close deletes the retained cache
   Active --> UpdateReady: controllerchange on controlled page
   UpdateReady --> [*]: reader reloads
 ```
@@ -303,28 +305,28 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 ## Suggested follow-up issues
 
 1. Measure sweeper age from the last status write, not from column A, and record that time in a new column.
-2. Make the sweeper skip a row when a `submit-record.yml` run for that `sheet_row` is queued or in progress.
-3. Add an attempt counter for `archived` rows and stop sentinel retries after a fixed limit.
-4. Order the release FIFO by run creation time or by `run_attempt` start time, not by run id alone.
-5. Add a tombstone list of retired THREAD ids to the exporter so that it never reuses a number.
-6. Make `fetchCoreData` skip the IDB read when `checkVersion` times out, so that it never serves an old deploy key.
-7. Stop the SW from deleting the previous release's cache until no client of that release remains.
-8. Remove the `popstate` filter overwrite outside desktop routes, or write standard archive filters to the URL.
-9. Apply `publication` and `includeReplies` in `filteredRecords`, or stop parsing them from the URL.
-10. Retry a stewardship run once after `stale_remote_head` by rebasing onto the new `origin/main`.
-11. Treat zero endpoint divergence as a warning in `refresh-social-release-artifacts.mjs`, not as a thrown error.
-12. Prune `generatedPublishedRecordIds` entries in the refresh when the record is no longer published.
-13. Add the pending-journal check to the JS CSV writers in `data/fixes/` and `data/lib/python-csv-maintenance.js`.
-14. Exclude `failed` rows from `get_processed_ids` so that the batch runner retries them.
-15. Return a failure instead of `skipped` from `push_full_release` when the job expects SFTP secrets.
-16. Reset `coreFetchStarted` on error and add a retry button that fetches again without a page reload.
-17. Treat an unparseable column A timestamp as stuck and log it in `sweep_stuck.py`.
-18. Call `terminateSemanticSearch` on the semantic query error path in `App.js`.
-19. Cancel the 180 ms close timer in `RecordModal.js` when the record changes or the component unmounts.
-20. Use functional `setLayout` updaters in `closeWindow` and `minimizeWindow` in `DesktopShell.js`.
-21. Set `db` only after `createTables` succeeds in `sqliteService.js`.
-22. Move `stampVersion` inside the rollback try in `scripts/bump-version.mjs`.
-23. Delete the pushed branch when `gh pr create` fails in `sync_sheet_to_archive.py`.
-24. Remove the unused `noop` status from the `process_submission.py` docstring, and add `committed` to the sweeper workflow comment.
-25. Use one spelling (`TRUE`/`FALSE`) for `verified` and `needs_review` in all writers, and make one validator enforce it.
-26. Use one shared default filter object for `App.js` and `viewState.js`.
+2. Make the sweeper skip a row when a `submit-record.yml` run for that `sheet_row` is queued or in progress. Fixed (the run title now names the row, and the sweeper skips rows with an active run and dispatches nothing when the lookup fails).
+3. Add an attempt counter for `archived` rows and stop sentinel retries after a fixed limit. Fixed (the sentinel URL carries the attempt number, a failed run writes `[sweep attempt N]` into column H, and the sweeper stops after five; no new column).
+4. Order the release FIFO by run creation time or by `run_attempt` start time, not by run id alone. Fixed (the queue now orders by the current attempt's `run_started_at`, with run id only as the tie-break, so a re-run waits behind runs that started before it).
+5. Add a tombstone list of retired THREAD ids to the exporter so that it never reuses a number. Fixed (the exporter reads and appends to `data/thread-id-tombstones.json` before it replaces the artifact; history shows the old renumbering reissued THREAD-00016 and THREAD-00017 on 2026-07-23 and THREAD-00018 on 2026-08-15, but every id is held by a published thread today, so no id is retired and the list starts empty; `sync_sheet_to_archive.py`, `process_submission.py`, and the stewardship publisher stage the file with the regenerated JSON).
+6. Make `fetchCoreData` skip the IDB read when `checkVersion` times out, so that it never serves an old deploy key. Fixed (a timed-out check now skips both cache tiers and fetches, and the fresh payload is stored under the key read after the fetch).
+7. Stop the SW from deleting the previous release's cache until no client of that release remains. Fixed (activate keeps the newest previous static cache while a window open at activation remains and deletes it on a later navigation once they close; other-release `?v=` URLs are served from any cache, and network bytes are never stored under their keys).
+8. Remove the `popstate` filter overwrite outside desktop routes, or write standard archive filters to the URL. Fixed (popstate now restores filters only onto desktop record-window entries, the only ones that write them; the standard archive keeps its live filters).
+9. Apply `publication` and `includeReplies` in `filteredRecords`, or stop parsing them from the URL. Fixed (no control sets either filter and records carry no reply flag, so the URL contract no longer parses or writes them).
+10. Retry a stewardship run once after `stale_remote_head` by rebasing onto the new `origin/main`. Fixed (on `stale_remote_head` the publisher refetches, resets to the new head, captures again and reruns every gate once; it refuses the retry when main changed lockfiles, LFS config, `.github/` or a module the publisher has already loaded).
+11. Treat zero endpoint divergence as a warning in `refresh-social-release-artifacts.mjs`, not as a thrown error. Still open. Downgrading the refresh error alone does not let a release through: the stewardship publisher runs `npm test` before it pushes, and `tests/graph-sqlite-validator.test.js` fails a deferred or reviewed type whose divergence examples no longer violate. The release would still fail, only later and with a less direct message. Closing this needs a curator ruling on whether the refresh may flip a type to `enforced` itself.
+12. Prune `generatedPublishedRecordIds` entries in the refresh when the record is no longer published. Fixed (the refresh drops THREAD exceptions whose container is no longer published; a stale non-thread exception is still left for validation to stop on).
+13. Add the pending-journal check to the JS CSV writers in `data/fixes/` and `data/lib/python-csv-maintenance.js`. Fixed (`data/lib/pending-capture.js` mirrors the Python check; every `data/fixes/*.js` write and the bridge `render` call it first).
+14. Exclude `failed` rows from `get_processed_ids` so that the batch runner retries them. Fixed (failed rows load again on the next run; auto mode sends each post at most once per run so a post that always fails cannot loop).
+15. Return a failure instead of `skipped` from `push_full_release` when the job expects SFTP secrets. Fixed (`submit-record.yml` sets `ROSEN_REQUIRE_TRANSFER=1`, so missing settings fail the push by name and the row stays `archived`).
+16. Reset `coreFetchStarted` on error and add a retry button that fetches again without a page reload. Fixed (the catch releases the ref, and a "Try again" button in the shared error panel bumps a retry counter that reruns the load effect; "Reload page" stays as a fallback).
+17. Treat an unparseable column A timestamp as stuck and log it in `sweep_stuck.py`. Fixed (an unparseable or empty column A now counts as stuck and logs a warning; a future timestamp stays fresh).
+18. Call `terminateSemanticSearch` on the semantic query error path in `App.js`. Fixed (the query error path now releases the worker, as the off switch does).
+19. Cancel the 180 ms close timer in `RecordModal.js` when the record changes or the component unmounts. Fixed (the timer lives in a ref that an effect keyed on `isOpen` and the record id clears).
+20. Use functional `setLayout` updaters in `closeWindow` and `minimizeWindow` in `DesktopShell.js`. Fixed (both now write through `setLayout((current) => ...)`; the cross-tab `storage` listener from problem 19 is still open).
+21. Set `db` only after `createTables` succeeds in `sqliteService.js`. Fixed (the schema is built on a local database, which is closed on failure and published to `db` only after it succeeds).
+22. Move `stampVersion` inside the rollback try in `scripts/bump-version.mjs`. Fixed (the version.json write and the stamp loop now run inside the rollback try).
+23. Delete the pushed branch when `gh pr create` fails in `sync_sheet_to_archive.py`. Fixed (a failed `gh pr create` now deletes the pushed branch and still reports the original error).
+24. Remove the unused `noop` status from the `process_submission.py` docstring, and add `committed` to the sweeper workflow comment. Fixed (both docstrings drop `noop`, and the workflow comment lists `committed` with the new skip and cap rules).
+25. Use one spelling (`TRUE`/`FALSE`) for `verified` and `needs_review` in all writers, and make one validator enforce it. Fixed (the Python CSV writers now write `TRUE`/`FALSE`, `process_submission.py` normalizes a processor's own verdict, and `tests/flag-spelling.test.js` checks the CSVs and writer literals; current data already passed, so no cells changed).
+26. Use one shared default filter object for `App.js` and `viewState.js`. Fixed (App.js now spreads `viewState.defaultFilters()` and adds only the App-only `recordIds`).

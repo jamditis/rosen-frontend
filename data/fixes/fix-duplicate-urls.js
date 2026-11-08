@@ -16,6 +16,7 @@
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 import { readFileSync, writeFileSync } from 'fs';
+import { assertNoPendingCapture } from '../lib/pending-capture.js';
 
 const CSV_PATH = 'data/archive_records-public.csv';
 
@@ -56,5 +57,6 @@ const output = stringify(filtered, {
   columns: Object.keys(records[0]),
 });
 
+assertNoPendingCapture(CSV_PATH);
 writeFileSync(CSV_PATH, output);
 console.log('CSV updated successfully.');

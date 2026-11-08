@@ -28,7 +28,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 # Add backend to path
 backend_dir = Path(__file__).parent.parent
@@ -470,6 +470,7 @@ class BatchEntityExtractor:
         self,
         batch_size: int = DEFAULT_BATCH_SIZE,
         tier: int = 1,
+        exclude: Optional[Set[str]] = None,
     ) -> List[Dict]:
         """
         Load and filter unprocessed social posts.
@@ -477,11 +478,13 @@ class BatchEntityExtractor:
         Uses the same filtering logic as UnifiedEntityProcessor:
         - Minimum 7 words, 20 characters
         - Priority tiers: 1 (high engagement), 2 (2023+), 3 (all remaining)
-        - Skip already-processed posts
+        - Skip already-processed posts; failed posts are retried
 
         Args:
             batch_size: Max number of posts to return.
             tier: Priority tier (1, 2, or 3).
+            exclude: Post IDs to leave out, such as posts already sent in
+                this run.
 
         Returns:
             List of post dicts ready for extraction.
@@ -502,7 +505,8 @@ class BatchEntityExtractor:
 
         # Filter out already-processed
         processed_ids = self.db.get_processed_ids()
-        unprocessed = [p for p in filtered if p.get("id") not in processed_ids]
+        skip = processed_ids | (exclude or set())
+        unprocessed = [p for p in filtered if p.get("id") not in skip]
         print(f"[BATCH] {len(unprocessed)} posts remaining after filtering processed")
 
         if not unprocessed:
@@ -513,7 +517,7 @@ class BatchEntityExtractor:
 
         if not prioritized and tier < 3:
             print(f"[BATCH] No posts in tier {tier}, trying next tier...")
-            return self.load_unprocessed_posts(batch_size, tier + 1)
+            return self.load_unprocessed_posts(batch_size, tier + 1, exclude)
 
         batch = prioritized[:batch_size]
         print(f"[BATCH] Prepared batch of {len(batch)} posts (tier {tier})")
@@ -1076,12 +1080,16 @@ class BatchEntityExtractor:
             poll_interval: Seconds between status checks.
             tier: Starting priority tier.
         """
+        # Failed posts are retried, but only once per run, so a post that
+        # always fails cannot keep this loop submitting batches.
+        attempted: Set[str] = set()
         while True:
             # Load next batch
-            posts = self.load_unprocessed_posts(batch_size, tier)
+            posts = self.load_unprocessed_posts(batch_size, tier, attempted)
             if not posts:
                 print("[BATCH] No more unprocessed posts. Done!")
                 break
+            attempted.update(post.get("id") for post in posts)
 
             # Submit
             batch_id = self.submit_batch(posts)

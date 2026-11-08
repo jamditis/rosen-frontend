@@ -43,6 +43,7 @@
  */
 
 import { readFileSync, writeFileSync, renameSync } from 'fs';
+import { assertNoPendingCapture } from '../lib/pending-capture.js';
 import { parse } from 'csv-parse/sync';
 
 const DRY_RUN = process.argv.includes('--dry-run');
@@ -221,6 +222,7 @@ if (failures.length) {
 if (!DRY_RUN && edits.length > 0) {
   // Atomic write: same-directory temp file, then rename over the source so an
   // interrupted run never leaves a partially written CSV.
+  assertNoPendingCapture(csvPath);
   const tmpPath = `${csvPath}.tmp`;
   writeFileSync(tmpPath, text);
   renameSync(tmpPath, csvPath);

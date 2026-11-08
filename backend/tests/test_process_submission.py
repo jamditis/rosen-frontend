@@ -1229,6 +1229,40 @@ class TestSubmissionRegressions:
             not live_calls
         ), "sentinel must NOT writeback live when SFTP retry itself failed"
 
+    def test_sentinel_failure_records_the_attempt_in_the_error_cell(
+        self, monkeypatch, csv_with_headers
+    ):
+        """The sweeper caps sentinel retries by reading the attempt number
+        back from column H, so a failed retry must write it there."""
+        _stub_schema(monkeypatch)
+        sheets_mock = _stub_sheets(monkeypatch)
+        _stub_sftp(
+            monkeypatch,
+            result={
+                "ok": False,
+                "skipped": False,
+                "files_pushed": 0,
+                "error": "host unreachable",
+            },
+        )
+        _stub_subprocess(monkeypatch)
+
+        _run(
+            monkeypatch,
+            csv_with_headers,
+            url="https://example.com/sweep-noop-1748147200-attempt-3",
+            sheet_row=42,
+            retry_record_id="RECORD-00042",
+        )
+
+        archived = [
+            c
+            for c in sheets_mock.call_args_list
+            if c.kwargs.get("status") == "archived"
+        ]
+        assert archived
+        assert archived[-1].kwargs["error"].startswith("[sweep attempt 3] ")
+
     def test_dispatcher_failure_payload_writes_error(
         self, monkeypatch, csv_with_headers
     ):
@@ -2241,6 +2275,28 @@ class TestReviewGate:
         assert row["verified"] == "TRUE"
         assert row["needs_review"].lower() == "true"
 
+    @pytest.mark.parametrize("processor_value", [False, "false", "False", "no"])
+    def test_processor_flags_are_written_in_canonical_spelling(
+        self, monkeypatch, csv_with_headers, processor_value
+    ):
+        """verified and needs_review are written as TRUE/FALSE only.
+
+        Readers disagree on other spellings: the quality evaluator and the
+        ingestion receipt accept only TRUE/FALSE. A non-clipping processor's
+        explicit verdict stays authoritative but is written canonically.
+        """
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch, verified=processor_value)
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        _run(monkeypatch, csv_with_headers, url="https://example.com/flagged")
+        with csv_with_headers.open() as f:
+            row = next(csv.DictReader(f))
+        assert row["verified"] == "FALSE"
+        assert row["needs_review"] == "TRUE"
+
     def test_clipping_publish_prefixes_match_processor(self):
         expected = {"CLIP", *ClippingProcessor.PUBLICATION_PREFIXES.values()}
         assert process_submission.CLIPPING_ID_PREFIXES == expected
@@ -2398,3 +2454,15 @@ def test_manual_corrupt_reservations_leave_csv_untouched(monkeypatch, csv_with_h
     assert result["status"] == "error"
     assert "reservation failed" in result["error"]
     assert csv_with_headers.read_bytes() == before
+
+
+def test_documented_status_outcomes_are_ones_the_pipeline_writes():
+    """The docstrings list the queue statuses readers and the sweeper rely on.
+
+    No code path returns or writes ``noop``; a sentinel run ends ``live``,
+    ``committed`` or ``archived``.
+    """
+    for doc in (process_submission.__doc__, process_submission.process_one.__doc__):
+        assert "noop" not in doc
+        for status in ("live", "committed", "archived", "duplicate", "error"):
+            assert status in doc

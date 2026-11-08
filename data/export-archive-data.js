@@ -26,6 +26,8 @@ import { writeRelationshipAdjacencyArtifacts } from './export-relationship-adjac
 import { parseEntityMerges, buildEntityRedirects } from './lib/entity-merges.js';
 import {
   assignStableThreadIds,
+  parseThreadTombstones,
+  retireDroppedThreadIds,
   selectPublishableThreadCandidates,
 } from './lib/thread-id-allocator.js';
 
@@ -237,6 +239,17 @@ async function main() {
   const priorRuntimeThreadRecords = priorArchiveData.records.filter(record => (
     typeof record?.id === 'string' && record.id.startsWith('THREAD-')
   ));
+
+  // The prior artifact only remembers published threads. Ids that dropped out
+  // of publication live in this committed tombstone list, so a dropped number
+  // is never handed to another root. It is required, like the prior artifact.
+  const tombstonePath = path.join(__dirname, 'thread-id-tombstones.json');
+  let retiredThreadIds;
+  try {
+    retiredThreadIds = parseThreadTombstones(JSON.parse(fs.readFileSync(tombstonePath, 'utf-8')));
+  } catch (error) {
+    throw new Error(`THREAD id tombstones at ${tombstonePath} are missing or invalid: ${error.message}`, { cause: error });
+  }
 
   // Check that files exist
   const filesToCheck = [
@@ -495,6 +508,7 @@ async function main() {
   const threadIdByRoot = assignStableThreadIds({
     priorRuntimeRecords: priorRuntimeThreadRecords,
     sourceThreadRecords: existingThreadRecords,
+    retiredThreadIds,
     detectedRootIds: rootsToGenerate,
   });
 
@@ -821,6 +835,18 @@ async function main() {
     },
     autocompleteIndex: Array.from(searchTerms).sort()
   };
+
+  // Record dropped THREAD ids before the prior artifact is replaced. If this
+  // ran after, a crash between the two writes would forget the dropped id.
+  const nextRetiredThreadIds = retireDroppedThreadIds({
+    priorRuntimeRecords: priorRuntimeThreadRecords,
+    publishedThreadRecords: allRecords.filter(record => record.id.startsWith('THREAD-')),
+    tombstones: retiredThreadIds,
+  });
+  if (JSON.stringify(nextRetiredThreadIds) !== JSON.stringify(retiredThreadIds)) {
+    fs.writeFileSync(tombstonePath, `${JSON.stringify({ version: 1, retired: nextRetiredThreadIds }, null, 2)}\n`);
+    console.log(`  - Retired THREAD ids: ${nextRetiredThreadIds.length} (thread-id-tombstones.json)`);
+  }
 
   // Write JSON file (full version for backward compatibility)
   console.log('\n💾 Writing archive-data.json...');

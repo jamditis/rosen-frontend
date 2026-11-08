@@ -291,12 +291,21 @@ def run_node_tests() -> Tuple[bool, str]:
 
 
 def _changed_paths(csv_path: pathlib.Path) -> List[str]:
-    """Repo-relative paths the sync touches: the CSV plus the regenerated JSON."""
+    """Repo-relative paths the sync touches: the CSV plus the regenerated JSON.
+
+    The exporter appends dropped THREAD ids to the tombstone file before it
+    replaces archive-data.json, so the tombstones must ship in the same commit
+    or the next export could hand a dropped number to a different thread.
+    """
     try:
         rel_csv = str(csv_path.resolve().relative_to(PROJECT_ROOT.resolve()))
     except ValueError:
         rel_csv = str(csv_path)
-    return [rel_csv] + [f"data/{f}" for f in _DEPLOY_JSON_FILES] + ["data/feeds"]
+    return (
+        [rel_csv]
+        + [f"data/{f}" for f in _DEPLOY_JSON_FILES]
+        + ["data/feeds", "data/thread-id-tombstones.json"]
+    )
 
 
 def _branch_name() -> str:
@@ -432,25 +441,44 @@ def open_sync_pr(
             capture_output=True,
             text=True,
         )
-        subprocess.run(
-            [
-                "gh",
-                "pr",
-                "create",
-                "--base",
-                "main",
-                "--head",
-                branch,
-                "--title",
-                title,
-                "--body",
-                body,
-            ],
-            cwd=str(PROJECT_ROOT),
-            check=True,
-            capture_output=True,
-            text=True,
-        )
+        try:
+            subprocess.run(
+                [
+                    "gh",
+                    "pr",
+                    "create",
+                    "--base",
+                    "main",
+                    "--head",
+                    branch,
+                    "--title",
+                    title,
+                    "--body",
+                    body,
+                ],
+                cwd=str(PROJECT_ROOT),
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except subprocess.CalledProcessError:
+            # The branch is already on origin. Without a PR nobody reviews it,
+            # and the next run pushes another; remove it, then report the
+            # original failure.
+            deleted = subprocess.run(
+                ["git", "push", "origin", "--delete", branch],
+                cwd=str(PROJECT_ROOT),
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            if deleted.returncode != 0:
+                print(
+                    f"[sync] could not delete orphaned branch {branch}: "
+                    f"{(deleted.stderr or '').strip()}",
+                    file=sys.stderr,
+                )
+            raise
         return branch, f"opened PR from {branch}"
     except subprocess.CalledProcessError as exc:
         diagnostics = "\n".join(

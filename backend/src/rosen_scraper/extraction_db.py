@@ -152,13 +152,18 @@ class ExtractionDB:
 
     def get_processed_ids(self) -> Set[str]:
         """
-        Get all processed record IDs.
+        Get the record IDs that need no further extraction.
+
+        Failed rows are left out so that a later run retries them; a provider
+        outage would otherwise leave those records without relationships.
 
         Returns:
-            Set of record ID strings that have been processed
+            Set of completed or skipped record ID strings
         """
         with self._get_connection() as conn:
-            cursor = conn.execute("SELECT record_id FROM processed_records")
+            cursor = conn.execute(
+                "SELECT record_id FROM processed_records WHERE status != 'failed'"
+            )
             return {row["record_id"] for row in cursor.fetchall()}
 
     def get_processed_count(self) -> int:

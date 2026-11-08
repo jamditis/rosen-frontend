@@ -53,6 +53,7 @@ records how the older dangling ids were resolved.
 |------|---------|
 | `SCHEMA.md` | Human-readable data dictionary — start here if you want to use the data |
 | `schema.json` | Machine-readable schema, linked from the site's open-data download UI |
+| `thread-id-tombstones.json` | Every generated `THREAD-` id that has dropped out of publication, with its root post id. The exporter reads it, reserves those ids, and appends to it before it replaces `archive-data.json`, so a dropped number is never given to a different thread. Entries are never removed; a root that returns gets its old id back. Not deployed. |
 | `relationship-type-registry.json` | Machine-readable relationship-type semantics — endpoint types, direction, inverse, temporal scope (issue #737) |
 | `archive-embeddings.bin` / `.json` | Quantized vectors and hash-bound ID index for non-social records |
 | `archive-social-embeddings.bin` / `.json` | Quantized vectors and hash-bound ID index for social records; loaded only when meaning search is on |

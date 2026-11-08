@@ -91,7 +91,8 @@ test('registers only a source-backed Jay thread and preserves all existing holds
   const duplicateHolds = structuredClone(existingPolicy.duplicateEdgeExceptions);
   const thread = generatedThread();
   const result = registerSourceSupportedGeneratedThreads(existingPolicy, {
-    publishedRecords: [thread],
+    // The already-registered exceptions are still published.
+    publishedRecords: [{ id: 'THREAD-00019' }, { id: 'dissertation-1986' }, thread],
     archiveRows: [],
     socialRows: [
       sourceRow('BSKY-10000', 'root'),
@@ -109,6 +110,31 @@ test('registers only a source-backed Jay thread and preserves all existing holds
   assert.deepEqual(result.policy.relationshipTypeHolds, relationshipHolds);
   assert.deepEqual(result.policy.duplicateEdgeExceptions, duplicateHolds);
   assert.deepEqual(existingPolicy.relationshipTypeHolds, relationshipHolds);
+});
+
+test('prunes a registered thread that is no longer published', () => {
+  const result = registerSourceSupportedGeneratedThreads(existingPolicy, {
+    // THREAD-00019 fell out of publication; the dissertation is still published.
+    publishedRecords: [{ id: 'dissertation-1986' }],
+    archiveRows: [],
+    socialRows: [],
+  });
+
+  assert.deepEqual(result.removed, ['THREAD-00019']);
+  assert.deepEqual(result.added, []);
+  assert.deepEqual(result.policy.generatedPublishedRecordIds, ['dissertation-1986']);
+  assert.deepEqual(existingPolicy.generatedPublishedRecordIds, ['THREAD-00019', 'dissertation-1986']);
+});
+
+test('keeps a stale non-thread exception so validation still stops on it', () => {
+  const result = registerSourceSupportedGeneratedThreads(existingPolicy, {
+    publishedRecords: [{ id: 'THREAD-00019' }],
+    archiveRows: [],
+    socialRows: [],
+  });
+
+  assert.deepEqual(result.removed, []);
+  assert.deepEqual(result.policy.generatedPublishedRecordIds, ['THREAD-00019', 'dissertation-1986']);
 });
 
 test('rejects a generated thread without valid source provenance', () => {

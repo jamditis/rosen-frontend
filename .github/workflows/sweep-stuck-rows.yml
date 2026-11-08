@@ -4,8 +4,12 @@ name: Pillar 3a — sweep stuck submission rows
 # status + age, and re-fires submit-record.yml for rows stuck past their
 # threshold (submitted >30min, processing >1hr, archived >24hr).
 #
-# Terminal statuses (live / error / duplicate / "no URL" / "invalid URL")
-# are never touched regardless of age.
+# Terminal statuses (live / committed / error / duplicate / "no URL" /
+# "invalid URL") are never touched regardless of age. committed means the
+# record is on main but this runner has no live transfer configured.
+#
+# Rows whose submit-record.yml run is still queued or running are skipped,
+# and an archived row stops after five sentinel retries (see sweep_stuck.py).
 #
 # The dedup check inside process_submission.py guarantees re-dispatches
 # are safe: Existing canonical records skip scraping and append, then reconcile
@@ -30,7 +34,7 @@ concurrency:
 
 permissions:
   contents: read
-  actions: write   # so the script can workflow_dispatch submit-record.yml
+  actions: write   # dispatch submit-record.yml and list its active runs
 
 jobs:
   sweep:

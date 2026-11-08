@@ -98,6 +98,8 @@ function deploymentMdDataFiles() {
 const KNOWN_NOT_DEPLOYED = new Map([
   ['data/record-id-sequence.json',
     'Backend record_id_sequence.py reservation state. Tracked for identity preservation; no deployed page reads it.'],
+  ['data/thread-id-tombstones.json',
+    'Exporter registry of retired THREAD ids. Tracked for identity preservation; no deployed page reads it.'],
   ['data/source-identity-quality-policy.json',
     'versioned rules for the offline source-quality evaluator; no deployed page reads them'],
   ['data/source-identity-quality-evidence.json',

@@ -1,4 +1,8 @@
 name: Pillar 3a — submit record
+# The sweeper (backend/scripts/sweep_stuck.py) reads the row number from this
+# title to skip rows whose run is still queued or running. The runs API does
+# not return dispatch inputs, so keep "for row <n>" at the end of the title.
+run-name: Submit record for row ${{ inputs.sheet_row }}
 
 # Fired by Apps Script (the queue-sheet "Process new submissions" button) via
 # the GitHub API workflow_dispatch endpoint. Runs backend/scripts/process_submission.py
@@ -195,6 +199,10 @@ jobs:
           # and silently fall back to password auth.
           ROSEN_SFTP_KEY_PASSPHRASE: ${{ secrets.ROSEN_SFTP_KEY_PASSPHRASE }}
           ROSEN_SFTP_KNOWN_HOSTS: ${{ secrets.ROSEN_SFTP_KNOWN_HOSTS }}
+          # This job exists to publish. With the flag set, a missing transfer
+          # secret fails the push and leaves the row archived (retryable)
+          # instead of the terminal committed status.
+          ROSEN_REQUIRE_TRANSFER: '1'
           # process_submission.py reads these for the git commit identity
           GIT_BOT_NAME: rosen-archive-bot
           GIT_BOT_EMAIL: "rosen-archive-bot[bot]@users.noreply.github.com"

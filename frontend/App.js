@@ -1,15 +1,16 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.70';
+import { html } from './html.js?v=3.8.71';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, BookMarked, Compass, HelpCircle, MoreHorizontal, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.70';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.70';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.70';
-import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.70';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.70';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.70';
-import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.70';
-import { canonicalRecordUrl, setRecordParam } from './utils/recordDeepLink.js?v=3.8.70';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.71';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.71';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.71';
+import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.71';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.71';
+import { defaultFilters, parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.71';
+import { filtersForHistoryEntry } from './services/historyFilters.js?v=3.8.71';
+import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.71';
+import { canonicalRecordUrl, setRecordParam } from './utils/recordDeepLink.js?v=3.8.71';
 import {
   BROKEN_RECORD_SKIP_MS,
   DISSERTATION_YEAR_NOTE,
@@ -17,18 +18,18 @@ import {
   brokenRecordLine,
   isDissertationYearQuery,
   summarizeBrokenRecord,
-} from './utils/easterEggs.js?v=3.8.70';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.70';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.70';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.70';
+} from './utils/easterEggs.js?v=3.8.71';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.71';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.71';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.71';
 import {
   buildSearchText,
   matchesParsedSearchText,
   normalizeForSearch,
   parseSearchQuery,
   searchLoadedIndexes,
-} from './utils/searchNormalize.js?v=3.8.70';
-import { sortRecords } from './utils/recordSort.js?v=3.8.70';
+} from './utils/searchNormalize.js?v=3.8.71';
+import { sortRecords } from './utils/recordSort.js?v=3.8.71';
 import {
   DEFAULT_SORT,
   RELEVANCE_SORT,
@@ -36,34 +37,34 @@ import {
   orderByFusedRank,
   sortForQueryChange,
   sortForSemanticToggle,
-} from './utils/searchRanking.js?v=3.8.70';
+} from './utils/searchRanking.js?v=3.8.71';
 import {
   requestSemanticSearch,
   terminateSemanticSearch,
   warmupSemanticSearch,
-} from './services/semanticSearch.js?v=3.8.70';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.70';
-import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.70';
-import Sidebar from './components/Sidebar.js?v=3.8.70';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.70';
-import RecordView from './components/RecordView.js?v=3.8.70';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.70';
-import DissertationPage from './components/DissertationPage.js?v=3.8.70';
-import ToolsModal from './components/ToolsModal.js?v=3.8.70';
-import BugReportModal from './components/BugReportModal.js?v=3.8.70';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.70';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.70';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.70';
-import Timeline from './components/Timeline.js?v=3.8.70';
-import AboutPage from './components/AboutPage.js?v=3.8.70';
-import WikiPage from './components/WikiPage.js?v=3.8.70';
-import StartHerePage from './components/StartHerePage.js?v=3.8.70';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.70';
-import EasterEggNote from './components/EasterEggNote.js?v=3.8.70';
-import NowherePage from './components/NowherePage.js?v=3.8.70';
-import SemanticSearchToggle, { semanticStatusMessage } from './components/SemanticSearchToggle.js?v=3.8.70';
+} from './services/semanticSearch.js?v=3.8.71';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.71';
+import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.71';
+import Sidebar from './components/Sidebar.js?v=3.8.71';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.71';
+import RecordView from './components/RecordView.js?v=3.8.71';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.71';
+import DissertationPage from './components/DissertationPage.js?v=3.8.71';
+import ToolsModal from './components/ToolsModal.js?v=3.8.71';
+import BugReportModal from './components/BugReportModal.js?v=3.8.71';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.71';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.71';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.71';
+import Timeline from './components/Timeline.js?v=3.8.71';
+import AboutPage from './components/AboutPage.js?v=3.8.71';
+import WikiPage from './components/WikiPage.js?v=3.8.71';
+import StartHerePage from './components/StartHerePage.js?v=3.8.71';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.71';
+import EasterEggNote from './components/EasterEggNote.js?v=3.8.71';
+import NowherePage from './components/NowherePage.js?v=3.8.71';
+import SemanticSearchToggle, { semanticStatusMessage } from './components/SemanticSearchToggle.js?v=3.8.71';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.70'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.71'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,
@@ -154,19 +155,15 @@ class DesktopRouteErrorBoundary extends Component {
   }
 }
 
-// One source of truth for the empty filter state. The initial state and both
-// "clear filters" paths spread this, so adding a filter field can't leave a
-// reset path out of sync.
-const DEFAULT_FILTERS = {
-  search: '',
-  categories: [],
-  era: null,
-  year: null,
-  publication: [],
-  type: null,
-  includeReplies: false,
+// One source of truth for the empty filter state. The URL-backed fields come
+// from viewState.defaultFilters, the same factory parseViewState fills, so the
+// two shapes cannot drift. recordIds is App-only: analytics query results are
+// transient and never part of the URL contract. A fresh object per call, so no
+// reset path can share arrays with live state.
+const createDefaultFilters = () => ({
+  ...defaultFilters(),
   recordIds: null,
-};
+});
 
 const App = () => {
   const [records, setRecords] = useState([]);
@@ -211,7 +208,7 @@ const App = () => {
   const [yearNoteDismissed, setYearNoteDismissed] = useState(false);
 
   const [filters, setFilters] = useState(() => ({
-    ...DEFAULT_FILTERS,
+    ...createDefaultFilters(),
     ...parseViewState(window.location.href).filters,
   }));
   const desktopActiveNeedsRecords = currentRoute === ROUTES.desktop
@@ -330,18 +327,22 @@ const App = () => {
       setDesktopAppId(getDesktopAppIdFromUrl());
       setSelectedEntityId(getEntityIdFromUrl());
 
-      // Desktop filters replace the current history entry as their readable
-      // query string changes. Back/Forward must therefore restore those
-      // historical query-backed filters alongside the active window. Ordinary
-      // hash navigation keeps the live in-memory filters (standard archive
-      // filters are not URL-synchronised), while transient analytics recordIds
-      // intentionally clear because they are not part of the URL contract.
+      // Desktop record windows replace the current history entry as their
+      // readable query string changes, so Back/Forward onto one of those
+      // entries restores its query-backed filters alongside the active window
+      // (transient analytics recordIds clear there because they are not part
+      // of the URL contract). Every other entry carries no filters: the
+      // standard archive does not write them to the URL, so Back onto it, or
+      // onto any other route, keeps the live in-memory filters, just as
+      // ordinary hash navigation does.
       if (event?.type === 'popstate') {
-        const historicalState = parseViewState(window.location.href);
-        setFilters({
-          ...DEFAULT_FILTERS,
-          ...historicalState.filters,
-        });
+        const historicalFilters = filtersForHistoryEntry(window.location.href, DESKTOP_RECORD_APPS);
+        if (historicalFilters) {
+          setFilters({
+            ...createDefaultFilters(),
+            ...historicalFilters,
+          });
+        }
       }
 
       const recordId = getRecordIdFromUrl();
@@ -514,8 +515,11 @@ const App = () => {
   // Gate the ~13MB core fetch so cold deep-links into non-record routes do
   // not fetch and parse archive data those routes never render. The ref makes
   // this fire once; depending on currentRoute means navigating back to a
-  // record-backed route back-fills the data.
+  // record-backed route back-fills the data. A failed load releases the ref,
+  // and the error panel's retry bumps coreLoadAttempt to run the effect again
+  // without a page reload.
   const coreFetchStarted = useRef(false);
+  const [coreLoadAttempt, setCoreLoadAttempt] = useState(0);
   useEffect(() => {
     let active = true;
     loadReleaseMetadata()
@@ -538,14 +542,24 @@ const App = () => {
         setRecords(data.records);
         setFacets(data.facets);
         setAutocompleteIndex(data.autocompleteIndex);
+        // A failed load releases the guard, so a later route change can
+        // reload the data on its own; clear the old error when it succeeds.
+        setError(null);
         setLoading(false);
       })
       .catch(err => {
         console.error(err);
-        setError('Failed to load archive data. Please refresh the page or try again later.');
+        coreFetchStarted.current = false;
+        setError('Failed to load archive data. Check your connection, then try again.');
         setLoading(false);
       });
-  }, [currentRoute, desktopAppId, desktopNeedsRecords]);
+  }, [currentRoute, desktopAppId, desktopNeedsRecords, coreLoadAttempt]);
+
+  const retryCoreLoad = () => {
+    setError(null);
+    setLoading(true);
+    setCoreLoadAttempt(attempt => attempt + 1);
+  };
 
   // Preserve the standard archive's background full-detail warmup, but keep
   // the lighter guided and entity desktop surfaces on core data until a
@@ -720,6 +734,9 @@ const App = () => {
           setSemanticHits(EMPTY_SEMANTIC_HITS);
           setSemanticStatus('error');
           setSemanticEnabled(false);
+          // The toggle now reads off, so give back the model's memory as the
+          // off switch does. Turning it on again starts a fresh worker.
+          terminateSemanticSearch();
           // Same recovery as a failed warmup: the semantic leg is gone, so the
           // sort it selected goes with it.
           setSortBy(prev => sortForSemanticToggle(prev, { enabled: false, hasQuery: true }));
@@ -1016,7 +1033,7 @@ const App = () => {
 
   const clearAllScope = () => {
     pendingScopeFocusKey.current = 'status';
-    setFilters({ ...DEFAULT_FILTERS });
+    setFilters(createDefaultFilters());
   };
 
   useEffect(() => {
@@ -1055,7 +1072,7 @@ const App = () => {
     onSelectRecord: selectRecord,
     onOpenFolder: handleFolderClick,
     onPageChange: handlePageChange,
-    onClearFilters: () => setFilters({ ...DEFAULT_FILTERS }),
+    onClearFilters: () => setFilters(createDefaultFilters()),
     onOpenStandard: (mode = viewMode) => goTo(mode === 'folder' ? ROUTES.folders : ROUTES.archive),
   };
 
@@ -1214,13 +1231,22 @@ const App = () => {
         <p className="archive-section-label">Archive status</p>
         <h3>Error loading archive</h3>
         <p>${error}</p>
-        <button
-            type="button"
-            onClick=${() => window.location.reload()}
-            className="archive-action archive-action--danger"
-        >
-            Reload page
-        </button>
+        <div className="archive-error-state__actions">
+            <button
+                type="button"
+                onClick=${retryCoreLoad}
+                className="archive-action archive-action--danger"
+            >
+                Try again
+            </button>
+            <button
+                type="button"
+                onClick=${() => window.location.reload()}
+                className="archive-action archive-action--secondary"
+            >
+                Reload page
+            </button>
+        </div>
     </div>
   `;
 
@@ -1340,7 +1366,7 @@ const App = () => {
                 setFilters=${setFilters}
                 isOpen=${sidebarOpen}
                 onClose=${closeSidebar}
-                resetFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
+                resetFilters=${() => setFilters(createDefaultFilters())}
                 autocompleteIndex=${autocompleteIndex}
                 semanticSearch=${semanticSearchProps}
                 onCategoryStreak=${handleCategoryStreak}
@@ -1618,7 +1644,7 @@ const App = () => {
                   onSelectRecord=${selectRecord}
                   onOpenFolder=${handleFolderClick}
                   onPageChange=${handlePageChange}
-                  onClearFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
+                  onClearFilters=${() => setFilters(createDefaultFilters())}
                   onFilterCategory=${handleFilterCategory}
                   skipping=${recordsSkipping}
                 />

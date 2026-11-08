@@ -34,7 +34,7 @@ async function writeFixture(root) {
       path.join(repositoryRoot, 'data/fixes/apply-2026-08-27-duplicate-adjudication.js'),
       path.join(fixesDir, 'apply-2026-08-27-duplicate-adjudication.js'),
     ),
-    ...['csv-record-surgery.js', 'csv-unescape.js', 'graph-policy-refresh.js'].map((name) =>
+    ...['csv-record-surgery.js', 'csv-unescape.js', 'graph-policy-refresh.js', 'pending-capture.js'].map((name) =>
       copyFile(path.join(repositoryRoot, 'data/lib', name), path.join(libDir, name))),
   ]);
 

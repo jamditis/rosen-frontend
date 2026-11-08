@@ -39,6 +39,34 @@ _PUSH_FILES = DATA_DEPLOY_JSON_FILES
 _LIVE_SITE_ROOT = "https://pressthink.org/j/rosen-archive/"
 
 
+def _transfer_required() -> bool:
+    """True when the job declares a live transfer mandatory (submit-record.yml)."""
+    return os.environ.get("ROSEN_REQUIRE_TRANSFER", "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+
+
+def _missing_full_release_settings():
+    """Name the full-release settings that are unset, for an actionable error."""
+    missing = [
+        name
+        for name in ("ROSEN_SFTP_HOST", "ROSEN_SFTP_USER", "ROSEN_SFTP_SITE_PATH")
+        if not os.environ.get(name, "").strip()
+    ]
+    protocol = os.environ.get("ROSEN_TRANSFER_PROTOCOL", "sftp").strip().lower()
+    if protocol == "ftps":
+        if not os.environ.get("ROSEN_SFTP_PASSWORD", ""):
+            missing.append("ROSEN_SFTP_PASSWORD")
+    elif not (
+        os.environ.get("ROSEN_SFTP_PASSWORD", "")
+        or os.environ.get("ROSEN_SFTP_KEY_PATH", "").strip()
+    ):
+        missing.append("ROSEN_SFTP_PASSWORD or ROSEN_SFTP_KEY_PATH")
+    return missing
+
+
 def push_full_release(record_ids=()):
     """Publish the tested release with existing pair rollback, then verify it."""
     from scripts import deploy_full_site as deploy
@@ -64,6 +92,20 @@ def push_full_release(record_ids=()):
                 }
         cfg = deploy._read_env()
         if cfg is None:
+            if _transfer_required():
+                # A skipped push is terminal (committed). On a job that is
+                # meant to publish, a missing or renamed secret must stay a
+                # retryable failure instead (state machine map, problem 14).
+                error = "Transfer is required on this job but not configured; " + (
+                    "missing " + ", ".join(_missing_full_release_settings())
+                )
+                logger.error(error)
+                return {
+                    "ok": False,
+                    "skipped": False,
+                    "files_pushed": 0,
+                    "error": error,
+                }
             return {"ok": True, "skipped": True, "files_pushed": 0, "error": None}
         pages = deploy.generate_record_pages(PROJECT_ROOT)
         files = deploy.collect_local_files(PROJECT_ROOT)

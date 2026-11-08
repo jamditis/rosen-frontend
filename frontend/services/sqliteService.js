@@ -13,8 +13,8 @@
 // sql.js is loaded dynamically to ensure JS and WASM are from the same source
 // The import map version can have WASM binary mismatches
 
-import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.8.70';
-import { ERAS } from '../constants.js?v=3.8.70';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.8.71';
+import { ERAS } from '../constants.js?v=3.8.71';
 
 // Self-hosted sql.js WASM binary (#291). The loader JS below is pinned with
 // SRI, but sql.js exposes no SRI hook for the .wasm it fetches via locateFile,
@@ -96,11 +96,18 @@ export const initDatabase = async () => {
         locateFile: () => SQL_WASM_PATH
       });
 
-      db = new SQL.Database();
+      // Publish the database only after its schema exists. A half-built
+      // instance left in `db` would be returned by the fast path above on
+      // every later call, so a failed createTables could never be retried.
+      const database = new SQL.Database();
+      try {
+        createTables(database);
+      } catch (schemaError) {
+        try { database.close(); } catch { /* already unusable */ }
+        throw schemaError;
+      }
+      db = database;
       console.log('[SQLite] Database initialized');
-
-      // Create tables
-      createTables();
 
       return db;
     } catch (error) {
@@ -116,9 +123,9 @@ export const initDatabase = async () => {
 /**
  * Create the database schema
  */
-function createTables() {
+function createTables(database) {
   // Records table
-  db.run(`
+  database.run(`
     CREATE TABLE IF NOT EXISTS records (
       id TEXT PRIMARY KEY,
       title TEXT,
@@ -136,44 +143,44 @@ function createTables() {
   `);
 
   // Create indexes for common queries
-  db.run('CREATE INDEX IF NOT EXISTS idx_records_year ON records(year)');
-  db.run('CREATE INDEX IF NOT EXISTS idx_records_era ON records(era)');
-  db.run('CREATE INDEX IF NOT EXISTS idx_records_type ON records(type)');
-  db.run('CREATE INDEX IF NOT EXISTS idx_records_date ON records(date)');
-  db.run('CREATE INDEX IF NOT EXISTS idx_records_pub ON records(pub)');
+  database.run('CREATE INDEX IF NOT EXISTS idx_records_year ON records(year)');
+  database.run('CREATE INDEX IF NOT EXISTS idx_records_era ON records(era)');
+  database.run('CREATE INDEX IF NOT EXISTS idx_records_type ON records(type)');
+  database.run('CREATE INDEX IF NOT EXISTS idx_records_date ON records(date)');
+  database.run('CREATE INDEX IF NOT EXISTS idx_records_pub ON records(pub)');
 
   // Categories junction table (many-to-many)
-  db.run(`
+  database.run(`
     CREATE TABLE IF NOT EXISTS record_categories (
       record_id TEXT,
       category TEXT,
       PRIMARY KEY (record_id, category)
     )
   `);
-  db.run('CREATE INDEX IF NOT EXISTS idx_rc_category ON record_categories(category)');
+  database.run('CREATE INDEX IF NOT EXISTS idx_rc_category ON record_categories(category)');
 
   // Concepts junction table
-  db.run(`
+  database.run(`
     CREATE TABLE IF NOT EXISTS record_concepts (
       record_id TEXT,
       concept TEXT,
       PRIMARY KEY (record_id, concept)
     )
   `);
-  db.run('CREATE INDEX IF NOT EXISTS idx_rcon_concept ON record_concepts(concept)');
+  database.run('CREATE INDEX IF NOT EXISTS idx_rcon_concept ON record_concepts(concept)');
 
   // Tags junction table
-  db.run(`
+  database.run(`
     CREATE TABLE IF NOT EXISTS record_tags (
       record_id TEXT,
       tag TEXT,
       PRIMARY KEY (record_id, tag)
     )
   `);
-  db.run('CREATE INDEX IF NOT EXISTS idx_rt_tag ON record_tags(tag)');
+  database.run('CREATE INDEX IF NOT EXISTS idx_rt_tag ON record_tags(tag)');
 
   // Entities table
-  db.run(`
+  database.run(`
     CREATE TABLE IF NOT EXISTS entities (
       id TEXT PRIMARY KEY,
       name TEXT,
@@ -185,19 +192,19 @@ function createTables() {
       total_mentions INTEGER
     )
   `);
-  db.run('CREATE INDEX IF NOT EXISTS idx_entities_type ON entities(type)');
-  db.run('CREATE INDEX IF NOT EXISTS idx_entities_name ON entities(name)');
+  database.run('CREATE INDEX IF NOT EXISTS idx_entities_type ON entities(type)');
+  database.run('CREATE INDEX IF NOT EXISTS idx_entities_name ON entities(name)');
 
   // Record-Entity relationships
-  db.run(`
+  database.run(`
     CREATE TABLE IF NOT EXISTS record_entities (
       record_id TEXT,
       entity_id TEXT,
       PRIMARY KEY (record_id, entity_id)
     )
   `);
-  db.run('CREATE INDEX IF NOT EXISTS idx_re_entity ON record_entities(entity_id)');
-  db.run('CREATE INDEX IF NOT EXISTS idx_re_record ON record_entities(record_id)');
+  database.run('CREATE INDEX IF NOT EXISTS idx_re_entity ON record_entities(entity_id)');
+  database.run('CREATE INDEX IF NOT EXISTS idx_re_record ON record_entities(record_id)');
 
   console.log('[SQLite] Tables created');
 }

@@ -39,6 +39,7 @@
  * Re-runs are a no-op: with the retired rows gone there is nothing to merge.
  */
 import { readFileSync, writeFileSync, renameSync } from 'node:fs';
+import { assertNoPendingCapture } from '../lib/pending-capture.js';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -102,6 +103,7 @@ function planMerges(entityRecords) {
 
 function writeAtomically(filePath, text) {
   const tmp = `${filePath}.tmp`;
+  assertNoPendingCapture(filePath);
   writeFileSync(tmp, text, 'utf-8');
   renameSync(tmp, filePath);
 }

@@ -141,7 +141,7 @@ Production deploys by certificate-verified FTPS to
 When deployment files change:
 
 1. Regenerate JSON if data changed.
-2. Bump the version in lockstep across `index.html`, `version.json`, every relevant `?v=` import string, and `frontend/sw.js` `CACHE_VERSION`. The service worker caches static JS and CSS under exact versioned request URLs and drops old cache namespaces when a release activates. Both version markers are required so returning visitors cannot mix module releases.
+2. Bump the version in lockstep across `index.html`, `version.json`, every relevant `?v=` import string, and `frontend/sw.js` `CACHE_VERSION`. The service worker caches static JS and CSS under exact versioned request URLs and drops old cache namespaces when a release activates, except the newest previous static cache, which it keeps until the windows open at activation have closed. Both version markers are required so returning visitors cannot mix module releases.
 3. Upload dependencies before release entry points. For a full manual bundle,
    preserve the order produced by `backend/scripts/deploy_full_site.py`: assets
    and data first; standalone pages and record shells next; then root

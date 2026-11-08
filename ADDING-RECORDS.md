@@ -92,7 +92,7 @@ Find the record by its exact ID and source URL. Change the intended fields in th
 
 Preserve all other columns, even when a value is blank. Keep the ID and unrelated fields unchanged. Before changing source rows, the maintainer must check for pending ingestion transactions; stop and follow [the recovery instructions](docs/operations/pressthink-ingestion.md) if one exists. Do not run another writer in the same checkout. Reconcile the correction against the latest `main` before validation and publication, and never lower or hand-edit the ID reservation state.
 
-Automated submissions can set `verified=TRUE` while also setting `needs_review=true`. Neither a public record nor the verification flag alone establishes that a human has finished checking it.
+Automated submissions can set `verified=TRUE` while also setting `needs_review=TRUE`. Write both flags as `TRUE` or `FALSE` in capitals; `needs_review` may also be blank. `tests/flag-spelling.test.js` fails on any other spelling. Neither a public record nor the verification flag alone establishes that a human has finished checking it.
 
 ### Thematic categories to use
 
@@ -197,7 +197,7 @@ Require successful public-byte verification and matching release markers. Then o
 
 There is currently **no supported manual new-row or ID-reservation path** for `data/social_posts.csv`. The article allocator handles only `RECORD-` IDs. It does not reserve `BSKY-`, `TWTR-`, or `MAST-` IDs. The Bluesky collector derives new numbers from the social CSV's current maximum; a separately prepared manual batch can choose the same numbers. A conversation with another maintainer or a lock in a different checkout does not prevent that race.
 
-Use the [current Bluesky publisher](docs/operations/bluesky-stewardship.md) for Jay's posts within its supported collection scope. It waits in the release queue, refreshes current `main`, prepares the batch, and refuses to push if `main` has moved. A manual dispatch of **Bluesky stewardship publisher** on `main` defaults to `dry_run=true`; a dry run verifies without adding records or publishing. An authorized publishing run must use that same workflow. Do not run `bluesky_feed_backfill.py` or `bluesky_batch_update.py` as a separate canonical writer alongside it, and do not send social backfills through the article submission route as a workaround.
+Use the [current Bluesky publisher](docs/operations/bluesky-stewardship.md) for Jay's posts within its supported collection scope. It waits in the release queue, refreshes current `main`, prepares the batch, and never pushes onto a moved `main`; if `main` moves before the push, it rebuilds and retests the batch on the new `main` once. A manual dispatch of **Bluesky stewardship publisher** on `main` defaults to `dry_run=true`; a dry run verifies without adding records or publishing. An authorized publishing run must use that same workflow. Do not run `bluesky_feed_backfill.py` or `bluesky_batch_update.py` as a separate canonical writer alongside it, and do not send social backfills through the article submission route as a workaround.
 
 For Twitter, Mastodon, or Bluesky material outside that publisher's scope, prepare the source URLs and review evidence as a backfill request outside the canonical CSV. Adding those rows requires a separately implemented and tested writer that shares durable social-ID reservations and coordinates with the publisher. This guide does not claim that capability exists.
 
