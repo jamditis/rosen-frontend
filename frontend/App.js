@@ -1,15 +1,15 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.68';
+import { html } from './html.js?v=3.8.70';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, BookMarked, Compass, HelpCircle, MoreHorizontal, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.68';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.68';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.68';
-import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.68';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.68';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.68';
-import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.68';
-import { canonicalRecordUrl, setRecordParam } from './utils/recordDeepLink.js?v=3.8.68';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.70';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.70';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.70';
+import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.70';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.70';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.70';
+import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.70';
+import { canonicalRecordUrl, setRecordParam } from './utils/recordDeepLink.js?v=3.8.70';
 import {
   BROKEN_RECORD_SKIP_MS,
   DISSERTATION_YEAR_NOTE,
@@ -17,18 +17,18 @@ import {
   brokenRecordLine,
   isDissertationYearQuery,
   summarizeBrokenRecord,
-} from './utils/easterEggs.js?v=3.8.68';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.68';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.68';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.68';
+} from './utils/easterEggs.js?v=3.8.70';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.70';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.70';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.70';
 import {
   buildSearchText,
   matchesParsedSearchText,
   normalizeForSearch,
   parseSearchQuery,
   searchLoadedIndexes,
-} from './utils/searchNormalize.js?v=3.8.68';
-import { sortRecords } from './utils/recordSort.js?v=3.8.68';
+} from './utils/searchNormalize.js?v=3.8.70';
+import { sortRecords } from './utils/recordSort.js?v=3.8.70';
 import {
   DEFAULT_SORT,
   RELEVANCE_SORT,
@@ -36,34 +36,34 @@ import {
   orderByFusedRank,
   sortForQueryChange,
   sortForSemanticToggle,
-} from './utils/searchRanking.js?v=3.8.68';
+} from './utils/searchRanking.js?v=3.8.70';
 import {
   requestSemanticSearch,
   terminateSemanticSearch,
   warmupSemanticSearch,
-} from './services/semanticSearch.js?v=3.8.68';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.68';
-import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.68';
-import Sidebar from './components/Sidebar.js?v=3.8.68';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.68';
-import RecordView from './components/RecordView.js?v=3.8.68';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.68';
-import DissertationPage from './components/DissertationPage.js?v=3.8.68';
-import ToolsModal from './components/ToolsModal.js?v=3.8.68';
-import BugReportModal from './components/BugReportModal.js?v=3.8.68';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.68';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.68';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.68';
-import Timeline from './components/Timeline.js?v=3.8.68';
-import AboutPage from './components/AboutPage.js?v=3.8.68';
-import WikiPage from './components/WikiPage.js?v=3.8.68';
-import StartHerePage from './components/StartHerePage.js?v=3.8.68';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.68';
-import EasterEggNote from './components/EasterEggNote.js?v=3.8.68';
-import NowherePage from './components/NowherePage.js?v=3.8.68';
-import SemanticSearchToggle, { semanticStatusMessage } from './components/SemanticSearchToggle.js?v=3.8.68';
+} from './services/semanticSearch.js?v=3.8.70';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.70';
+import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.70';
+import Sidebar from './components/Sidebar.js?v=3.8.70';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.70';
+import RecordView from './components/RecordView.js?v=3.8.70';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.70';
+import DissertationPage from './components/DissertationPage.js?v=3.8.70';
+import ToolsModal from './components/ToolsModal.js?v=3.8.70';
+import BugReportModal from './components/BugReportModal.js?v=3.8.70';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.70';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.70';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.70';
+import Timeline from './components/Timeline.js?v=3.8.70';
+import AboutPage from './components/AboutPage.js?v=3.8.70';
+import WikiPage from './components/WikiPage.js?v=3.8.70';
+import StartHerePage from './components/StartHerePage.js?v=3.8.70';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.70';
+import EasterEggNote from './components/EasterEggNote.js?v=3.8.70';
+import NowherePage from './components/NowherePage.js?v=3.8.70';
+import SemanticSearchToggle, { semanticStatusMessage } from './components/SemanticSearchToggle.js?v=3.8.70';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.68'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.70'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,
@@ -1619,6 +1619,7 @@ const App = () => {
                   onOpenFolder=${handleFolderClick}
                   onPageChange=${handlePageChange}
                   onClearFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
+                  onFilterCategory=${handleFilterCategory}
                   skipping=${recordsSkipping}
                 />
             `}

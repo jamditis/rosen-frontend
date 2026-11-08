@@ -103,7 +103,8 @@ Usage
     python3 backend/scripts/pressthink_2004_2008_gap.py fetch-monthly-index \\
         --out backend/inventories/pressthink-2004-2008/wayback-monthly-index.json
 
-    # measure the gap and write the report (no network)
+    # measure the gap and write the report (no network). The report reads the
+    # archive CSV with csv-parse, so it needs Node and `npm install` first.
     python3 backend/scripts/pressthink_2004_2008_gap.py report \\
         --inventory backend/inventories/pressthink-2004-2008/wayback-monthly-index.json \\
         --inventory backend/inventories/pressthink-2004-2008/wayback-cdx.json \\
@@ -114,12 +115,12 @@ Usage
 from __future__ import annotations
 
 import argparse
-import csv
 import datetime as _dt
 import http.client
 import html as _html
 import json
 import re
+import subprocess
 import sys
 import time
 import urllib.error
@@ -1545,9 +1546,55 @@ def _write_inventory(path: Path, payload: dict) -> None:
 # --------------------------------------------------------------------------
 
 
+# The archive CSV keeps bare-LF newlines inside CRLF records. Python's csv
+# module ends a record at such a newline, which truncates the row and invents a
+# phantom one from the rest: on the 2026-11 file it read 1,965 rows where there
+# are 1,218 records, and cut short the raw_text of 52 real ones. csv-parse is
+# the reader the exporter, the tests and the site use, so the matcher reads the
+# file through it too. See data/lib/csv-record-surgery.js.
+_NODE_CSV_PARSE = """
+import fs from 'node:fs';
+import { parse } from 'csv-parse/sync';
+const records = parse(fs.readFileSync(process.argv[1], 'utf8'), {
+  columns: true,
+  skip_empty_lines: true,
+});
+process.stdout.write(JSON.stringify(records));
+"""
+
+
 def load_archive_rows(path: Path) -> list[dict]:
-    with open(path, newline="", encoding="utf-8") as fh:
-        return list(csv.DictReader(fh))
+    """Read the archive CSV with csv-parse, as the rest of the archive does.
+
+    Node runs from the repository root so it can resolve csv-parse, so the
+    path is made absolute first: a relative path names a file in the caller's
+    working directory, not in the repository root.
+
+    Fails loudly when Node or csv-parse is missing. A silent fallback to
+    Python's reader would index a different set of rows than the archive holds.
+    """
+    try:
+        result = subprocess.run(
+            [
+                "node",
+                "--input-type=module",
+                "--eval",
+                _NODE_CSV_PARSE,
+                str(Path(path).resolve()),
+            ],
+            cwd=_REPO_ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=True,
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError("reading the archive CSV needs Node on PATH") from exc
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            f"csv-parse could not read {path} (run npm install first?): {exc.stderr.strip()}"
+        ) from exc
+    return json.loads(result.stdout)
 
 
 def _today() -> str:
