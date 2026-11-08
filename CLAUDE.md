@@ -92,7 +92,7 @@ Source-row snapshot checked against repository data on **2026-11-08**. The [stew
 |------|------|----------|
 | `data/archive_records-public.csv` | 1,220 | Curated archive records (991 RECORD, 137 TUMBLR, 82 CLIP, 10 THREAD). Multiline text means file line counts are not record counts. |
 | `data/social_posts.csv` | 30,129 | Twitter, Bluesky, and Mastodon source posts; some are filtered from publication |
-| `data/extracted_entities.csv` | 7,498 | Named entities (people, orgs, concepts) |
+| `data/extracted_entities.csv` | 7,481 | Named entities (people, orgs, concepts) |
 | `data/extracted_relationships.csv` | 11,189 | Entity-to-entity assertions with source-record provenance |
 | `data/authored-excerpts.csv` | 17 | Optional summary overrides keyed by record ID; nonblank entries replace the record summary |
 | `data/entity-merges.csv` | 18 | Retired entity IDs and the canonical ID each was merged into; exported as `entityRedirects` in `archive-entities.json` |
