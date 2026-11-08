@@ -311,7 +311,7 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 7. Stop the SW from deleting the previous release's cache until no client of that release remains.
 8. Remove the `popstate` filter overwrite outside desktop routes, or write standard archive filters to the URL.
 9. Apply `publication` and `includeReplies` in `filteredRecords`, or stop parsing them from the URL.
-10. Retry a stewardship run once after `stale_remote_head` by rebasing onto the new `origin/main`.
+10. Retry a stewardship run once after `stale_remote_head` by rebasing onto the new `origin/main`. Fixed (on `stale_remote_head` the publisher refetches, resets to the new head, captures again and reruns every gate once; it refuses the retry when main changed lockfiles, LFS config or `.github/`).
 11. Treat zero endpoint divergence as a warning in `refresh-social-release-artifacts.mjs`, not as a thrown error. Fixed (the refresh asks the census for zero divergence as a warning and logs it; curator scripts keep it as a problem, and the committed-registry tests in `npm test` still flag it at PR time).
 12. Prune `generatedPublishedRecordIds` entries in the refresh when the record is no longer published. Fixed (the refresh drops THREAD exceptions whose container is no longer published; a stale non-thread exception is still left for validation to stop on).
 13. Add the pending-journal check to the JS CSV writers in `data/fixes/` and `data/lib/python-csv-maintenance.js`.

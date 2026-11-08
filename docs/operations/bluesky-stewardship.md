@@ -64,7 +64,12 @@ The release number, module imports, service worker, and data cache advance toget
 ## Publication contract
 
 The publisher tests the complete generated release before pushing explicit data
-and version paths through the existing GitHub App. It refuses a moved main branch.
+and version paths through the existing GitHub App. It never pushes onto a moved
+main branch. When main moves before the push, it fetches the new head, resets the
+checkout to it, captures the sources again, and reruns every build and test gate
+once before pushing. It skips that retry, and the run fails as `stale_remote_head`,
+when main moves a second time or the new commits change the package manifests or
+lockfiles, the LFS settings, or anything under `.github/`.
 Certificate-verified FTPS uploads dependencies before release entry points and keeps
 the existing making-of publication hold. Live byte verification compares all public
 record payloads, search indexes, embedding pairs, relationship shards, committed
