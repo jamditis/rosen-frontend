@@ -5021,8 +5021,8 @@ RECORD-00426_REL_032,RECORD-00426,P0005,Jay Rosen,Discusses,C0690,The Media as c
 RECORD-00426_REL_033,RECORD-00426,P0005,Jay Rosen,Discusses,C0691,Citizenship as public intervention,Citizenship as a kind of public intervention is involved.,1,2026-05-27
 RECORD-00426_REL_034,RECORD-00426,P2255,Jello Biafra,Inspired By,C0332,Adopt-a-Journalist,"As Jello Biafra once said: 'Don't hate the media, become the media!'",0.7,2026-05-27
 RECORD-00477_REL_001,RECORD-00477,P0555,Dan Rather,Affiliated With,O0419,CBS News,"the anchorman, Dan Rather, presented the CBS report Wednesday Night accusing Bush of disappearing from Guard duty",1,2026-05-27
-RECORD-00477_REL_002,RECORD-00477,P0555,Dan Rather,Affiliated With,W0701,60 Minutes,"it was Dan Rather on Sixty Minutes, and it is now Rather on the hook if the documents are fake",1,2026-05-27
-RECORD-00477_REL_003,RECORD-00477,W0701,60 Minutes,Published In,O0419,CBS News,If Sixty Minutes had presented a damaging story of that kind at the height of an election campaign,1,2026-05-27
+RECORD-00477_REL_002,RECORD-00477,P0555,Dan Rather,Affiliated With,O0767,60 Minutes,"it was Dan Rather on Sixty Minutes, and it is now Rather on the hook if the documents are fake",1,2026-05-27
+RECORD-00477_REL_003,RECORD-00477,O0767,60 Minutes,Published In,O0419,CBS News,If Sixty Minutes had presented a damaging story of that kind at the height of an election campaign,1,2026-05-27
 RECORD-00477_REL_004,RECORD-00477,E0238,Killian documents controversy (Rathergate),Discusses,P0014,George W. Bush,CBS News peddled forged documents as the real thing in its recent investigation of President Bush's National Guard Service,1,2026-05-27
 RECORD-00477_REL_005,RECORD-00477,E0238,Killian documents controversy (Rathergate),Occurred At,O0419,CBS News,whether CBS News peddled forged documents as the real thing,1,2026-05-27
 RECORD-00477_REL_006,RECORD-00477,P0014,George W. Bush,Affiliated With,O1035,Texas Air National Guard,Bush of disappearing from Guard duty,0.9,2026-05-27
@@ -5039,7 +5039,7 @@ RECORD-00477_REL_016,RECORD-00477,P0852,Stirling Newberry,Affiliated With,O0681,
 RECORD-00477_REL_017,RECORD-00477,P0852,Stirling Newberry,Criticizes,O0419,CBS News,convinced there's a credibility crisis for CBS ('the simple truth is that the equipment that existed in 1972 would not have produced this output...'),1,2026-05-27
 RECORD-00477_REL_018,RECORD-00477,C0694,Collapse of the traditional news model,Originated By,O0970,Belmont Club,the smartest thing I have seen written so far on the events in question is again by Belmont Club: 'The traditional news model is collapsing.',1,2026-05-27
 RECORD-00477_REL_019,RECORD-00477,E0239,Guard week,Expands On,E0240,Swift Boat Veterans for Truth controversy,This story is bursting open what was called the 'undercard' in the earlier scandal story to which 'Guard week' is a reply of sorts— the Swift Boat Veterans for Truth,0.9,2026-05-27
-RECORD-00477_REL_020,RECORD-00477,W0702,The Note,Published In,O0055,ABC News,"ABC's The Note said Friday, 'Republicans can rightly ask about the confluence of all the DNC, outside group, and media focus on revisiting the Guard story.'",1,2026-05-27
+RECORD-00477_REL_020,RECORD-00477,O0883,The Note,Published In,O0055,ABC News,"ABC's The Note said Friday, 'Republicans can rightly ask about the confluence of all the DNC, outside group, and media focus on revisiting the Guard story.'",1,2026-05-27
 RECORD-00477_REL_021,RECORD-00477,P0555,Dan Rather,Cites,O0028,Los Angeles Times,"Rather told the Los Angeles Times, 'I'm of the school, my name is on it, I'm responsible.'",1,2026-05-27
 RECORD-00477_REL_022,RECORD-00477,O1317,The Boston Globe,Discusses,E0238,Killian documents controversy (Rathergate),"Contrast that with the Boston Globe's account, which barely mentions those who 'led the way'",0.9,2026-05-27
 RECORD-00477_REL_023,RECORD-00477,E0238,Killian documents controversy (Rathergate),Occurred At,E0239,Guard week,"the confluence of events in the news media, in publishing, and in politics that made for 'Guard week' this week",0.9,2026-05-27
@@ -6019,10 +6019,10 @@ RECORD-00657_REL_009,RECORD-00657,P2398,Jonathan Martin,Mentions,C0841,Church of
 RECORD-00657_REL_010,RECORD-00657,P0088,Barack Obama,Discusses,C0328,Signing Statements,He said he would end the abuse of signing statements,1,2026-05-27
 RECORD-00657_REL_011,RECORD-00657,P0088,Barack Obama,Affiliated With,L0026,Washington,wise to the ways of Washington,0.8,2026-05-27
 RECORD-00657_REL_012,RECORD-00657,O1452,Supreme Court of the United States,Discusses,C0843,State Secrets Privilege,his administration has sided with its predecessor in a Supreme Court case involving the state secrets privilege,0.9,2026-05-27
-RECORD-00658_REL_001,RECORD-00658,P1387,David Gregory,Affiliated With,W0789,Meet the Press,host David Gregory... his new policy on Meet the Press of letting his guests make false statements without any challenge or fact checking.,1,2026-05-27
-RECORD-00658_REL_002,RECORD-00658,P1020,Tim Russert,Affiliated With,W0789,Meet the Press,"September 2008: Tim Russert dies, Tom Brokaw takes over Meet the Press temporarily.",1,2026-05-27
-RECORD-00658_REL_003,RECORD-00658,P0556,Tom Brokaw,Affiliated With,W0789,Meet the Press,Tom Brokaw takes over Meet the Press temporarily.,1,2026-05-27
-RECORD-00658_REL_004,RECORD-00658,W0789,Meet the Press,Published In,O0065,NBC,"On the January 4 edition of NBC's Meet the Press, host David Gregory...",1,2026-05-27
+RECORD-00658_REL_001,RECORD-00658,P1387,David Gregory,Affiliated With,O0279,Meet the Press,host David Gregory... his new policy on Meet the Press of letting his guests make false statements without any challenge or fact checking.,1,2026-05-27
+RECORD-00658_REL_002,RECORD-00658,P1020,Tim Russert,Affiliated With,O0279,Meet the Press,"September 2008: Tim Russert dies, Tom Brokaw takes over Meet the Press temporarily.",1,2026-05-27
+RECORD-00658_REL_003,RECORD-00658,P0556,Tom Brokaw,Affiliated With,O0279,Meet the Press,Tom Brokaw takes over Meet the Press temporarily.,1,2026-05-27
+RECORD-00658_REL_004,RECORD-00658,O0279,Meet the Press,Published In,O0065,NBC,"On the January 4 edition of NBC's Meet the Press, host David Gregory...",1,2026-05-27
 RECORD-00658_REL_005,RECORD-00658,P1387,David Gregory,Criticizes,C0844,Fact-checking guests on television,"David Gregory: No, I won't fact check my guests and you guys can't make me.",1,2026-05-27
 RECORD-00658_REL_006,RECORD-00658,P0005,Jay Rosen,Criticizes,P1387,David Gregory,"It is not a matter of a pursed-lip schoolmarm lecturing people. It's a matter of the host of Meet the Press knowing what he's talking about, and knowing when a guest is trying to get away with somethi",1,2026-05-27
 RECORD-00658_REL_007,RECORD-00658,P1387,David Gregory,Mentions,P0742,Andrew Card,"Gregory interviews Andrew Card, who famously said 'From a marketing point of view, you don't introduce new products in August'. Card lies about the statement and Gregory does not challenge him.",1,2026-05-27
@@ -6411,7 +6411,7 @@ RECORD-00680_REL_022,RECORD-00680,P0324,Dan Froomkin,Originated By,W0330,White H
 RECORD-00680_REL_023,RECORD-00680,P0324,Dan Froomkin,Affiliated With,O0023,The Washington Post,Dan Froomkin's White House Briefing column,1,2026-05-27
 RECORD-00680_REL_024,RECORD-00680,P0270,Jim Brady,Affiliated With,O0023,The Washington Post,Jim Brady at post.com and others have done good work pushing the newsroom to think anew,1,2026-05-27
 RECORD-00680_REL_025,RECORD-00680,P2309,Leonard Downie,Affiliated With,O0023,The Washington Post,your leaving the Post should not be seen as a criticism of... Len Downie as a boss,1,2026-05-27
-RECORD-00680_REL_026,RECORD-00680,W0702,The Note,Mentions,O1010,Roll Call,"Roll Call, The Hill Newspaper, and National Journal are very much in the game",0.7,2026-05-27
+RECORD-00680_REL_026,RECORD-00680,O0883,The Note,Mentions,O1010,Roll Call,"Roll Call, The Hill Newspaper, and National Journal are very much in the game",0.7,2026-05-27
 RECORD-00680_REL_027,RECORD-00680,W0812,Hotline,Published In,O0465,National Journal,The Note and Hotline compete in the space online,0.9,2026-05-27
 RECORD-00680_REL_028,RECORD-00680,W0813,Face the Nation,Published In,O0419,CBS News,"We expect our staff to be making appearances on Face the Nation, and perhaps other CBS News shows",1,2026-05-27
 RECORD-00680_REL_029,RECORD-00680,P0916,John Harris,Mentions,E0004,Iraq War,what started out as the left's critique of the Iraq war increasingly defines the center,1,2026-05-27
@@ -6579,8 +6579,8 @@ RECORD-00689_REL_002,RECORD-00689,E0304,First YouTube Democratic Presidential De
 RECORD-00689_REL_003,RECORD-00689,E0304,First YouTube Democratic Presidential Debate,Occurred At,L0138,"Charleston, South Carolina","Democratic presidential candidates' debate in Charleston, SC, July 23, 2007",1,2026-05-27
 RECORD-00689_REL_004,RECORD-00689,E0304,First YouTube Democratic Presidential Debate,Affiliated With,O0059,Democratic Party,"Democratic presidential candidates' debate in Charleston, SC, July 23, 2007",1,2026-05-27
 RECORD-00689_REL_005,RECORD-00689,E0304,First YouTube Democratic Presidential Debate,Pioneered,C0905,Citizen Participation in Political Debates,first-ever YouTube debate; citizens submitted questions via video to candidates,0.9,2026-05-27
-RECORD-00689_REL_006,RECORD-00689,W0826,OffTheBus,Published In,O0034,The Huffington Post,Breaking Off The Bus News (HuffPost section),1,2026-05-27
-RECORD-00689_REL_007,RECORD-00689,W0826,OffTheBus,Expands On,C0905,Citizen Participation in Political Debates,"OffTheBus is a citizen-journalism project covering the campaign, aligned with the debate's citizen-question format",0.8,2026-05-27
+RECORD-00689_REL_006,RECORD-00689,O0447,OffTheBus,Published In,O0034,The Huffington Post,Breaking Off The Bus News (HuffPost section),1,2026-05-27
+RECORD-00689_REL_007,RECORD-00689,O0447,OffTheBus,Expands On,C0905,Citizen Participation in Political Debates,"OffTheBus is a citizen-journalism project covering the campaign, aligned with the debate's citizen-question format",0.8,2026-05-27
 RECORD-00689_REL_008,RECORD-00689,P2433,Hillary Rodham Clinton,Mentions,E0304,First YouTube Democratic Presidential Debate,"Mrs. Clinton, how would you define the word 'liberal?' And would you use this word to describe yourself?",1,2026-05-27
 RECORD-00689_REL_009,RECORD-00689,P0088,Barack Obama,Mentions,E0304,First YouTube Democratic Presidential Debate,either Hillary Clinton or Barack Obama became president; Whenever I read an editorial about one of you,1,2026-05-27
 RECORD-00689_REL_010,RECORD-00689,P0849,Dennis Kucinich,Mentions,E0304,First YouTube Democratic Presidential Debate,"Congressman Kucinich, how would America be better off with you as president",1,2026-05-27
@@ -6769,8 +6769,8 @@ RECORD-00698_REL_017,RECORD-00698,C0292,Rollback,Discusses,O0126,White House,One
 RECORD-00698_REL_018,RECORD-00698,O0732,Al Qaeda,Criticizes,P0014,George W. Bush,"Al Qaeda makes announcements, and like the president's they instantly travel around the world. But Al Qaeda doesn't have to answer questions.",0.8,2026-05-27
 RECORD-00698_REL_019,RECORD-00698,P0354,Osama bin Laden,Affiliated With,O0732,Al Qaeda,That gives Osama and company an edge.,1,2026-05-27
 RECORD-00698_REL_020,RECORD-00698,O0033,PressThink,Affiliated With,O1313,New York University,"Jay Rosen teaches journalism at New York University and writes the blog, PressThink.",1,2026-05-27
-RECORD-00698_REL_021,RECORD-00698,W0826,OffTheBus,Published In,O0691,HuffPost,He is also co-publisher with Arianna Huffington of Huff Post's OffTheBus.,1,2026-05-27
-RECORD-00698_REL_022,RECORD-00698,P0183,Arianna Huffington,Founded By,W0826,OffTheBus,co-publisher with Arianna Huffington of Huff Post's OffTheBus,1,2026-05-27
+RECORD-00698_REL_021,RECORD-00698,O0447,OffTheBus,Published In,O0691,HuffPost,He is also co-publisher with Arianna Huffington of Huff Post's OffTheBus.,1,2026-05-27
+RECORD-00698_REL_022,RECORD-00698,P0183,Arianna Huffington,Founded By,O0447,OffTheBus,co-publisher with Arianna Huffington of Huff Post's OffTheBus,1,2026-05-27
 RECORD-00698_REL_023,RECORD-00698,C0925,Opacity of executive power,Discusses,O0126,White House,"The goal, I think, was to make the American presidency more opaque, so that no one could see in.",1,2026-05-27
 RECORD-00698_REL_024,RECORD-00698,C0376,Strategic non-communication,Expands On,C0925,Opacity of executive power,Non-communication we still do not appreciate; its purpose is to make executive power less legible.,0.9,2026-05-27
 RECORD-00698_REL_025,RECORD-00698,P2033,John F. Kennedy,Discusses,O0126,White House,"From the the time of John Kennedy until Bush the younger, it was assumed that the President's powers were not only the formal ones in the Constitution",0.8,2026-05-27
@@ -7287,8 +7287,8 @@ RECORD-00725_REL_005,RECORD-00725,P0005,Jay Rosen,Originated By,C0934,"Not the o
 RECORD-00725_REL_006,RECORD-00725,P0005,Jay Rosen,Pioneered,C0047,Public Journalism,an effort to find ways to involve members of the public more directly in journalism through his work on public journalism,0.9,2026-05-27
 RECORD-00725_REL_007,RECORD-00725,P0005,Jay Rosen,Originated By,W0889,The Production of Innocence in the Reporting of American Politics,The 'production of innocence' was his phrase,1,2026-05-27
 RECORD-00725_REL_008,RECORD-00725,W0889,The Production of Innocence in the Reporting of American Politics,Published In,O0033,PressThink,pressthink.org/2013/the-production-of-innocence-in-the-reporting-of-american-politics,1,2026-05-27
-RECORD-00725_REL_009,RECORD-00725,P0005,Jay Rosen,Pioneered,W0891,Assignment Zero,"later, through Assignment Zero, described by the Citizendium as 'an experiment in crowd-sourced journalism'",0.9,2026-05-27
-RECORD-00725_REL_010,RECORD-00725,W0891,Assignment Zero,Discusses,C0037,Crowdsourcing,"an experiment in crowd-sourced journalism, allowing collaboration between amateur and professional journalists",1,2026-05-27
+RECORD-00725_REL_009,RECORD-00725,P0005,Jay Rosen,Pioneered,O1161,Assignment Zero,"later, through Assignment Zero, described by the Citizendium as 'an experiment in crowd-sourced journalism'",0.9,2026-05-27
+RECORD-00725_REL_010,RECORD-00725,O1161,Assignment Zero,Discusses,C0037,Crowdsourcing,"an experiment in crowd-sourced journalism, allowing collaboration between amateur and professional journalists",1,2026-05-27
 RECORD-00725_REL_011,RECORD-00725,C0037,Crowdsourcing,Originated By,P0727,Jeff Howe,The phrase 'crowdsourcing' was coined by my Northeastern colleague Jeff Howe.,1,2026-05-27
 RECORD-00725_REL_012,RECORD-00725,P0727,Jeff Howe,Affiliated With,O1308,Northeastern University,my Northeastern colleague Jeff Howe,1,2026-05-27
 RECORD-00725_REL_013,RECORD-00725,C0047,Public Journalism,Expands On,C0048,Civic Journalism,his work on public journalism (sometimes called civic journalism) in the '90s,1,2026-05-27
@@ -7332,7 +7332,7 @@ RECORD-00729_REL_002,RECORD-00729,P0005,Jay Rosen,Originated By,O0033,PressThink
 RECORD-00729_REL_003,RECORD-00729,O0033,PressThink,Supports,E0338,Reporters Without Borders 2005 Freedom Blog award,"In June 2005, PressThink won the Reporters Without Borders 2005 Freedom Blog award for outstanding defense of free expression",1,2026-05-27
 RECORD-00729_REL_004,RECORD-00729,O0207,Reporters Without Borders,Mentions,O0033,PressThink,PressThink won the Reporters Without Borders 2005 Freedom Blog award,1,2026-05-27
 RECORD-00729_REL_005,RECORD-00729,P0005,Jay Rosen,Founded By,W0084,NewAssignment.net,"In July 2006 he launched NewAssignment.Net, his experimental site for pro-am, open source reporting projects",1,2026-05-27
-RECORD-00729_REL_006,RECORD-00729,W0891,Assignment Zero,Affiliated With,O1537,Wired.com,"The first one was called Assignment Zero, a collaboration with Wired.com",1,2026-05-27
+RECORD-00729_REL_006,RECORD-00729,O1161,Assignment Zero,Affiliated With,O1537,Wired.com,"The first one was called Assignment Zero, a collaboration with Wired.com",1,2026-05-27
 RECORD-00729_REL_007,RECORD-00729,W0673,OfftheBus.Net,Affiliated With,O1350,Huffington Post,A second project is OfftheBus.Net with the Huffington Post,1,2026-05-27
 RECORD-00729_REL_008,RECORD-00729,W0029,What Are Journalists For?,Published In,O0116,Yale University Press,"In 1999, Yale University Press published his book, WHAT ARE JOURNALISTS FOR?",1,2026-05-27
 RECORD-00729_REL_009,RECORD-00729,W0029,What Are Journalists For?,Discusses,C0048,Civic Journalism,"his book, WHAT ARE JOURNALISTS FOR?, about the rise of the civic journalism movement",1,2026-05-27
@@ -7575,8 +7575,8 @@ RECORD-00747_REL_016,RECORD-00747,O0221,NBC News,Criticizes,P0313,Keith Olberman
 RECORD-00747_REL_017,RECORD-00747,O0031,NPR,Criticizes,P0311,Juan Williams,NPR terminated the contract of former news analyst Juan Williams for repeatedly voicing personal views in other news outlets,1,2026-05-27
 RECORD-00747_REL_018,RECORD-00747,P0311,Juan Williams,Affiliated With,O0031,NPR,former news analyst Juan Williams,1,2026-05-27
 RECORD-00747_REL_019,RECORD-00747,O1502,ABC,Cites,O0272,PolitiFact,ABC arranged for the PolitiFact truth squad to verify statements made on ABC's This Week,1,2026-05-27
-RECORD-00747_REL_020,RECORD-00747,P0168,Jake Tapper,Affiliated With,W0904,This Week,Jake Tapper served as its substitute host,1,2026-05-27
-RECORD-00747_REL_021,RECORD-00747,W0904,This Week,Published In,O1502,ABC,statements made on ABC's This Week,1,2026-05-27
+RECORD-00747_REL_020,RECORD-00747,P0168,Jake Tapper,Affiliated With,O1205,This Week,Jake Tapper served as its substitute host,1,2026-05-27
+RECORD-00747_REL_021,RECORD-00747,O1205,This Week,Published In,O1502,ABC,statements made on ABC's This Week,1,2026-05-27
 RECORD-00747_REL_022,RECORD-00747,W0275,Morning Edition,Published In,O0031,NPR,Listen to the Story / Morning Edition,1,2026-05-27
 RECORD-00747_REL_023,RECORD-00747,P0045,David Folkenflik,Affiliated With,O0031,NPR,by David Folkenflik [NPR],1,2026-05-27
 RECORD-00747_REL_024,RECORD-00747,P0005,Jay Rosen,Discusses,O1502,ABC,When he suggested that the broadcast network Sunday morning talk shows incorporate a significant fact-check component... ABC arranged for the PolitiFact truth squad,0.9,2026-05-27
@@ -7654,7 +7654,7 @@ RECORD-00754_REL_007,RECORD-00754,C0042,Citizens agenda,Originated By,P0005,Jay 
 RECORD-00754_REL_008,RECORD-00754,W0913,The Citizens Agenda in Campaign Coverage,Originated By,P0005,Jay Rosen,Jay Rosen published a blog post arguing for 'a citizens agenda in campaign coverage',1,2026-05-27
 RECORD-00754_REL_009,RECORD-00754,C0042,Citizens agenda,Expands On,C0048,Civic Journalism,"the citizens agenda is the digital — digitized — heir of civic journalism, the movement that (with Rosen at the helm) came to prominence in the 1990s",0.9,2026-05-27
 RECORD-00754_REL_010,RECORD-00754,C0048,Civic Journalism,Pioneered,P0005,Jay Rosen,"civic journalism, the movement that (with Rosen at the helm) came to prominence in the 1990s",0.9,2026-05-27
-RECORD-00754_REL_011,RECORD-00754,W0826,OffTheBus,Affiliated With,O0034,The Huffington Post,HuffPo's 2008 OffTheBus project,1,2026-05-27
+RECORD-00754_REL_011,RECORD-00754,O0447,OffTheBus,Affiliated With,O0034,The Huffington Post,HuffPo's 2008 OffTheBus project,1,2026-05-27
 RECORD-00754_REL_012,RECORD-00754,C0042,Citizens agenda,Criticizes,C0491,Horserace Coverage,"it's an attempt to disrupt the horserace as the 'master narrative' of political reporting, to inject more perspective",0.9,2026-05-27
 RECORD-00754_REL_013,RECORD-00754,P0270,Jim Brady,Affiliated With,O0180,Digital First Media,"Jim Brady and the collection of community papers at Digital First Media, which is partnering with the project",1,2026-05-27
 RECORD-00754_REL_014,RECORD-00754,O0180,Digital First Media,Supports,C0042,Citizens agenda,"Digital First Media, which is partnering with the project to tailor the national findings to the local",1,2026-05-27
@@ -7802,10 +7802,10 @@ RECORD-00763_REL_004,RECORD-00763,P1098,Dan Kennedy,Affiliated With,O1587,GBH,Da
 RECORD-00763_REL_005,RECORD-00763,P0005,Jay Rosen,Pioneered,C0047,Public Journalism,"Rosen was among the first wave to embrace 'public journalism' (also known as 'civic journalism'), a 1990s-era movement",0.9,2026-05-27
 RECORD-00763_REL_006,RECORD-00763,P0005,Jay Rosen,Discusses,C1060,Trust-based journalism,he was intrigued because The Correspondent has been 'optimized for trust.',0.9,2026-05-27
 RECORD-00763_REL_007,RECORD-00763,O0305,The Correspondent,Pioneered,C1060,Trust-based journalism,"The Correspondent has been 'optimized for trust.' Among other things, the site will be free of advertising",0.9,2026-05-27
-RECORD-00763_REL_008,RECORD-00763,P0005,Jay Rosen,Founded By,W0891,Assignment Zero,"Assignment Zero, a project he founded in 2007 to tap what we used to call the 'wisdom of the crowd.'",1,2026-05-27
+RECORD-00763_REL_008,RECORD-00763,P0005,Jay Rosen,Founded By,O1161,Assignment Zero,"Assignment Zero, a project he founded in 2007 to tap what we used to call the 'wisdom of the crowd.'",1,2026-05-27
 RECORD-00763_REL_009,RECORD-00763,P0727,Jeff Howe,Originated By,C0037,Crowdsourcing,"Jeff Howe, who coined the term 'crowdsourcing' and wrote a book by that name.",1,2026-05-27
 RECORD-00763_REL_010,RECORD-00763,P0727,Jeff Howe,Affiliated With,O1308,Northeastern University,my Northeastern colleague Jeff Howe,1,2026-05-27
-RECORD-00763_REL_011,RECORD-00763,P0727,Jeff Howe,Affiliated With,W0891,Assignment Zero,Among those involved in Assignment Zero was my Northeastern colleague Jeff Howe,1,2026-05-27
+RECORD-00763_REL_011,RECORD-00763,P0727,Jeff Howe,Affiliated With,O1161,Assignment Zero,Among those involved in Assignment Zero was my Northeastern colleague Jeff Howe,1,2026-05-27
 RECORD-00763_REL_012,RECORD-00763,P1098,Dan Kennedy,Founded By,W0919,The Wired City,Several years ago I interviewed Rosen for my 2013 book 'The Wired City' about how journalists in the digital age can involve the public,1,2026-05-27
 RECORD-00763_REL_013,RECORD-00763,P0165,Walter Lippmann,Founded By,W0877,Public Opinion,"Lippmann, in his book 'Public Opinion' (1922), wrote that the public's job was to ratify decisions made by experts",1,2026-05-27
 RECORD-00763_REL_014,RECORD-00763,P0164,John Dewey,Founded By,W0068,The Public and Its Problems,Dewey responded in a book of his own titled 'The Public and Its Problems' (1927),1,2026-05-27
@@ -7923,17 +7923,17 @@ RECORD-00769_REL_001,RECORD-00769,P0005,Jay Rosen,Affiliated With,O1313,New York
 RECORD-00769_REL_002,RECORD-00769,P0005,Jay Rosen,Originated By,C1082,Fact-checking Sunday shows,"NYU Journalism Professor Jay Rosen proposed something simple that was, at the same time, revolutionary: Why don't the Sunday morning talk shows fact-check their guests?",1,2026-05-27
 RECORD-00769_REL_003,RECORD-00769,W0927,My Simple Fix for the Messed Up Sunday Shows,Originated By,P0005,Jay Rosen,"In a blog post, Rosen argued that there was plenty wrong with the Sunday show format",1,2026-05-27
 RECORD-00769_REL_004,RECORD-00769,W0927,My Simple Fix for the Messed Up Sunday Shows,Discusses,C1082,Fact-checking Sunday shows,fact checking each show and posting the results online on Wednesday would be a relatively easy way to add a little more accountability,1,2026-05-27
-RECORD-00769_REL_005,RECORD-00769,P1387,David Gregory,Affiliated With,W0789,Meet the Press,Meet the Press host David Gregory was asked about the idea,1,2026-05-27
+RECORD-00769_REL_005,RECORD-00769,P1387,David Gregory,Affiliated With,O0279,Meet the Press,Meet the Press host David Gregory was asked about the idea,1,2026-05-27
 RECORD-00769_REL_006,RECORD-00769,P1387,David Gregory,Criticizes,C1082,Fact-checking Sunday shows,David Gregory... said that fact checking would not be incorporated into his show,0.9,2026-05-27
 RECORD-00769_REL_007,RECORD-00769,O1596,Meet the Facts,Founded By,P2581,Chas Danner,two college students took Gregory up on his offer and launched the website Meet the Facts,1,2026-05-27
 RECORD-00769_REL_008,RECORD-00769,O1596,Meet the Facts,Founded By,P2582,Paul Breer,"Paul Breer, a political science student in Kansas, and Chas Danner... launched the website Meet the Facts",1,2026-05-27
-RECORD-00769_REL_009,RECORD-00769,O1596,Meet the Facts,Discusses,W0789,Meet the Press,"comb through each episode of Meet the Press, list all of the asserted facts on their website",1,2026-05-27
+RECORD-00769_REL_009,RECORD-00769,O1596,Meet the Facts,Discusses,O0279,Meet the Press,"comb through each episode of Meet the Press, list all of the asserted facts on their website",1,2026-05-27
 RECORD-00769_REL_010,RECORD-00769,O1596,Meet the Facts,Pioneered,C1082,Fact-checking Sunday shows,"label the statements as true, mostly true, half true, or false",0.9,2026-05-27
 RECORD-00769_REL_011,RECORD-00769,P2581,Chas Danner,Affiliated With,O1595,The New School,"Chas Danner, a journalism student at The New School in New York City",1,2026-05-27
-RECORD-00769_REL_012,RECORD-00769,W0789,Meet the Press,Published In,O0065,NBC,NBC declined our request to discuss this subject,1,2026-05-27
-RECORD-00769_REL_013,RECORD-00769,P1020,Tim Russert,Affiliated With,W0789,Meet the Press,Meet the Press' reputation with David Gregory and before him with Tim Russert,1,2026-05-27
-RECORD-00769_REL_014,RECORD-00769,P2583,Betsy Fischer,Affiliated With,W0789,Meet the Press,"I wish I could talk to David Gregory or Betsy Fischer, the executive producer",1,2026-05-27
-RECORD-00769_REL_015,RECORD-00769,P2519,Mike Pence,Mentions,W0789,Meet the Press,"Last week, Mike Pence made some statements",0.9,2026-05-27
+RECORD-00769_REL_012,RECORD-00769,O0279,Meet the Press,Published In,O0065,NBC,NBC declined our request to discuss this subject,1,2026-05-27
+RECORD-00769_REL_013,RECORD-00769,P1020,Tim Russert,Affiliated With,O0279,Meet the Press,Meet the Press' reputation with David Gregory and before him with Tim Russert,1,2026-05-27
+RECORD-00769_REL_014,RECORD-00769,P2583,Betsy Fischer,Affiliated With,O0279,Meet the Press,"I wish I could talk to David Gregory or Betsy Fischer, the executive producer",1,2026-05-27
+RECORD-00769_REL_015,RECORD-00769,P2519,Mike Pence,Mentions,O0279,Meet the Press,"Last week, Mike Pence made some statements",0.9,2026-05-27
 RECORD-00769_REL_016,RECORD-00769,O0067,USA Today,Criticizes,P2519,Mike Pence,"USA Today did a survey of economists where they agreed that, in fact, the Stimulus Bill had cut the unemployment rate",0.8,2026-05-27
 RECORD-00769_REL_017,RECORD-00769,O1456,Congressional Budget Office,Criticizes,P2519,Mike Pence,"the Congressional Budget Office, which is a nonpartisan organization, said the same thing",0.8,2026-05-27
 RECORD-00769_REL_018,RECORD-00769,O0272,PolitiFact,Pioneered,C1082,Fact-checking Sunday shows,"there are other people in the fact-checking business already. They're nonpartisan, apolitical. I'm talking about Politifact",0.9,2026-05-27
@@ -8493,7 +8493,7 @@ RECORD-00810_REL_019,RECORD-00810,P1419,Kinsey Wilson,Affiliated With,O0855,USA 
 RECORD-00810_REL_020,RECORD-00810,P1349,Bill Grueskin,Affiliated With,O1344,Wall Street Journal,"Bill Grueskin, Managing Editor, The Wall Street Journal Online.",1,2026-05-27
 RECORD-00810_REL_021,RECORD-00810,P1420,Stephen Baker,Affiliated With,O1374,BusinessWeek,"Stephen Baker, Senior Writer, Business Week, co-author of Blogspotting for Business Week Online.",1,2026-05-27
 RECORD-00810_REL_022,RECORD-00810,P1420,Stephen Baker,Affiliated With,W0956,Blogspotting,co-author of Blogspotting for Business Week Online.,1,2026-05-27
-RECORD-00810_REL_023,RECORD-00810,P0701,Vaughn Ververs,Affiliated With,W0955,Public Eye,"Vaughn Ververs, Editor of the new ombudsman-like blog, Public Eye, at CBSNews.com",1,2026-05-27
+RECORD-00810_REL_023,RECORD-00810,P0701,Vaughn Ververs,Affiliated With,O0443,Public Eye,"Vaughn Ververs, Editor of the new ombudsman-like blog, Public Eye, at CBSNews.com",1,2026-05-27
 RECORD-00810_REL_024,RECORD-00810,P1421,Stephen Shepard,Affiliated With,O0723,CUNY Graduate School of Journalism,now the Dean of the new CUNY J-School who gets to create a Web era curriculum from a tabula rasa.,1,2026-05-27
 RECORD-00810_REL_025,RECORD-00810,P1421,Stephen Shepard,Affiliated With,O1374,BusinessWeek,"Stephen Shepard, formerly the editor of Business Week",1,2026-05-27
 RECORD-00810_REL_026,RECORD-00810,P1422,Christy Carpenter,Affiliated With,O0816,Museum of Television and Radio,"Christy Carpenter, executive director of the Media Center project at the Museum",1,2026-05-27
@@ -8510,7 +8510,7 @@ RECORD-00810_REL_036,RECORD-00810,O1464,New York Times Digital,Owns,W0419,TimesS
 RECORD-00810_REL_037,RECORD-00810,P2616,Kevin Sites,Affiliated With,O1648,Yahoo News,a company on the rise (with news about Kevin Sites and new columnists),0.9,2026-05-27
 RECORD-00810_REL_038,RECORD-00810,E0395,"Big Media, the Bloggers roundtable",Discusses,C1136,Citizens media,"evangelist for citizens media... About Big Media, the Bloggers and where the two are likely to meet",0.9,2026-05-27
 RECORD-00810_REL_039,RECORD-00810,E0395,"Big Media, the Bloggers roundtable",Discusses,C0103,Open Source Journalism,"I discussed an example of collaborative, open source journalism-by-blog.",0.9,2026-05-27
-RECORD-00810_REL_040,RECORD-00810,C0103,Open Source Journalism,Cites,W0957,Wikipedia,Other attempts to explain how open source methods can be highly effective-- Wikipedia for example,0.8,2026-05-27
+RECORD-00810_REL_040,RECORD-00810,C0103,Open Source Journalism,Cites,O0515,Wikipedia,Other attempts to explain how open source methods can be highly effective-- Wikipedia for example,0.8,2026-05-27
 RECORD-00810_REL_041,RECORD-00810,P0462,Merrill Brown,Criticizes,C0447,Big Media,"wrote an influential report warning news executives that the world is changing, so you have to reach out.",0.8,2026-05-27
 RECORD-00811_REL_001,RECORD-00811,P0452,Jack Shafer,Criticizes,P1043,Judith Miller,the epic collision of first principles from which Judith Miller has just slunk away,0.95,2026-05-27
 RECORD-00811_REL_002,RECORD-00811,P1043,Judith Miller,Affiliated With,O0002,The New York Times,only New York Times reporter Judith Miller is in jail today,1,2026-05-27
@@ -8606,8 +8606,8 @@ RECORD-00813_REL_035,RECORD-00813,P0023,Greg Mitchell,Affiliated With,O0025,Edit
 RECORD-00813_REL_036,RECORD-00813,P1483,Gloria Borger,Mentions,O1653,The New York Times Washington Bureau,"Gloria Borger of US News, sitting in Washington",1,2026-05-27
 RECORD-00813_REL_037,RECORD-00813,P0545,Nicholas Kristof,Affiliated With,O0002,The New York Times,"to Nick Kristof of the Times, among others",1,2026-05-27
 RECORD-00813_REL_038,RECORD-00813,P0739,Dick Cheney,Affiliated With,O0126,White House,Vice President Dick Cheney's chief of staff,1,2026-05-27
-RECORD-00813_REL_039,RECORD-00813,C0340,Gang of 500,Originated By,W0702,The Note,ABC's The Note observed today... If you aren't spending 90% of your waking time thinking about this... then you aren't a member of the Gang of 500,1,2026-05-27
-RECORD-00813_REL_040,RECORD-00813,W0702,The Note,Published In,O0055,ABC News,ABC's The Note observed today,1,2026-05-27
+RECORD-00813_REL_039,RECORD-00813,C0340,Gang of 500,Originated By,O0883,The Note,ABC's The Note observed today... If you aren't spending 90% of your waking time thinking about this... then you aren't a member of the Gang of 500,1,2026-05-27
+RECORD-00813_REL_040,RECORD-00813,O0883,The Note,Published In,O0055,ABC News,ABC's The Note observed today,1,2026-05-27
 RECORD-00814_REL_001,RECORD-00814,P0030,Bill Keller,Affiliated With,O0002,The New York Times,"Bill Keller to New York Times staff, Oct. 11.",1,2026-05-27
 RECORD-00814_REL_002,RECORD-00814,P1043,Judith Miller,Affiliated With,O0002,The New York Times,Judith Miller is a Washington journalist for the Times,1,2026-05-27
 RECORD-00814_REL_003,RECORD-00814,P0037,Gabriel Sherman,Affiliated With,O0018,The New York Observer,reporter Gabriel Sherman is starting to get replies to some of the most glaring questions,1,2026-05-27
@@ -8772,7 +8772,7 @@ RECORD-00820_REL_010,RECORD-00820,P0457,David Halberstam,Criticizes,E0409,Judith
 RECORD-00820_REL_011,RECORD-00820,P0452,Jack Shafer,Affiliated With,O0038,Slate,Jack Shafer's point of comparison was Scott McClellan,0.9,2026-05-27
 RECORD-00820_REL_012,RECORD-00820,P0452,Jack Shafer,Criticizes,P2416,"Arthur Sulzberger, Jr.",reporters should ask Sulzberger if he was legally free to speak his mind,0.9,2026-05-27
 RECORD-00820_REL_013,RECORD-00820,P0452,Jack Shafer,Mentions,P0764,Scott McClellan,"Jack Shafer's point of comparison was Scott McClellan, and the controlled emptiness of the White House briefing room",1,2026-05-27
-RECORD-00820_REL_014,RECORD-00820,P0059,Glenn Reynolds,Affiliated With,W0971,Instapundit,Glenn Reynolds... said at Instapundit,1,2026-05-27
+RECORD-00820_REL_014,RECORD-00820,P0059,Glenn Reynolds,Affiliated With,O0384,Instapundit,Glenn Reynolds... said at Instapundit,1,2026-05-27
 RECORD-00820_REL_015,RECORD-00820,P0059,Glenn Reynolds,Criticizes,P2416,"Arthur Sulzberger, Jr.","Glenn Reynolds, who thought Sulzberger gave a 'deeply unimpressive performance'",1,2026-05-27
 RECORD-00820_REL_016,RECORD-00820,P0411,Jayson Blair,Affiliated With,O0002,The New York Times,"The Jayson Blair episode was much worse, Sulzberger said.",1,2026-05-27
 RECORD-00820_REL_017,RECORD-00820,E0254,Jayson Blair plagiarism scandal,Occurred At,O0002,The New York Times,"The Jayson Blair episode was much worse, Sulzberger said.",1,2026-05-27
@@ -8988,7 +8988,7 @@ RECORD-00828_REL_019,RECORD-00828,P0108,Craig Newmark,Supports,O0456,NewAssignme
 RECORD-00828_REL_020,RECORD-00828,O1679,Thirdwave,Supports,W0191,Polling Place Photo Project,Thirdwave is AIGA's development partner and responsible for supporting the technology of the Polling Place Photo Project,1,2026-05-27
 RECORD-00828_REL_021,RECORD-00828,W0191,Polling Place Photo Project,Cites,O1680,Creative Commons,There's a Creative Commons license (type by-nd) meaning others can use them but cannot monkey with the images,1,2026-05-27
 RECORD-00828_REL_022,RECORD-00828,P0878,Russ Walker,Affiliated With,O0476,Washingtonpost.com,"Russ Walker, an editor at Washingtonpost.com",1,2026-05-27
-RECORD-00828_REL_023,RECORD-00828,P0012,Mark Glaser,Affiliated With,W0984,Media Shift,a suggestion posted at Mark Glaser's Media Shift by Russ Walker,1,2026-05-27
+RECORD-00828_REL_023,RECORD-00828,P0012,Mark Glaser,Affiliated With,O0789,Media Shift,a suggestion posted at Mark Glaser's Media Shift by Russ Walker,1,2026-05-27
 RECORD-00828_REL_024,RECORD-00828,W0191,Polling Place Photo Project,Occurred At,E0417,2006 U.S. midterm elections,"When Americans vote on November 7th, what will it look like?",1,2026-05-27
 RECORD-00828_REL_025,RECORD-00828,E0418,2000 Florida election dispute,Occurred At,L0053,Florida,a lot of nightmare images left over from Florida in 2000,1,2026-05-27
 RECORD-00828_REL_026,RECORD-00828,O0456,NewAssignment.Net,Pioneered,C0103,Open Source Journalism,"NewAssignment.Net, my pilot project in open source journalism",1,2026-05-27
@@ -9011,7 +9011,7 @@ RECORD-00829_REL_012,RECORD-00829,O1009,Allbritton Communications,Owns,O1354,Cap
 RECORD-00829_REL_013,RECORD-00829,P1138,Katharine Seelye,Affiliated With,O0002,The New York Times,In Katharine Seelye's story for the New York Times,1,2026-05-27
 RECORD-00829_REL_014,RECORD-00829,P0005,Jay Rosen,Criticizes,O0023,The Washington Post,Now we're getting to the part I don't get... the 'next generation' talk... lame and general language,0.8,2026-05-27
 RECORD-00829_REL_015,RECORD-00829,P0005,Jay Rosen,Criticizes,C1185,Pulling back the curtain,"does this not try to frame a very old, in fact cliched image in media criticism--of Toto pulling back the curtain on the Wizard--as something generationally new?",1,2026-05-27
-RECORD-00829_REL_016,RECORD-00829,P0051,Jon Stewart,Affiliated With,W0986,The Daily Show,Jon Stewart knows something about that. Does anyone at Allbritton Communications watch the Daily Show?,1,2026-05-27
+RECORD-00829_REL_016,RECORD-00829,P0051,Jon Stewart,Affiliated With,O0985,The Daily Show,Jon Stewart knows something about that. Does anyone at Allbritton Communications watch the Daily Show?,1,2026-05-27
 RECORD-00829_REL_017,RECORD-00829,P0005,Jay Rosen,Discusses,C0704,Unbundling of the metropolitan newspaper,"It's the further unbundling of the metropolitan newspaper (in this case, the Post.) I get that.",1,2026-05-27
 RECORD-00829_REL_018,RECORD-00829,P0712,Jim VandeHei,Originated By,C0705,Journalism's state secrets,"knock down some of traditional journalism's 'state secrets,' such as how stories get leaked and whose motives are served",1,2026-05-27
 RECORD-00829_REL_019,RECORD-00829,C0705,Journalism's state secrets,Expands On,C1186,Gentleman's agreements in political reporting,won't be bound by certain gentleman's agreements that have settled over political reporting,0.9,2026-05-27
@@ -9070,9 +9070,9 @@ RECORD-00832_REL_001,RECORD-00832,O0456,NewAssignment.Net,Affiliated With,O0034,
 RECORD-00832_REL_002,RECORD-00832,P0183,Arianna Huffington,Affiliated With,O0034,The Huffington Post,Arianna Huffington and I are announcing today a new joint venture in campaign journalism,1,2026-05-27
 RECORD-00832_REL_003,RECORD-00832,O0456,NewAssignment.Net,Pioneered,C0126,Pro-Am journalism,"NewAssignment.Net, my experimental site for 'pro-am' journalism",1,2026-05-27
 RECORD-00832_REL_004,RECORD-00832,C0126,Pro-Am journalism,Originated By,O0456,NewAssignment.Net,my experimental site for 'pro-am' journalism,0.9,2026-05-27
-RECORD-00832_REL_005,RECORD-00832,W0891,Assignment Zero,Affiliated With,O0456,NewAssignment.Net,"Assignment Zero, our current project with Wired.com",1,2026-05-27
-RECORD-00832_REL_006,RECORD-00832,W0891,Assignment Zero,Affiliated With,O1537,Wired.com,"Assignment Zero, our current project with Wired.com",1,2026-05-27
-RECORD-00832_REL_007,RECORD-00832,P0762,David Carr,Discusses,W0891,Assignment Zero,Read David Carr's column about it in the New York Times,1,2026-05-27
+RECORD-00832_REL_005,RECORD-00832,O1161,Assignment Zero,Affiliated With,O0456,NewAssignment.Net,"Assignment Zero, our current project with Wired.com",1,2026-05-27
+RECORD-00832_REL_006,RECORD-00832,O1161,Assignment Zero,Affiliated With,O1537,Wired.com,"Assignment Zero, our current project with Wired.com",1,2026-05-27
+RECORD-00832_REL_007,RECORD-00832,P0762,David Carr,Discusses,O1161,Assignment Zero,Read David Carr's column about it in the New York Times,1,2026-05-27
 RECORD-00832_REL_008,RECORD-00832,P0762,David Carr,Affiliated With,O0002,The New York Times,David Carr's column ... in the New York Times,1,2026-05-27
 RECORD-00832_REL_009,RECORD-00832,O0456,NewAssignment.Net,Discusses,E0231,2008 U.S. Presidential Election,campaign reporting ... as they try to cover the race for president,0.9,2026-05-27
 RECORD-00832_REL_010,RECORD-00832,O0034,The Huffington Post,Discusses,E0231,2008 U.S. Presidential Election,The Huffington Post is going to cover the 2008 campaign in a variety of ways,1,2026-05-27
@@ -9319,15 +9319,15 @@ RECORD-00842_REL_004,RECORD-00842,P2639,Frank Sennett,Owns,W1000,Alternative Sou
 RECORD-00842_REL_005,RECORD-00842,P0977,Steve Smith,Affiliated With,O0567,Spokesman-Review,"one of my favorite local newspapers run by one of my favorite editors, Steve Smith",1,2026-05-27
 RECORD-00842_REL_006,RECORD-00842,P0977,Steve Smith,Pioneered,C0559,Transparent Newsroom,"Steve Smith, pioneer of the transparent newsroom",1,2026-05-27
 RECORD-00842_REL_007,RECORD-00842,P0183,Arianna Huffington,Affiliated With,O1350,Huffington Post,Arianna and I are the co-publishers,1,2026-05-27
-RECORD-00842_REL_008,RECORD-00842,P0183,Arianna Huffington,Founded By,W0826,OffTheBus,When I decided to join forces with Arianna and Huffington Post and do my open platform campaign bureau idea this way,0.9,2026-05-27
-RECORD-00842_REL_009,RECORD-00842,P0184,Amanda Michel,Affiliated With,W0826,OffTheBus,"Amanda Michel, project director, already knew a lot about working with lists",1,2026-05-27
-RECORD-00842_REL_010,RECORD-00842,P0184,Amanda Michel,Affiliated With,W0891,Assignment Zero,we learned a lot from Assignment Zero and Amanda Michel,0.9,2026-05-27
-RECORD-00842_REL_011,RECORD-00842,W0826,OffTheBus,Published In,O1350,Huffington Post,"OffTheBus, my new venture in election coverage with the Huffington Post",1,2026-05-27
-RECORD-00842_REL_012,RECORD-00842,W0826,OffTheBus,Expands On,C1214,open platform campaign bureau,my open platform campaign bureau idea this way,1,2026-05-27
-RECORD-00842_REL_013,RECORD-00842,W0826,OffTheBus,Discusses,E0433,First YouTube/CNN Presidential Debate,OffTheBus did cover the first YouTube debate with the candidates,1,2026-05-27
+RECORD-00842_REL_008,RECORD-00842,P0183,Arianna Huffington,Founded By,O0447,OffTheBus,When I decided to join forces with Arianna and Huffington Post and do my open platform campaign bureau idea this way,0.9,2026-05-27
+RECORD-00842_REL_009,RECORD-00842,P0184,Amanda Michel,Affiliated With,O0447,OffTheBus,"Amanda Michel, project director, already knew a lot about working with lists",1,2026-05-27
+RECORD-00842_REL_010,RECORD-00842,P0184,Amanda Michel,Affiliated With,O1161,Assignment Zero,we learned a lot from Assignment Zero and Amanda Michel,0.9,2026-05-27
+RECORD-00842_REL_011,RECORD-00842,O0447,OffTheBus,Published In,O1350,Huffington Post,"OffTheBus, my new venture in election coverage with the Huffington Post",1,2026-05-27
+RECORD-00842_REL_012,RECORD-00842,O0447,OffTheBus,Expands On,C1214,open platform campaign bureau,my open platform campaign bureau idea this way,1,2026-05-27
+RECORD-00842_REL_013,RECORD-00842,O0447,OffTheBus,Discusses,E0433,First YouTube/CNN Presidential Debate,OffTheBus did cover the first YouTube debate with the candidates,1,2026-05-27
 RECORD-00842_REL_014,RECORD-00842,E0433,First YouTube/CNN Presidential Debate,Occurred At,L0262,Charleston,"We had a team in Charleston, one at headquarters in New York",0.9,2026-05-27
 RECORD-00842_REL_015,RECORD-00842,O0567,Spokesman-Review,Affiliated With,L0112,Spokane,the Spokesman-Review in Spokane,1,2026-05-27
-RECORD-00842_REL_016,RECORD-00842,W0826,OffTheBus,Discusses,O0897,Federal Election Commission,Our first features hundreds of people digging into the July 15th FEC filings by the campaigns,0.9,2026-05-27
+RECORD-00842_REL_016,RECORD-00842,O0447,OffTheBus,Discusses,O0897,Federal Election Commission,Our first features hundreds of people digging into the July 15th FEC filings by the campaigns,0.9,2026-05-27
 RECORD-00842_REL_017,RECORD-00842,P2639,Frank Sennett,Discusses,C1215,conflict of interest in journalism,"I do not think working journalists should donate to political causes and work on campaigns, however, because that amounts to a conflict of interest",1,2026-05-27
 RECORD-00843_REL_001,RECORD-00843,O0447,OffTheBus,Affiliated With,O0034,The Huffington Post,"It lives at the Huffington Post, but its focus is a lot tighter.",1,2026-05-27
 RECORD-00843_REL_002,RECORD-00843,O0447,OffTheBus,Discusses,E0248,2008 United States presidential election,OffTheBus is not about politics in some general sense; it's about the 2008 contest for president.,1,2026-05-27
@@ -9436,10 +9436,10 @@ RECORD-00847_REL_021,RECORD-00847,P1775,Lawrence Wilkerson,Affiliated With,P0774
 RECORD-00847_REL_022,RECORD-00847,P1775,Lawrence Wilkerson,Criticizes,O0448,Bush Administration,They are radical. They're not conservative. They've stolen my party and I would like my party back.,1,2026-05-27
 RECORD-00847_REL_023,RECORD-00847,P0005,Jay Rosen,Owns,O0033,PressThink,Jay Rosen teaches journalism at New York University and writes PressThink.,1,2026-05-27
 RECORD-00847_REL_024,RECORD-00847,P0005,Jay Rosen,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University,1,2026-05-27
-RECORD-00847_REL_025,RECORD-00847,P0005,Jay Rosen,Founded By,W0826,OffTheBus,"He is also co-publisher, with Arianna Huffington, of OffTheBus",1,2026-05-27
-RECORD-00847_REL_026,RECORD-00847,P0183,Arianna Huffington,Founded By,W0826,OffTheBus,"co-publisher, with Arianna Huffington, of OffTheBus",1,2026-05-27
-RECORD-00847_REL_027,RECORD-00847,W0826,OffTheBus,Published In,O0034,The Huffington Post,a citizen journalism project hosted at the Huffington Post and launched in partnership with NewAssignment.Net,1,2026-05-27
-RECORD-00847_REL_028,RECORD-00847,W0826,OffTheBus,Affiliated With,O0456,NewAssignment.Net,launched in partnership with NewAssignment.Net,1,2026-05-27
+RECORD-00847_REL_025,RECORD-00847,P0005,Jay Rosen,Founded By,O0447,OffTheBus,"He is also co-publisher, with Arianna Huffington, of OffTheBus",1,2026-05-27
+RECORD-00847_REL_026,RECORD-00847,P0183,Arianna Huffington,Founded By,O0447,OffTheBus,"co-publisher, with Arianna Huffington, of OffTheBus",1,2026-05-27
+RECORD-00847_REL_027,RECORD-00847,O0447,OffTheBus,Published In,O0034,The Huffington Post,a citizen journalism project hosted at the Huffington Post and launched in partnership with NewAssignment.Net,1,2026-05-27
+RECORD-00847_REL_028,RECORD-00847,O0447,OffTheBus,Affiliated With,O0456,NewAssignment.Net,launched in partnership with NewAssignment.Net,1,2026-05-27
 RECORD-00847_REL_029,RECORD-00847,P0014,George W. Bush,Affiliated With,O0448,Bush Administration,"the Bush administration, in the name of fighting terrorism, has put America on the radical path to ruin",1,2026-05-27
 RECORD-00847_REL_030,RECORD-00847,P0005,Jay Rosen,Originated By,C1193,Rollback of the press,"rolling back the press, making secrecy and opacity standard operating procedure",0.9,2026-05-27
 RECORD-00847_REL_031,RECORD-00847,P0005,Jay Rosen,Discusses,C1224,Repeal of empiricism,repealing the very principle of empiricism in matters of state,0.9,2026-05-27
@@ -9658,7 +9658,7 @@ RECORD-00856_REL_030,RECORD-00856,P0088,Barack Obama,Discusses,O0145,Chicago Tri
 RECORD-00856_REL_031,RECORD-00856,P0200,Mitt Romney,Mentions,C0724,Straight Talk Express,There's an incident with Mitt Romney to remind them what 'straight talk' sometimes means.,0.7,2026-05-27
 RECORD-00856_REL_032,RECORD-00856,C1242,Presumptive Credibility Bank,Expands On,C0698,Questions actually answered (QAA),"The currency in which reporters trade is questions actually answered, QAA. McCain simply realized that the QAA system allowed him to print money",1,2026-05-27
 RECORD-00856_REL_033,RECORD-00856,P0949,John McCain,Pioneered,C0698,Questions actually answered (QAA),"McCain simply realized that the QAA system allowed him to print money, as in: ask all the questions you want!",0.9,2026-05-27
-RECORD-00856_REL_034,RECORD-00856,P0348,Chuck Todd,Affiliated With,W0789,Meet the Press,"Then on Meet the Press, NBC's political director, Chuck Todd, explained",1,2026-05-27
+RECORD-00856_REL_034,RECORD-00856,P0348,Chuck Todd,Affiliated With,O0279,Meet the Press,"Then on Meet the Press, NBC's political director, Chuck Todd, explained",1,2026-05-27
 RECORD-00856_REL_035,RECORD-00856,P0949,John McCain,Affiliated With,O0045,Republican Party,more willing to criticize his own party than other Republicans,1,2026-05-27
 RECORD-00856_REL_036,RECORD-00856,P0949,John McCain,Affiliated With,E0224,2008 U.S. presidential campaign,presidential candidate McCain's coverage in the 2008 campaign,0.9,2026-05-27
 RECORD-00856_REL_037,RECORD-00856,P0088,Barack Obama,Affiliated With,E0224,2008 U.S. presidential campaign,One unanswered question about Barack Obama is whether he will have the confidence to take the General Petraeus approach,0.9,2026-05-27
@@ -9859,18 +9859,18 @@ RECORD-00876_REL_029,RECORD-00876,O1456,Congressional Budget Office,Discusses,C0
 RECORD-00876_REL_030,RECORD-00876,O1485,Drexel Burnham Lambert,Affiliated With,O1486,AIG Financial Products,He created the Financial Products division in 1987 with traders from soon-to-be disgraced Drexel Burnham Lambert,1,2026-05-27
 RECORD-00876_REL_031,RECORD-00876,E0456,2008 financial crisis and AIG bailout,Discusses,O1722,American International Group,running critique of the business press after the banking meltdown,0.9,2026-05-27
 RECORD-00876_REL_032,RECORD-00876,W0849,Ex-Chairman of A.I.G. Says Bailout Has Failed,Discusses,E0456,2008 financial crisis and AIG bailout,Ex-Chairman of A.I.G. Says Bailout Has Failed,1,2026-05-27
-RECORD-00878_REL_001,RECORD-00878,P0348,Chuck Todd,Affiliated With,W0789,Meet the Press,"Over at the 'Meet the Press' site, where NBC's Chuck Todd holds forth",1,2026-05-27
+RECORD-00878_REL_001,RECORD-00878,P0348,Chuck Todd,Affiliated With,O0279,Meet the Press,"Over at the 'Meet the Press' site, where NBC's Chuck Todd holds forth",1,2026-05-27
 RECORD-00878_REL_002,RECORD-00878,P0348,Chuck Todd,Affiliated With,O0221,NBC News,NBC's Chuck Todd holds forth,1,2026-05-27
-RECORD-00878_REL_003,RECORD-00878,W0789,Meet the Press,Owned By,O0221,NBC News,"'Meet the Press' site, where NBC's Chuck Todd holds forth",1,2026-05-27
+RECORD-00878_REL_003,RECORD-00878,O0279,Meet the Press,Owned By,O0221,NBC News,"'Meet the Press' site, where NBC's Chuck Todd holds forth",1,2026-05-27
 RECORD-00878_REL_004,RECORD-00878,P0348,Chuck Todd,Criticizes,C1264,Leave it there press,"These are people who live daily with 'the partisan divide,' a cliche they helped make into a cliche.",0.9,2026-05-27
 RECORD-00878_REL_005,RECORD-00878,P2658,Amy Walter,Discusses,C1265,Political polarization,"In our current Polarized America, is it possible for Americans to be unified on anything?",0.9,2026-05-27
 RECORD-00878_REL_006,RECORD-00878,C1264,Leave it there press,Expands On,C1266,False symmetry in political coverage,Every dubious truth claim you had to let pass because challenging it might interrupt the flow,0.8,2026-05-27
 RECORD-00878_REL_007,RECORD-00878,C1264,Leave it there press,Expands On,C0627,Savvy Style of Political Journalism,Every time you defaulted to 'will it work?' when the bigger question was 'is it so?',0.8,2026-05-27
 RECORD-00878_REL_008,RECORD-00878,C1266,False symmetry in political coverage,Discusses,C1265,Political polarization,Every time you described political polarization as symmetrical when it isn't.,0.95,2026-05-27
 RECORD-00878_REL_009,RECORD-00878,E0457,Planned Parenthood shooting in Colorado Springs,Occurred At,O1723,Planned Parenthood,a deranged man killed three people at a Planned Parenthood facility in Colorado,1,2026-05-27
-RECORD-00878_REL_010,RECORD-00878,W0789,Meet the Press,Discusses,E0457,Planned Parenthood shooting in Colorado Springs,We saw it play out last week after a deranged man killed three people at a Planned Parenthood facility in Colorado.,0.9,2026-05-27
-RECORD-00878_REL_011,RECORD-00878,W0789,Meet the Press,Discusses,E0458,San Bernardino shooting,"we saw it play out yesterday after we learned a Muslim married couple killed 14 in San Bernadino, CA",0.9,2026-05-27
-RECORD-00878_REL_012,RECORD-00878,W0986,The Daily Show,Criticizes,C1264,Leave it there press,Every time you laughed at the Daily Show's treatment of you with no companion sense of dread. (They're on to us.),0.85,2026-05-27
+RECORD-00878_REL_010,RECORD-00878,O0279,Meet the Press,Discusses,E0457,Planned Parenthood shooting in Colorado Springs,We saw it play out last week after a deranged man killed three people at a Planned Parenthood facility in Colorado.,0.9,2026-05-27
+RECORD-00878_REL_011,RECORD-00878,O0279,Meet the Press,Discusses,E0458,San Bernardino shooting,"we saw it play out yesterday after we learned a Muslim married couple killed 14 in San Bernadino, CA",0.9,2026-05-27
+RECORD-00878_REL_012,RECORD-00878,O0985,The Daily Show,Criticizes,C1264,Leave it there press,Every time you laughed at the Daily Show's treatment of you with no companion sense of dread. (They're on to us.),0.85,2026-05-27
 RECORD-00878_REL_013,RECORD-00878,E0116,White House Correspondents Dinner,Mentions,C1264,Leave it there press,Every eye you rolled at the humorless scolds who rage at the White House Correspondents dinner.,0.7,2026-05-27
 RECORD-00878_REL_014,RECORD-00878,C1264,Leave it there press,Originated By,O0033,PressThink,This post was originally published at PressThink.,1,2026-05-27
 RECORD-00878_REL_015,RECORD-00878,C1264,Leave it there press,Published In,O0691,HuffPost,Reposted at HuffPost from PressThink original,0.9,2026-05-27
@@ -9914,7 +9914,7 @@ RECORD-00882_REL_014,RECORD-00882,P2124,Adam Ragusea,Affiliated With,W0652,The P
 RECORD-00882_REL_015,RECORD-00882,W0652,The Pub,Published In,O1206,Current,Adam Ragusea hosts Current's weekly podcast The Pub,1,2026-05-27
 RECORD-00882_REL_016,RECORD-00882,P2124,Adam Ragusea,Affiliated With,O1325,Mercer University,a journalist in residence and visiting assistant professor at Mercer University's Center for Collaborative Journalism,1,2026-05-27
 RECORD-00882_REL_017,RECORD-00882,O1726,Pandora,Mentions,W1021,Serial,Pandora's botched announcement of an exclusive-but-not-really deal with Serial and This American Life,1,2026-05-27
-RECORD-00882_REL_018,RECORD-00882,O1726,Pandora,Mentions,W1022,This American Life,Pandora's botched announcement of an exclusive-but-not-really deal with Serial and This American Life,1,2026-05-27
+RECORD-00882_REL_018,RECORD-00882,O1726,Pandora,Mentions,O1043,This American Life,Pandora's botched announcement of an exclusive-but-not-really deal with Serial and This American Life,1,2026-05-27
 RECORD-00882_REL_019,RECORD-00882,P0273,Erik Wemple,Criticizes,O0002,The New York Times,Washington Post media blogger Erik Wemple's misguided criticism of the New York Times,1,2026-05-27
 RECORD-00882_REL_020,RECORD-00882,P0273,Erik Wemple,Affiliated With,O0023,The Washington Post,Washington Post media blogger Erik Wemple,1,2026-05-27
 RECORD-00882_REL_021,RECORD-00882,O1724,WBUR,Discusses,E0459,Boston 2024 Olympics bid,A series of polls showing anemic public support for Boston's 2024 Olympics bid may have played a role in that bid ultimately fizzling.,1,2026-05-27
@@ -10070,10 +10070,10 @@ RECORD-00892_REL_006,RECORD-00892,P0290,Dave Winer,Originated By,C1296,Myth of i
 RECORD-00892_REL_007,RECORD-00892,P0290,Dave Winer,Cites,W1041,"Jorn Barger, the NewsPage Network, and the Emergence of the Weblog Community","Dave cites Rudolf Amman's Jorn Barger, the NewsPage Network, and the Emergence of the Weblog Community.",1,2026-05-27
 RECORD-00892_REL_008,RECORD-00892,W1041,"Jorn Barger, the NewsPage Network, and the Emergence of the Weblog Community",Discusses,P2678,Jorn Barger,"Jorn Barger, the NewsPage Network, and the Emergence of the Weblog Community",1,2026-05-27
 RECORD-00892_REL_009,RECORD-00892,P2677,Rudolf Ammann,Originated By,W1041,"Jorn Barger, the NewsPage Network, and the Emergence of the Weblog Community","Rudolf Amman's Jorn Barger, the NewsPage Network, and the Emergence of the Weblog Community",1,2026-05-27
-RECORD-00892_REL_010,RECORD-00892,P2676,Beth Noveck,Affiliated With,O1738,Personal Democracy Forum,Beth Noveck is coming back to PDF to tell the conference how she's creating it for Obama.,0.9,2026-05-27
+RECORD-00892_REL_010,RECORD-00892,P2676,Beth Noveck,Affiliated With,E0077,Personal Democracy Forum,Beth Noveck is coming back to PDF to tell the conference how she's creating it for Obama.,0.9,2026-05-27
 RECORD-00892_REL_011,RECORD-00892,P2676,Beth Noveck,Affiliated With,P0088,Barack Obama,Beth Noveck is coming back to PDF to tell the conference how she's creating it for Obama.,0.9,2026-05-27
 RECORD-00892_REL_012,RECORD-00892,P0226,David Weinberger,Originated By,C1293,Transparency is the new objectivity,David Weinberger's gem at PDF: 'Transparency is the new objectivity.',1,2026-05-27
-RECORD-00892_REL_013,RECORD-00892,P0226,David Weinberger,Mentions,O1738,Personal Democracy Forum,David Weinberger's gem at PDF: 'Transparency is the new objectivity.',0.9,2026-05-27
+RECORD-00892_REL_013,RECORD-00892,P0226,David Weinberger,Mentions,E0077,Personal Democracy Forum,David Weinberger's gem at PDF: 'Transparency is the new objectivity.',0.9,2026-05-27
 RECORD-00892_REL_014,RECORD-00892,C1293,Transparency is the new objectivity,Expands On,C0659,The View from Nowhere,'Here's where I am coming from' is easier to trust than The View from Nowhere.,0.8,2026-05-27
 RECORD-00892_REL_015,RECORD-00892,C1294,Here's where I am coming from,Criticizes,C0659,The View from Nowhere,Here's where I am coming from is easier to trust than The View from Nowhere. (Jay's formulation.),1,2026-05-27
 RECORD-00892_REL_016,RECORD-00892,W1039,Rebooting the News,Criticizes,O0075,Twitter,"Since it's been corrupted by the Suggested Users List, maybe number of followers just needs to be erased from the user interface of Twitter.",1,2026-05-27
@@ -10179,7 +10179,7 @@ RECORD-00899_REL_007,RECORD-00899,W1059,The Afghanistan War Logs Released by Wik
 RECORD-00899_REL_008,RECORD-00899,W1058,From Judith Miller to Julian Assange,Discusses,P1043,Judith Miller,From Judith Miller to Julian Assange,1,2026-05-27
 RECORD-00899_REL_009,RECORD-00899,W1058,From Judith Miller to Julian Assange,Discusses,P2361,Julian Assange,From Judith Miller to Julian Assange,1,2026-05-27
 RECORD-00899_REL_010,RECORD-00899,P2361,Julian Assange,Founded By,O0783,Wikileaks,"Julian Assange, founder of Wikileaks",0.9,2026-05-27
-RECORD-00899_REL_011,RECORD-00899,E0467,Personal Democracy Forum flash conference on Wikileaks and Internet freedom,Affiliated With,O1738,Personal Democracy Forum,Personal Democracy Forum 'flash' conference on Wikileaks and Internet freedom,1,2026-05-27
+RECORD-00899_REL_011,RECORD-00899,E0467,Personal Democracy Forum flash conference on Wikileaks and Internet freedom,Affiliated With,E0077,Personal Democracy Forum,Personal Democracy Forum 'flash' conference on Wikileaks and Internet freedom,1,2026-05-27
 RECORD-00899_REL_012,RECORD-00899,O1750,EasyDNS,Supports,O0783,Wikileaks,The EasyDNS story is kind of inspiring,0.8,2026-05-27
 RECORD-00899_REL_013,RECORD-00899,C1311,Distributed eye on power,Discusses,O0783,Wikileaks,a distributed 'eye on power' system that includes the old press as one component part,1,2026-05-27
 RECORD-00900_REL_001,RECORD-00900,W1060,Rebooting the News #85,Discusses,P0290,Dave Winer,"Minimal blogging suite 'o tools: an update, and why Dave's doing this.",0.95,2026-05-27
@@ -10258,10 +10258,10 @@ RECORD-00755_REL_020,RECORD-00755,W1067,The Mutualized Future is Bright,Originat
 RECORD-00755_REL_021,RECORD-00755,O1754,Studio 20 at NYU,Affiliated With,O1313,New York University,Studio 20 at NYU... how he's trying to model a different kind of journalism education,1,2026-05-27
 RECORD-00755_REL_022,RECORD-00755,P2697,Neil Newhouse,Criticizes,C0041,Horse race journalism,Romney pollster Neil Newhouse: 'we're not going to let our campaign be dictated by fact-checkers.',0.7,2026-05-27
 RECORD-00755_REL_023,RECORD-00755,C0004,View from Nowhere,Expands On,C0094,Production of Innocence,production of innocence... view from nowhere — related Rosen concepts on press neutrality,0.8,2026-05-27
-RECORD-00781_REL_001,RECORD-00781,P1387,David Gregory,Affiliated With,W0789,Meet the Press,"David Gregory, the host of NBC's Meet the Press",1,2026-05-27
-RECORD-00781_REL_002,RECORD-00781,P0168,Jake Tapper,Affiliated With,W0904,This Week,Jake Tapper of ABC News... has instituted the after-the-show fact check on This Week,1,2026-05-27
-RECORD-00781_REL_003,RECORD-00781,W0789,Meet the Press,Published In,O0065,NBC,host of NBC's Meet the Press,1,2026-05-27
-RECORD-00781_REL_004,RECORD-00781,W0904,This Week,Published In,O0055,ABC News,Jake Tapper of ABC News... This Week,1,2026-05-27
+RECORD-00781_REL_001,RECORD-00781,P1387,David Gregory,Affiliated With,O0279,Meet the Press,"David Gregory, the host of NBC's Meet the Press",1,2026-05-27
+RECORD-00781_REL_002,RECORD-00781,P0168,Jake Tapper,Affiliated With,O1205,This Week,Jake Tapper of ABC News... has instituted the after-the-show fact check on This Week,1,2026-05-27
+RECORD-00781_REL_003,RECORD-00781,O0279,Meet the Press,Published In,O0065,NBC,host of NBC's Meet the Press,1,2026-05-27
+RECORD-00781_REL_004,RECORD-00781,O1205,This Week,Published In,O0055,ABC News,Jake Tapper of ABC News... This Week,1,2026-05-27
 RECORD-00781_REL_005,RECORD-00781,W0813,Face the Nation,Published In,O0419,CBS News,"The CBS News Sunday show, Face the Nation",1,2026-05-27
 RECORD-00781_REL_006,RECORD-00781,W0722,Reliable Sources,Published In,O0015,CNN,"Howard Kurtz... endorses the simple fix on his CNN program, Reliable Sources",1,2026-05-27
 RECORD-00781_REL_007,RECORD-00781,P0005,Jay Rosen,Affiliated With,O1313,New York University,NYU journalism professor Jay Rosen,1,2026-05-27
@@ -10272,19 +10272,19 @@ RECORD-00781_REL_011,RECORD-00781,P0005,Jay Rosen,Criticizes,P1387,David Gregory
 RECORD-00781_REL_012,RECORD-00781,P1387,David Gregory,Criticizes,C1318,Midweek fact check,there's no need to fact check what his guests say on the air because viewers can do that on their own terms,1,2026-05-27
 RECORD-00781_REL_013,RECORD-00781,P0168,Jake Tapper,Supports,C1318,Midweek fact check,"ABC News announces that its Sunday show, This Week, hosted by Jake Tapper, will fact check what its guests say by collaborating with Politifact.com",1,2026-05-27
 RECORD-00781_REL_014,RECORD-00781,P0068,Howard Kurtz,Supports,C1318,Midweek fact check,"Howard Kurtz, media reporter for the Washington Post, endorses the simple fix on his CNN program, Reliable Sources",1,2026-05-27
-RECORD-00781_REL_015,RECORD-00781,W0904,This Week,Affiliated With,W1071,PolitiFact,This Week... will fact check what its guests say by collaborating with Politifact.com,1,2026-05-27
+RECORD-00781_REL_015,RECORD-00781,O1205,This Week,Affiliated With,W1071,PolitiFact,This Week... will fact check what its guests say by collaborating with Politifact.com,1,2026-05-27
 RECORD-00781_REL_016,RECORD-00781,P0764,Scott McClellan,Criticizes,E0004,Iraq War,Scott McClellan was wrong to charge the press with insufficient skepticism in examining the case for war in Iraq,0.9,2026-05-27
 RECORD-00781_REL_017,RECORD-00781,P1387,David Gregory,Criticizes,P0764,Scott McClellan,David Gregory on Hardball says that former Bush press secretary Scott McClellan was wrong,1,2026-05-27
 RECORD-00781_REL_018,RECORD-00781,P0763,Stephen Colbert,Criticizes,P1387,David Gregory,David Gregory comes in for some merciless ribbing... David Gregory has rejected this hare-brained scheme,1,2026-05-27
 RECORD-00781_REL_019,RECORD-00781,P0763,Stephen Colbert,Mentions,W1072,My Simple Fix for the Sunday Shows,Colbert mentions my Simple Fix post (calling me Field Marshall Thesarus for certain features of my writing style),1,2026-05-27
 RECORD-00781_REL_020,RECORD-00781,P1803,Michael Calderone,Discusses,C1318,Midweek fact check,"Michael Calderone, the media beat reporter for The Politico, examines the depressed state of the Sunday shows",1,2026-05-27
 RECORD-00781_REL_021,RECORD-00781,P0102,Brian Stelter,Discusses,C1318,Midweek fact check,Brian Stelter of the New York Times reports on the news from Tapper and This Week,1,2026-05-27
-RECORD-00781_REL_022,RECORD-00781,P2583,Betsy Fischer,Affiliated With,W0789,Meet the Press,"Betsy Fischer, executive producer of Meet the Press",1,2026-05-27
+RECORD-00781_REL_022,RECORD-00781,P2583,Betsy Fischer,Affiliated With,O0279,Meet the Press,"Betsy Fischer, executive producer of Meet the Press",1,2026-05-27
 RECORD-00781_REL_023,RECORD-00781,P2381,Michelle Bachmann,Mentions,W0813,Face the Nation,"Face the Nation, is forced to fact check Republican Congresswoman Michelle Bachmann after a series of bizarre claims",1,2026-05-27
-RECORD-00781_REL_024,RECORD-00781,P0949,John McCain,Mentions,W0789,Meet the Press,the Washington politician who's been on Meet the Press more than any other is John McCain,1,2026-05-27
-RECORD-00781_REL_025,RECORD-00781,P1020,Tim Russert,Affiliated With,W0789,Meet the Press,heir to the chair that Tim Russert held,1,2026-05-27
+RECORD-00781_REL_024,RECORD-00781,P0949,John McCain,Mentions,O0279,Meet the Press,the Washington politician who's been on Meet the Press more than any other is John McCain,1,2026-05-27
+RECORD-00781_REL_025,RECORD-00781,P1020,Tim Russert,Affiliated With,O0279,Meet the Press,heir to the chair that Tim Russert held,1,2026-05-27
 RECORD-00781_REL_026,RECORD-00781,P1429,Bob Schieffer,Affiliated With,W0813,Face the Nation,Bob Schieffer at Face the Nation,1,2026-05-27
-RECORD-00781_REL_027,RECORD-00781,P2140,George Stephanopoulos,Affiliated With,W0904,This Week,This Week with George Stephanopoulos on ABC will get a new host,1,2026-05-27
+RECORD-00781_REL_027,RECORD-00781,P2140,George Stephanopoulos,Affiliated With,O1205,This Week,This Week with George Stephanopoulos on ABC will get a new host,1,2026-05-27
 RECORD-00781_REL_028,RECORD-00781,P2164,Bill Adair,Affiliated With,W1071,PolitiFact,Jake Tapper and Bill Adair of Politifact are guests on the Colbert Report,1,2026-05-27
 RECORD-00781_REL_029,RECORD-00781,P0068,Howard Kurtz,Affiliated With,O0023,The Washington Post,"Howard Kurtz, media reporter for the Washington Post",1,2026-05-27
 RECORD-00781_REL_030,RECORD-00781,P1880,Brian Williams,Affiliated With,O0065,NBC,The NBC newsman tells TIME magazine,1,2026-05-27
@@ -10340,7 +10340,7 @@ RECORD-00819_REL_029,RECORD-00819,P1043,Judith Miller,Discusses,C1323,Weapons of
 RECORD-00819_REL_030,RECORD-00819,P0005,Jay Rosen,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University,1,2026-05-27
 RECORD-00819_REL_031,RECORD-00819,E0004,Iraq War,Occurred At,L0002,Iraq,During the Iraq war... embedded in Iraq in 2003,1,2026-05-27
 RECORD-00819_REL_032,RECORD-00819,P0865,William Jackson,Affiliated With,O0025,Editor & Publisher,William Jackson of Editor & Publisher,1,2026-05-27
-RECORD-00819_REL_033,RECORD-00819,W1077,Romenesko,Published In,O0309,Poynter Institute,letter at Romenesko,0.9,2026-05-27
+RECORD-00819_REL_033,RECORD-00819,O0035,Romenesko,Published In,O0309,Poynter Institute,letter at Romenesko,0.9,2026-05-27
 RECORD-00875_REL_001,RECORD-00875,P1385,Daniel C. Hallin,Pioneered,W1078,The Uncensored War: The Media and Vietnam,"in its original form, from the 1986 book The Uncensored War by press scholar Daniel C. Hallin",1,2026-05-27
 RECORD-00875_REL_002,RECORD-00875,C0436,Sphere of Consensus,Originated By,P1385,Daniel C. Hallin,Label the doughnut hole 'sphere of consensus.',1,2026-05-27
 RECORD-00875_REL_003,RECORD-00875,C0435,Sphere of Legitimate Debate,Originated By,P1385,Daniel C. Hallin,Call the middle region 'sphere of legitimate debate',1,2026-05-27
@@ -10348,18 +10348,18 @@ RECORD-00875_REL_004,RECORD-00875,C0437,Sphere of Deviance,Originated By,P1385,D
 RECORD-00875_REL_005,RECORD-00875,C0436,Sphere of Consensus,Published In,W1078,The Uncensored War: The Media and Vietnam,"Here it is in its original form, from the 1986 book The Uncensored War",1,2026-05-27
 RECORD-00875_REL_006,RECORD-00875,C0435,Sphere of Legitimate Debate,Published In,W1078,The Uncensored War: The Media and Vietnam,"Here it is in its original form, from the 1986 book The Uncensored War",1,2026-05-27
 RECORD-00875_REL_007,RECORD-00875,C0437,Sphere of Deviance,Published In,W1078,The Uncensored War: The Media and Vietnam,"Here it is in its original form, from the 1986 book The Uncensored War",1,2026-05-27
-RECORD-00875_REL_008,RECORD-00875,W1079,Washington Week,Affiliated With,O0003,PBS,Perhaps the purest expression of this sphere is Washington Week on PBS,1,2026-05-27
-RECORD-00875_REL_009,RECORD-00875,W1079,Washington Week,Discusses,C0435,Sphere of Legitimate Debate,"Perhaps the purest expression of this sphere is Washington Week on PBS, where journalists discuss what the two-party system defines as 'the issues.'",0.9,2026-05-27
+RECORD-00875_REL_008,RECORD-00875,O0875,Washington Week,Affiliated With,O0003,PBS,Perhaps the purest expression of this sphere is Washington Week on PBS,1,2026-05-27
+RECORD-00875_REL_009,RECORD-00875,O0875,Washington Week,Discusses,C0435,Sphere of Legitimate Debate,"Perhaps the purest expression of this sphere is Washington Week on PBS, where journalists discuss what the two-party system defines as 'the issues.'",0.9,2026-05-27
 RECORD-00875_REL_010,RECORD-00875,C0231,"He Said, She Said Journalism",Expands On,C0435,Sphere of Legitimate Debate,"He said, she said journalism is like the bad seed of this sphere, but also a logical outcome of it.",0.9,2026-05-27
 RECORD-00875_REL_011,RECORD-00875,P1386,David Brody,Affiliated With,O0820,Christian Broadcasting Network,David Brody of Christian Broadcasting Network shows up on Meet the Press,1,2026-05-27
-RECORD-00875_REL_012,RECORD-00875,P1386,David Brody,Mentions,W0789,Meet the Press,David Brody of Christian Broadcasting Network shows up on Meet the Press,1,2026-05-27
+RECORD-00875_REL_012,RECORD-00875,P1386,David Brody,Mentions,O0279,Meet the Press,David Brody of Christian Broadcasting Network shows up on Meet the Press,1,2026-05-27
 RECORD-00875_REL_013,RECORD-00875,P0587,Amy Goodman,Affiliated With,O0821,Democracy Now,Amy Goodman of Democracy Now never does.,1,2026-05-27
 RECORD-00875_REL_014,RECORD-00875,P2700,Pat Robertson,Founded By,O0820,Christian Broadcasting Network,Pat Robertson's CBN is now within the sphere of legitimate debate,0.9,2026-05-27
 RECORD-00875_REL_015,RECORD-00875,P0318,Glenn Greenwald,Affiliated With,O0030,Salon,"Glenn Greenwald, with a link to salon.com/opinion/greenwald/2009/01/08/israel",1,2026-05-27
 RECORD-00875_REL_016,RECORD-00875,P0318,Glenn Greenwald,Criticizes,C0435,Sphere of Legitimate Debate,if you dissent from the 'lockstep behavior of both major American political parties when it comes to Israel' (Glenn Greenwald),0.8,2026-05-27
 RECORD-00875_REL_017,RECORD-00875,P0014,George W. Bush,Mentions,E0004,Iraq War,When political journalists failed properly to examine George W. Bush's case for war in Iraq,1,2026-05-27
 RECORD-00875_REL_018,RECORD-00875,E0004,Iraq War,Discusses,C0436,Sphere of Consensus,They treated Bush's plan as part of the sphere of consensus.,0.9,2026-05-27
-RECORD-00875_REL_019,RECORD-00875,P1387,David Gregory,Affiliated With,W0789,Meet the Press,"David Gregory, now host of Meet the Press, did say to his enduring shame.",1,2026-05-27
+RECORD-00875_REL_019,RECORD-00875,P1387,David Gregory,Affiliated With,O0279,Meet the Press,"David Gregory, now host of Meet the Press, did say to his enduring shame.",1,2026-05-27
 RECORD-00875_REL_020,RECORD-00875,P0485,Leonard Downie Jr.,Affiliated With,O0023,The Washington Post,"As Len Downie, former editor of the Washington Post once said",1,2026-05-27
 RECORD-00875_REL_021,RECORD-00875,P0485,Leonard Downie Jr.,Discusses,C0435,Sphere of Legitimate Debate,'We think it's important informationally. We are not allowing ourselves to think politically.',0.8,2026-05-27
 RECORD-00875_REL_022,RECORD-00875,P2701,Atrios (Duncan Black),Criticizes,C0435,Sphere of Legitimate Debate,Atrios... has a more colorful phrase for 'maintaining boundaries around the sphere of legitimate debate.',0.9,2026-05-27

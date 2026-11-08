@@ -16,6 +16,7 @@ The regression cases the issue asks for are pinned here:
 
 import importlib.util
 import json
+import re
 from pathlib import Path
 
 # The module lives in backend/scripts/, which is not an importable package, so
@@ -38,6 +39,10 @@ ARCHIVE_CSV = _REPO_ROOT / "data" / "archive_records-public.csv"
 CHECKED_IN_REPORT = (
     _REPO_ROOT / "backend" / "inventories" / "pressthink-2004-2008" / "gap-report.json"
 )
+SHARED_OPENING_AUDIT = (
+    _REPO_ROOT / "docs" / "research" / "2026-11-shared-opening-raw-text-audit.md"
+)
+_RECORD_ID = re.compile(r"[A-Z]+-\d{5}")
 
 
 def _record(record_id, title, url, publication_date, raw_text="", excerpt=""):
@@ -1091,6 +1096,76 @@ def test_the_real_archive_csv_produces_usable_fingerprints():
     # read first
     assert not set(index.by_fingerprint) & index.ambiguous_fingerprints
     assert all(len(p.split()) == gap.FINGERPRINT_WORDS for p in index.by_fingerprint)
+
+
+def test_load_archive_rows_reads_the_records_csv_parse_reads(tmp_path):
+    # The archive CSV keeps bare-LF newlines inside CRLF records. Python's csv
+    # module ends a record at the bare LF, which splits one record into a
+    # truncated row and a phantom row. The exporter, the tests and the site
+    # all read the file with csv-parse, so the matcher must read what they read.
+    path = tmp_path / "awkward.csv"
+    path.write_bytes(
+        (
+            "id,title,raw_text\r\n"
+            "R1,One,plain\r\n"
+            "R2,Two,line one\nline two\r\n"
+            'R3,Three,"has, a comma"\r\n'
+        ).encode("utf-8")
+    )
+    rows = gap.load_archive_rows(path)
+    assert [row["id"] for row in rows] == ["R1", "R2", "R3"]
+    assert rows[1]["raw_text"] == "line one\nline two"
+
+
+def test_load_archive_rows_resolves_a_relative_path_from_the_callers_directory(
+    tmp_path, monkeypatch
+):
+    # Node runs from the repository root to find csv-parse. A relative path
+    # must still name the file in the caller's working directory.
+    (tmp_path / "rel.csv").write_bytes(b"id,title\r\nR1,One\r\n")
+    monkeypatch.chdir(tmp_path)
+    rows = gap.load_archive_rows(Path("rel.csv"))
+    assert [row["id"] for row in rows] == ["R1"]
+
+
+def test_load_archive_rows_reads_every_real_record_whole():
+    rows = gap.load_archive_rows(ARCHIVE_CSV)
+    malformed = [
+        row.get("id") for row in rows if not _RECORD_ID.fullmatch(row.get("id") or "")
+    ]
+    assert malformed == []
+    ids = [row["id"] for row in rows]
+    assert len(ids) == len(set(ids))
+
+
+def _shared_opening_groups(rows: list[dict]) -> dict[str, set[str]]:
+    """Fingerprints that more than one archive row claims, with their rows."""
+    owners: dict[str, set[str]] = {}
+    for row in rows:
+        title = (row.get("title") or "").strip()
+        for print_ in gap._record_fingerprints(row, title):
+            owners.setdefault(print_, set()).add(row["id"])
+    return {p: ids for p, ids in owners.items() if len(ids) > 1}
+
+
+def test_every_shared_opening_in_the_archive_is_classified_in_the_audit():
+    # The fingerprint tier drops a twelve-word opening that two rows share. Each
+    # such group was classified by hand in the #864 audit. A new group means a
+    # new duplicate, boilerplate prefix or misattached text, so it must be
+    # looked at and added to the audit rather than dropped silently.
+    rows = gap.load_archive_rows(ARCHIVE_CSV)
+    index = gap.build_archive_index(rows)
+    groups = _shared_opening_groups(rows)
+    assert set(groups) == set(index.ambiguous_fingerprints)
+
+    audit = SHARED_OPENING_AUDIT.read_text(encoding="utf-8")
+    unaudited = sorted(
+        record_id
+        for ids in groups.values()
+        for record_id in ids
+        if f"`{record_id}`" not in audit
+    )
+    assert unaudited == []
 
 
 def test_the_checked_in_report_never_lets_two_works_claim_one_row():

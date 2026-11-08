@@ -242,6 +242,20 @@ describe('desktop archive adapter', () => {
       'desktop record reading uses the canonical RecordView overlay');
   });
 
+  // #861: the opt-in search-by-meaning switch reaches desktop Archive and
+  // Folders through the shared filter panel. Every other desktop archive
+  // control draws the shell's focus ring, so the switch and its help button
+  // must too, or a keyboard reader loses track of them inside the window.
+  it('gives the semantic search toggle the desktop focus ring', () => {
+    const css = read('frontend/desktop/desktop.css');
+    const rule = css.match(/([^{}]*)\{\s*outline:\s*3px solid var\(--desktop-focus\);[^}]*\}/g) || [];
+    const selectors = rule.map((block) => block.slice(0, block.indexOf('{'))).join(',');
+    assert.match(selectors, /\.desktop-archive-panel \.archive-semantic-toggle input:focus-visible/,
+      'the semantic checkbox must take the desktop focus ring');
+    assert.match(selectors, /\.desktop-archive-panel \.archive-semantic-toggle__help:focus-visible/,
+      'the semantic help button must take the desktop focus ring');
+  });
+
   it('loads the corpus only for real desktop record apps', () => {
     const app = read('frontend/App.js');
     const desktopFiles = [
