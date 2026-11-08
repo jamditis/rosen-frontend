@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen&apos;s Internet Archive</title>
-    <dateCreated>Sat, 07 Nov 2026 22:22:27 GMT</dateCreated>
-    <dateModified>Sat, 07 Nov 2026 22:22:27 GMT</dateModified>
+    <dateCreated>Sun, 08 Nov 2026 18:48:19 GMT</dateCreated>
+    <dateModified>Sun, 08 Nov 2026 18:48:19 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -356,7 +356,9 @@
         <outline text="The plan is to have no plan" type="link" url="https://www.adbusters.org/article/the-plan-is-to-have-no-plan" created="2020-05-04"/>
       </outline>
       <outline text="Platform Transition &amp; Future Models (2021-Present)" type="category">
+        <outline text="Review | ‘The Vivisectors’ by Missouri Williams: the violence of understanding others" type="link" url="https://www.thehindu.com/books/books-reviews/the-vivisectors-author-missouri-williams-booker-prize-longlisted/article71648830.ece" created="2026-11-06"/>
         <outline text="Bluesky’s new CEO wants a big tent, not a bubble..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mzj224rfrc2v" created="2026-11-04"/>
+        <outline text="Going Digital: The People Formerly Known as the Audience" type="link" url="https://thepoint.com.au/opinions/261030-going-digital-the-people-formerly-known-as-the-audience" created="2026-11-02"/>
         <outline text="Hmmm..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mysoyejl722c" created="2026-10-26"/>
         <outline text="Thanks for those numbers..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3myiz4p7vyk2o" created="2026-10-23"/>
         <outline text="In the end, barely $13 of your $100 buys real airtime or digital ads..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3myipw7smts2q" created="2026-10-22"/>
@@ -406,12 +408,12 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="Bangor Daily News and the view from nowhere" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mukygfarxc2f" created="2026-09-02"/>
         <outline text="Reporting on the OpenAI and Hugging Face incident" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3muhw545o6c2a" created="2026-09-01"/>
         <outline text="Opinion writers, audiences, and newsroom managers" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3muctmvtwj22p" created="2026-08-30"/>
-        <outline text="A reader&apos;s comparison with George Lakoff" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mu45rrmmm22q" created="2026-08-28"/>
-        <outline text="A media studies doctorate and a journalism teaching career" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mu3ccpg7fs2j" created="2026-08-27"/>
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23662)" type="category">
+      <outline text="Press &amp; Media Criticism (23664)" type="category">
+        <outline text="Review | ‘The Vivisectors’ by Missouri Williams: the violence of understanding others" type="link" url="https://www.thehindu.com/books/books-reviews/the-vivisectors-author-missouri-williams-booker-prize-longlisted/article71648830.ece"/>
+        <outline text="Going Digital: The People Formerly Known as the Audience" type="link" url="https://thepoint.com.au/opinions/261030-going-digital-the-people-formerly-known-as-the-audience"/>
         <outline text="Margaret Sullivan grades midterm coverage" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxtriyyquk2o"/>
         <outline text="Exposure and accountability as different political tasks" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxttuf5qps2x"/>
         <outline text="An emergency setting for Trump coverage" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxrotujt3s2t"/>
@@ -437,10 +439,9 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="The propaganda risks of a media merger" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mvxpj67vac2y"/>
         <outline text="News marketing and the promise of insider access" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mvve6hphnc23"/>
         <outline text="Two meanings of journalism&apos;s inner circle" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mvve6lehrs23"/>
-        <outline text="Commercialization, gatekeepers, and internet distribution" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mvvkvfpqp22p"/>
-        <outline text="Which newsrooms make up the national mainstream press?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mvtaf7b3ck23"/>
       </outline>
-      <outline text="Journalism Theory &amp; Practice (8381)" type="category">
+      <outline text="Journalism Theory &amp; Practice (8382)" type="category">
+        <outline text="Review | ‘The Vivisectors’ by Missouri Williams: the violence of understanding others" type="link" url="https://www.thehindu.com/books/books-reviews/the-vivisectors-author-missouri-williams-booker-prize-longlisted/article71648830.ece"/>
         <outline text="Exposure and accountability as different political tasks" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxttuf5qps2x"/>
         <outline text="Where can readers find the citizens agenda itself?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxes3td4oc25"/>
         <outline text="The argument is not that earlier criticism never existed" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mx3mip5rps2r"/>
@@ -467,7 +468,6 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="Why The Ubyssey is covering the World Cup" type="link" url="https://ubyssey.ca/margins/world-cup-coverage/"/>
         <outline text="Finally..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog4ns5tvk22"/>
         <outline text="One thing to keep your eye on as Paramount takes control:  what happen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modgj3bfys2l"/>
-        <outline text="The post says keep an eye on what happens to fact checking at CNN." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modin76wac22"/>
       </outline>
       <outline text="Politics &amp; Democracy (7818)" type="category">
         <outline text="Margaret Sullivan grades midterm coverage" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxtriyyquk2o"/>
@@ -498,7 +498,8 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="What are your top issues in November’s elections? Inform Roanoke Times coverage" type="link" url="https://roanoke.com/news/local/government-politics/elections/article_8d00487d-2a84-492b-abb3-57af9d25727e.html"/>
         <outline text="The New York Times:..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3msma664idk2u"/>
       </outline>
-      <outline text="Audience &amp; Public Engagement (3784)" type="category">
+      <outline text="Audience &amp; Public Engagement (3785)" type="category">
+        <outline text="Going Digital: The People Formerly Known as the Audience" type="link" url="https://thepoint.com.au/opinions/261030-going-digital-the-people-formerly-known-as-the-audience"/>
         <outline text="Helping the web archive itself" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxotyhnjks23"/>
         <outline text="Where can readers find the citizens agenda itself?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxes3td4oc25"/>
         <outline text="Josh Marshall on platform audiences" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mw5bvzhlvs27"/>
@@ -523,10 +524,10 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="Got an example you want to share?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3sfytnjh22v"/>
         <outline text="Thank you!" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3i6g4eopc2b"/>
         <outline text="From my latest post" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36gxcpdsk2v"/>
-        <outline text="Interesting idea" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35vskmbps2j"/>
       </outline>
-      <outline text="Technology &amp; Digital Media (2963)" type="category">
+      <outline text="Technology &amp; Digital Media (2964)" type="category">
         <outline text="Bluesky’s new CEO wants a big tent, not a bubble..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mzj224rfrc2v"/>
+        <outline text="Going Digital: The People Formerly Known as the Audience" type="link" url="https://thepoint.com.au/opinions/261030-going-digital-the-people-formerly-known-as-the-audience"/>
         <outline text="Hmmm..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mysoyejl722c"/>
         <outline text="Thanks for those numbers..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3myiz4p7vyk2o"/>
         <outline text="In the end, barely $13 of your $100 buys real airtime or digital ads..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3myipw7smts2q"/>
@@ -550,7 +551,6 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="How does the app know that a news article maybe need a correction?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo53zqc3qk2j"/>
         <outline text="From @status.news Paramount boss David Ellison also recently took the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo3z6kxclk25"/>
         <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnzhtopyfk2y"/>
-        <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnxuigz7p223"/>
       </outline>
       <outline text="Journalism Education (686)" type="category">
         <outline text="A media studies doctorate and a journalism teaching career" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mu3ccpg7fs2j"/>

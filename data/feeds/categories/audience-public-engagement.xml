@@ -5,9 +5,19 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records in the &quot;Audience &amp; Public Engagement&quot; category</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 07 Nov 2026 22:22:27 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 08 Nov 2026 18:48:19 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/categories/audience-public-engagement.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Going Digital: The People Formerly Known as the Audience</title>
+    <link>https://thepoint.com.au/opinions/261030-going-digital-the-people-formerly-known-as-the-audience</link>
+    <guid isPermaLink="true">https://thepoint.com.au/opinions/261030-going-digital-the-people-formerly-known-as-the-audience</guid>
+    <pubDate>Mon, 02 Nov 2026 00:00:00 GMT</pubDate>
+    <description>In an extract from her book on the ABC under Mark Scott, Margaret Simons traces Scott’s debt to Jay Rosen: public journalism, the citizens’ agenda, and “the people formerly known as the audience.” She recounts Rosen’s 2010 Lateline interview with Leigh Sales, where he criticised horse-race coverage and the “cult of the savvy” and questioned a Sunday program called Insiders, which she notes survived his disapproval.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Audience &amp; Public Engagement</category>
+    <category>Technology &amp; Digital Media</category>
+  </item>
   <item>
     <title>Helping the web archive itself</title>
     <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mxotyhnjks23</link>
@@ -452,15 +462,6 @@
     <pubDate>Wed, 08 Oct 2025 00:00:00 GMT</pubDate>
     <description>A Twitter/X post by Jay Rosen from 2025-10-08. Topics: Press &amp; Media Criticism, Audience &amp; Public Engagement.</description>
     <category>Press &amp; Media Criticism</category>
-    <category>Audience &amp; Public Engagement</category>
-  </item>
-  <item>
-    <title>Congrats, Lawrence! And relax</title>
-    <link>https://x.com/jayrosen_nyu/status/1975945649146548275</link>
-    <guid isPermaLink="true">https://x.com/jayrosen_nyu/status/1975945649146548275</guid>
-    <pubDate>Wed, 08 Oct 2025 00:00:00 GMT</pubDate>
-    <description>A Twitter/X post by Jay Rosen from 2025-10-08. Topics: Journalism Education, Audience &amp; Public Engagement.</description>
-    <category>Journalism Education</category>
     <category>Audience &amp; Public Engagement</category>
   </item>
   </channel>

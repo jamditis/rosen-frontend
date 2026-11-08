@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { html } from '../html.js?v=3.8.66';
+import { html } from '../html.js?v=3.8.67';
 import { Sparkles } from 'lucide-react';
-import SemanticSearchHelpDialog from './SemanticSearchHelpDialog.js?v=3.8.66';
+import SemanticSearchHelpDialog from './SemanticSearchHelpDialog.js?v=3.8.67';
 
 /**
  * Short line for the archive's live region, announced when the semantic state
