@@ -34,3 +34,41 @@ describe('one default filter object (item 26)', () => {
     assert.doesNotMatch(app, /^\s+search: '',\n\s+categories: \[\],/m);
   });
 });
+
+describe('Back keeps the standard archive filters (item 8)', async () => {
+  const { filtersForHistoryEntry } = await import('../frontend/services/viewState.js');
+  const BASE = 'https://pressthink.org/j/rosen-archive/';
+  const RECORD_APPS = new Set(['archive', 'folders', 'entities', 'start', 'findings']);
+
+  it('keeps the live filters when Back lands on a standard route', () => {
+    // The standard archive never writes its filters to the URL, so its history
+    // entries carry none. Restoring from them would clear the reader's search.
+    assert.equal(filtersForHistoryEntry(BASE, RECORD_APPS), null);
+    assert.equal(filtersForHistoryEntry(`${BASE}#folders`, RECORD_APPS), null);
+    assert.equal(filtersForHistoryEntry(`${BASE}#about`, RECORD_APPS), null);
+    assert.equal(filtersForHistoryEntry(`${BASE}?record=RECORD-00001`, RECORD_APPS), null);
+  });
+
+  it('keeps the live filters on desktop windows that do not write them', () => {
+    assert.equal(filtersForHistoryEntry(`${BASE}#desktop`, RECORD_APPS), null);
+    assert.equal(filtersForHistoryEntry(`${BASE}#desktop/tools`, RECORD_APPS), null);
+  });
+
+  it('restores the query-backed filters of a desktop record window', () => {
+    const restored = filtersForHistoryEntry(
+      `${BASE}?q=view+from+nowhere&cat=Press+%26+Media+Criticism#desktop/archive`,
+      RECORD_APPS,
+    );
+    assert.equal(restored.search, 'view from nowhere');
+    assert.deepEqual(restored.categories, ['Press & Media Criticism']);
+    // An empty desktop query is still a recorded state: clear what is live.
+    assert.equal(filtersForHistoryEntry(`${BASE}#desktop/folders`, RECORD_APPS).search, '');
+  });
+
+  it('App.js restores filters on popstate only when the entry carries them', () => {
+    const popstate = app.slice(app.indexOf("event?.type === 'popstate'"));
+    const branch = popstate.slice(0, popstate.indexOf('const recordId = getRecordIdFromUrl()'));
+    assert.match(branch, /filtersForHistoryEntry\(window\.location\.href, DESKTOP_RECORD_APPS\)/);
+    assert.match(branch, /if \(historicalFilters\) \{\s*setFilters\(\{/);
+  });
+});

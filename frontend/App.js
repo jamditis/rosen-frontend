@@ -7,7 +7,7 @@ import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.70';
 import { withViewTransition } from './utils/viewTransition.js?v=3.8.70';
 import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.70';
 import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.70';
-import { defaultFilters, parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.70';
+import { defaultFilters, filtersForHistoryEntry, parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.70';
 import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.70';
 import { canonicalRecordUrl, setRecordParam } from './utils/recordDeepLink.js?v=3.8.70';
 import {
@@ -326,18 +326,22 @@ const App = () => {
       setDesktopAppId(getDesktopAppIdFromUrl());
       setSelectedEntityId(getEntityIdFromUrl());
 
-      // Desktop filters replace the current history entry as their readable
-      // query string changes. Back/Forward must therefore restore those
-      // historical query-backed filters alongside the active window. Ordinary
-      // hash navigation keeps the live in-memory filters (standard archive
-      // filters are not URL-synchronised), while transient analytics recordIds
-      // intentionally clear because they are not part of the URL contract.
+      // Desktop record windows replace the current history entry as their
+      // readable query string changes, so Back/Forward onto one of those
+      // entries restores its query-backed filters alongside the active window
+      // (transient analytics recordIds clear there because they are not part
+      // of the URL contract). Every other entry carries no filters: the
+      // standard archive does not write them to the URL, so Back onto it, or
+      // onto any other route, keeps the live in-memory filters, just as
+      // ordinary hash navigation does.
       if (event?.type === 'popstate') {
-        const historicalState = parseViewState(window.location.href);
-        setFilters({
-          ...createDefaultFilters(),
-          ...historicalState.filters,
-        });
+        const historicalFilters = filtersForHistoryEntry(window.location.href, DESKTOP_RECORD_APPS);
+        if (historicalFilters) {
+          setFilters({
+            ...createDefaultFilters(),
+            ...historicalFilters,
+          });
+        }
       }
 
       const recordId = getRecordIdFromUrl();

@@ -293,7 +293,7 @@ describe('desktop archive adapter', () => {
     assert.match(app, /viewStateToUrl\(\{[\s\S]*route:\s*ROUTES\.desktop/);
     assert.match(app, /routeParams:\s*\{\s*desktopAppId,[\s\S]*?entityId:\s*selectedEntityId/);
     assert.match(app, /selectedRecord:\s*selectedRecordId/);
-    assert.match(app, /event\?\.type === 'popstate'[\s\S]*historicalState = parseViewState\(window\.location\.href\)[\s\S]*setFilters\(\{[\s\S]*\.\.\.createDefaultFilters\(\),[\s\S]*\.\.\.historicalState\.filters/,
+    assert.match(app, /event\?\.type === 'popstate'[\s\S]*historicalFilters = filtersForHistoryEntry\(window\.location\.href, DESKTOP_RECORD_APPS\)[\s\S]*setFilters\(\{[\s\S]*\.\.\.createDefaultFilters\(\),[\s\S]*\.\.\.historicalFilters/,
       'Back and Forward must restore the query-backed filters recorded in desktop history');
     assert.match(app, /desktopAppId === 'entities' && selectedEntityId \? \{ entityId: selectedEntityId \} : \{\}/,
       'a selected entity must share the canonical desktop view-state URL');
