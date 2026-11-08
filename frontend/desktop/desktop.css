@@ -805,6 +805,8 @@
 .desktop-view-switch button:focus-visible,
 .desktop-filter-toggle:focus-visible,
 .desktop-sort-control select:focus-visible,
+.desktop-archive-panel .archive-semantic-toggle input:focus-visible,
+.desktop-archive-panel .archive-semantic-toggle__help:focus-visible,
 .desktop-archive-error button:focus-visible {
   outline: 3px solid var(--desktop-focus);
   outline-offset: 2px;
