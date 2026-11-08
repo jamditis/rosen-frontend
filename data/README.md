@@ -37,6 +37,7 @@ Counts verified 2026-07-23; they grow as records are added.
 | `social_posts.csv` | 29,747 | Social media posts: 26,114 Twitter/X (`TWTR-`), 3,117 Bluesky (`BSKY-`), 516 Mastodon (`MAST-`) |
 | `extracted_entities.csv` | 8,150 | Named entities: people, organizations, and concepts |
 | `extracted_relationships.csv` | 12,556 | Entity-to-record relationships with context snippets |
+| `entity-merges.csv` | 18 | Retired entity ids and the canonical id each one now resolves to (#874); published as `entityRedirects` in `archive-entities.json`. See `SCHEMA.md`. |
 
 A curated record's `related_to` cell is a list of record ids separated by `, `.
 Every id in it must name a row in `archive_records-public.csv` or
@@ -78,7 +79,7 @@ npm install          # first time only
 npm run export-data  # or: node data/export-archive-data.js
 ```
 
-The script reads the four source CSVs (plus `authored-excerpts.csv`), processes and links the records, and writes the JSON files listed above. It prints progress as it goes, including a row count for each CSV it reads.
+The script reads the four source CSVs (plus `authored-excerpts.csv` and `entity-merges.csv`), processes and links the records, and writes the JSON files listed above. It prints progress as it goes, including a row count for each CSV it reads.
 
 The legacy Python record-removal commands use the same Node CSV parser so they
 can preserve embedded newlines and untouched row bytes. Run `npm ci` from the

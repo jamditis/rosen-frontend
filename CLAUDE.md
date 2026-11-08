@@ -95,6 +95,9 @@ Source-row snapshot checked against repository data on **2026-11-08**. The [stew
 | `data/extracted_entities.csv` | 7,498 | Named entities (people, orgs, concepts) |
 | `data/extracted_relationships.csv` | 11,189 | Entity-to-entity assertions with source-record provenance |
 | `data/authored-excerpts.csv` | 17 | Optional summary overrides keyed by record ID; nonblank entries replace the record summary |
+| `data/entity-merges.csv` | 18 | Retired entity IDs and the canonical ID each was merged into; exported as `entityRedirects` in `archive-entities.json` |
+
+When two entities turn out to be the same thing, retire one: remove its row, fold its mentions into the canonical row, re-point its relationships, and append a row to `data/entity-merges.csv`. Never reuse a retired ID. `data/fixes/apply-2026-11-cross-type-merges.js` does all of this for names in `data/fixes/cross-type-duplicate-rules.js`; the open cross-type rulings are in `docs/research/2026-11-cross-type-entity-duplicates.md`.
 
 Submit new articles through the queued `submit-record.yml` workflow described in [ADDING-RECORDS.md](ADDING-RECORDS.md); it assigns `RECORD-*` IDs through the shared allocator. Manual CSV corrections retain existing IDs. Preserve [`data/record-id-sequence.json`](data/record-id-sequence.json), which records the allocator's high-water mark. Never infer the next ID from the last CSV row, a row count, or a fixed ID printed in documentation.
 
@@ -209,6 +212,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── extracted_entities.csv       # Named entities
 │   ├── extracted_relationships.csv  # Entity relationships
 │   ├── authored-excerpts.csv        # Optional curator-written summary overrides
+│   ├── entity-merges.csv            # Retired entity IDs -> canonical IDs
 │   ├── stewardship-census.md        # Source and publication coverage snapshot
 │   ├── export-archive-data.js       # JSON generator script
 │   ├── schema.json                  # Data schema
