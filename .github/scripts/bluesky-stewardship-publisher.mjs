@@ -541,10 +541,11 @@ function assertRemoteHeadUnchanged(root, startCommit, gitCommand = git) {
   }
 }
 
-// A retry runs this already-loaded publisher and the installed dependencies
-// against the new head. If main changed either, the retry would test something
-// other than what a fresh run would, so it is refused.
-const RETRY_UNSAFE_PATH = /^(?:package(?:-lock)?\.json$|backend\/(?:poetry\.lock|pyproject\.toml)$|\.gitattributes$|\.lfsconfig$|\.github\/)/;
+// A retry runs this already-loaded publisher, the modules it imports and the
+// installed dependencies against the new head. If main changed any of them, the
+// retry would test something other than what a fresh run would, so it is
+// refused. Keep the module paths in step with this file's local imports.
+export const RETRY_UNSAFE_PATH = /^(?:package(?:-lock)?\.json$|backend\/(?:poetry\.lock|pyproject\.toml)$|\.gitattributes$|\.lfsconfig$|\.github\/|scripts\/bump-version\.mjs$|workers\/source-discovery\/src\/)/;
 
 function moveAside(file) {
   if (!fs.existsSync(file)) return;

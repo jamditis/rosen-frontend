@@ -69,7 +69,9 @@ main branch. When main moves before the push, it fetches the new head, resets th
 checkout to it, captures the sources again, and reruns every build and test gate
 once before pushing. It skips that retry, and the run fails as `stale_remote_head`,
 when main moves a second time or the new commits change the package manifests or
-lockfiles, the LFS settings, or anything under `.github/`.
+lockfiles, the LFS settings, anything under `.github/`, or a module the running
+publisher has already loaded (`scripts/bump-version.mjs` and
+`workers/source-discovery/src/`).
 Certificate-verified FTPS uploads dependencies before release entry points and keeps
 the existing making-of publication hold. Live byte verification compares all public
 record payloads, search indexes, embedding pairs, relationship shards, committed

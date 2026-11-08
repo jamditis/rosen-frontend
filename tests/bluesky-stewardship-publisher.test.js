@@ -11,6 +11,7 @@ import {
   changedPaths,
   finalizePublication,
   postFailedReceipt,
+  RETRY_UNSAFE_PATH,
   rebaseOntoRemoteHead,
   run,
   runPreparation,
@@ -748,6 +749,8 @@ describe('rebasing a stale stewardship checkout', () => {
     'package-lock.json',
     'backend/poetry.lock',
     '.github/scripts/bluesky-stewardship-publisher.mjs',
+    'scripts/bump-version.mjs',
+    'workers/source-discovery/src/source-manifest.js',
   ]) {
     it(`refuses to retry when main changed ${file}`, (t) => {
       const fixture = remoteFixture(t);
@@ -763,4 +766,19 @@ describe('rebasing a stale stewardship checkout', () => {
       assert.equal(fixture.state.startCommit, fixture.startCommit);
     });
   }
+});
+
+it('refuses a retry when main changed any module the running publisher imported', () => {
+  // The retry reuses the modules already loaded in memory, so every local
+  // import of the publisher must be on the unsafe list.
+  const publisherDir = path.join(root, '.github/scripts');
+  const source = fs.readFileSync(path.join(publisherDir, 'bluesky-stewardship-publisher.mjs'), 'utf8');
+  const localImports = [...source.matchAll(/^import[^;]*?from '(\.{1,2}\/[^']+)';/gms)]
+    .map((match) => path.relative(root, path.resolve(publisherDir, match[1])).split(path.sep).join('/'));
+  assert.ok(localImports.length > 0);
+  for (const file of localImports) {
+    assert.ok(RETRY_UNSAFE_PATH.test(file), `${file} is imported by the publisher but a retry would not refuse a change to it`);
+  }
+  assert.equal(RETRY_UNSAFE_PATH.test('data/social_posts.csv'), false);
+  assert.equal(RETRY_UNSAFE_PATH.test('scripts/refresh-social-release-artifacts.mjs'), false);
 });
