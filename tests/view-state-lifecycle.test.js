@@ -35,6 +35,29 @@ describe('one default filter object (item 26)', () => {
   });
 });
 
+describe('record modal close timer (item 19)', () => {
+  const modal = read('frontend', 'components', 'RecordModal.js');
+  const beginClose = modal.slice(
+    modal.indexOf('const beginClose'),
+    modal.indexOf('const handleClose'),
+  );
+
+  it('keeps the 180 ms close timer in a ref so it can be cancelled', () => {
+    assert.match(beginClose, /closeTimerRef\.current = setTimeout\(/);
+    assert.doesNotMatch(beginClose, /^\s+setTimeout\(\(\) => completeClose/m);
+  });
+
+  it('cancels the pending close when the record changes or the modal unmounts', () => {
+    // Scenario: the reader closes the modal and opens another card within
+    // 180 ms. The old timer must not call onClose on the new record.
+    assert.match(
+      modal,
+      /useEffect\(\(\) => cancelCloseTimer, \[isOpen, record\?\.id\]\)/,
+    );
+    assert.match(modal, /const cancelCloseTimer = \(\) => \{[\s\S]*?clearTimeout\(closeTimerRef\.current\)/);
+  });
+});
+
 describe('Back keeps the standard archive filters (item 8)', async () => {
   const { filtersForHistoryEntry } = await import('../frontend/services/viewState.js');
   const BASE = 'https://pressthink.org/j/rosen-archive/';

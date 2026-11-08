@@ -77,7 +77,18 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   const closeButtonRef = useRef(null);
   const openerRef = useRef(null);
   const backgroundStateRef = useRef([]);
+  const closeTimerRef = useRef(null);
   const hasRecord = Boolean(record);
+
+  // The close animation runs for 180 ms before onClose. If the reader opens
+  // another record in that window, or the modal unmounts, the pending close
+  // belongs to the old record and must not close the new one.
+  const cancelCloseTimer = () => {
+    if (closeTimerRef.current === null) return;
+    clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = null;
+  };
+  useEffect(() => cancelCloseTimer, [isOpen, record?.id]);
   const currentFullRecord = fullRecord?.id === record?.id ? fullRecord : null;
 
   useEffect(() => {
@@ -345,7 +356,11 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
       return;
     }
     setIsClosing(true);
-    setTimeout(() => completeClose(afterClose), 180);
+    cancelCloseTimer();
+    closeTimerRef.current = setTimeout(() => {
+      closeTimerRef.current = null;
+      completeClose(afterClose);
+    }, 180);
   };
 
   const handleClose = () => beginClose();
