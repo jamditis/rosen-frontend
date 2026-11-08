@@ -22,18 +22,39 @@ export const RELEASE_WORKFLOWS = Object.freeze([
 const sleep = (milliseconds) =>
   new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-export function findBlockingRuns(runs, currentRunId) {
+// A re-run attempt keeps its original run id but starts again at the re-run
+// time, so the queue orders by the start of the current attempt and uses the
+// run id only to break ties or when a timestamp is missing.
+function attemptStartedAt(run) {
+  const started = Date.parse(run?.run_started_at || run?.created_at || '');
+  return Number.isNaN(started) ? null : started;
+}
+
+export function compareReleaseRuns(left, right) {
+  const leftStarted = attemptStartedAt(left);
+  const rightStarted = attemptStartedAt(right);
+  if (leftStarted !== null && rightStarted !== null && leftStarted !== rightStarted) {
+    return leftStarted - rightStarted;
+  }
+  return Number(left.id) - Number(right.id);
+}
+
+export function findBlockingRuns(runs, currentRun) {
   const active = new Set(ACTIVE_STATUSES);
   const releasePaths = new Set(RELEASE_WORKFLOWS);
-  const current = Number(currentRunId);
+  const currentId = Number(typeof currentRun === 'object' ? currentRun?.id : currentRun);
+  const current = typeof currentRun === 'object' && currentRun
+    ? currentRun
+    : runs.find((run) => Number(run.id) === currentId) || { id: currentId };
 
   return runs
     .filter((run) =>
-      Number(run.id) < current &&
+      Number(run.id) !== currentId &&
+      compareReleaseRuns(run, current) < 0 &&
       active.has(run.status) &&
       releasePaths.has(run.path),
     )
-    .sort((left, right) => Number(left.id) - Number(right.id));
+    .sort(compareReleaseRuns);
 }
 
 async function fetchJson(url, token) {
@@ -70,6 +91,15 @@ export async function listActiveRuns(apiUrl, repository, token, get = fetchJson)
   return runs;
 }
 
+/** Resolve this run's own record, so its attempt start time orders the queue. */
+export async function currentReleaseRun(apiUrl, repository, token, runId, runs, get = fetchJson) {
+  const listed = runs.find((run) => Number(run.id) === Number(runId));
+  if (listed) return listed;
+  const run = await get(new URL(`${apiUrl}/repos/${repository}/actions/runs/${runId}`), token);
+  if (Number(run?.id) !== Number(runId)) throw new Error('Invalid current release run query');
+  return run;
+}
+
 export async function waitForReleaseTurn({
   apiUrl,
   repository,
@@ -87,7 +117,8 @@ export async function waitForReleaseTurn({
     // Query active states so unrelated recent CI cannot hide an older writer.
     // Back off to five minutes while the same older run remains active.
     const runs = await listActiveRuns(apiUrl, repository, token);
-    const blockers = findBlockingRuns(runs, runId);
+    const current = await currentReleaseRun(apiUrl, repository, token, runId, runs);
+    const blockers = findBlockingRuns(runs, current);
     if (blockers.length === 0) {
       console.log(`Release turn acquired for run ${runId}.`);
       return;
