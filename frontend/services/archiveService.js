@@ -410,6 +410,12 @@ export const fetchCoreData = async () => {
 
   debug('Fetching core data from:', dataUrl);
 
+  // The key this payload is cached under. If a background version check
+  // changes it during the fetch, the body may still be the previous release's
+  // (the service worker answers this URL stale-while-revalidate), so it is
+  // returned but not cached under either key.
+  const fetchKey = coreIdbKey();
+
   try {
     const response = await fetch(dataUrl);
     if (!response.ok) {
@@ -445,11 +451,13 @@ export const fetchCoreData = async () => {
     // Cache the result. IndexedDB first; fall back to Web Storage only when
     // IndexedDB is unavailable, so capable browsers skip the redundant ~13 MB
     // sessionStorage write (and its JSON.stringify) entirely.
-    // Re-read the key: a version check that finished during the fetch has
-    // stored the new deploy version, and the fresh payload belongs under it.
-    const storedInIdb = await idbSet(coreIdbKey(), makeCoreEntry(data));
-    if (!storedInIdb) {
-      setCachedData(dataUrl, data);
+    if (coreIdbKey() !== fetchKey) {
+      debug('Deploy version changed during the fetch; not caching core data');
+    } else {
+      const storedInIdb = await idbSet(fetchKey, makeCoreEntry(data));
+      if (!storedInIdb) {
+        setCachedData(dataUrl, data);
+      }
     }
 
     return data;
