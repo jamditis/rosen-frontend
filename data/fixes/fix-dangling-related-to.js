@@ -2,14 +2,14 @@
  * fix-dangling-related-to.js
  *
  * Clears the related_to entries that name records the archive no longer holds
- * (issue #871). Earlier removals -- the PressThink _p.html dedup
- * (data/dedup_records.py), the duplicate-URL fix (fix-duplicate-urls.js), the
- * duplicate report's removals, and the 2025 cleanups of the RECORD-006xx
- * placeholders -- deleted rows without cleaning the lists that pointed at them.
+ * (issue #871). Earlier duplicate removals -- 084a33b0 (24 duplicate-URL
+ * rows), f6c12a3d (fix-duplicate-urls.js), 8876c2ef (the duplicate report's
+ * removals), and fb8b2a08 (TUMBLR-00062) -- deleted rows without cleaning the
+ * lists that pointed at them.
  *
  * Each dangling id is adjudicated in docs/research/2026-11-related-to-dangling-ids.md.
- * REPOINT holds the ids whose removal the repository documents as a merge into
- * a named surviving record; every other dangling id is dropped. A re-pointed
+ * REPOINT holds the ids whose removal commit names the surviving record that
+ * kept the same work; DROP holds the ids with no surviving successor. A re-pointed
  * id that would duplicate an entry already in the list, or point a record at
  * itself, is dropped instead.
  *
@@ -42,23 +42,50 @@ const RECORDS_PATH = path.join(DATA_DIR, 'archive_records-public.csv');
 const SOCIAL_PATH = path.join(DATA_DIR, 'social_posts.csv');
 
 // Removed record -> the surviving record the repository says replaced it.
+// Where the first survivor was itself removed later, the entry points at the
+// record that replaced it in turn.
 export const REPOINT = new Map([
-  ['RECORD-00055', 'RECORD-00777'], // data/fixes/fix-duplicate-urls.js
-  ['RECORD-00583', 'RECORD-00772'], // data/fixes/fix-duplicate-urls.js
-  ['RECORD-00108', 'RECORD-00056'], // data/quality-reports/duplicate-report.txt, pair 3-1
-  ['RECORD-00521', 'RECORD-00200'], // data/quality-reports/duplicate-report.txt, pair 3-4
-  ['RECORD-00570', 'RECORD-00918'], // duplicate-report.txt pair 3-2, then the #863 split
-  ['TUMBLR-00062', 'RECORD-00662'], // data/quality-reports/duplicate-report.txt, group 2B
+  // 084a33b0 "Remove 24 duplicate URL records": each row shared its url with
+  // the record kept, and that record still holds the url.
+  ['RECORD-00006', 'RECORD-00002'],
+  ['RECORD-00007', 'RECORD-00003'],
+  ['RECORD-00008', 'RECORD-00004'],
+  ['RECORD-00015', 'RECORD-00010'],
+  ['RECORD-00016', 'RECORD-00011'],
+  ['RECORD-00017', 'RECORD-00012'],
+  ['RECORD-00018', 'RECORD-00013'],
+  ['RECORD-00019', 'RECORD-00014'],
+  ['RECORD-00615', 'RECORD-00604'],
+  ['RECORD-00621', 'RECORD-00601'],
+  ['RECORD-00622', 'RECORD-00600'],
+  ['RECORD-00623', 'RECORD-00609'],
+  ['RECORD-00627', 'RECORD-00601'],
+  // 084a33b0 kept RECORD-00610; 8876c2ef removed that as a duplicate of
+  // RECORD-00340 (duplicate-report.txt pair 3-3).
+  ['RECORD-00616', 'RECORD-00340'],
+  // 084a33b0 kept RECORD-00607; bc776997 (#591) removed that and kept RECORD-00191.
+  ['RECORD-00620', 'RECORD-00191'],
+  // 084a33b0 kept RECORD-00606; 8876c2ef removed that and kept RECORD-00387
+  // (duplicate-report.txt pair 3-6).
+  ['RECORD-00628', 'RECORD-00387'],
+  // 084a33b0 kept RECORD-00093; f6c12a3d removed that and kept RECORD-00751
+  // (data/fixes/fix-duplicate-urls.js).
+  ['RECORD-00631', 'RECORD-00751'],
+  // f6c12a3d, data/fixes/fix-duplicate-urls.js.
+  ['RECORD-00055', 'RECORD-00777'],
+  ['RECORD-00583', 'RECORD-00772'],
+  // 8876c2ef, data/quality-reports/duplicate-report.txt.
+  ['RECORD-00108', 'RECORD-00056'], // pair 3-1
+  ['RECORD-00521', 'RECORD-00200'], // pair 3-4
+  ['RECORD-00570', 'RECORD-00918'], // pair 3-2 kept RECORD-00429; the #863 split moved the post to RECORD-00918
+  // fb8b2a08, duplicate-report.txt group 2B.
+  ['TUMBLR-00062', 'RECORD-00662'],
 ]);
 
-// Removed records with no documented successor.
-export const DROP = new Set([
-  'RECORD-00006', 'RECORD-00007', 'RECORD-00008',
-  'RECORD-00015', 'RECORD-00016', 'RECORD-00017', 'RECORD-00018', 'RECORD-00019',
-  'RECORD-00611', 'RECORD-00615', 'RECORD-00616',
-  'RECORD-00620', 'RECORD-00621', 'RECORD-00622', 'RECORD-00623',
-  'RECORD-00625', 'RECORD-00627', 'RECORD-00628', 'RECORD-00631',
-]);
+// Removed records with no surviving successor. 084a33b0 kept RECORD-00602 for
+// both, and c9902c6e removed RECORD-00602 as a corrupted duplicate of social
+// rows, leaving no curated record to point at.
+export const DROP = new Set(['RECORD-00611', 'RECORD-00625']);
 
 const SEPARATOR = ', ';
 
