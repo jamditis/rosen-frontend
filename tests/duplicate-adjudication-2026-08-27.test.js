@@ -121,23 +121,32 @@ describe('2026-08-27 duplicate adjudication (#867)', () => {
     );
   });
 
-  it('leaves no related_to list pointing at a dropped record', () => {
-    // Scoped to the seven ids on purpose. The CSV carries older dangling
-    // related_to entries from earlier cleanups, and that backlog is its own
-    // problem; this asserts only that the #867 removal cleaned up after itself.
+  it('resolves every related_to id to a record that still exists', () => {
+    // This began as a check on the seven #867 ids alone. Issue #871 cleared the
+    // older dangling entries left by earlier removals (see
+    // docs/research/2026-11-related-to-dangling-ids.md), so the guard now covers
+    // every id: a removal that forgets to clean related_to fails here, whoever
+    // made it. related_to is a comma-separated list, so a token that does not
+    // resolve, a semicolon-joined pair included, is a broken reference.
     const records = parse(read('data/archive_records-public.csv').toString('utf8'), {
       columns: true,
       skip_empty_lines: true,
     });
+    const social = parse(read('data/social_posts.csv').toString('utf8'), {
+      columns: true,
+      skip_empty_lines: true,
+    });
+    const knownIds = new Set([...records, ...social].map((record) => record.id));
+    const dangling = [];
     for (const record of records) {
       for (const relatedId of (record.related_to || '').split(',')) {
         const trimmed = relatedId.trim();
-        assert.equal(
-          DROPPED.has(trimmed),
-          false,
-          `${record.id}.related_to still points at dropped ${trimmed}`,
-        );
+        if (trimmed && !knownIds.has(trimmed)) dangling.push(`${record.id} -> ${trimmed}`);
       }
+    }
+    assert.deepEqual(dangling, [], `related_to names ids that resolve to no record:\n${dangling.join('\n')}`);
+    for (const droppedId of DROPPED.keys()) {
+      assert.equal(knownIds.has(droppedId), false, `${droppedId} was dropped and must stay gone`);
     }
   });
 

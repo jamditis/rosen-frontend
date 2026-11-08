@@ -38,6 +38,14 @@ Counts verified 2026-07-23; they grow as records are added.
 | `extracted_entities.csv` | 8,150 | Named entities: people, organizations, and concepts |
 | `extracted_relationships.csv` | 12,556 | Entity-to-record relationships with context snippets |
 
+A curated record's `related_to` cell is a list of record ids separated by `, `.
+Every id in it must name a row in `archive_records-public.csv` or
+`social_posts.csv`, and `tests/duplicate-adjudication-2026-08-27.test.js`
+fails when one does not. When you remove a record, remove its id from every
+`related_to` list in the same change, or point it at the record that replaces
+it. [The #871 adjudication](../docs/research/2026-11-related-to-dangling-ids.md)
+records how the older dangling ids were resolved.
+
 ### Reference files
 
 | File | Purpose |
