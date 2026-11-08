@@ -1566,12 +1566,22 @@ process.stdout.write(JSON.stringify(records));
 def load_archive_rows(path: Path) -> list[dict]:
     """Read the archive CSV with csv-parse, as the rest of the archive does.
 
+    Node runs from the repository root so it can resolve csv-parse, so the
+    path is made absolute first: a relative path names a file in the caller's
+    working directory, not in the repository root.
+
     Fails loudly when Node or csv-parse is missing. A silent fallback to
     Python's reader would index a different set of rows than the archive holds.
     """
     try:
         result = subprocess.run(
-            ["node", "--input-type=module", "--eval", _NODE_CSV_PARSE, str(path)],
+            [
+                "node",
+                "--input-type=module",
+                "--eval",
+                _NODE_CSV_PARSE,
+                str(Path(path).resolve()),
+            ],
             cwd=_REPO_ROOT,
             capture_output=True,
             text=True,

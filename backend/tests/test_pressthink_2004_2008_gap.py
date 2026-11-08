@@ -1117,9 +1117,22 @@ def test_load_archive_rows_reads_the_records_csv_parse_reads(tmp_path):
     assert rows[1]["raw_text"] == "line one\nline two"
 
 
+def test_load_archive_rows_resolves_a_relative_path_from_the_callers_directory(
+    tmp_path, monkeypatch
+):
+    # Node runs from the repository root to find csv-parse. A relative path
+    # must still name the file in the caller's working directory.
+    (tmp_path / "rel.csv").write_bytes(b"id,title\r\nR1,One\r\n")
+    monkeypatch.chdir(tmp_path)
+    rows = gap.load_archive_rows(Path("rel.csv"))
+    assert [row["id"] for row in rows] == ["R1"]
+
+
 def test_load_archive_rows_reads_every_real_record_whole():
     rows = gap.load_archive_rows(ARCHIVE_CSV)
-    malformed = [row.get("id") for row in rows if not _RECORD_ID.fullmatch(row.get("id") or "")]
+    malformed = [
+        row.get("id") for row in rows if not _RECORD_ID.fullmatch(row.get("id") or "")
+    ]
     assert malformed == []
     ids = [row["id"] for row in rows]
     assert len(ids) == len(set(ids))
