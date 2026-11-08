@@ -12,8 +12,8 @@
 // version.json `cache_version`, e.g. v9). That is a different namespace on its own
 // release cadence and is deliberately left untouched here.
 //
-// The bump is atomic: if the post-rewrite guardrail fails, every file (including
-// version.json) is rolled back to its pre-bump content, so a rejected bump never
+// The bump is atomic: if a stamp write or the post-rewrite guardrail fails, every
+// file (including version.json) is rolled back to its pre-bump content, so a rejected bump never
 // leaves a half-stamped tree.
 //
 // Usage:
@@ -81,7 +81,7 @@ export function stampVersion(rootDir, target) {
 }
 
 // Resolve the target version, update version.json when a new one is given, stamp
-// the tree, then run `verify` as the guardrail. If `verify` throws, roll every
+// the tree, then run `verify` as the guardrail. If the stamp or `verify` throws, roll every
 // touched file (version.json included) back to its pre-bump content and rethrow
 // with `.rolledBack = true`, so a failed bump is non-destructive.
 export function applyVersion(rootDir, { argVersion, verify } = {}) {
@@ -98,17 +98,22 @@ export function applyVersion(rootDir, { argVersion, verify } = {}) {
   if (argVersion) {
     if (!SEMVER.test(argVersion)) throw new Error(`"${argVersion}" is not a semver x.y.z version`);
     target = argVersion;
-    versionJson.version = target;
-    versionJson.updated = new Date().toISOString().slice(0, 10);
-    fs.writeFileSync(versionJsonPath, `${JSON.stringify(versionJson, null, 2)}\n`);
   } else {
     target = versionJson.version;
     if (!SEMVER.test(target)) throw new Error(`version.json version "${target}" is not semver x.y.z`);
   }
 
-  const result = stampVersion(rootDir, target);
-
+  // Every write sits inside the rollback, so a read or write error partway
+  // through the stamp cannot leave version.json at the new version while some
+  // markers still carry the old one.
+  let result;
   try {
+    if (argVersion) {
+      versionJson.version = target;
+      versionJson.updated = new Date().toISOString().slice(0, 10);
+      fs.writeFileSync(versionJsonPath, `${JSON.stringify(versionJson, null, 2)}\n`);
+    }
+    result = stampVersion(rootDir, target);
     if (verify) verify();
   } catch (err) {
     for (const [file, content] of snapshot) fs.writeFileSync(file, content);
@@ -134,7 +139,7 @@ function main(rootDir, argVersion) {
     });
   } catch (err) {
     if (err.rolledBack) {
-      fail('version-consistency test failed after stamping — reverted all changes; investigate the inconsistency and retry');
+      fail(`stamping or the version-consistency test failed (${err.message}); reverted all changes, investigate and retry`);
     }
     fail(err.message);
   }

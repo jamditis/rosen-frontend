@@ -323,7 +323,7 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 19. Cancel the 180 ms close timer in `RecordModal.js` when the record changes or the component unmounts.
 20. Use functional `setLayout` updaters in `closeWindow` and `minimizeWindow` in `DesktopShell.js`.
 21. Set `db` only after `createTables` succeeds in `sqliteService.js`.
-22. Move `stampVersion` inside the rollback try in `scripts/bump-version.mjs`.
+22. Move `stampVersion` inside the rollback try in `scripts/bump-version.mjs`. Fixed (the version.json write and the stamp loop now run inside the rollback try).
 23. Delete the pushed branch when `gh pr create` fails in `sync_sheet_to_archive.py`. Fixed (a failed `gh pr create` now deletes the pushed branch and still reports the original error).
 24. Remove the unused `noop` status from the `process_submission.py` docstring, and add `committed` to the sweeper workflow comment. Fixed (both docstrings drop `noop`, and the workflow comment lists `committed` with the new skip and cap rules).
 25. Use one spelling (`TRUE`/`FALSE`) for `verified` and `needs_review` in all writers, and make one validator enforce it.

@@ -177,4 +177,28 @@ describe('applyVersion', () => {
     assert.strictEqual(read('frontend/sw.js'), swBefore);
     assert.strictEqual(read('version.json'), versionJsonBefore);
   });
+
+  it('rolls the whole tree back when stamping itself fails mid-loop', (t) => {
+    const indexBefore = read('index.html');
+    const versionJsonBefore = read('version.json');
+    const sidebar = path.join(root, 'frontend/components/Sidebar.js');
+    const realWrite = fs.writeFileSync;
+    let failed = false;
+    // Fail one stamp write once, after version.json and earlier markers were written.
+    t.mock.method(fs, 'writeFileSync', (file, ...rest) => {
+      if (file === sidebar && !failed) {
+        failed = true;
+        throw new Error('stamp write boom');
+      }
+      return realWrite(file, ...rest);
+    });
+
+    assert.throws(
+      () => applyVersion(root, { argVersion: '2.3.4', verify: () => {} }),
+      (err) => err.message.includes('stamp write boom') && err.rolledBack === true,
+    );
+
+    assert.strictEqual(read('index.html'), indexBefore);
+    assert.strictEqual(read('version.json'), versionJsonBefore);
+  });
 });
