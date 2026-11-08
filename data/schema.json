@@ -22,6 +22,15 @@
       "type": "array",
       "items": { "$ref": "#/$defs/entity" }
     },
+    "entityRedirects": {
+      "type": "object",
+      "description": "Retired entity id -> the live entity id it was merged into. Built from data/entity-merges.csv; every value is an id in entities, no key is. A consumer that looks an entity up by id should resolve it through this map first.",
+      "propertyNames": { "pattern": "^[A-Z][0-9]+$" },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[A-Z][0-9]+$"
+      }
+    },
     "facets": { "$ref": "#/$defs/facets" },
     "autocompleteIndex": {
       "type": "array",

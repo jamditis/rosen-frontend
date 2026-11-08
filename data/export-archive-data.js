@@ -23,6 +23,7 @@ import { unescapeRow } from './lib/csv-unescape.js';
 import { buildSearchIndex, socialSearchIndexOptions } from './lib/search-index-builder.js';
 import { loadAuthoredExcerpts, resolveSummary } from './lib/summary-resolver.js';
 import { writeRelationshipAdjacencyArtifacts } from './export-relationship-adjacency.js';
+import { parseEntityMerges, buildEntityRedirects } from './lib/entity-merges.js';
 import {
   assignStableThreadIds,
   selectPublishableThreadCandidates,
@@ -212,6 +213,8 @@ async function main() {
   const socialPostsPath = path.join(__dirname, 'social_posts.csv');
   const relationshipsPath = path.join(__dirname, 'extracted_relationships.csv');
   const entitiesPath = path.join(__dirname, 'extracted_entities.csv');
+  // Retired entity ids and the canonical id each one now resolves to (#874).
+  const entityMergesPath = path.join(__dirname, 'entity-merges.csv');
   // Optional sidecar of human-authored summary overrides (#309). Not in the
   // required-files check below: a missing file fails open to no overrides.
   const authoredExcerptsPath = path.join(__dirname, 'authored-excerpts.csv');
@@ -240,7 +243,8 @@ async function main() {
     { path: archiveRecordsPath, name: 'archive_records-public.csv' },
     { path: socialPostsPath, name: 'social_posts.csv' },
     { path: relationshipsPath, name: 'extracted_relationships.csv' },
-    { path: entitiesPath, name: 'extracted_entities.csv' }
+    { path: entitiesPath, name: 'extracted_entities.csv' },
+    { path: entityMergesPath, name: 'entity-merges.csv' }
   ];
 
   for (const file of filesToCheck) {
@@ -266,6 +270,7 @@ async function main() {
   const socialPostsData = parse(socialPostsCsv, { columns: true, skip_empty_lines: true }).map(unescapeRow);
   const relationshipsData = parse(relationshipsCsv, { columns: true, skip_empty_lines: true }).map(unescapeRow);
   const entitiesData = parse(entitiesCsv, { columns: true, skip_empty_lines: true }).map(unescapeRow);
+  const entityMerges = parseEntityMerges(fs.readFileSync(entityMergesPath, 'utf-8'));
 
   // Human-authored summary overrides (#309), keyed by record id. Fails open to
   // an empty map when the sidecar is absent so the export never breaks on it.
@@ -297,6 +302,24 @@ async function main() {
     firstMentionRecordId: row.first_mention_record_id,
     totalMentions: parseInt(row.total_mentions) || 1
   }));
+
+  // Publish every retired id with the live entity it now resolves to, so a
+  // link or cached payload that still names a merged-away entity can be sent
+  // on (#874). buildEntityRedirects throws on a redirect that leads nowhere.
+  // A relationship that still names a retired id would put that id into
+  // recordEntityMap with no entity behind it, so refuse to export one.
+  const entityRedirects = buildEntityRedirects(entityMerges, new Set(entities.map(e => e.id)));
+  const strayRelationships = relationshipsData.filter(rel => (
+    entityRedirects[rel.source_entity_id] || entityRedirects[rel.target_entity_id]
+  ));
+  if (strayRelationships.length > 0) {
+    throw new Error(
+      `${strayRelationships.length} relationship rows still name a retired entity id ` +
+      `(${strayRelationships.slice(0, 5).map(rel => rel.relationship_id).join(', ')}); ` +
+      're-point them at the canonical id listed in data/entity-merges.csv'
+    );
+  }
+  console.log(`  - Entity redirects: ${Object.keys(entityRedirects).length} retired ids`);
 
   // Group entities by type for facets
   const entityTypes = new Set();
@@ -789,6 +812,7 @@ async function main() {
     generated: new Date().toISOString(),
     records: allRecords,
     entities: entities,
+    entityRedirects,
     facets: {
       categories: Array.from(categories).sort(),
       eras: ERAS,
@@ -892,6 +916,8 @@ async function main() {
     version: "1.1.0",
     generated: new Date().toISOString(),
     entities: entities,
+    // Retired entity id -> canonical entity id (#874)
+    entityRedirects,
     // Include relatedIds mapping for entity connections
     recordEntityMap: allRecords.reduce((acc, r) => {
       if (r.relatedIds && r.relatedIds.length > 0) {

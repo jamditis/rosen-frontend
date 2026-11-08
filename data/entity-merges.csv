@@ -1,0 +1,19 @@
+retired_id,retired_type,retired_name,canonical_id,merged_on,issue,reason
+W0666,Work,PressThink,O0033,2026-08-27,#859,"Same blog registered twice, once as a Work and once as an Organization; mentions and relationships folded into O0033."
+O1738,Organization,Personal Democracy Forum,E0077,2026-11-08,#875,Same Personal Democracy Forum as Event E0077; the cross-type rule keeps Event.
+O1373,Organization,Democratic National Convention,E0100,2026-11-08,#875,Same Democratic National Convention as Event E0100; the cross-type rule keeps Event.
+W1077,Work,Romenesko,O0035,2026-11-08,#875,Same Romenesko as Organization O0035; the cross-type rule keeps Person and Organization.
+W0789,Work,Meet the Press,O0279,2026-11-08,#875,Same Meet the Press as Organization O0279; the cross-type rule keeps Organization.
+W0971,Work,Instapundit,O0384,2026-11-08,#875,Same Instapundit as Organization O0384; the cross-type rule keeps Organization.
+W0955,Work,Public Eye,O0443,2026-11-08,#875,Same Public Eye as Organization O0443; the cross-type rule keeps Organization.
+W0826,Work,OffTheBus,O0447,2026-11-08,#875,Same OffTheBus as Organization O0447; the cross-type rule keeps Organization.
+W0957,Work,Wikipedia,O0515,2026-11-08,#875,Same Wikipedia as Organization O0515; the cross-type rule keeps Organization.
+W0701,Work,60 Minutes,O0767,2026-11-08,#875,Same 60 Minutes as Organization O0767; the cross-type rule keeps Organization.
+W0984,Work,Media Shift,O0789,2026-11-08,#875,Same Media Shift as Organization O0789; the cross-type rule keeps Organization.
+W1079,Work,Washington Week,O0875,2026-11-08,#875,Same Washington Week as Organization O0875; the cross-type rule keeps Organization.
+W0702,Work,The Note,O0883,2026-11-08,#875,Same The Note as Organization O0883; the cross-type rule keeps Organization.
+W0986,Work,The Daily Show,O0985,2026-11-08,#875,Same The Daily Show as Organization O0985; the cross-type rule keeps Organization.
+W1022,Work,This American Life,O1043,2026-11-08,#875,Same This American Life as Organization O1043; the cross-type rule keeps Organization.
+W1073,Work,Hardball,O1143,2026-11-08,#875,Same Hardball as Organization O1143; the cross-type rule keeps Organization.
+W0891,Work,Assignment Zero,O1161,2026-11-08,#875,Same Assignment Zero as Organization O1161; the cross-type rule keeps Organization.
+W0904,Work,This Week,O1205,2026-11-08,#875,Same This Week as Organization O1205; the cross-type rule keeps Organization.
