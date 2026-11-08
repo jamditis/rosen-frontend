@@ -11,7 +11,8 @@ design.md`` "Stuck-row sweeper"):
 
     submitted   > 30 min  → re-dispatch with original URL
     processing  > 1 hr    → re-dispatch with original URL
-    archived    > 24 hr   → re-dispatch with sentinel URL (forces SFTP retry)
+    archived    > 24 hr   → re-dispatch with sentinel URL (forces SFTP retry),
+                            at most MAX_ARCHIVED_RETRIES times per row
 
 Terminal statuses (``live``, ``committed``, ``error``, ``duplicate``,
 ``no URL``, ``invalid URL``) are never touched regardless of age. ``committed``
@@ -81,6 +82,18 @@ _THRESHOLDS = {
 # short-circuits scrape/categorize/append and only runs the SFTP step.
 SENTINEL_URL_PREFIX = "https://example.com/sweep-noop-"
 
+# Sentinel retries allowed for one ``archived`` row. A failed sentinel run
+# writes ``[sweep attempt N]`` at the start of the row's error cell (column H);
+# the sweeper reads it back and stops once N reaches this limit. Clearing the
+# error cell re-arms the row. Five retries span about 2.5 hours of ticks.
+MAX_ARCHIVED_RETRIES = 5
+_ATTEMPT_MARKER = re.compile(r"^\[sweep attempt (\d+)\]")
+
+
+def _attempts_from_error(error: str) -> int:
+    match = _ATTEMPT_MARKER.match((error or "").strip())
+    return int(match.group(1)) if match else 0
+
 
 # ---------- Sheet ingestion -------------------------------------------------
 
@@ -112,7 +125,7 @@ def fetch_rows() -> List[Dict[str, Any]]:
 
     Returns a list of dicts, one per data row (header excluded). Keys:
     ``sheet_row`` (1-indexed), ``timestamp``, ``url``, ``title``, ``notes``,
-    ``status``, ``record_id``.
+    ``status``, ``record_id``, ``error``.
     """
     sheet_id = os.environ.get("SHEET_ID", "").strip()
     if not sheet_id:
@@ -147,6 +160,8 @@ def fetch_rows() -> List[Dict[str, Any]]:
                 # row[4] = column E (reserved); row[5] = F status.
                 "status": (row[5] or "").strip(),
                 "record_id": (row[6] or "").strip(),
+                # H holds the last error, and the sentinel attempt marker.
+                "error": (row[7] or "").strip(),
             }
         )
     return out
@@ -306,6 +321,7 @@ def sweep() -> Dict[str, int]:
         "dispatched": 0,
         "failed": 0,
         "in_flight": 0,
+        "retry_exhausted": 0,
     }
     # Look up active runs once, before the first dispatch, so the answer is
     # not muddied by runs this sweep starts. A failed lookup blocks every
@@ -354,11 +370,23 @@ def sweep() -> Dict[str, int]:
         title = row["title"]
         notes = row["notes"]
         if status == "archived":
+            attempts = _attempts_from_error(row.get("error", ""))
+            if attempts >= MAX_ARCHIVED_RETRIES:
+                counts["retry_exhausted"] += 1
+                logger.error(
+                    f"row {sheet_row}: archived after {attempts} sentinel "
+                    "retries, not retrying; fix the transfer and clear column H "
+                    "to retry"
+                )
+                continue
             # No-op submission: scrape/categorize/append are skipped; only
             # SFTP runs. The sentinel timestamp keeps each retry unique in
             # the Action run history without affecting dedup (the consumer
-            # short-circuits before the dedup check).
-            dispatch_url = f"{SENTINEL_URL_PREFIX}{int(time.time())}"
+            # short-circuits before the dedup check). The attempt suffix tells
+            # the run which number to write back if it fails.
+            dispatch_url = (
+                f"{SENTINEL_URL_PREFIX}{int(time.time())}-attempt-{attempts + 1}"
+            )
             title = title or f"(sweep-noop for row {sheet_row})"
         # raw_text is intentionally absent: the queue sheet has no raw_text
         # column yet (fetch_rows reads only A:H), so a row originally submitted

@@ -39,9 +39,11 @@ file-explorer plugin (manual upload), not a server account. So:
 
 `archived` is **not** terminal. `sweep-stuck-rows.yml` runs every 30 minutes and
 `backend/scripts/sweep_stuck.py` re-dispatches any `archived` row older than 24 h
-with a sentinel URL (`https://example.com/sweep-noop-<ts>`) to force an SFTP retry
-(`_THRESHOLDS['archived'] = 24 * 60 * 60`); anything outside that thresholds dict
-is terminal.
+with a sentinel URL (`https://example.com/sweep-noop-<ts>-attempt-<n>`) to force
+an SFTP retry (`_THRESHOLDS['archived'] = 24 * 60 * 60`); anything outside that
+thresholds dict is terminal. A failed sentinel run writes `[sweep attempt <n>]` at
+the start of column H, and the sweeper stops after `MAX_ARCHIVED_RETRIES` (5)
+attempts. Clear column H to re-arm the row once the transfer is fixed.
 
 But the sentinel path in `process_submission.py` (`_is_sentinel`, ~line 542)
 short-circuits scrape/categorize/append, runs only the SFTP step, then checks

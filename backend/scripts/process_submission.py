@@ -52,6 +52,7 @@ import json
 import logging
 import os
 import pathlib
+import re
 import subprocess
 import sys
 import tempfile
@@ -403,7 +404,14 @@ def _final_writeback(sheet_id, sheet_tab, sheet_row, status, record_id, error=""
 
 
 def _retry_publication(
-    record_id, sheet_id, sheet_tab, sheet_row, prototype_mode=False, *, duplicate=False
+    record_id,
+    sheet_id,
+    sheet_tab,
+    sheet_row,
+    prototype_mode=False,
+    *,
+    duplicate=False,
+    attempt=None,
 ):
     """Publish an existing canonical record without scraping or appending it."""
     try:
@@ -435,6 +443,9 @@ def _retry_publication(
         )
     else:
         note = f"Publication retry failed: {push.get('error', 'unknown')}"
+        if attempt is not None:
+            # sweep_stuck.py reads this marker back to cap sentinel retries.
+            note = f"[sweep attempt {attempt}] {note}"
         _safe_writeback(
             sheet_id,
             sheet_tab,
@@ -739,6 +750,15 @@ def _is_sentinel(url: str) -> bool:
     return (url or "").startswith(SENTINEL_URL_PREFIX)
 
 
+_SENTINEL_ATTEMPT = re.compile(r"-attempt-(\d+)$")
+
+
+def _sentinel_attempt(url: str) -> Optional[int]:
+    """Return the sweeper's attempt number from a sentinel URL, if present."""
+    match = _SENTINEL_ATTEMPT.search(url or "")
+    return int(match.group(1)) if match else None
+
+
 def process_one(
     url: str,
     title: str = "",
@@ -794,7 +814,12 @@ def process_one(
             return result
         logger.info("Sentinel retry; publishing existing record %s", retry_record_id)
         return _retry_publication(
-            retry_record_id, sheet_id, sheet_tab, sheet_row, prototype_mode
+            retry_record_id,
+            sheet_id,
+            sheet_tab,
+            sheet_row,
+            prototype_mode,
+            attempt=_sentinel_attempt(url),
         )
 
     # --- Step 1: sheet ack (best-effort). ---------------------------------

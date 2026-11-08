@@ -43,7 +43,16 @@ _REAL_LIST_ACTIVE = getattr(sweep_stuck, "list_active_submission_rows", None)
 # ---------- Fixtures ---------------------------------------------------------
 
 
-def _row(timestamp_iso, url, status, sheet_row=2, title="", notes="", record_id=""):
+def _row(
+    timestamp_iso,
+    url,
+    status,
+    sheet_row=2,
+    title="",
+    notes="",
+    record_id="",
+    error="",
+):
     """One row in the queue, shaped the way ``sweep_stuck`` reads it.
 
     Columns: A=timestamp, B=url, C=title, D=notes, F=status, G=record_id,
@@ -57,6 +66,7 @@ def _row(timestamp_iso, url, status, sheet_row=2, title="", notes="", record_id=
         "notes": notes,
         "status": status,
         "record_id": record_id,
+        "error": error,
     }
 
 
@@ -398,3 +408,78 @@ class TestListActiveSubmissionRows:
         )
         title = line.split(":", 1)[1].strip().replace("${{ inputs.sheet_row }}", "42")
         assert sweep_stuck._row_from_run_title(title) == 42
+
+
+class TestArchivedRetryCap:
+    """Sentinel retries of an ``archived`` row stop after a fixed count.
+
+    The count lives in the row's own error cell (column H): every failed
+    sentinel run writes ``[sweep attempt N]`` there, so no new column is needed.
+    """
+
+    def _archived(self, error=""):
+        return _row(
+            _iso_ago(hours=30),
+            "https://example.com/stuck-arc",
+            "archived",
+            sheet_row=9,
+            record_id="RECORD-00009",
+            error=error,
+        )
+
+    def test_first_retry_is_attempt_one(self, monkeypatch):
+        _env(monkeypatch)
+        _stub_sheet_rows(monkeypatch, [self._archived("Live push failed")])
+        dispatch_mock = _stub_dispatch_ok(monkeypatch)
+
+        sweep_stuck.sweep()
+
+        url = dispatch_mock.call_args.args[0]["url"]
+        assert url.startswith(sweep_stuck.SENTINEL_URL_PREFIX)
+        assert url.endswith("-attempt-1")
+
+    def test_next_retry_counts_up_from_the_error_cell(self, monkeypatch):
+        _env(monkeypatch)
+        _stub_sheet_rows(
+            monkeypatch,
+            [self._archived("[sweep attempt 2] Publication retry failed: x")],
+        )
+        dispatch_mock = _stub_dispatch_ok(monkeypatch)
+
+        sweep_stuck.sweep()
+
+        assert dispatch_mock.call_args.args[0]["url"].endswith("-attempt-3")
+
+    def test_stops_after_the_limit(self, monkeypatch, caplog):
+        _env(monkeypatch)
+        limit = sweep_stuck.MAX_ARCHIVED_RETRIES
+        _stub_sheet_rows(
+            monkeypatch,
+            [self._archived(f"[sweep attempt {limit}] Publication retry failed")],
+        )
+        dispatch_mock = _stub_dispatch_ok(monkeypatch)
+
+        counts = sweep_stuck.sweep()
+
+        dispatch_mock.assert_not_called()
+        assert counts["retry_exhausted"] == 1
+        assert "row 9" in caplog.text
+
+    def test_fetch_rows_reads_the_error_column(self, monkeypatch):
+        _env(monkeypatch)
+        monkeypatch.setattr(sweep_stuck, "_load_sheets_credentials", lambda: None)
+        values = [
+            ["ts", "url", "title", "notes", "e", "status", "id", "error"],
+            ["t", "u", "", "", "", "archived", "RECORD-1", "[sweep attempt 4] x"],
+        ]
+        service = MagicMock()
+        service.spreadsheets.return_value.values.return_value.get.return_value.execute.return_value = {  # noqa: E501
+            "values": values
+        }
+        import googleapiclient.discovery as discovery
+
+        monkeypatch.setattr(discovery, "build", lambda *a, **k: service)
+
+        rows = sweep_stuck.fetch_rows()
+
+        assert rows[0]["error"] == "[sweep attempt 4] x"

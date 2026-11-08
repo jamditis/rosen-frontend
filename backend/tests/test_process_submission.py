@@ -1229,6 +1229,40 @@ class TestSubmissionRegressions:
             not live_calls
         ), "sentinel must NOT writeback live when SFTP retry itself failed"
 
+    def test_sentinel_failure_records_the_attempt_in_the_error_cell(
+        self, monkeypatch, csv_with_headers
+    ):
+        """The sweeper caps sentinel retries by reading the attempt number
+        back from column H, so a failed retry must write it there."""
+        _stub_schema(monkeypatch)
+        sheets_mock = _stub_sheets(monkeypatch)
+        _stub_sftp(
+            monkeypatch,
+            result={
+                "ok": False,
+                "skipped": False,
+                "files_pushed": 0,
+                "error": "host unreachable",
+            },
+        )
+        _stub_subprocess(monkeypatch)
+
+        _run(
+            monkeypatch,
+            csv_with_headers,
+            url="https://example.com/sweep-noop-1748147200-attempt-3",
+            sheet_row=42,
+            retry_record_id="RECORD-00042",
+        )
+
+        archived = [
+            c
+            for c in sheets_mock.call_args_list
+            if c.kwargs.get("status") == "archived"
+        ]
+        assert archived
+        assert archived[-1].kwargs["error"].startswith("[sweep attempt 3] ")
+
     def test_dispatcher_failure_payload_writes_error(
         self, monkeypatch, csv_with_headers
     ):
