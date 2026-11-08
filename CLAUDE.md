@@ -86,14 +86,14 @@ Configured in `frontend/constants.js` via `DATA_CONFIG`.
 
 ### Source CSV files
 
-Source-row snapshot checked against repository data on **2026-11-06**. The [stewardship census](data/stewardship-census.md) distinguishes source rows from published records: 1,218 curated records, 25,829 published social source records, 9 generated social thread containers, and 1 dissertation make up the 27,057 published records.
+Source-row snapshot checked against repository data on **2026-11-08**. The [stewardship census](data/stewardship-census.md) distinguishes source rows from published records: 1,220 curated records, 25,829 published social source records, 9 generated social thread containers, and 1 dissertation make up the 27,059 published records.
 
 | File | Rows | Contents |
 |------|------|----------|
-| `data/archive_records-public.csv` | 1,218 | Curated archive records (989 RECORD, 137 TUMBLR, 82 CLIP, 10 THREAD). Multiline text means file line counts are not record counts. |
+| `data/archive_records-public.csv` | 1,220 | Curated archive records (991 RECORD, 137 TUMBLR, 82 CLIP, 10 THREAD). Multiline text means file line counts are not record counts. |
 | `data/social_posts.csv` | 30,129 | Twitter, Bluesky, and Mastodon source posts; some are filtered from publication |
-| `data/extracted_entities.csv` | 7,488 | Named entities (people, orgs, concepts) |
-| `data/extracted_relationships.csv` | 11,172 | Entity-to-entity assertions with source-record provenance |
+| `data/extracted_entities.csv` | 7,498 | Named entities (people, orgs, concepts) |
+| `data/extracted_relationships.csv` | 11,189 | Entity-to-entity assertions with source-record provenance |
 | `data/authored-excerpts.csv` | 17 | Optional summary overrides keyed by record ID; nonblank entries replace the record summary |
 
 Submit new articles through the queued `submit-record.yml` workflow described in [ADDING-RECORDS.md](ADDING-RECORDS.md); it assigns `RECORD-*` IDs through the shared allocator. Manual CSV corrections retain existing IDs. Preserve [`data/record-id-sequence.json`](data/record-id-sequence.json), which records the allocator's high-water mark. Never infer the next ID from the last CSV row, a row count, or a fixed ID printed in documentation.

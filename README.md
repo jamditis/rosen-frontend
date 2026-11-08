@@ -10,8 +10,8 @@ This public repository holds the website source, archive data, and tools used to
 
 Counts checked against the repository data on **November 6, 2026**:
 
-- **27,057 published records** — 1,218 curated records, 25,829 published social source records, 9 generated social thread containers, and the dissertation
-- **7,488 named entities** — people, organizations, and concepts connected to records across the collection
+- **27,059 published records** — 1,220 curated records, 25,829 published social source records, 9 generated social thread containers, and the dissertation
+- **7,498 named entities** — people, organizations, and concepts connected to records across the collection
 - **The 1986 dissertation** — *The Impossible Press: American Journalism and the Decline of Public Life*, written under Neil Postman and released publicly in December 2025
 
 Records carry theme, era, and publication information, with coverage varying by field and source. Most curated records are also cross-linked to the people, organizations, and ideas they mention; entity extraction is still catching up on some records, and the social media posts are largely not entity-linked yet. The [stewardship census](data/stewardship-census.md) distinguishes source rows, published records, generated threads, and missing fields.
