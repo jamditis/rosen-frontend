@@ -26,9 +26,11 @@
  * trustworthy: they are a count of the current table, not a memory of an older
  * one.
  *
- * Neither half guesses at a curator decision. If a divergence backlog reaches
- * zero rows, that means the type could now be enforced, which is a ruling for
- * the curator to make, so the refresh reports it and changes nothing.
+ * Neither half guesses at an open curator decision. One ruling is standing:
+ * when a divergence backlog reaches zero rows, the refresh marks the type
+ * "enforced" and drops the snapshot, and reports the change (curator ruling,
+ * 2026-11-08), because the validator would then hold every row to the rule
+ * anyway.
  */
 
 const RECORD_ID_PATTERN = /^(.+?)_REL_\d+$/;
@@ -272,10 +274,13 @@ export function refreshRelationshipTypeCensus(registry, { relationshipRows, enti
       } else {
         const violating = violatingRows(typeRows, entry, entityTypeById);
         if (!violating.length) {
-          // Enforcing the type is now possible, but that is a curator ruling.
-          problems.push(
-            `${name}: no row diverges any more, so endpointEnforcement can be flipped to "enforced" and this block removed`,
-          );
+          // Every row now fits the declared endpoints, so the rule is enforced
+          // and the snapshot goes (curator ruling, 2026-11-08). Leaving the
+          // type deferred would fail every release on a stale snapshot.
+          const before = entry.endpointEnforcement;
+          entry.endpointEnforcement = 'enforced';
+          delete entry.endpointDivergence;
+          changes.push(`${name} endpointEnforcement ${before} -> enforced, no row diverges any more`);
         } else {
           const before = `${divergence.violatingRows}/${divergence.totalRows}`;
           divergence.violatingRows = violating.length;

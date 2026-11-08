@@ -1140,8 +1140,15 @@ describe('committed relationship type registry (#737)', () => {
       for (const type of [...entry.allowedSourceTypes, ...entry.allowedTargetTypes]) {
         assert.ok(validEntityTypes.has(type), `${name}: ${type} is not a registered entity type`);
       }
-      assert.equal(entry.endpointEnforcement, 'reviewed', `${name}: rows that read backward go to the review report, not a validation failure`);
-      assert.ok(entry.endpointDivergence, `${name}: reviewed enforcement must record an endpointDivergence`);
+      // Rows that read backward go to the review report, not a validation
+      // failure. Once none are left, the release refresh enforces the type
+      // and drops the snapshot (curator ruling, 2026-11-08).
+      if (entry.endpointEnforcement === 'enforced') {
+        assert.equal(entry.endpointDivergence, undefined, `${name}: an enforced type carries no endpointDivergence`);
+      } else {
+        assert.equal(entry.endpointEnforcement, 'reviewed', `${name}: rows that read backward go to the review report, not a validation failure`);
+        assert.ok(entry.endpointDivergence, `${name}: reviewed enforcement must record an endpointDivergence`);
+      }
       assert.equal(typeof entry.rulingNote, 'string', `${name}: rulingNote`);
       assert.match(entry.rulingNote, /737/, `${name}: rulingNote should cite issue #737`);
     }
