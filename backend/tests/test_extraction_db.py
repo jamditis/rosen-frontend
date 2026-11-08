@@ -95,3 +95,16 @@ def test_save_relationship_inserts_with_defaults(db):
 def test_save_relationships_bulk_appends_duplicate_ids(db):
     db.save_relationships([_rel(), _rel()])
     assert db.get_relationship_count() == 2
+
+
+def test_processed_ids_leave_failed_records_for_retry(db):
+    """A failed extraction (e.g. a provider outage) must be retried later."""
+    db.mark_processed("BSKY-1", entity_count=2)
+    db.mark_processed("BSKY-2", status="skipped")
+    db.mark_processed("BSKY-3", status="failed", error_msg="503 from provider")
+
+    assert db.get_processed_ids() == {"BSKY-1", "BSKY-2"}
+    assert [row["record_id"] for row in db.get_failed_records()] == ["BSKY-3"]
+
+    db.mark_processed("BSKY-3", entity_count=1)
+    assert db.get_processed_ids() == {"BSKY-1", "BSKY-2", "BSKY-3"}
