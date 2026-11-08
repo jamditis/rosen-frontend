@@ -29,3 +29,29 @@ and `git lfs pull`. Without them eight provenance, census, and model-asset
 tests fail for reasons that have nothing to do with the change. Node's
 built-in fetch also ignores HTTPS_PROXY; run model downloads such as
 `npm run build-embeddings` with `NODE_USE_ENV_PROXY=1`.
+
+## Stamp the census after every generator
+
+`npm run census:stewardship` records the input commit. Any generator that
+runs after it (the export, embeddings, or
+`scripts/refresh-social-release-artifacts.mjs`) makes it stale, and
+`validate` fails in CI even though a local run before the commit passed.
+Run the census last, on committed inputs, and commit it on its own.
+
+## Run the preview audit before a frontend push
+
+CI runs only on pull requests into `main`, so a stacked branch gets its
+first audit when the stack reaches the bottom PR. Run the routes a change
+touches locally first:
+`PREVIEW_AUDIT_CHROMIUM_PATH=/opt/pw-browsers/chromium-1243/chrome-linux64/chrome PREVIEW_AUDIT_ROUTES=... PREVIEW_AUDIT_VIEWPORT=tablet npm run preview:audit`.
+Two limits apply. The desktop shell fails any control under 44 by 44 px.
+CI measures layout shift several times higher than a local run (1.70
+against 0.41 on the same route), so a route near its budget in CI can
+pass locally and still fail there. Check the route's last CI value before
+changing card or chip sizes.
+
+## Check for a merged PR before redoing an issue
+
+An issue can stay open after a PR that said "Refs" instead of "Fixes"
+finished it (#861 and #929). Search merged PRs for the issue number
+before assigning work.
