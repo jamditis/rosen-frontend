@@ -202,8 +202,10 @@ Use one layout for Legion, the second copy, and any private repo:
   manifests/                   # schema-v1 manifests (copies of the repo ones)
   bags/                        # #702 baseline bags
   quarantine/
-  logs/fixity/  logs/sync/
+  logs/fixity/
 ```
+
+Sync logs live outside this tree, in `<ROOT>/sync-logs/`, so a sync never copies or checks a file that it is still writing.
 
 - Record IDs are the folder names, and they never change.
 - A new capture gets a new capture-ID folder. Nothing is overwritten.
@@ -241,8 +243,9 @@ The total is well under 1 TB, a small fraction of the 24 TB drive.
 - **Primary copy.** Legion `<ROOT>` (storage class `preservation`).
 - **Second copy.** Storage class `replica`. The location is decision D-J4. It must sit on a different physical device, and ideally in a different building. One drive is one copy. Section 3 of #697 asks for two copies of high-fidelity captures.
 - **Sync.** Use rclone because it runs on Windows and Linux:
-  - copy with `rclone copy --immutable --checksum`, which refuses to change an existing file;
-  - verify with `rclone check --checksum` (`--download` where the remote has no SHA-256).
+  - copy `objects/` with `rclone copy --immutable --checksum`, which refuses to change an existing capture file;
+  - copy `manifests/` with `rclone sync --checksum --backup-dir`, because manifests gain events and must update; the backup dir keeps each replaced version;
+  - verify each tree with `rclone check --checksum` (`--download` where the remote has no SHA-256).
   - rsync with `--checksum` works where both ends are POSIX.
 - **Fixity schedule:**
   - on write, `sha256sum -c` of the new capture folder on both copies;
@@ -255,9 +258,9 @@ The total is well under 1 TB, a small fraction of the 24 TB drive.
 ### D10. Access control
 
 1. Stop adding third-party bytes to this public repo (D8).
-2. Add `/preservation/durable/` and `*.durable.*` to `.gitignore`, next to the baseline safety net (`.gitignore:124-129`).
+2. Add `/preservation/durable/work/` and `*.durable.*` to `.gitignore`, next to the baseline safety net (`.gitignore:124-129`). The tools in `preservation/durable/*.mjs` (section 8) stay tracked; only captured bytes go under `preservation/durable/work/`.
 3. Add `tests/durable-copy-guard.test.js`. It fails when:
-   - any tracked file is under `preservation/durable/`;
+   - any tracked file is under `preservation/durable/work/`;
    - any tracked `.pdf`, `.wacz`, `.warc`, `.mp3`, `.mp4`, `.m4a`, `.mkv`, `.webm` or `.wav` sits outside a short allowlist: `dissertation/**/*.pdf`, `archived/dissertation-tools/source/*.pdf` and the current `preservation/salon/**` files, pinned by path and SHA-256 so it cannot grow quietly;
    - `_DEPLOY_DIRS`, `_DEPLOY_FILES` or `_DEPLOY_DATA_FILES` in `backend/scripts/deploy_full_site.py:81-111`, `:147-188` names anything under `preservation/`;
    - `DEPLOYMENT.md` "What NOT to deploy" (`DEPLOYMENT.md:253-269`) does not list `preservation/`.

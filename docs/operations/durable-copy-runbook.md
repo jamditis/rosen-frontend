@@ -183,8 +183,8 @@ If a PDF fails, move it to `quarantine/` with the validator output. Fix the temp
 ## 6. Store and record
 
 1. Write the files to `objects/<class>/<id>/<captureId>/` using the layout in design D7. Never overwrite a file. A new capture gets a new folder.
-2. Write `SHA256SUMS` in the folder: `sha256sum * > SHA256SUMS`, run from inside the folder.
-3. Write `sidecar.json`: the record row at capture time, the capture receipt and the rights decision.
+2. Write `sidecar.json`: the record row at capture time, the capture receipt and the rights decision.
+3. Write `SHA256SUMS` last, so it covers every file in the folder, the sidecar included. Run from inside the folder: `find . -type f ! -name SHA256SUMS -printf '%P\0' | sort -z | xargs -0 sha256sum > SHA256SUMS`. A later `sha256sum -c` checks only the files listed, so a file written after this step has no fixity cover.
 4. Append schema-v1 events for the record:
    - `capture-attempt`, then `artifact-created` for each file;
    - `rights-decision`;
@@ -198,15 +198,24 @@ If a PDF fails, move it to `quarantine/` with the validator output. Fix the temp
 
 **Second copy (storage class `replica`).** After each batch:
 
+Capture objects never change, but manifests gain events and logs grow. Sync them separately:
+
 ```sh
-rclone copy --immutable --checksum \
-  "$ROOT/rosen-archive-preservation" replica:rosen-archive-preservation \
-  --log-file "$ROOT/rosen-archive-preservation/logs/sync/$(date -u +%Y%m%dT%H%M%SZ).log"
-rclone check --checksum "$ROOT/rosen-archive-preservation" replica:rosen-archive-preservation
-# If the remote cannot report SHA-256, use: rclone check --download
+P="$ROOT/rosen-archive-preservation"
+LOG="$ROOT/sync-logs/$(date -u +%Y%m%dT%H%M%SZ).log"   # outside the synced tree
+
+# 1. Capture objects: immutable. An existing file is never updated.
+rclone copy --immutable --checksum "$P/objects" replica:rosen-archive-preservation/objects --log-file "$LOG"
+rclone check --checksum "$P/objects" replica:rosen-archive-preservation/objects
+
+# 2. Manifests: updated in place, with the replaced version kept on the replica.
+rclone sync --checksum "$P/manifests" replica:rosen-archive-preservation/manifests \
+  --backup-dir "replica:rosen-archive-preservation/manifest-history/$(date -u +%Y%m%dT%H%M%SZ)" --log-file "$LOG"
+rclone check --checksum "$P/manifests" replica:rosen-archive-preservation/manifests
+# If the remote cannot report SHA-256, add --download to each check.
 ```
 
-`--immutable` stops rclone changing a file that already exists. An error from it means a file changed. Treat that as an incident (section 8).
+`--immutable` stops rclone changing an object that already exists. An error from step 1 means a capture file changed. Treat that as an incident (section 8). A manifest change in step 2 is normal: it appends events, and `--backup-dir` keeps the version it replaces. Keep the sync log outside the synced tree, so the copy and the check never read a file that is still being written. Store `logs/fixity/` results in the repo or in `$ROOT/sync-logs/` for the same reason.
 
 Then write a `storage-copy-created` event for the replica copy.
 
