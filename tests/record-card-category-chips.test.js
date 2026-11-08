@@ -84,6 +84,15 @@ describe('record card category chips', () => {
     assert.match(rule[1], /cursor:\s*pointer/);
     assert.doesNotMatch(rule[1], /padding|font-size|line-height|border-width/);
     assert.match(styles, /\.archive-record-card__label--action:focus-visible/);
+    // The desktop shell resets `font` and `color` on every button with a
+    // selector that outranks the label rule, so the chip restates them there.
+    const desktopCss = read('frontend/desktop/desktop.css');
+    assert.match(desktopCss, /\.archive-desktop button,\s*\.archive-desktop a\s*\{\s*font:\s*inherit/);
+    const desktopRule = styles.match(/\.archive-desktop \.archive-record-card__label--action\s*\{([^}]*)\}/);
+    assert.ok(desktopRule, 'desktop button chip rule missing');
+    for (const prop of ['color', 'font-size', 'font-weight', 'line-height', 'letter-spacing']) {
+      assert.match(desktopRule[1], new RegExp(`(^|[\\s;])${prop}:`), `desktop chip must restate ${prop}`);
+    }
     // The label row keeps the body's inset after it leaves the link.
     const labels = styles.match(/\.archive-record-card__labels\s*\{([^}]*)\}/);
     assert.match(labels[1], /margin:\s*0 1\.15rem 1\.15rem/);

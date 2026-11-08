@@ -4291,6 +4291,17 @@ mark {
   cursor: pointer;
 }
 
+/* The desktop shell gives every button `font: inherit` and `color: inherit`
+   (.archive-desktop button), which outranks the shared label rule. Restate
+   the label's type and ink there so the chip keeps the span chip's box. */
+.archive-desktop .archive-record-card__label--action {
+  color: var(--archive-ink-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
 .archive-record-card__label--action:focus-visible {
   outline: 3px solid var(--archive-focus);
   outline-offset: 2px;
