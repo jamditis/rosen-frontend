@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records in the &quot;Technology &amp; Digital Media&quot; category</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 07 Nov 2026 22:22:27 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 08 Nov 2026 18:41:59 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/categories/technology-digital-media.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
   <item>
@@ -14,6 +14,16 @@
     <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3mzj224rfrc2v</guid>
     <pubDate>Wed, 04 Nov 2026 00:00:00 GMT</pubDate>
     <description>Replying to @kinneyaaron.bsky.social on Bluesky, Rosen writes: &quot;Bluesky’s new CEO wants a big tent, not a bubble.&quot; August 2026 interview between Bluesky CEO Toni Schneider and Nilay Patel, editor-in-chief of The Verge, which mentions the platform&apos;s reputation as a home for left wing political views. Does that help?&quot;</description>
+    <category>Technology &amp; Digital Media</category>
+  </item>
+  <item>
+    <title>Going Digital: The People Formerly Known as the Audience</title>
+    <link>https://thepoint.com.au/opinions/261030-going-digital-the-people-formerly-known-as-the-audience</link>
+    <guid isPermaLink="true">https://thepoint.com.au/opinions/261030-going-digital-the-people-formerly-known-as-the-audience</guid>
+    <pubDate>Mon, 02 Nov 2026 00:00:00 GMT</pubDate>
+    <description>In an extract from her book on the ABC under Mark Scott, Margaret Simons traces Scott’s debt to Jay Rosen: public journalism, the citizens’ agenda, and “the people formerly known as the audience.” She recounts Rosen’s 2010 Lateline interview with Leigh Sales, where he criticised horse-race coverage and the “cult of the savvy” and questioned a Sunday program called Insiders, which she notes survived his disapproval.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Audience &amp; Public Engagement</category>
     <category>Technology &amp; Digital Media</category>
   </item>
   <item>
@@ -445,15 +455,6 @@
     <pubDate>Thu, 09 Oct 2025 00:00:00 GMT</pubDate>
     <description>A Bluesky post by Jay Rosen from 2025-10-09. Topics: Press &amp; Media Criticism, Technology &amp; Digital Media.</description>
     <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>From a new post of mind, explaining the role I am taking in News Creator Corps</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3m2rfv26rmc2t</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3m2rfv26rmc2t</guid>
-    <pubDate>Thu, 09 Oct 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-10-09. Topics: Journalism Education, Technology &amp; Digital Media.</description>
-    <category>Journalism Education</category>
     <category>Technology &amp; Digital Media</category>
   </item>
   </channel>
