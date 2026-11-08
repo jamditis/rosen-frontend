@@ -40,6 +40,7 @@
 // Dry run by default; pass --apply to write.
 
 import { readFileSync, writeFileSync } from 'fs';
+import { assertNoPendingCapture } from '../lib/pending-capture.js';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 
@@ -312,6 +313,7 @@ if (!APPLY) {
 // record_delimiter alone and would otherwise emit an unquoted embedded newline
 // (invalid CSV). Verified byte-identical against a pure round-trip of HEAD.
 const stringifyOpts = { header: true, record_delimiter: '\r\n', quoted_match: /[\r\n]/ };
+assertNoPendingCapture(ENTITIES_PATH);
 writeFileSync(ENTITIES_PATH, stringify(keptEntities, { ...stringifyOpts, columns: ENTITY_COLUMNS }));
 writeFileSync(RELATIONSHIPS_PATH, stringify(keptRelationships, { ...stringifyOpts, columns: RELATIONSHIP_COLUMNS }));
 console.log('\napplied. Regenerate JSON: node data/export-archive-data.js');

@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from 'fs';
+import { assertNoPendingCapture } from '../lib/pending-capture.js';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 
@@ -153,6 +154,7 @@ const relationshipColumns = [
   'context_snippet', 'confidence_score', 'extracted_date'
 ];
 
+assertNoPendingCapture(ENTITIES_PATH);
 writeFileSync(ENTITIES_PATH, stringify(updatedEntities, { header: true, columns: entityColumns }));
 writeFileSync(RELATIONSHIPS_PATH, stringify(updatedRelationships, { header: true, columns: relationshipColumns }));
 

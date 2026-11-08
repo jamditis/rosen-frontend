@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 import { loadCsv, renderCsv, serializeRecord, verifyEdit } from './csv-record-surgery.js';
+import { assertNoPendingCapture } from './pending-capture.js';
 
 function loadEditableCsv(source, rows, columns) {
   if (!rows.length) {
@@ -71,6 +72,9 @@ function main() {
   if (!['read', 'render'].includes(operation)) {
     throw new Error('Expected read or render operation');
   }
+  // The Python caller writes whatever render returns, so refuse before any
+  // bytes leave while a capture journal could still roll this CSV forward.
+  if (operation === 'render') assertNoPendingCapture(filename);
 
   const originalBytes = fs.readFileSync(filename);
   const original = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true })

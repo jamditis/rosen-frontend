@@ -9,6 +9,7 @@
  */
 
 import { readFileSync, writeFileSync } from 'fs';
+import { assertNoPendingCapture } from '../lib/pending-capture.js';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 
@@ -130,6 +131,7 @@ console.log(`${'─'.repeat(60)}\n`);
 if (!DRY_RUN && changes.length > 0) {
   const columns = Object.keys(records[0]);
   const output = stringify(records, { header: true, columns });
+  assertNoPendingCapture(csvPath);
   writeFileSync(csvPath, output);
   console.log(`Wrote cleaned CSV to ${csvPath}`);
 } else if (DRY_RUN) {
