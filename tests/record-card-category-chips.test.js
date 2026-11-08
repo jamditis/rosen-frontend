@@ -90,6 +90,9 @@ describe('record card category chips', () => {
     assert.match(desktopCss, /\.archive-desktop button,\s*\.archive-desktop a\s*\{\s*font:\s*inherit/);
     const desktopRule = styles.match(/\.archive-desktop \.archive-record-card__label--action\s*\{([^}]*)\}/);
     assert.ok(desktopRule, 'desktop button chip rule missing');
+    // The desktop shell holds every target to 44 by 44 px; the preview audit
+    // fails any smaller button inside .archive-desktop.
+    assert.match(desktopRule[1], /min-height:\s*44px/, 'desktop chip must be at least 44px tall');
     for (const prop of ['color', 'font-size', 'font-weight', 'line-height', 'letter-spacing']) {
       assert.match(desktopRule[1], new RegExp(`(^|[\\s;])${prop}:`), `desktop chip must restate ${prop}`);
     }
