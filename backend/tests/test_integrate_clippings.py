@@ -17,4 +17,4 @@ def test_clipping_rows_publish_with_explicit_review_state():
     assert list(row) == CSV_COLUMNS
     assert row["verified"] == "TRUE"
     assert row["low_confidence"] == ""
-    assert row["needs_review"] == "true"
+    assert row["needs_review"] == "TRUE"

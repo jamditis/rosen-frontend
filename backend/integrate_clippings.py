@@ -165,7 +165,7 @@ def convert_to_csv_row(record, new_id):
         "verified": "TRUE",
         "notes": record.get("notes", ""),
         "low_confidence": "",
-        "needs_review": "true",
+        "needs_review": "TRUE",
     }
 
 

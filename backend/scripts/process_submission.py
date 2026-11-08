@@ -280,6 +280,20 @@ def _next_record_id(existing_ids: Set[str], prefix: str = "RECORD") -> str:
     return f"{prefix}-{highest + 1:05d}"
 
 
+_TRUE_SPELLINGS = frozenset({"true", "yes", "1"})
+
+
+def _csv_flag(value) -> str:
+    """Write verified/needs_review as TRUE or FALSE, the one canonical spelling.
+
+    Readers disagree on anything else: the exporter accepts TRUE/true/Yes, but
+    the quality evaluator and the ingestion receipt accept only TRUE/FALSE.
+    """
+    if isinstance(value, bool):
+        return "TRUE" if value else "FALSE"
+    return "TRUE" if str(value or "").strip().lower() in _TRUE_SPELLINGS else "FALSE"
+
+
 def _clean_title(title: str, publication: str) -> str:
     """Strip a trailing ' - <publication>' site suffix from a scraped title.
 
@@ -1004,7 +1018,7 @@ def process_one(
     if notes:
         scrape["notes"] = notes
     # Capture any verified value a processor set BEFORE enrich_data runs its
-    # `data.setdefault('verified', False)` — after that call the key always
+    # `data.setdefault('verified', "FALSE")` — after that call the key always
     # exists, so this is the only point where "processor set it" and "processor
     # left it unset" are still distinguishable.
     processor_verified = scrape.get("verified")
@@ -1013,9 +1027,9 @@ def process_one(
     except Exception as exc:  # noqa: BLE001 — enrichment is non-critical
         logger.warning(f"enrich_data failed (continuing): {exc}")
     if low_confidence:
-        scrape["low_confidence"] = "true"
+        scrape["low_confidence"] = "TRUE"
     # Hybrid 'live but flagged' model. Auto-submissions publish immediately so
-    # the submitter sees the record appear, then carry needs_review=true so a
+    # the submitter sees the record appear, then carry needs_review=TRUE so a
     # human can vet the AI-generated metadata before it's treated as final.
     #
     # Force verified True when no processor set it, and for clipping-family ids.
@@ -1024,9 +1038,9 @@ def process_one(
     # fresh clippings through verified=TRUE lets the exporter use one verification
     # model instead of bypassing the column based on a CLIP- id prefix (#352).
     # enrich_data() above runs
-    # `data.setdefault('verified', False)` (a conservative default for legacy or
-    # broken rows), so `scrape.get('verified', True)` would always read back that
-    # False and the public exporter — which drops verified=False rows — would
+    # `data.setdefault('verified', "FALSE")` (a conservative default for legacy
+    # or broken rows), so `scrape.get('verified', True)` would always read back
+    # that FALSE and the public exporter — which drops unverified rows — would
     # silently hide every submission. Article scrapes leave verified unset, so
     # they publish. A processor's explicit verified value remains authoritative
     # for non-clipping records.
@@ -1038,7 +1052,9 @@ def process_one(
         # 'True' round-trips through the CSV and is then dropped, silently hiding
         # the record. 'TRUE' matches the existing column convention.
         scrape["verified"] = "TRUE"
-    scrape["needs_review"] = "true"
+    else:
+        scrape["verified"] = _csv_flag(processor_verified)
+    scrape["needs_review"] = "TRUE"
 
     # Guarantee an exporter-visible title. The public exporter drops any record
     # whose title is empty, 'Untitled', or under 5 chars, so a manual paste with

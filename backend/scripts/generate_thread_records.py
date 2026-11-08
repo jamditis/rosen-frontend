@@ -160,7 +160,7 @@ def create_thread_record(
         "key_concepts": "",
         "platforms": "Bluesky",
         "copyright": "",
-        "verified": "Yes",
+        "verified": "TRUE",
         "date_added": datetime.now().strftime("%Y-%m-%d"),
         "date_modified": datetime.now().strftime("%Y-%m-%d"),
         "date_processed": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),

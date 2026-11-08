@@ -192,7 +192,7 @@ class ClippingProcessor:
             "key_concepts": "",  # To be filled by AI
             "tags": "",
             "notes": f"OCR'd newspaper clipping. Source file: {filename}. Metadata confidence: {metadata.confidence:.0%}",
-            "verified": "false",
+            "verified": "FALSE",
             "date_processed": datetime.now().strftime("%m/%d/%Y"),
         }
 

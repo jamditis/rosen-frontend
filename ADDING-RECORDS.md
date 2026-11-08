@@ -92,7 +92,7 @@ Find the record by its exact ID and source URL. Change the intended fields in th
 
 Preserve all other columns, even when a value is blank. Keep the ID and unrelated fields unchanged. Before changing source rows, the maintainer must check for pending ingestion transactions; stop and follow [the recovery instructions](docs/operations/pressthink-ingestion.md) if one exists. Do not run another writer in the same checkout. Reconcile the correction against the latest `main` before validation and publication, and never lower or hand-edit the ID reservation state.
 
-Automated submissions can set `verified=TRUE` while also setting `needs_review=true`. Neither a public record nor the verification flag alone establishes that a human has finished checking it.
+Automated submissions can set `verified=TRUE` while also setting `needs_review=TRUE`. Write both flags as `TRUE` or `FALSE` in capitals; `needs_review` may also be blank. `tests/flag-spelling.test.js` fails on any other spelling. Neither a public record nor the verification flag alone establishes that a human has finished checking it.
 
 ### Thematic categories to use
 

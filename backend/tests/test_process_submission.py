@@ -2275,6 +2275,28 @@ class TestReviewGate:
         assert row["verified"] == "TRUE"
         assert row["needs_review"].lower() == "true"
 
+    @pytest.mark.parametrize("processor_value", [False, "false", "False", "no"])
+    def test_processor_flags_are_written_in_canonical_spelling(
+        self, monkeypatch, csv_with_headers, processor_value
+    ):
+        """verified and needs_review are written as TRUE/FALSE only.
+
+        Readers disagree on other spellings: the quality evaluator and the
+        ingestion receipt accept only TRUE/FALSE. A non-clipping processor's
+        explicit verdict stays authoritative but is written canonically.
+        """
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch, verified=processor_value)
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        _run(monkeypatch, csv_with_headers, url="https://example.com/flagged")
+        with csv_with_headers.open() as f:
+            row = next(csv.DictReader(f))
+        assert row["verified"] == "FALSE"
+        assert row["needs_review"] == "TRUE"
+
     def test_clipping_publish_prefixes_match_processor(self):
         expected = {"CLIP", *ClippingProcessor.PUBLICATION_PREFIXES.values()}
         assert process_submission.CLIPPING_ID_PREFIXES == expected

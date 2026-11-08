@@ -326,5 +326,5 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 22. Move `stampVersion` inside the rollback try in `scripts/bump-version.mjs`. Fixed (the version.json write and the stamp loop now run inside the rollback try).
 23. Delete the pushed branch when `gh pr create` fails in `sync_sheet_to_archive.py`. Fixed (a failed `gh pr create` now deletes the pushed branch and still reports the original error).
 24. Remove the unused `noop` status from the `process_submission.py` docstring, and add `committed` to the sweeper workflow comment. Fixed (both docstrings drop `noop`, and the workflow comment lists `committed` with the new skip and cap rules).
-25. Use one spelling (`TRUE`/`FALSE`) for `verified` and `needs_review` in all writers, and make one validator enforce it.
+25. Use one spelling (`TRUE`/`FALSE`) for `verified` and `needs_review` in all writers, and make one validator enforce it. Fixed (the Python CSV writers now write `TRUE`/`FALSE`, `process_submission.py` normalizes a processor's own verdict, and `tests/flag-spelling.test.js` checks the CSVs and writer literals; current data already passed, so no cells changed).
 26. Use one shared default filter object for `App.js` and `viewState.js`.
