@@ -1619,6 +1619,7 @@ const App = () => {
                   onOpenFolder=${handleFolderClick}
                   onPageChange=${handlePageChange}
                   onClearFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
+                  onFilterCategory=${handleFilterCategory}
                   skipping=${recordsSkipping}
                 />
             `}

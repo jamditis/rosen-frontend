@@ -40,6 +40,11 @@ const DesktopArchivePanel = ({
   const resultsRef = useRef(null);
   const filterPanelRef = useRef(null);
   const filterButtonRef = useRef(null);
+  // A card's category chip narrows this panel to that one category, the same
+  // filter the standard archive's chips and record modal apply (#876).
+  const filterByCategory = (category) => {
+    setFilters(prev => ({ ...prev, categories: [category] }));
+  };
   const desktopSemanticSearch = semanticSearch && {
     ...semanticSearch,
     inputId: `desktop-${viewMode}-archive-search-semantic`,
@@ -219,6 +224,7 @@ const DesktopArchivePanel = ({
             onOpenFolder=${onOpenFolder}
             onPageChange=${changePage}
             onClearFilters=${onClearFilters}
+            onFilterCategory=${filterByCategory}
           />
         </section>
       </div>
