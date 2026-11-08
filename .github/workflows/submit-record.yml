@@ -199,6 +199,10 @@ jobs:
           # and silently fall back to password auth.
           ROSEN_SFTP_KEY_PASSPHRASE: ${{ secrets.ROSEN_SFTP_KEY_PASSPHRASE }}
           ROSEN_SFTP_KNOWN_HOSTS: ${{ secrets.ROSEN_SFTP_KNOWN_HOSTS }}
+          # This job exists to publish. With the flag set, a missing transfer
+          # secret fails the push and leaves the row archived (retryable)
+          # instead of the terminal committed status.
+          ROSEN_REQUIRE_TRANSFER: '1'
           # process_submission.py reads these for the git commit identity
           GIT_BOT_NAME: rosen-archive-bot
           GIT_BOT_EMAIL: "rosen-archive-bot[bot]@users.noreply.github.com"

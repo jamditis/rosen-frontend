@@ -316,7 +316,7 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 12. Prune `generatedPublishedRecordIds` entries in the refresh when the record is no longer published.
 13. Add the pending-journal check to the JS CSV writers in `data/fixes/` and `data/lib/python-csv-maintenance.js`.
 14. Exclude `failed` rows from `get_processed_ids` so that the batch runner retries them.
-15. Return a failure instead of `skipped` from `push_full_release` when the job expects SFTP secrets.
+15. Return a failure instead of `skipped` from `push_full_release` when the job expects SFTP secrets. Fixed (`submit-record.yml` sets `ROSEN_REQUIRE_TRANSFER=1`, so missing settings fail the push by name and the row stays `archived`).
 16. Reset `coreFetchStarted` on error and add a retry button that fetches again without a page reload.
 17. Treat an unparseable column A timestamp as stuck and log it in `sweep_stuck.py`.
 18. Call `terminateSemanticSearch` on the semantic query error path in `App.js`.

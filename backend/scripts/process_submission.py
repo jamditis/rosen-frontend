@@ -32,7 +32,9 @@ Behavior (12-step pipeline from the design's "Architecture" diagram):
 
 Status outcomes: ``live | committed | archived | duplicate | error | noop``.
 ``committed`` is terminal: the record is appended but live push (SFTP) is not
-configured on this runner, so the sweeper must not retry it.
+configured on this runner, so the sweeper must not retry it. A job that sets
+``ROSEN_REQUIRE_TRANSFER=1`` (``submit-record.yml`` does) never reaches it:
+missing transfer settings fail the push, and the row stays ``archived``.
 
 Critical conventions:
     * NEVER ``git add -A`` — stage explicit paths.
