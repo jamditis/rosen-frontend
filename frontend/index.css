@@ -4448,6 +4448,13 @@ mark {
   line-height: var(--line-height-normal);
 }
 
+.archive-error-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
 .archive-loading-state__mark {
   position: relative;
   width: 4rem;

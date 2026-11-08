@@ -514,8 +514,11 @@ const App = () => {
   // Gate the ~13MB core fetch so cold deep-links into non-record routes do
   // not fetch and parse archive data those routes never render. The ref makes
   // this fire once; depending on currentRoute means navigating back to a
-  // record-backed route back-fills the data.
+  // record-backed route back-fills the data. A failed load releases the ref,
+  // and the error panel's retry bumps coreLoadAttempt to run the effect again
+  // without a page reload.
   const coreFetchStarted = useRef(false);
+  const [coreLoadAttempt, setCoreLoadAttempt] = useState(0);
   useEffect(() => {
     let active = true;
     loadReleaseMetadata()
@@ -542,10 +545,17 @@ const App = () => {
       })
       .catch(err => {
         console.error(err);
-        setError('Failed to load archive data. Please refresh the page or try again later.');
+        coreFetchStarted.current = false;
+        setError('Failed to load archive data. Check your connection, then try again.');
         setLoading(false);
       });
-  }, [currentRoute, desktopAppId, desktopNeedsRecords]);
+  }, [currentRoute, desktopAppId, desktopNeedsRecords, coreLoadAttempt]);
+
+  const retryCoreLoad = () => {
+    setError(null);
+    setLoading(true);
+    setCoreLoadAttempt(attempt => attempt + 1);
+  };
 
   // Preserve the standard archive's background full-detail warmup, but keep
   // the lighter guided and entity desktop surfaces on core data until a
@@ -1214,13 +1224,22 @@ const App = () => {
         <p className="archive-section-label">Archive status</p>
         <h3>Error loading archive</h3>
         <p>${error}</p>
-        <button
-            type="button"
-            onClick=${() => window.location.reload()}
-            className="archive-action archive-action--danger"
-        >
-            Reload page
-        </button>
+        <div className="archive-error-state__actions">
+            <button
+                type="button"
+                onClick=${retryCoreLoad}
+                className="archive-action archive-action--danger"
+            >
+                Try again
+            </button>
+            <button
+                type="button"
+                onClick=${() => window.location.reload()}
+                className="archive-action archive-action--secondary"
+            >
+                Reload page
+            </button>
+        </div>
     </div>
   `;
 

@@ -101,7 +101,7 @@ stateDiagram-v2
   NotStarted --> Loading: navigate to record route
   Loading --> Loaded
   Loading --> Error
-  Error --> [*]: full reload only
+  Error --> Loading: try again (no reload)
 ```
 
 ### F6 cache tiers
@@ -318,7 +318,7 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 13. Add the pending-journal check to the JS CSV writers in `data/fixes/` and `data/lib/python-csv-maintenance.js`. Fixed (`data/lib/pending-capture.js` mirrors the Python check; every `data/fixes/*.js` write and the bridge `render` call it first).
 14. Exclude `failed` rows from `get_processed_ids` so that the batch runner retries them. Fixed (failed rows load again on the next run; auto mode sends each post at most once per run so a post that always fails cannot loop).
 15. Return a failure instead of `skipped` from `push_full_release` when the job expects SFTP secrets. Fixed (`submit-record.yml` sets `ROSEN_REQUIRE_TRANSFER=1`, so missing settings fail the push by name and the row stays `archived`).
-16. Reset `coreFetchStarted` on error and add a retry button that fetches again without a page reload.
+16. Reset `coreFetchStarted` on error and add a retry button that fetches again without a page reload. Fixed (the catch releases the ref, and a "Try again" button in the shared error panel bumps a retry counter that reruns the load effect; "Reload page" stays as a fallback).
 17. Treat an unparseable column A timestamp as stuck and log it in `sweep_stuck.py`. Fixed (an unparseable or empty column A now counts as stuck and logs a warning; a future timestamp stays fresh).
 18. Call `terminateSemanticSearch` on the semantic query error path in `App.js`.
 19. Cancel the 180 ms close timer in `RecordModal.js` when the record changes or the component unmounts.
