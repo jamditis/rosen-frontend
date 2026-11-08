@@ -2,9 +2,24 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  assertCensusReady,
   newlyCapturedRecordIdsFromReport,
   registerSourceSupportedGeneratedThreads,
 } from '../scripts/refresh-social-release-artifacts.mjs';
+
+test('lets a release through when a relationship type reaches zero divergence', () => {
+  const logged = [];
+  assert.doesNotThrow(() => assertCensusReady(
+    { problems: [], warnings: ['Mentions: no row diverges any more'] },
+    message => logged.push(message),
+  ));
+  assert.equal(logged.length, 1);
+  assert.match(logged[0], /Mentions: no row diverges/);
+  assert.throws(
+    () => assertCensusReady({ problems: ['Mentions: bad note'], warnings: [] }, () => {}),
+    /relationship census needs review: Mentions: bad note/,
+  );
+});
 
 const existingPolicy = {
   schemaVersion: 1,

@@ -181,6 +181,41 @@ test('refuses to rule on a backlog that has reached zero', () => {
   assert.equal(result.registry.types.Mentions.endpointDivergence.violatingRows, 1);
 });
 
+test('can report a backlog that reached zero as a warning instead of a problem', () => {
+  const registry = {
+    types: {
+      Mentions: {
+        allowedSourceTypes: ['Person'],
+        allowedTargetTypes: ['Work'],
+        endpointEnforcement: 'deferred',
+        endpointDivergence: {
+          violatingRows: 1,
+          totalRows: 2,
+          asOfDate: '2026-01-01',
+          exampleRelationshipIds: ['RECORD-00002_REL_001'],
+          note: '1 of 2 current Mentions rows have a source or target entity type outside this allowlist.',
+        },
+      },
+    },
+  };
+
+  const result = refreshRelationshipTypeCensus(registry, {
+    relationshipRows: [row('RECORD-00001_REL_001', 'Mentions', 'P0001', 'W0001')],
+    entityRows: [
+      { entity_id: 'P0001', entity_type: 'Person', entity_name: 'Jay Rosen' },
+      { entity_id: 'W0001', entity_type: 'Work', entity_name: 'PressThink' },
+    ],
+    asOfDate: '2026-08-27',
+    zeroDivergence: 'warning',
+  });
+
+  assert.deepEqual(result.problems, []);
+  assert.equal(result.warnings.length, 1);
+  assert.match(result.warnings[0], /endpointEnforcement can be flipped/);
+  // The flip is still a curator ruling, so the block is left as it was.
+  assert.equal(result.registry.types.Mentions.endpointDivergence.violatingRows, 1);
+});
+
 test('drops a contradiction block once no reversed pair is left', () => {
   const registry = {
     types: {
