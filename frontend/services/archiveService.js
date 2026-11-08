@@ -251,9 +251,12 @@ const checkVersion = () => {
 };
 
 // Bound the wait at the call site so a slow or hung version.json can't
-// stall a load a good cache could satisfy. The check stays in flight in
-// the background and clears the cache if it eventually returns.
+// stall the load. The check stays in flight in the background and clears the
+// cache if it eventually returns. fetchCoreData skips its cache reads after a
+// timeout, because the stored deploy version that names the cache key has not
+// been confirmed.
 const VERSION_CHECK_TIMEOUT_MS = 4000;
+const VERSION_CHECK_TIMED_OUT = Symbol('version-check-timed-out');
 
 const getCachedData = (url) => {
   try {
@@ -369,29 +372,40 @@ export const fetchCoreData = async () => {
   const dataUrl = DATA_CONFIG.archive_core;
 
   // Check deploy version (clears caches if version changed), bounded so a
-  // slow version.json doesn't stall a load a good cache could satisfy.
-  await raceTimeout(checkVersion(), VERSION_CHECK_TIMEOUT_MS);
+  // slow version.json doesn't stall a load. checkVersion never rejects, so
+  // the fallback sentinel means only that the bound expired.
+  const versionCheck = await raceTimeout(checkVersion(), VERSION_CHECK_TIMEOUT_MS, {
+    fallback: VERSION_CHECK_TIMED_OUT,
+  });
+  // After a timeout the stored deploy version may still be the previous
+  // release's, and both cache tiers below would answer with that release's
+  // records. Go to the network instead of trusting an unconfirmed key.
+  const cacheConfirmed = versionCheck !== VERSION_CHECK_TIMED_OUT;
 
-  const idbKey = coreIdbKey();
+  if (cacheConfirmed) {
+    const idbKey = coreIdbKey();
 
-  // 1. IndexedDB cache — structured-clones the object on read, skipping the
-  // JSON.parse of the ~13 MB blob, and persists across tab close (the blob
-  // exceeds localStorage's ~5 MB cap, so the Web Storage fallback below lands
-  // in sessionStorage, which a fresh tab never sees). See idbCache.js (#275).
-  const idbEntry = await idbGet(idbKey);
-  if (isFreshEntry(idbEntry)) {
-    debug('Using IndexedDB-cached core data');
-    return idbEntry.data;
-  }
+    // 1. IndexedDB cache — structured-clones the object on read, skipping the
+    // JSON.parse of the ~13 MB blob, and persists across tab close (the blob
+    // exceeds localStorage's ~5 MB cap, so the Web Storage fallback below lands
+    // in sessionStorage, which a fresh tab never sees). See idbCache.js (#275).
+    const idbEntry = await idbGet(idbKey);
+    if (isFreshEntry(idbEntry)) {
+      debug('Using IndexedDB-cached core data');
+      return idbEntry.data;
+    }
 
-  // 2. Web Storage cache — covers browsers where IndexedDB is blocked (Safari
-  // Private, Firefox strict tracking protection). Promote a hit into
-  // IndexedDB, best-effort and unawaited, so the next read skips the parse.
-  const cached = getCachedData(dataUrl);
-  if (cached) {
-    debug('Using Web Storage-cached core data');
-    idbSet(idbKey, makeCoreEntry(cached));
-    return cached;
+    // 2. Web Storage cache — covers browsers where IndexedDB is blocked (Safari
+    // Private, Firefox strict tracking protection). Promote a hit into
+    // IndexedDB, best-effort and unawaited, so the next read skips the parse.
+    const cached = getCachedData(dataUrl);
+    if (cached) {
+      debug('Using Web Storage-cached core data');
+      idbSet(idbKey, makeCoreEntry(cached));
+      return cached;
+    }
+  } else {
+    debug('Deploy version check timed out; skipping cached core data');
   }
 
   debug('Fetching core data from:', dataUrl);
@@ -431,7 +445,9 @@ export const fetchCoreData = async () => {
     // Cache the result. IndexedDB first; fall back to Web Storage only when
     // IndexedDB is unavailable, so capable browsers skip the redundant ~13 MB
     // sessionStorage write (and its JSON.stringify) entirely.
-    const storedInIdb = await idbSet(idbKey, makeCoreEntry(data));
+    // Re-read the key: a version check that finished during the fetch has
+    // stored the new deploy version, and the fresh payload belongs under it.
+    const storedInIdb = await idbSet(coreIdbKey(), makeCoreEntry(data));
     if (!storedInIdb) {
       setCachedData(dataUrl, data);
     }
