@@ -58,6 +58,29 @@ describe('record modal close timer (item 19)', () => {
   });
 });
 
+describe('desktop close and minimize use the latest layout (item 20)', () => {
+  const shell = read('frontend', 'desktop', 'DesktopShell.js');
+  const body = (name) => shell.slice(
+    shell.indexOf(`const ${name} = (app) => {`),
+    shell.indexOf('\n  };\n', shell.indexOf(`const ${name} = (app) => {`)),
+  );
+
+  // Scenario: a drag-end position update is queued, then the reader closes a
+  // window in the same tick. Writing a layout computed from the render-time
+  // value drops the queued position; a functional updater applies on top.
+  it('closeWindow writes the layout with a functional updater', () => {
+    const close = body('closeWindow');
+    assert.match(close, /setLayout\(\(current\) => closeDesktopWindow\(current, app\.id, shellAppIds\)\)/);
+    assert.doesNotMatch(close, /setLayout\(nextLayout\)/);
+  });
+
+  it('minimizeWindow writes the layout with a functional updater', () => {
+    const minimize = body('minimizeWindow');
+    assert.match(minimize, /setLayout\(\(current\) => minimizeDesktopWindow\(current, app\.id, shellAppIds\)\)/);
+    assert.doesNotMatch(minimize, /setLayout\(nextLayout\)/);
+  });
+});
+
 describe('Back keeps the standard archive filters (item 8)', async () => {
   const { filtersForHistoryEntry } = await import('../frontend/services/viewState.js');
   const BASE = 'https://pressthink.org/j/rosen-archive/';

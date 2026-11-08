@@ -805,8 +805,12 @@ const DesktopShell = ({
   const closeWindow = (app) => {
     if (dragSessionRef.current?.app.id === app.id) cancelWindowDrag();
     if (moveControlsAppId === app.id) closeMoveControls(app.id, false);
+    // Write through a functional updater so a queued update, such as a
+    // drag-end position, is applied first and not dropped. The render-time
+    // layout only picks the window to select next, which depends on which
+    // windows are open and how they stack, not on their positions.
+    setLayout((current) => closeDesktopWindow(current, app.id, shellAppIds));
     const nextLayout = closeDesktopWindow(layout, app.id, shellAppIds);
-    setLayout(nextLayout);
     setStatusMessage(`Closed ${app.label}.`);
     if (activeAppId === app.id) {
       onSelectApp?.(nextVisibleDesktopWindow(nextLayout) || null);
@@ -820,8 +824,12 @@ const DesktopShell = ({
   const minimizeWindow = (app) => {
     if (dragSessionRef.current?.app.id === app.id) cancelWindowDrag();
     if (moveControlsAppId === app.id) closeMoveControls(app.id, false);
+    // Write through a functional updater so a queued update, such as a
+    // drag-end position, is applied first and not dropped. The render-time
+    // layout only picks the window to select next, which depends on which
+    // windows are open and how they stack, not on their positions.
+    setLayout((current) => minimizeDesktopWindow(current, app.id, shellAppIds));
     const nextLayout = minimizeDesktopWindow(layout, app.id, shellAppIds);
-    setLayout(nextLayout);
     setStatusMessage(`Minimized ${app.label}. Use its taskbar button to restore it.`);
     if (activeAppId === app.id) {
       onSelectApp?.(nextVisibleDesktopWindow(nextLayout, app.id) || null);

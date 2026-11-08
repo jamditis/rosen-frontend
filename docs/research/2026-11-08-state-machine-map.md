@@ -323,7 +323,7 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 17. Treat an unparseable column A timestamp as stuck and log it in `sweep_stuck.py`. Fixed (an unparseable or empty column A now counts as stuck and logs a warning; a future timestamp stays fresh).
 18. Call `terminateSemanticSearch` on the semantic query error path in `App.js`. Fixed (the query error path now releases the worker, as the off switch does).
 19. Cancel the 180 ms close timer in `RecordModal.js` when the record changes or the component unmounts. Fixed (the timer lives in a ref that an effect keyed on `isOpen` and the record id clears).
-20. Use functional `setLayout` updaters in `closeWindow` and `minimizeWindow` in `DesktopShell.js`.
+20. Use functional `setLayout` updaters in `closeWindow` and `minimizeWindow` in `DesktopShell.js`. Fixed (both now write through `setLayout((current) => ...)`; the cross-tab `storage` listener from problem 19 is still open).
 21. Set `db` only after `createTables` succeeds in `sqliteService.js`. Fixed (the schema is built on a local database, which is closed on failure and published to `db` only after it succeeds).
 22. Move `stampVersion` inside the rollback try in `scripts/bump-version.mjs`. Fixed (the version.json write and the stamp loop now run inside the rollback try).
 23. Delete the pushed branch when `gh pr create` fails in `sync_sheet_to_archive.py`. Fixed (a failed `gh pr create` now deletes the pushed branch and still reports the original error).
