@@ -457,6 +457,29 @@ describe('relationship type registry enforcement (#737)', () => {
     assert.equal(summary.endpointReviewRows[0].validationState, 'held');
   });
 
+  it('fails a held relationship that breaks the endpoint rule of an "enforced" type', async () => {
+    // Held types (Founded By, Owned By) are promoted to "enforced" once their
+    // backlog reaches zero (curator ruling, 2026-11-08). Their rows stay held,
+    // so the held path must enforce the rule too, or a later bad row would be
+    // neither a failure nor a review row.
+    const fixture = validFixture();
+    fixture.relationships[0].type = 'Owned By';
+    fixture.policy.relationshipTypeHolds = [{
+      relationshipId: 'REL-00001',
+      observedType: 'Owned By',
+      reason: 'Legacy inverse relationship type awaiting semantic normalization in issue #737.',
+    }];
+    fixture.policy.relationshipTypeRegistry = {
+      'Owned By': {
+        allowedSourceTypes: ['Organization', 'Work'],
+        allowedTargetTypes: ['Organization', 'Person'],
+        endpointEnforcement: 'enforced',
+      },
+    };
+
+    await assert.rejects(validateGraphDataset(fixture), /REL-00001: source entity type Person is not an allowed source type for Owned By/);
+  });
+
   it('puts a curator-approved retype recommendation in the review report', async () => {
     const fixture = validFixture();
     fixture.relationships[0].type = 'Created';
