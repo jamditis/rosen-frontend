@@ -4,7 +4,7 @@
     "compatibility": "additive changes within version 1; semantic changes require a new major version"
   },
   "input": {
-    "commit": "e3a88a0c6b502471978f614356e3a0b013308c4e",
+    "commit": "ab288ba047d95196d944b780ec358ad537c4c3bb",
     "dirty": false,
     "schema_version": "stewardship-census/1.0.0",
     "files": [
@@ -18,27 +18,27 @@
       },
       {
         "path": "data/extracted_entities.csv",
-        "sha256": "480adb8e41e77210e3d90ef69842a6d4a5475a9413fc4c3170f6bfa7758941d0"
+        "sha256": "9caeed8a9a5cb7ec5128816789e74428e42e826ac6688f61c88d3e80dd57f78c"
       },
       {
         "path": "data/extracted_relationships.csv",
-        "sha256": "a852f0bec98bbd37ec6e6192419354a6cb892e3963a824853236506715a1bbf3"
+        "sha256": "3859062707da3b2141c3f2a7067085921ca370f614e52a8757118de314d0b2ea"
       },
       {
         "path": "data/archive-data.json",
-        "sha256": "831826f8be5c0670dda4ec47dbcbf085062e81796797a22e882653f080322f78"
+        "sha256": "181e1afaa9b07a5c12f35a0a9db6453d343825b47a244522fb74d78a7a6fe252"
       },
       {
         "path": "data/archive-core.json",
-        "sha256": "ec9b5a938328ac963a2e2b5ae46242e915962bb947c70d433663b42c92aca8a6"
+        "sha256": "6bffcf2e34da7e361387fd265d2e80b85f90720181336d1d3b1e269e0c1f4f23"
       },
       {
         "path": "data/archive-details.json",
-        "sha256": "f849f2584d863a609c8d782f94c192f34f3bf2ba973ccf3347624c2a9aca4e0f"
+        "sha256": "656c89e0786a237fac1ec9e5f441217c71e8a44677c1f302682bd27f7ff8babf"
       },
       {
         "path": "data/archive-entities.json",
-        "sha256": "c2ed7b60a44caa736d49399e7f48b2b6703bedd91980b6a34ff342bf06e30f3a"
+        "sha256": "bba120180385274e3b9adb71788cef7ae7917742734e0a722dfb037078c8cf4d"
       },
       {
         "path": "data/authored-excerpts.csv",
@@ -4694,18 +4694,18 @@
   },
   "graph": {
     "entities": {
-      "total": 7498,
+      "total": 7481,
       "by_type": {
         "Concept": 1299,
         "Event": 465,
         "Location": 262,
-        "Organization": 1642,
+        "Organization": 1640,
         "Person": 2658,
-        "Work": 1172
+        "Work": 1157
       },
-      "detached_from_relationships": 1715,
+      "detached_from_relationships": 1712,
       "blank_first_mention": 0,
-      "runtime_total": 7498
+      "runtime_total": 7481
     },
     "relationships": {
       "total": 11189,
@@ -30483,8 +30483,8 @@
       {
         "metric": "entities",
         "baseline": 8150,
-        "current": 7498,
-        "delta": -652
+        "current": 7481,
+        "delta": -669
       },
       {
         "metric": "relationships",
