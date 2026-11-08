@@ -84,6 +84,7 @@ const APP_SHELL_FRONTEND_FILES = [
   'services/archiveService.js',
   'services/bodyScrollLock.js',
   'services/cacheConfig.js',
+  'services/historyFilters.js',
   'services/idbCache.js',
   'services/queryComposition.js',
   'services/releaseMetadata.js',

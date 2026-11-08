@@ -7,7 +7,8 @@ import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.70';
 import { withViewTransition } from './utils/viewTransition.js?v=3.8.70';
 import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.70';
 import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.70';
-import { defaultFilters, filtersForHistoryEntry, parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.70';
+import { defaultFilters, parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.70';
+import { filtersForHistoryEntry } from './services/historyFilters.js?v=3.8.70';
 import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.70';
 import { canonicalRecordUrl, setRecordParam } from './utils/recordDeepLink.js?v=3.8.70';
 import {

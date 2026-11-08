@@ -201,27 +201,6 @@ export function viewStateToUrl(viewState, baseHref) {
 }
 
 /**
- * The filters a Back or Forward step to `href` should restore, or null when
- * the live in-memory filters should stay.
- *
- * Only desktop record windows write their filters into the URL (App.js
- * replaces the history entry as they change), so only their entries carry a
- * filter state to restore. The standard archive, the other hash routes, and
- * desktop windows without records never write filters, so their entries carry
- * none; reading them back would clear the reader's search on every Back.
- *
- * @param {string} href - the URL the history step landed on.
- * @param {Set<string>} recordAppIds - desktop app ids that write filters.
- * @returns {object|null}
- */
-export function filtersForHistoryEntry(href, recordAppIds) {
-  const state = parseViewState(href);
-  if (state.route !== ROUTES.desktop) return null;
-  if (!recordAppIds?.has(state.routeParams.desktopAppId)) return null;
-  return state.filters;
-}
-
-/**
  * Migrate a legacy ?view=dissertation|about URL to the hash-route form.
  * Pure: returns the migrated URL string, or the input unchanged when there is
  * nothing to migrate. A wiring-phase wrapper applies the result to history.

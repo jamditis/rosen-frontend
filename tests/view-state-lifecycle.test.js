@@ -5,7 +5,7 @@
  *
  * App.js, RecordModal.js, and DesktopShell.js resolve esm.sh import-map
  * specifiers that the node runner does not have, so they cannot be imported
- * here. Pure decisions live in frontend/services/viewState.js and are tested
+ * here. Pure decisions live in frontend/services/ modules and are tested
  * for real; the wiring that calls them is checked against the source text.
  */
 
@@ -82,7 +82,7 @@ describe('desktop close and minimize use the latest layout (item 20)', () => {
 });
 
 describe('Back keeps the standard archive filters (item 8)', async () => {
-  const { filtersForHistoryEntry } = await import('../frontend/services/viewState.js');
+  const { filtersForHistoryEntry } = await import('../frontend/services/historyFilters.js');
   const BASE = 'https://pressthink.org/j/rosen-archive/';
   const RECORD_APPS = new Set(['archive', 'folders', 'entities', 'start', 'findings']);
 
