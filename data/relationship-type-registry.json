@@ -433,7 +433,7 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
-        "violatingRows": 18,
+        "violatingRows": 20,
         "totalRows": 187,
         "asOfDate": "2026-11-08",
         "exampleRelationshipIds": [
@@ -443,7 +443,7 @@
           "RECORD-00291_REL_010",
           "RECORD-00300_REL_011"
         ],
-        "note": "18 of 187 current Expands On rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes (at 80% of all rows, a concept expanding on another concept, e.g. \"Public Journalism expands on democracy,\" is the dominant real-world pattern, not the exception). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "20 of 187 current Expands On rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes (at 80% of all rows, a concept expanding on another concept, e.g. \"Public Journalism expands on democracy,\" is the dominant real-world pattern, not the exception). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 2,
@@ -487,7 +487,7 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
-        "violatingRows": 708,
+        "violatingRows": 686,
         "totalRows": 3159,
         "asOfDate": "2026-11-08",
         "exampleRelationshipIds": [
@@ -497,11 +497,11 @@
           "RECORD-00020_REL_009",
           "RECORD-00020_REL_010"
         ],
-        "note": "708 of 3159 current Affiliated With rows have a source or target entity type outside the declared allowlist. The issue #737 curator ruling, 2026-08-27, keeps this type strictly directed (Person source, Organization target); do not widen it. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "686 of 3159 current Affiliated With rows have a source or target entity type outside the declared allowlist. The issue #737 curator ruling, 2026-08-27, keeps this type strictly directed (Person source, Organization target); do not widen it. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 55,
-        "rowsInvolved": 208,
+        "rowsInvolved": 209,
         "asOfDate": "2026-11-08",
         "examplePairs": [
           {
@@ -523,7 +523,7 @@
             "backwardAssertion": "Catherine Mathis -> The New York Times"
           }
         ],
-        "note": "55 entity pairs (208 rows) currently have Affiliated With asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "55 entity pairs (209 rows) currently have Affiliated With asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
       "directionNote": "Reversed rows are the same employment or membership fact recorded backward, not a second fact (issue #737 curator ruling, 2026-08-27) -- unlike Mentions or Criticizes, \"employer affiliated with employee\" and \"employee affiliated with employer\" describe one relationship. Each reversed row is a candidate for a swap or a drop, listed in data/relationship-review-report.json for curator review."
     },
@@ -548,7 +548,7 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
-        "violatingRows": 114,
+        "violatingRows": 127,
         "totalRows": 536,
         "asOfDate": "2026-11-08",
         "exampleRelationshipIds": [
@@ -558,11 +558,11 @@
           "RECORD-00060_REL_001",
           "RECORD-00098_REL_014"
         ],
-        "note": "114 of 536 current Published In rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Person to allowedSourceTypes (\"Jay Rosen published in PressThink\" is normal byline shorthand, not an error). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "127 of 536 current Published In rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Person to allowedSourceTypes (\"Jay Rosen published in PressThink\" is normal byline shorthand, not an error). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
-        "pairCount": 8,
-        "rowsInvolved": 17,
+        "pairCount": 11,
+        "rowsInvolved": 25,
         "asOfDate": "2026-11-08",
         "examplePairs": [
           {
@@ -584,7 +584,7 @@
             "backwardAssertion": "On the Media -> NPR"
           }
         ],
-        "note": "8 entity pairs (17 rows) currently have Published In asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "11 entity pairs (25 rows) currently have Published In asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
       "directionNote": "Two separate rulings (issue #737 curator ruling, 2026-08-27): (a) a person as the source is valid byline shorthand, now allowed; (b) an organization as the source (like \"The New York Times published in Bush Secretly Lifted...\") is the same publication fact recorded backward, not a new shape, and stays flagged for curator review."
     },
@@ -853,7 +853,7 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
-        "violatingRows": 41,
+        "violatingRows": 42,
         "totalRows": 226,
         "asOfDate": "2026-11-08",
         "exampleRelationshipIds": [
@@ -863,7 +863,7 @@
           "RECORD-00496_REL_002",
           "RECORD-00496_REL_004"
         ],
-        "note": "41 of 226 current Pioneered rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Organization and Concept to allowedSourceTypes and Work to allowedTargetTypes. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "42 of 226 current Pioneered rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Organization and Concept to allowedSourceTypes and Work to allowedTargetTypes. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 3,
@@ -981,7 +981,7 @@
       ],
       "directionalContradictions": {
         "pairCount": 7,
-        "rowsInvolved": 30,
+        "rowsInvolved": 33,
         "asOfDate": "2026-11-08",
         "examplePairs": [
           {
@@ -1003,7 +1003,7 @@
             "backwardAssertion": "Jay Rosen -> PressThink"
           }
         ],
-        "note": "7 entity pairs (30 rows) assert Founded By in both directions for the same two entities. This is the same endpoint-ordering inconsistency named in deferralReason above, made concrete."
+        "note": "7 entity pairs (33 rows) assert Founded By in both directions for the same two entities. This is the same endpoint-ordering inconsistency named in deferralReason above, made concrete."
       },
       "rulingNote": "The issue #737 curator ruling, 2026-08-27, adopts \"source = founded entity, target = founder\" as the formal direction, confirming Founded By as Founded's inverse in meaning (2 of the 3 sampled pairs and the plain-English reading support it). This type stays \"deferred\" here because it is not part of the active extraction schema (backend/entity_extraction_schema_v3.json) -- the ruling settles what the label means, not whether the pipeline should write it going forward. Separately, book or article targets (like \"What Are Journalists For?\") likely belong to Authored By instead of Founded By or Founded, since Founded's own schema is scoped to organizations, not works."
     },

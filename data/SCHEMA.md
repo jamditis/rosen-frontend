@@ -15,6 +15,7 @@ The archive uses JSON and CSV formats for data storage, with RSS and OPML for sy
 | CSV | `archive_records-public.csv` | Source archive records |
 | CSV | `authored-excerpts.csv` | Optional human-authored summary overrides, keyed by `record_id` (#309) |
 | CSV | `extracted_entities.csv` | Extracted entities |
+| CSV | `entity-merges.csv` | Retired entity ids and the canonical id each was merged into (#874) |
 | CSV | `extracted_relationships.csv` | Entity relationships |
 | RSS 2.0 | `feeds/*.xml` | Syndication feeds |
 | OPML 2.0 | `feeds/*.opml` | Outline/subscription lists |
@@ -149,6 +150,35 @@ Entities represent people, organizations, concepts, and other named items extrac
   "totalMentions": 1427
 }
 ```
+
+### Merged entities
+
+When two entity rows turn out to name the same thing, the duplicate row is
+removed from `extracted_entities.csv`, its mentions fold into the row that
+stays, and its relationships are re-pointed there. `entity-merges.csv` keeps
+one row per retired id so a link that still carries it can be sent on:
+
+| Column | Description |
+|--------|-------------|
+| `retired_id` | The entity id that no longer exists |
+| `retired_type` | Its entity type before the merge |
+| `retired_name` | Its display name before the merge |
+| `canonical_id` | The entity it was merged into |
+| `merged_on` | Date of the merge, `YYYY-MM-DD` |
+| `issue` | The issue that ruled on it, e.g. `#875` |
+| `reason` | One line on why the two rows are the same thing |
+
+The exporter publishes the table as `entityRedirects` in `archive-entities.json`
+and `archive-data.json`: an object from retired id to canonical id, with chains
+of merges already followed, so one lookup reaches a live entity.
+
+```json
+"entityRedirects": { "W0666": "O0033", "W0789": "O0279" }
+```
+
+A consumer that looks an entity up by id should resolve it through this map
+first. A retired id never appears in `entities` or in any relationship, and the
+exporter refuses to run if a relationship still names one.
 
 ---
 

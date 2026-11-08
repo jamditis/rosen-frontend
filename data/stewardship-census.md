@@ -2,7 +2,7 @@
 
 Schema: `stewardship-census/1.0.0`
 
-Input commit: `d4e0d6787a262eca71fb3bcac8ce433eb22c5620` (input files clean)
+Input commit: `bf77b46af279862a5b3911941a80df4b4239db87` (input files clean)
 
 ## Record reconciliation
 
@@ -48,7 +48,7 @@ Classification is `first_match`; every omitted source row appears in exactly one
 
 ## Graph coverage
 
-Entities: 7,498 source, 7,498 runtime. Relationship assertions: 11,189.
+Entities: 7,481 source, 7,481 runtime. Relationship assertions: 11,189.
 
 | Group | Source rows | Source rows with assertions | Assertions | Published rows | Published rows with assertions |
 | --- | --- | --- | --- | --- | --- |
@@ -89,7 +89,7 @@ Baseline data commit: `5d3d5351346a9712de4f54d95e69ba0f410c6efd`.
 | generated thread containers | 8 | 9 | +1 |
 | injected records | 1 | 1 | 0 |
 | published total | 26,616 | 27,059 | +443 |
-| entities | 8,150 | 7,498 | -652 |
+| entities | 8,150 | 7,481 | -669 |
 | relationships | 12,556 | 11,189 | -1,367 |
 
 - PR #751 verified the previously held curated batch and regenerated the runtime corpus.

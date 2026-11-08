@@ -4206,9 +4206,9 @@ mark {
 
 .archive-record-card__body {
   display: flex;
-  height: 100%;
+  flex: 1 1 auto;
   flex-direction: column;
-  padding: 1.15rem;
+  padding: 1.15rem 1.15rem 0;
   color: inherit;
   text-decoration: none;
   cursor: pointer;
@@ -4265,11 +4265,13 @@ mark {
   -webkit-line-clamp: 4;
 }
 
+/* The label row follows the record link (#876), so it carries the body's
+   side and bottom inset itself. */
 .archive-record-card__labels {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin-top: auto;
+  margin: 0 1.15rem 1.15rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--archive-rule-subtle);
 }
@@ -4278,6 +4280,37 @@ mark {
   padding: 0.3rem 0.45rem;
   border: 1px solid var(--archive-rule);
   background: var(--archive-paper-deep);
+}
+
+/* A category chip that filters the archive. It keeps the span chip's box:
+   only the button defaults the shared label rule does not set are reset. */
+.archive-record-card__label--action {
+  margin: 0;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* The desktop shell gives every button `font: inherit` and `color: inherit`
+   (.archive-desktop button), which outranks the shared label rule. Restate
+   the label's type and ink there so the chip keeps the span chip's box. */
+.archive-desktop .archive-record-card__label--action {
+  color: var(--archive-ink-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.archive-record-card__label--action:focus-visible {
+  outline: 3px solid var(--archive-focus);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .archive-record-card__label--action:hover {
+    border-color: var(--archive-ink);
+  }
 }
 
 .archive-record-card__label--review {

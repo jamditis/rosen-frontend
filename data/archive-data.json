@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "generated": "2026-11-08T18:48:17.833Z",
+  "generated": "2026-11-08T19:38:12.255Z",
   "records": [
     {
       "id": "RECORD-01108",
@@ -6972,7 +6972,7 @@
         "C0934",
         "C0047",
         "W0889",
-        "W0891",
+        "O1161",
         "C0037",
         "P0727",
         "O1308",
@@ -676480,7 +676480,7 @@
         "O1587",
         "C0047",
         "C1060",
-        "W0891",
+        "O1161",
         "C0037",
         "P0727",
         "W0919",
@@ -678362,7 +678362,7 @@
       "needsReview": false,
       "type": "article",
       "relatedIds": [
-        "W0789",
+        "O0279",
         "P0348",
         "O0221",
         "C1264",
@@ -678373,7 +678373,7 @@
         "O1723",
         "E0457",
         "E0458",
-        "W0986",
+        "O0985",
         "E0116",
         "O0033",
         "O0691"
@@ -678556,7 +678556,7 @@
         "O1325",
         "W1021",
         "O1726",
-        "W1022",
+        "O1043",
         "O0002",
         "P0273",
         "O0023",
@@ -683470,7 +683470,7 @@
         "C0042",
         "W0913",
         "C0048",
-        "W0826",
+        "O0447",
         "C0491",
         "O0180",
         "P0270",
@@ -684972,7 +684972,7 @@
         "O0031",
         "O0272",
         "O1502",
-        "W0904",
+        "O1205",
         "P0168",
         "W0275"
       ]
@@ -685062,7 +685062,7 @@
         "P0005",
         "C1082",
         "W0927",
-        "W0789",
+        "O0279",
         "P1387",
         "P2581",
         "O1596",
@@ -685186,7 +685186,7 @@
         "P1043",
         "W1058",
         "P2361",
-        "O1738",
+        "E0077",
         "E0467",
         "O1750",
         "C1311"
@@ -687585,7 +687585,7 @@
       "needsReview": false,
       "type": "article",
       "relatedIds": [
-        "W0789",
+        "O0279",
         "P1387",
         "P1020",
         "P0556",
@@ -687647,9 +687647,9 @@
       "needsReview": false,
       "type": "article",
       "relatedIds": [
-        "W0789",
+        "O0279",
         "P1387",
-        "W0904",
+        "O1205",
         "P0168",
         "O0065",
         "O0055",
@@ -690673,7 +690673,7 @@
         "W1041",
         "P2678",
         "P2677",
-        "O1738",
+        "E0077",
         "P2676",
         "P0088",
         "C1293",
@@ -690725,7 +690725,7 @@
         "O0207",
         "W0084",
         "O1537",
-        "W0891",
+        "O1161",
         "O1350",
         "W0673",
         "O0116",
@@ -690862,11 +690862,11 @@
         "C0435",
         "C0437",
         "O0003",
-        "W1079",
+        "O0875",
         "C0231",
         "O0820",
         "P1386",
-        "W0789",
+        "O0279",
         "O0821",
         "P0587",
         "P2700",
@@ -691812,7 +691812,7 @@
         "O1313",
         "O0033",
         "O0691",
-        "W0826",
+        "O0447",
         "P0183",
         "C0925",
         "P2033"
@@ -693668,7 +693668,7 @@
         "O0145",
         "P0200",
         "C0698",
-        "W0789",
+        "O0279",
         "O0045",
         "E0224"
       ]
@@ -695424,7 +695424,7 @@
         "O0448",
         "O0033",
         "O1313",
-        "W0826",
+        "O0447",
         "P0183",
         "O0034",
         "O0456",
@@ -696174,7 +696174,7 @@
         "O0059",
         "C0905",
         "O0034",
-        "W0826",
+        "O0447",
         "P2433",
         "P0088",
         "P0849",
@@ -696217,9 +696217,9 @@
         "C0559",
         "O1350",
         "P0183",
-        "W0826",
+        "O0447",
         "P0184",
-        "W0891",
+        "O1161",
         "C1214",
         "E0433",
         "L0262",
@@ -697581,7 +697581,7 @@
         "O0456",
         "P0183",
         "C0126",
-        "W0891",
+        "O1161",
         "O1537",
         "P0762",
         "O0002",
@@ -698181,7 +698181,7 @@
         "P1138",
         "P0005",
         "C1185",
-        "W0986",
+        "O0985",
         "P0051",
         "C0704",
         "C0705",
@@ -698472,7 +698472,7 @@
         "O1680",
         "O0476",
         "P0878",
-        "W0984",
+        "O0789",
         "P0012",
         "E0417",
         "L0053",
@@ -701312,7 +701312,7 @@
         "P0270",
         "P2309",
         "O1010",
-        "W0702",
+        "O0883",
         "O0465",
         "W0812",
         "W0813",
@@ -702030,7 +702030,7 @@
         "O0038",
         "P0452",
         "P0764",
-        "W0971",
+        "O0384",
         "P0059",
         "P0411",
         "E0254",
@@ -702097,7 +702097,7 @@
         "O0025",
         "P0865",
         "O0309",
-        "W1077"
+        "O0035"
       ]
     },
     {
@@ -702918,7 +702918,7 @@
         "P1483",
         "P0545",
         "P0739",
-        "W0702",
+        "O0883",
         "C0340",
         "O0055"
       ]
@@ -703183,7 +703183,7 @@
         "O1374",
         "P1420",
         "W0956",
-        "W0955",
+        "O0443",
         "P0701",
         "O0723",
         "P1421",
@@ -703204,7 +703204,7 @@
         "P2616",
         "C1136",
         "C0103",
-        "W0957"
+        "O0515"
       ]
     },
     {
@@ -710544,7 +710544,7 @@
       "relatedIds": [
         "O0419",
         "P0555",
-        "W0701",
+        "O0767",
         "P0014",
         "E0238",
         "O1035",
@@ -710565,7 +710565,7 @@
         "C0694",
         "E0239",
         "O0055",
-        "W0702",
+        "O0883",
         "O0028",
         "O1317"
       ]
@@ -728944,7 +728944,7 @@
       "affiliation": "",
       "prominence": 5,
       "firstMentionRecordId": "RECORD-00180",
-      "totalMentions": 2
+      "totalMentions": 3
     },
     {
       "id": "E0078",
@@ -729186,7 +729186,7 @@
       "affiliation": "",
       "prominence": 7,
       "firstMentionRecordId": "RECORD-00226",
-      "totalMentions": 6
+      "totalMentions": 7
     },
     {
       "id": "E0101",
@@ -732992,7 +732992,7 @@
       "affiliation": "",
       "prominence": 8,
       "firstMentionRecordId": "RECORD-00151",
-      "totalMentions": 4
+      "totalMentions": 5
     },
     {
       "id": "O0036",
@@ -735533,7 +735533,7 @@
       "affiliation": "",
       "prominence": 8,
       "firstMentionRecordId": "RECORD-00088",
-      "totalMentions": 3
+      "totalMentions": 4
     },
     {
       "id": "O0280",
@@ -736644,7 +736644,7 @@
       "affiliation": "",
       "prominence": 3,
       "firstMentionRecordId": "RECORD-00145",
-      "totalMentions": 7
+      "totalMentions": 8
     },
     {
       "id": "O0385",
@@ -737271,7 +737271,7 @@
       "affiliation": "CBS News",
       "prominence": 9,
       "firstMentionRecordId": "RECORD-00179",
-      "totalMentions": 2
+      "totalMentions": 3
     },
     {
       "id": "O0444",
@@ -737315,7 +737315,7 @@
       "affiliation": "",
       "prominence": 8,
       "firstMentionRecordId": "RECORD-00180",
-      "totalMentions": 10
+      "totalMentions": 11
     },
     {
       "id": "O0448",
@@ -738041,7 +738041,7 @@
       "affiliation": "",
       "prominence": 9,
       "firstMentionRecordId": "RECORD-00200",
-      "totalMentions": 7
+      "totalMentions": 8
     },
     {
       "id": "O0516",
@@ -740714,7 +740714,7 @@
       "affiliation": "",
       "prominence": 4,
       "firstMentionRecordId": "RECORD-00318",
-      "totalMentions": 3
+      "totalMentions": 4
     },
     {
       "id": "O0768",
@@ -740945,7 +740945,7 @@
       "affiliation": "",
       "prominence": 5,
       "firstMentionRecordId": "RECORD-00326",
-      "totalMentions": 2
+      "totalMentions": 3
     },
     {
       "id": "O0790",
@@ -741858,7 +741858,7 @@
       "affiliation": "",
       "prominence": 4,
       "firstMentionRecordId": "RECORD-00360",
-      "totalMentions": 2
+      "totalMentions": 3
     },
     {
       "id": "O0876",
@@ -741935,7 +741935,7 @@
       "affiliation": "",
       "prominence": 3,
       "firstMentionRecordId": "RECORD-00362",
-      "totalMentions": 2
+      "totalMentions": 3
     },
     {
       "id": "O0884",
@@ -743035,7 +743035,7 @@
       "affiliation": "",
       "prominence": 2,
       "firstMentionRecordId": "RECORD-00411",
-      "totalMentions": 3
+      "totalMentions": 4
     },
     {
       "id": "O0986",
@@ -743662,7 +743662,7 @@
       "affiliation": "",
       "prominence": 8,
       "firstMentionRecordId": "RECORD-00456",
-      "totalMentions": 3
+      "totalMentions": 4
     },
     {
       "id": "O1044",
@@ -744707,7 +744707,7 @@
       "affiliation": "",
       "prominence": 2,
       "firstMentionRecordId": "RECORD-00545",
-      "totalMentions": 3
+      "totalMentions": 4
     },
     {
       "id": "O1144",
@@ -744905,7 +744905,7 @@
       "affiliation": "",
       "prominence": 9,
       "firstMentionRecordId": "RECORD-00554",
-      "totalMentions": 13
+      "totalMentions": 14
     },
     {
       "id": "O1162",
@@ -745389,7 +745389,7 @@
       "affiliation": "",
       "prominence": 4,
       "firstMentionRecordId": "RECORD-00581",
-      "totalMentions": 1
+      "totalMentions": 2
     },
     {
       "id": "O1206",
@@ -777787,28 +777787,6 @@
       "totalMentions": 1
     },
     {
-      "id": "W0701",
-      "type": "Work",
-      "name": "60 Minutes",
-      "normalizedName": "60 Minutes",
-      "role": "Television program",
-      "affiliation": "",
-      "prominence": 8,
-      "firstMentionRecordId": "RECORD-00477",
-      "totalMentions": 1
-    },
-    {
-      "id": "W0702",
-      "type": "Work",
-      "name": "The Note",
-      "normalizedName": "The Note",
-      "role": "Political news column",
-      "affiliation": "",
-      "prominence": 6,
-      "firstMentionRecordId": "RECORD-00477",
-      "totalMentions": 1
-    },
-    {
       "id": "C0693",
       "type": "Concept",
       "name": "Mainstream Media vs. Kid Internet",
@@ -779620,17 +779598,6 @@
       "role": "President of Czechoslovakia",
       "affiliation": "Czechoslovak government",
       "prominence": 4,
-      "firstMentionRecordId": "RECORD-00496",
-      "totalMentions": 1
-    },
-    {
-      "id": "O1373",
-      "type": "Organization",
-      "name": "Democratic National Convention",
-      "normalizedName": "Democratic National Convention",
-      "role": "Political organization",
-      "affiliation": "",
-      "prominence": 6,
       "firstMentionRecordId": "RECORD-00496",
       "totalMentions": 1
     },
@@ -783771,17 +783738,6 @@
       "totalMentions": 1
     },
     {
-      "id": "W0789",
-      "type": "Work",
-      "name": "Meet the Press",
-      "normalizedName": "Meet the Press",
-      "role": "Television news program",
-      "affiliation": "",
-      "prominence": 10,
-      "firstMentionRecordId": "RECORD-00658",
-      "totalMentions": 1
-    },
-    {
       "id": "C0844",
       "type": "Concept",
       "name": "Fact-checking guests on television",
@@ -785648,17 +785604,6 @@
       "role": "Political Debate",
       "affiliation": "",
       "prominence": 10,
-      "firstMentionRecordId": "RECORD-00689",
-      "totalMentions": 1
-    },
-    {
-      "id": "W0826",
-      "type": "Work",
-      "name": "OffTheBus",
-      "normalizedName": "OffTheBus",
-      "role": "Citizen Journalism Project",
-      "affiliation": "",
-      "prominence": 8,
       "firstMentionRecordId": "RECORD-00689",
       "totalMentions": 1
     },
@@ -789315,17 +789260,6 @@
       "totalMentions": 1
     },
     {
-      "id": "W0891",
-      "type": "Work",
-      "name": "Assignment Zero",
-      "normalizedName": "Assignment Zero",
-      "role": "Journalism experiment / project",
-      "affiliation": "",
-      "prominence": 6,
-      "firstMentionRecordId": "RECORD-00725",
-      "totalMentions": 1
-    },
-    {
       "id": "P2511",
       "type": "Person",
       "name": "Jelani Cobb",
@@ -790552,17 +790486,6 @@
       "name": "The Times of London",
       "normalizedName": "The Times of London",
       "role": "Newspaper",
-      "affiliation": "",
-      "prominence": 5,
-      "firstMentionRecordId": "RECORD-00747",
-      "totalMentions": 1
-    },
-    {
-      "id": "W0904",
-      "type": "Work",
-      "name": "This Week",
-      "normalizedName": "This Week",
-      "role": "Television program",
       "affiliation": "",
       "prominence": 5,
       "firstMentionRecordId": "RECORD-00747",
@@ -794705,17 +794628,6 @@
       "totalMentions": 1
     },
     {
-      "id": "W0955",
-      "type": "Work",
-      "name": "Public Eye",
-      "normalizedName": "Public Eye",
-      "role": "Ombudsman blog",
-      "affiliation": "",
-      "prominence": 5,
-      "firstMentionRecordId": "RECORD-00810",
-      "totalMentions": 1
-    },
-    {
       "id": "W0956",
       "type": "Work",
       "name": "Blogspotting",
@@ -794723,17 +794635,6 @@
       "role": "Blog",
       "affiliation": "",
       "prominence": 4,
-      "firstMentionRecordId": "RECORD-00810",
-      "totalMentions": 1
-    },
-    {
-      "id": "W0957",
-      "type": "Work",
-      "name": "Wikipedia",
-      "normalizedName": "Wikipedia",
-      "role": "Online encyclopedia",
-      "affiliation": "",
-      "prominence": 6,
       "firstMentionRecordId": "RECORD-00810",
       "totalMentions": 1
     },
@@ -795504,17 +795405,6 @@
       "role": "Television program",
       "affiliation": "",
       "prominence": 8,
-      "firstMentionRecordId": "RECORD-00820",
-      "totalMentions": 1
-    },
-    {
-      "id": "W0971",
-      "type": "Work",
-      "name": "Instapundit",
-      "normalizedName": "Instapundit",
-      "role": "Weblog",
-      "affiliation": "",
-      "prominence": 5,
       "firstMentionRecordId": "RECORD-00820",
       "totalMentions": 1
     },
@@ -796399,17 +796289,6 @@
       "totalMentions": 1
     },
     {
-      "id": "W0984",
-      "type": "Work",
-      "name": "Media Shift",
-      "normalizedName": "Media Shift",
-      "role": "Blog / PBS column",
-      "affiliation": "",
-      "prominence": 4,
-      "firstMentionRecordId": "RECORD-00828",
-      "totalMentions": 1
-    },
-    {
       "id": "C1184",
       "type": "Concept",
       "name": "Political ergonomics",
@@ -796461,17 +796340,6 @@
       "role": "Television program",
       "affiliation": "",
       "prominence": 4,
-      "firstMentionRecordId": "RECORD-00829",
-      "totalMentions": 1
-    },
-    {
-      "id": "W0986",
-      "type": "Work",
-      "name": "The Daily Show",
-      "normalizedName": "The Daily Show",
-      "role": "Television program",
-      "affiliation": "",
-      "prominence": 5,
       "firstMentionRecordId": "RECORD-00829",
       "totalMentions": 1
     },
@@ -798995,17 +798863,6 @@
       "totalMentions": 1
     },
     {
-      "id": "W1022",
-      "type": "Work",
-      "name": "This American Life",
-      "normalizedName": "This American Life",
-      "role": "Radio program",
-      "affiliation": "",
-      "prominence": 7,
-      "firstMentionRecordId": "RECORD-00882",
-      "totalMentions": 1
-    },
-    {
       "id": "C1273",
       "type": "Concept",
       "name": "Horse race polls",
@@ -799738,17 +799595,6 @@
       "normalizedName": "Jorn Barger",
       "role": "Blogger, coiner of the term 'weblog'",
       "affiliation": "Robot Wisdom",
-      "prominence": 6,
-      "firstMentionRecordId": "RECORD-00892",
-      "totalMentions": 1
-    },
-    {
-      "id": "O1738",
-      "type": "Organization",
-      "name": "Personal Democracy Forum",
-      "normalizedName": "Personal Democracy Forum",
-      "role": "Conference organization",
-      "affiliation": "",
       "prominence": 6,
       "firstMentionRecordId": "RECORD-00892",
       "totalMentions": 1
@@ -800898,17 +800744,6 @@
       "totalMentions": 1
     },
     {
-      "id": "W1073",
-      "type": "Work",
-      "name": "Hardball",
-      "normalizedName": "Hardball",
-      "role": "Television program",
-      "affiliation": "",
-      "prominence": 5,
-      "firstMentionRecordId": "RECORD-00781",
-      "totalMentions": 1
-    },
-    {
       "id": "C1318",
       "type": "Concept",
       "name": "Midweek fact check",
@@ -801052,17 +800887,6 @@
       "totalMentions": 1
     },
     {
-      "id": "W1077",
-      "type": "Work",
-      "name": "Romenesko",
-      "normalizedName": "Romenesko",
-      "role": "Media Column",
-      "affiliation": "",
-      "prominence": 4,
-      "firstMentionRecordId": "RECORD-00819",
-      "totalMentions": 1
-    },
-    {
       "id": "C1323",
       "type": "Concept",
       "name": "Weapons of Mass Destruction",
@@ -801114,17 +800938,6 @@
       "role": "Book",
       "affiliation": "",
       "prominence": 9,
-      "firstMentionRecordId": "RECORD-00875",
-      "totalMentions": 1
-    },
-    {
-      "id": "W1079",
-      "type": "Work",
-      "name": "Washington Week",
-      "normalizedName": "Washington Week",
-      "role": "Television program",
-      "affiliation": "",
-      "prominence": 5,
       "firstMentionRecordId": "RECORD-00875",
       "totalMentions": 1
     },
@@ -803615,6 +803428,26 @@
       "totalMentions": 1
     }
   ],
+  "entityRedirects": {
+    "O1373": "E0100",
+    "O1738": "E0077",
+    "W0666": "O0033",
+    "W0701": "O0767",
+    "W0702": "O0883",
+    "W0789": "O0279",
+    "W0826": "O0447",
+    "W0891": "O1161",
+    "W0904": "O1205",
+    "W0955": "O0443",
+    "W0957": "O0515",
+    "W0971": "O0384",
+    "W0984": "O0789",
+    "W0986": "O0985",
+    "W1022": "O1043",
+    "W1073": "O1143",
+    "W1077": "O0035",
+    "W1079": "O0875"
+  },
   "facets": {
     "categories": [
       "Audience & Public Engagement",

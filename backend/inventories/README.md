@@ -54,6 +54,16 @@ Inventories for the Movable Type era of PressThink, which lived at
 The script is `backend/scripts/pressthink_2004_2008_gap.py`. The written report
 is `docs/pressthink-2004-2008-gap-2026-08-27.md`.
 
+The `report` command reads `data/archive_records-public.csv` with csv-parse
+through Node, the same reader the exporter and the tests use, so run
+`npm install` first. Python's csv module splits that file's bare-LF records
+into truncated rows and phantom rows: the August report's `rows_indexed: 1784`
+counted a file that held 1,036 records. When the reader was fixed (#864) the
+file held 1,218 records, which Python read as 1,965 rows, and the match results
+did not change. The rows that share a twelve-word opening, which the fingerprint
+tier drops, are classified in
+`docs/research/2026-11-shared-opening-raw-text-audit.md`.
+
 Both of these sources read the same Wayback Machine crawl of the same host, and
 for 2004-2008 they resolve to the same url set. Two sources here are not two
 independent measurements, and the report says so. A genuinely independent
