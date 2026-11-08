@@ -40,6 +40,13 @@ describe('core load retry', () => {
       'the catch must reset coreFetchStarted so a retry can fetch again');
   });
 
+  it('clears a previous error when a later load succeeds', () => {
+    const { body } = coreLoadEffect();
+    const thenBlock = body.slice(body.indexOf('.then('), body.indexOf('.catch('));
+    assert.match(thenBlock, /setError\(null\)/,
+      'a route change can reload the data after a failure, so success must clear the error panel');
+  });
+
   it('re-runs the load effect when the reader asks to retry', () => {
     const { deps } = coreLoadEffect();
     assert.match(deps, /coreLoadAttempt/, 'the load effect must depend on the retry counter');

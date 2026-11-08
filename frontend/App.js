@@ -541,6 +541,9 @@ const App = () => {
         setRecords(data.records);
         setFacets(data.facets);
         setAutocompleteIndex(data.autocompleteIndex);
+        // A failed load releases the guard, so a later route change can
+        // reload the data on its own; clear the old error when it succeeds.
+        setError(null);
         setLoading(false);
       })
       .catch(err => {
