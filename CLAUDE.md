@@ -239,6 +239,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── narrative/                   # Project history (project-history, architecture, data-pipeline, changelog)
 │   ├── plans/                       # Dated design + implementation plans
 │   ├── research/                    # Dated discovery/inventory writeups (e.g. Pillar 2 sweeps)
+│   ├── operations/                  # Operator runbooks (PressThink ingestion, Bluesky stewardship, durable copies)
 │   ├── archived/                    # Older one-off audits/designs kept for reference
 │   ├── screenshots/                 # PNGs referenced from other docs
 │   └── (top-level audits: DATA_QUALITY_AUDIT_*, ENTITY_EXTRACTION_PIPELINE, HANDOFF, JAY_ADDING_RECORDS, JAY_ROSEN_HANDOFF_GOAL_PROGRESS, LAUNCH_VALIDATION_REPORT, QUESTIONS_FOR_ROSEN_CALL, issue-210-duplicate-findings)
