@@ -39,6 +39,7 @@ const RELEASE_DATA_PATHS = new Set([
   'data/archive-embeddings.json',
   'data/archive_records-public.csv',
   'data/record-id-sequence.json',
+  'data/thread-id-tombstones.json',
   'data/extracted_entities.csv',
   'data/extracted_relationships.csv',
   'data/archive-social-embeddings.bin',

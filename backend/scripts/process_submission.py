@@ -497,6 +497,7 @@ def _git_commit_and_push(
             "data/extracted_entities.csv",
             "data/extracted_relationships.csv",
             "data/record-id-sequence.json",
+            "data/thread-id-tombstones.json",
         ]
         + [f"data/{f}" for f in _STAGED_JSON_FILES]
         + ["data/feeds"]
