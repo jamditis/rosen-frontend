@@ -7,7 +7,7 @@ import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.70';
 import { withViewTransition } from './utils/viewTransition.js?v=3.8.70';
 import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.70';
 import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.70';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.70';
+import { defaultFilters, parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.70';
 import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.70';
 import { canonicalRecordUrl, setRecordParam } from './utils/recordDeepLink.js?v=3.8.70';
 import {
@@ -154,17 +154,15 @@ class DesktopRouteErrorBoundary extends Component {
   }
 }
 
-// One source of truth for the empty filter state. The initial state and both
-// "clear filters" paths spread this, so adding a filter field can't leave a
-// reset path out of sync.
-const DEFAULT_FILTERS = {
-  search: '',
-  categories: [],
-  era: null,
-  year: null,
-  type: null,
+// One source of truth for the empty filter state. The URL-backed fields come
+// from viewState.defaultFilters, the same factory parseViewState fills, so the
+// two shapes cannot drift. recordIds is App-only: analytics query results are
+// transient and never part of the URL contract. A fresh object per call, so no
+// reset path can share arrays with live state.
+const createDefaultFilters = () => ({
+  ...defaultFilters(),
   recordIds: null,
-};
+});
 
 const App = () => {
   const [records, setRecords] = useState([]);
@@ -209,7 +207,7 @@ const App = () => {
   const [yearNoteDismissed, setYearNoteDismissed] = useState(false);
 
   const [filters, setFilters] = useState(() => ({
-    ...DEFAULT_FILTERS,
+    ...createDefaultFilters(),
     ...parseViewState(window.location.href).filters,
   }));
   const desktopActiveNeedsRecords = currentRoute === ROUTES.desktop
@@ -337,7 +335,7 @@ const App = () => {
       if (event?.type === 'popstate') {
         const historicalState = parseViewState(window.location.href);
         setFilters({
-          ...DEFAULT_FILTERS,
+          ...createDefaultFilters(),
           ...historicalState.filters,
         });
       }
@@ -1027,7 +1025,7 @@ const App = () => {
 
   const clearAllScope = () => {
     pendingScopeFocusKey.current = 'status';
-    setFilters({ ...DEFAULT_FILTERS });
+    setFilters(createDefaultFilters());
   };
 
   useEffect(() => {
@@ -1066,7 +1064,7 @@ const App = () => {
     onSelectRecord: selectRecord,
     onOpenFolder: handleFolderClick,
     onPageChange: handlePageChange,
-    onClearFilters: () => setFilters({ ...DEFAULT_FILTERS }),
+    onClearFilters: () => setFilters(createDefaultFilters()),
     onOpenStandard: (mode = viewMode) => goTo(mode === 'folder' ? ROUTES.folders : ROUTES.archive),
   };
 
@@ -1360,7 +1358,7 @@ const App = () => {
                 setFilters=${setFilters}
                 isOpen=${sidebarOpen}
                 onClose=${closeSidebar}
-                resetFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
+                resetFilters=${() => setFilters(createDefaultFilters())}
                 autocompleteIndex=${autocompleteIndex}
                 semanticSearch=${semanticSearchProps}
                 onCategoryStreak=${handleCategoryStreak}
@@ -1638,7 +1636,7 @@ const App = () => {
                   onSelectRecord=${selectRecord}
                   onOpenFolder=${handleFolderClick}
                   onPageChange=${handlePageChange}
-                  onClearFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
+                  onClearFilters=${() => setFilters(createDefaultFilters())}
                   onFilterCategory=${handleFilterCategory}
                   skipping=${recordsSkipping}
                 />
