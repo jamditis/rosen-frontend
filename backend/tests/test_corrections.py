@@ -150,30 +150,6 @@ def test_enhanced_pdf_formatter():
         return False
 
 
-def test_bulk_reprocessor():
-    """Test bulk reprocessor availability."""
-    print("\n=== BULK REPROCESSOR TEST ===")
-
-    try:
-        from bulk_reprocessor import BulkReprocessor
-
-        print("Bulk reprocessor: AVAILABLE [OK]")
-
-        # Test key methods exist
-        processor_class = BulkReprocessor
-        if hasattr(processor_class, "update_source_sheet_status"):
-            print("- Source sheet status tracking: AVAILABLE [OK]")
-        if hasattr(processor_class, "process_batch"):
-            print("- Batch processing: AVAILABLE [OK]")
-        if hasattr(processor_class, "write_to_final_sheet"):
-            print("- Final sheet writing: AVAILABLE [OK]")
-
-        return True
-    except ImportError as e:
-        print(f"Bulk reprocessor: NOT AVAILABLE - {e}")
-        return False
-
-
 def main():
     """Run all correction tests."""
     print("Testing all key corrections from the workflow...\n")
@@ -182,7 +158,6 @@ def main():
     results.append(test_id_generation())
     results.append(test_date_formatting())
     results.append(test_enhanced_pdf_formatter())
-    results.append(test_bulk_reprocessor())
 
     print("\n=== SUMMARY ===")
     if all(results):

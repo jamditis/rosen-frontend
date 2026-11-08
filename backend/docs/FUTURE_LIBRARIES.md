@@ -450,19 +450,8 @@ poetry run python scripts/analyze_archive_patterns.py
 
 ### Using sumy
 
-```bash
-# Dry run (preview only)
-poetry run python scripts/backfill_summaries_sumy.py --dry-run --limit 5
-
-# Generate summaries for records with missing/short summaries
-poetry run python scripts/backfill_summaries_sumy.py
-
-# Use different algorithm
-poetry run python scripts/backfill_summaries_sumy.py --algorithm lexrank
-
-# Adjust summary length
-poetry run python scripts/backfill_summaries_sumy.py --sentences 5
-```
+`backfill_summaries_sumy.py` was the only caller. It moved to
+`archived/scripts/backend-oneoffs/` in #855, so no live script uses sumy now.
 
 ### Using webargs (example)
 

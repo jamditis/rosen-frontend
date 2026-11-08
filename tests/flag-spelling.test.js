@@ -24,8 +24,6 @@ const CANONICAL = new Set(['TRUE', 'FALSE', '']);
 const NOT_CSV_WRITERS = new Map([
   ['backend/scripts/rtn_backfill_scrape.py',
     'sets JSON booleans on an intermediate capture file; data/_add_pillar2_rtn_p1.py writes the CSV rows with TRUE'],
-  ['backend/scripts/backfill/bulk_reprocessor.py',
-    'legacy Google Sheets backfill; its cell typing is a Sheets decision, not a CSV write'],
 ]);
 
 function readCsv(name) {

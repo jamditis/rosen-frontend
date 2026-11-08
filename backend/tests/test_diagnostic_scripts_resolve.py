@@ -26,7 +26,6 @@ _CANONICAL = _BACKEND / "known_entities.json"
 
 # (module name, path relative to backend/) for every script #354 repairs.
 _SCRIPTS = {
-    "bulk_reprocessor": "scripts/backfill/bulk_reprocessor.py",
     "populate_new_fields": "scripts/diagnostics/populate_new_fields.py",
     "data_improver": "scripts/diagnostics/data_improver.py",
     "review_results": "scripts/diagnostics/review_results.py",
@@ -61,7 +60,6 @@ def test_known_entities_resolves_to_curated_file(name):
 
 # Entrypoint per script that reaches the gspread.service_account(filename=...) call.
 _CREDS_ENTRYPOINTS = {
-    "bulk_reprocessor": lambda m: m.BulkReprocessor(),
     "data_improver": lambda m: m.main(),
     "review_results": lambda m: m.main(),
     "schema_builder": lambda m: m.main(),
@@ -99,7 +97,7 @@ def test_credentials_path_anchored_to_backend(name, monkeypatch):
     try:
         _CREDS_ENTRYPOINTS[name](module)
     except _StopAtConnect:
-        pass  # bulk_reprocessor re-raises; the others swallow and return
+        pass  # some scripts re-raise; the others swallow and return
 
     assert "filename" in captured, f"{name}: gspread.service_account was never called"
     resolved = pathlib.Path(captured["filename"]).resolve()

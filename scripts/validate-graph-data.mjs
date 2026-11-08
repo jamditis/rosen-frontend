@@ -886,6 +886,24 @@ export async function validateGraphDataset(dataset) {
         }
       }
 
+      // Held rows of an "enforced" type answer to its endpoint rule as well.
+      // Founded By and Owned By are always held, and the release refresh
+      // promotes a type to "enforced" once no row diverges (curator ruling,
+      // 2026-11-08). Without this, a later bad held row would be neither a
+      // failure nor a review row.
+      if (validationState === 'held' && registryEntry?.endpointEnforcement === 'enforced') {
+        if (registryEntry.allowedSourceTypes && !registryEntry.allowedSourceTypes.includes(sourceEntity.type)) {
+          throw new GraphValidationError(
+            `${id}: source entity type ${sourceEntity.type} is not an allowed source type for ${relationshipType}`
+          );
+        }
+        if (registryEntry.allowedTargetTypes && !registryEntry.allowedTargetTypes.includes(targetEntity.type)) {
+          throw new GraphValidationError(
+            `${id}: target entity type ${targetEntity.type} is not an allowed target type for ${relationshipType}`
+          );
+        }
+      }
+
       // Endpoint-type review collection (issue #868). A "reviewed" type has
       // a curator-settled endpoint rule (unlike "deferred", which has none
       // yet), but pre-existing rows that don't fit it are not validation

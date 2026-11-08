@@ -8,8 +8,8 @@ production package.
 - `corrector.py` – Canonical range-safe smart-corrector CLI. It is dry-run by
   default and accepts all historical row selections through `--rows` and `--limit`.
 - `backfill/` – Backfill scripts that patch missing fields after ingestion
-  (`date_backfill.py`, `backfill_missing_dates.py`, `backfill_worker.py`,
-  `bulk_reprocessor.py`). Run them by hand only when the live pipeline is
+  (`date_backfill.py`, `backfill_missing_dates.py`, `backfill_worker.py`).
+  Run them by hand only when the live pipeline is
   paused. Every entry point runs under `python -m`; there are no `run_*.py`
   path wrappers left. See `backfill/README.md`.
 - `pdf/` – Batch PDF experiments and accessibility tooling that supplement the

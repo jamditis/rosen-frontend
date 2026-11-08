@@ -20,8 +20,8 @@ The fix differs by how each script can reach the backend root:
 * The two PDF scripts are run standalone from their own directory and only put
   the sibling ``pdf/`` dir on ``sys.path`` (never ``backend/src``), so they
   cannot import ``rosen_scraper``. They anchor with a literal
-  ``Path(__file__).resolve().parents[N]`` hop instead (same pattern as
-  ``scripts/backfill/bulk_reprocessor.py``) and are checked structurally,
+  ``Path(__file__).resolve().parents[N]`` hop instead and are checked
+  structurally,
   because importlib can't load them without their sibling modules.
 """
 
