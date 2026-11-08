@@ -134,7 +134,7 @@ The site is hosted at `pressthink.org/j/rosen-archive/` and deployed through cer
 
 1. Edit source files as needed.
 2. If data changed: `node data/export-archive-data.js`. Refresh the required search-by-meaning vectors as described in [`data/README.md`](data/README.md#search-by-meaning-vectors), and complete the data and release checks in the deployment guide.
-3. Run `npm run bump-version -- X.X.X` to stamp the new version across `index.html`, `version.json`, versioned JS/CSS references in `frontend/`, `faq/`, `features/`, and `dissertation/`, and the service worker's `CACHE_VERSION`. The service worker uses exact versioned request URLs and removes old cache namespaces when a release activates, so both version surfaces must move together.
+3. Run `npm run bump-version -- X.X.X` to stamp the new version across `index.html`, `version.json`, versioned JS/CSS references in `frontend/`, `faq/`, `features/`, and `dissertation/`, and the service worker's `CACHE_VERSION`. The service worker uses exact versioned request URLs and removes old cache namespaces when a release activates (keeping the newest previous static cache until the windows open at activation have closed), so both version surfaces must move together.
 4. Upload dependencies first, then standalone pages and record shells. Upload root `index.html`, `frontend/sw.js`, root `sw.js`, and `version.json` last, preserving the order from `backend/scripts/deploy_full_site.py`.
 
 **Do not upload:** CSVs, backup files, screenshots, or the `backend/`, `tests/`, `docs/`, `archived/`, `.github/`, `.claude/`, or `node_modules/` trees. See `DEPLOYMENT.md` for the full exclusion list.

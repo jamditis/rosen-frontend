@@ -139,7 +139,8 @@ stateDiagram-v2
 stateDiagram-v2
   [*] --> Installing: new sw.js bytes
   Installing --> Activating: skipWaiting (always)
-  Activating --> Active: delete old caches, claim
+  Activating --> Active: delete old caches (keep newest previous static cache while old windows are open), claim
+  Active --> Active: navigation after old windows close deletes the retained cache
   Active --> UpdateReady: controllerchange on controlled page
   UpdateReady --> [*]: reader reloads
 ```
@@ -309,7 +310,7 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 4. Order the release FIFO by run creation time or by `run_attempt` start time, not by run id alone. Fixed (the queue now orders by the current attempt's `run_started_at`, with run id only as the tie-break, so a re-run waits behind runs that started before it).
 5. Add a tombstone list of retired THREAD ids to the exporter so that it never reuses a number. Fixed (the exporter reads and appends to `data/thread-id-tombstones.json` before it replaces the artifact; history shows the old renumbering reissued THREAD-00016 and THREAD-00017 on 2026-07-23 and THREAD-00018 on 2026-08-15, but every id is held by a published thread today, so no id is retired and the list starts empty; `sync_sheet_to_archive.py`, `process_submission.py`, and the stewardship publisher stage the file with the regenerated JSON).
 6. Make `fetchCoreData` skip the IDB read when `checkVersion` times out, so that it never serves an old deploy key. Fixed (a timed-out check now skips both cache tiers and fetches, and the fresh payload is stored under the key read after the fetch).
-7. Stop the SW from deleting the previous release's cache until no client of that release remains.
+7. Stop the SW from deleting the previous release's cache until no client of that release remains. Fixed (activate keeps the newest previous static cache while a window open at activation remains and deletes it on a later navigation once they close; other-release `?v=` URLs are served from any cache, and network bytes are never stored under their keys).
 8. Remove the `popstate` filter overwrite outside desktop routes, or write standard archive filters to the URL.
 9. Apply `publication` and `includeReplies` in `filteredRecords`, or stop parsing them from the URL.
 10. Retry a stewardship run once after `stale_remote_head` by rebasing onto the new `origin/main`. Fixed (on `stale_remote_head` the publisher refetches, resets to the new head, captures again and reruns every gate once; it refuses the retry when main changed lockfiles, LFS config, `.github/` or a module the publisher has already loaded).

@@ -12,7 +12,9 @@
 
 // Cache version is tied to the app version in version.json. Bumping it on every
 // deploy (alongside index.html and the ?v= import strings) makes the activate
-// handler below drop stale cache namespaces after the release takes control.
+// handler below drop stale cache namespaces after the release takes control
+// (one previous static cache is kept while windows from before activation
+// remain; see the release handoff notes above the activate handler).
 const CACHE_VERSION = '3.8.70';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
@@ -204,28 +206,77 @@ self.addEventListener('install', event => {
   })());
 });
 
-// Activate event - clean up old caches aggressively
+// Install skips waiting and activate claims every open window, so a page from
+// the previous release keeps running under this worker and still imports its
+// own ?v= modules (the lazy desktop shell, for one). Deleting that release's
+// static cache at once would send those imports to the server, which only has
+// this release's bytes. So activate keeps the newest previous static cache
+// while any window that was open at activation remains, and deletes it on a
+// later navigation once those windows are gone. The record lives in memory:
+// if the worker is stopped first, the cache is kept until the next activation,
+// which deletes it, so at most one previous release is ever retained.
+const STATIC_CACHE_PATTERN = /^jrda-cache-(\d+(?:\.\d+)*)$/;
+let retainedRelease = null;
+
+function compareReleaseVersions(a, b) {
+  const left = a.split('.').map(Number);
+  const right = b.split('.').map(Number);
+  for (let i = 0; i < Math.max(left.length, right.length); i += 1) {
+    const diff = (left[i] || 0) - (right[i] || 0);
+    if (diff !== 0) return diff;
+  }
+  return 0;
+}
+
+function newestPreviousStaticCache(cacheNames) {
+  const previous = cacheNames
+    .filter(name => name !== CACHE_NAME && STATIC_CACHE_PATTERN.test(name))
+    .sort((a, b) => compareReleaseVersions(
+      b.match(STATIC_CACHE_PATTERN)[1],
+      a.match(STATIC_CACHE_PATTERN)[1],
+    ));
+  return previous[0] ?? null;
+}
+
+async function openWindowClientIds() {
+  if (typeof self.clients?.matchAll !== 'function') return [];
+  const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+  return windows.map(client => client.id);
+}
+
+async function releasePreviousCacheIfUnused() {
+  const retained = retainedRelease;
+  if (!retained) return false;
+  const open = new Set(await openWindowClientIds());
+  if ([...retained.clientIds].some(id => open.has(id))) return false;
+  if (retainedRelease === retained) retainedRelease = null;
+  console.log('[SW] Deleting previous release cache:', retained.cacheName);
+  await caches.delete(retained.cacheName);
+  return true;
+}
+
+// Activate event - clean up old caches, keeping one previous static cache for
+// windows that are still running the previous release
 self.addEventListener('activate', event => {
   console.log('[SW] Activating service worker...');
 
-  event.waitUntil(
-    caches.keys()
-      .then(cacheNames => {
-        return Promise.all(
-          cacheNames
-            .filter(name => name !== CACHE_NAME && name !== DATA_CACHE_NAME
-              && name !== SEMANTIC_CACHE_NAME)
-            .map(name => {
-              console.log('[SW] Deleting old cache:', name);
-              return caches.delete(name);
-            })
-        );
-      })
-      .then(() => {
-        console.log('[SW] Activate complete');
-        return self.clients.claim();
-      })
-  );
+  event.waitUntil((async () => {
+    const cacheNames = await caches.keys();
+    const openClientIds = await openWindowClientIds();
+    const keep = openClientIds.length ? newestPreviousStaticCache(cacheNames) : null;
+    await Promise.all(
+      cacheNames
+        .filter(name => name !== CACHE_NAME && name !== DATA_CACHE_NAME
+          && name !== SEMANTIC_CACHE_NAME && name !== keep)
+        .map(name => {
+          console.log('[SW] Deleting old cache:', name);
+          return caches.delete(name);
+        })
+    );
+    retainedRelease = keep ? { cacheName: keep, clientIds: new Set(openClientIds) } : null;
+    console.log('[SW] Activate complete');
+    await self.clients.claim();
+  })());
 });
 
 // Fetch event - handle requests with appropriate caching strategy
@@ -253,6 +304,10 @@ self.addEventListener('fetch', event => {
   // cached page only as an offline fallback (#274).
   if (isHtmlRequest(event.request, url.pathname)) {
     event.respondWith(networkFirst(event.request, CACHE_NAME));
+    // A navigation is the usual sign that an old window was closed or reloaded.
+    if (event.request.mode === 'navigate') {
+      event.waitUntil?.(releasePreviousCacheIfUnused());
+    }
     return;
   }
 
@@ -264,8 +319,13 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Handle static assets with cache-first
+  // Handle static assets with cache-first. A URL versioned for another
+  // release comes from a window still running that release.
   if (isStaticAsset(url.pathname)) {
+    if (isOtherReleaseAsset(url)) {
+      event.respondWith(otherReleaseAsset(event.request));
+      return;
+    }
     event.respondWith(cacheFirst(event.request, CACHE_NAME));
     return;
   }
@@ -409,6 +469,34 @@ async function cacheFirst(request, cacheName) {
   }
 }
 
+function isOtherReleaseAsset(url) {
+  const version = url.searchParams.get('v');
+  return version !== null && version !== CACHE_VERSION;
+}
+
+/**
+ * Serve a module versioned for another release from whichever cache holds it,
+ * normally the retained previous release cache. On a miss the network answers,
+ * but the response is never stored: the server holds only its current bytes,
+ * and caching them under another release's ?v= key would make the mix stick.
+ */
+async function otherReleaseAsset(request) {
+  const cachedResponse = await caches.match(request);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+
+  try {
+    return await fetch(request);
+  } catch (err) {
+    console.warn('[SW] Network fetch failed:', request.url, err);
+    return new Response('Resource not available offline', {
+      status: 503,
+      statusText: 'Service Unavailable'
+    });
+  }
+}
+
 /**
  * Network-first strategy
  */
@@ -449,6 +537,7 @@ self.addEventListener('message', event => {
   }
 
   if (event.data?.action === 'clearCache') {
+    retainedRelease = null;
     const pending = caches.keys().then(names => Promise.all(
       names.map(name => caches.delete(name))
     ));
