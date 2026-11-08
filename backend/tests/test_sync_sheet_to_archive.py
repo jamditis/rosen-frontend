@@ -610,3 +610,10 @@ def test_open_sync_pr_deletes_pushed_branch_when_pr_create_fails(tmp_path, monke
     assert ["git", "push", "origin", "--delete", "sync/master-sheet-777"] in commands[
         create_index + 1 :
     ]
+
+
+def test_sync_commit_includes_thread_id_tombstones(tmp_path):
+    """A thread the export drops must stay retired after the sync PR merges."""
+    assert "data/thread-id-tombstones.json" in sync._changed_paths(
+        tmp_path / "archive.csv"
+    )
