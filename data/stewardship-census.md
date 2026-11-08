@@ -2,7 +2,7 @@
 
 Schema: `stewardship-census/1.0.0`
 
-Input commit: `14eab3618be1df2a3dcd1a721524a4d7049e0958` (input files clean)
+Input commit: `bf77b46af279862a5b3911941a80df4b4239db87` (input files clean)
 
 ## Record reconciliation
 

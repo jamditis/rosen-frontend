@@ -4,7 +4,7 @@
     "compatibility": "additive changes within version 1; semantic changes require a new major version"
   },
   "input": {
-    "commit": "14eab3618be1df2a3dcd1a721524a4d7049e0958",
+    "commit": "bf77b46af279862a5b3911941a80df4b4239db87",
     "dirty": false,
     "schema_version": "stewardship-census/1.0.0",
     "files": [
@@ -26,19 +26,19 @@
       },
       {
         "path": "data/archive-data.json",
-        "sha256": "33d564aa3973c75b69a78213665cc3a995d63c2f8cdd1e966a45556ee62cf95e"
+        "sha256": "86723bb040f686c99f8144a3fd18c93882aead33e2001290642004934e11ec7f"
       },
       {
         "path": "data/archive-core.json",
-        "sha256": "1e5ff2ddb000b5c309519938a70c822c2a36ffb509e910b15438478d5cf9deae"
+        "sha256": "a643e47a342efd41ce4d6bbf6acb3b17cafef8de4406ff8a521c38bc4f651f3b"
       },
       {
         "path": "data/archive-details.json",
-        "sha256": "92f8694e4d273b0c663b02c0a0a35698624b2d3849e578b9cb2a17a7593b3ac8"
+        "sha256": "2e33976016921d2c710f476010e3d152d813df4d64798bd10e2dd658d2cc8e95"
       },
       {
         "path": "data/archive-entities.json",
-        "sha256": "93a6aca280192177a081b2c69a45bee9d0ae2c34eb6d7549433c4780324da008"
+        "sha256": "1aa6ac5061a4e86dae5d4eb86346823d9b3a7f69d162146ac36fb3c2e88b3dff"
       },
       {
         "path": "data/authored-excerpts.csv",

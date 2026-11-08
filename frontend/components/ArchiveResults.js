@@ -1,11 +1,11 @@
-import { html } from '../html.js?v=3.8.68';
+import { html } from '../html.js?v=3.8.70';
 import { ChevronLeft, ChevronRight, FolderOpen, SearchX } from 'lucide-react';
-import { COLORS } from '../constants.js?v=3.8.68';
-import { hashString } from '../services/archiveService.js?v=3.8.68';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.68';
-import { LEXICAL_SIGNAL, presentSearchSignal } from '../utils/searchRanking.js?v=3.8.68';
-import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.68';
-import LoadingQuotes from './LoadingQuotes.js?v=3.8.68';
+import { COLORS } from '../constants.js?v=3.8.70';
+import { hashString } from '../services/archiveService.js?v=3.8.70';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.70';
+import { LEXICAL_SIGNAL, presentSearchSignal } from '../utils/searchRanking.js?v=3.8.70';
+import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.70';
+import LoadingQuotes from './LoadingQuotes.js?v=3.8.70';
 
 const Highlight = ({ text, term }) => {
   if (!term || term.length < 2) return html`<span>${text}</span>`;
@@ -25,6 +25,10 @@ const Highlight = ({ text, term }) => {
  * The canonical archive-result renderer shared by the standard archive and
  * the optional desktop adapter. Filtering, sorting, pagination, and record
  * selection remain owned by App; this component only presents those results.
+ *
+ * A grid card's label row sits after its record link, not inside it, so the
+ * category chips can be buttons (#876): a chip filters the archive by its
+ * category instead of opening the record, and no control nests in a link.
  */
 const ArchiveResults = ({
   compact = false,
@@ -47,6 +51,9 @@ const ArchiveResults = ({
   onOpenFolder,
   onPageChange,
   onClearFilters,
+  // Filters the archive by one category (#876). The card's category chips
+  // call it; without it they render as plain labels.
+  onFilterCategory = null,
   // Brief stuck-record skip for the broken-record extra (#754). Off by
   // default, and the CSS drops the movement under reduced motion.
   skipping = false,
@@ -120,45 +127,59 @@ const ArchiveResults = ({
                   <p className="archive-record-card__summary">
                     <${Highlight} text=${item.summaryPreview || item.summary || ''} term=${searchTerm} />
                   </p>
+                </a>
 
-                  <div className="archive-record-card__labels">
-                    ${signal && html`
-                      <span
-                        className="archive-record-card__label archive-record-card__label--signal"
-                        title=${signalCopy.description}
+                <div className="archive-record-card__labels">
+                  ${signal && html`
+                    <span
+                      className="archive-record-card__label archive-record-card__label--signal"
+                      title=${signalCopy.description}
+                    >
+                      ${signalCopy.label}
+                    </span>
+                  `}
+                  ${item.categories.slice(0, 2).map((category, index) => {
+                    const chipStyle = index === 0 ? {
+                      backgroundColor: theme.bg,
+                      borderColor: theme.border,
+                      color: theme.text,
+                    } : undefined;
+                    return onFilterCategory ? html`
+                      <button
+                        type="button"
+                        key=${category}
+                        className="archive-record-card__label archive-record-card__label--action"
+                        style=${chipStyle}
+                        aria-label=${`Filter archive by category: ${category}`}
+                        onClick=${() => onFilterCategory(category)}
                       >
-                        ${signalCopy.label}
-                      </span>
-                    `}
-                    ${item.categories.slice(0, 2).map((category, index) => html`
+                        ${category}
+                      </button>
+                    ` : html`
                       <span
                         key=${category}
                         className="archive-record-card__label"
-                        style=${index === 0 ? {
-                          backgroundColor: theme.bg,
-                          borderColor: theme.border,
-                          color: theme.text,
-                        } : undefined}
+                        style=${chipStyle}
                       >
                         ${category}
                       </span>
-                    `)}
-                    ${item.categories.length > 2 && html`
-                      <span className="archive-record-card__label">
-                        +${item.categories.length - 2} more
-                      </span>
-                    `}
-                    ${recordNeedsReview(item) && html`
-                      <span
-                        className="archive-record-card__label archive-record-card__label--review"
-                        style=${{ backgroundColor: '#fffbeb', color: '#b45309' }}
-                        title="Auto-submitted; pending a human review pass"
-                      >
-                        needs review
-                      </span>
-                    `}
-                  </div>
-                </a>
+                    `;
+                  })}
+                  ${item.categories.length > 2 && html`
+                    <span className="archive-record-card__label">
+                      +${item.categories.length - 2} more
+                    </span>
+                  `}
+                  ${recordNeedsReview(item) && html`
+                    <span
+                      className="archive-record-card__label archive-record-card__label--review"
+                      style=${{ backgroundColor: '#fffbeb', color: '#b45309' }}
+                      title="Auto-submitted; pending a human review pass"
+                    >
+                      needs review
+                    </span>
+                  `}
+                </div>
               </article>
             `;
           })}

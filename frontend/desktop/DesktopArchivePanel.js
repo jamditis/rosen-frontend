@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.68';
+import { html } from '../html.js?v=3.8.70';
 import {
   AlertCircle,
   Filter,
@@ -7,9 +7,9 @@ import {
   LayoutGrid,
   RotateCw,
 } from 'lucide-react';
-import ArchiveResults from '../components/ArchiveResults.js?v=3.8.68';
-import Sidebar from '../components/Sidebar.js?v=3.8.68';
-import { RELEVANCE_SORT } from '../utils/searchRanking.js?v=3.8.68';
+import ArchiveResults from '../components/ArchiveResults.js?v=3.8.70';
+import Sidebar from '../components/Sidebar.js?v=3.8.70';
+import { RELEVANCE_SORT } from '../utils/searchRanking.js?v=3.8.70';
 
 const DesktopArchivePanel = ({
   viewMode,
@@ -40,6 +40,11 @@ const DesktopArchivePanel = ({
   const resultsRef = useRef(null);
   const filterPanelRef = useRef(null);
   const filterButtonRef = useRef(null);
+  // A card's category chip narrows this panel to that one category, the same
+  // filter the standard archive's chips and record modal apply (#876).
+  const filterByCategory = (category) => {
+    setFilters(prev => ({ ...prev, categories: [category] }));
+  };
   const desktopSemanticSearch = semanticSearch && {
     ...semanticSearch,
     inputId: `desktop-${viewMode}-archive-search-semantic`,
@@ -219,6 +224,7 @@ const DesktopArchivePanel = ({
             onOpenFolder=${onOpenFolder}
             onPageChange=${changePage}
             onClearFilters=${onClearFilters}
+            onFilterCategory=${filterByCategory}
           />
         </section>
       </div>
