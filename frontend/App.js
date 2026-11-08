@@ -733,6 +733,9 @@ const App = () => {
           setSemanticHits(EMPTY_SEMANTIC_HITS);
           setSemanticStatus('error');
           setSemanticEnabled(false);
+          // The toggle now reads off, so give back the model's memory as the
+          // off switch does. Turning it on again starts a fresh worker.
+          terminateSemanticSearch();
           // Same recovery as a failed warmup: the semantic leg is gone, so the
           // sort it selected goes with it.
           setSortBy(prev => sortForSemanticToggle(prev, { enabled: false, hasQuery: true }));

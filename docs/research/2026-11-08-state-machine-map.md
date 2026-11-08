@@ -321,7 +321,7 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 15. Return a failure instead of `skipped` from `push_full_release` when the job expects SFTP secrets. Fixed (`submit-record.yml` sets `ROSEN_REQUIRE_TRANSFER=1`, so missing settings fail the push by name and the row stays `archived`).
 16. Reset `coreFetchStarted` on error and add a retry button that fetches again without a page reload. Fixed (the catch releases the ref, and a "Try again" button in the shared error panel bumps a retry counter that reruns the load effect; "Reload page" stays as a fallback).
 17. Treat an unparseable column A timestamp as stuck and log it in `sweep_stuck.py`. Fixed (an unparseable or empty column A now counts as stuck and logs a warning; a future timestamp stays fresh).
-18. Call `terminateSemanticSearch` on the semantic query error path in `App.js`.
+18. Call `terminateSemanticSearch` on the semantic query error path in `App.js`. Fixed (the query error path now releases the worker, as the off switch does).
 19. Cancel the 180 ms close timer in `RecordModal.js` when the record changes or the component unmounts.
 20. Use functional `setLayout` updaters in `closeWindow` and `minimizeWindow` in `DesktopShell.js`.
 21. Set `db` only after `createTables` succeeds in `sqliteService.js`. Fixed (the schema is built on a local database, which is closed on failure and published to `db` only after it succeeds).

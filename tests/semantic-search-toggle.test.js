@@ -68,6 +68,16 @@ describe('semantic search toggle', () => {
     );
   });
 
+  it('drops the worker and its model when a semantic query fails', () => {
+    // The failed query turns the toggle off, so the model it loaded must go
+    // too, as it does when the reader turns the toggle off by hand.
+    const effect = app.slice(app.indexOf('requestSemanticSearch(query'));
+    const catchBlock = effect.slice(effect.indexOf('.catch('), effect.indexOf('SEMANTIC_QUERY_DEBOUNCE_MS'));
+    assert.match(catchBlock, /setSemanticEnabled\(false\)/);
+    assert.match(catchBlock, /terminateSemanticSearch\(\)/,
+      'the query error path must release the worker');
+  });
+
   it('keeps the ranking and the sort key in one tested module', () => {
     assert.match(
       app,
