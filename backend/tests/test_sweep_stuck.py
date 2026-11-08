@@ -483,3 +483,35 @@ class TestArchivedRetryCap:
         rows = sweep_stuck.fetch_rows()
 
         assert rows[0]["error"] == "[sweep attempt 4] x"
+
+
+class TestUnparseableTimestamp:
+    """A hand-edited column A must not hide a stuck row for good."""
+
+    @pytest.mark.parametrize("status", ["submitted", "processing"])
+    def test_unparseable_timestamp_counts_as_stuck(self, monkeypatch, caplog, status):
+        _env(monkeypatch)
+        _stub_sheet_rows(
+            monkeypatch,
+            [_row("yesterday", "https://example.com/hand-edit", status, sheet_row=8)],
+        )
+        dispatch_mock = _stub_dispatch_ok(monkeypatch)
+
+        sweep_stuck.sweep()
+
+        dispatch_mock.assert_called_once()
+        assert "row 8" in caplog.text
+        assert "yesterday" in caplog.text
+
+    def test_future_timestamp_is_still_fresh(self, monkeypatch):
+        # Clock skew gives a negative age; that is not an unparseable value.
+        _env(monkeypatch)
+        future = (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat()
+        _stub_sheet_rows(
+            monkeypatch, [_row(future, "https://example.com/skew", "submitted")]
+        )
+        dispatch_mock = _stub_dispatch_ok(monkeypatch)
+
+        sweep_stuck.sweep()
+
+        dispatch_mock.assert_not_called()

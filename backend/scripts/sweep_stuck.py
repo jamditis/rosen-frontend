@@ -52,7 +52,7 @@ import re
 import sys
 import time
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import requests
 
@@ -285,23 +285,31 @@ def _parse_ts(ts: str):
     return parsed
 
 
-def _age_seconds(ts: str) -> float:
+def _age_seconds(ts: str) -> Optional[float]:
+    """Age of column A in seconds, or None when it cannot be parsed."""
     parsed = _parse_ts(ts)
     if parsed is None:
-        return -1.0
+        return None
     return (datetime.now(timezone.utc) - parsed).total_seconds()
 
 
-def _is_stuck(status: str, age: float) -> bool:
+def _is_stuck(status: str, age: Optional[float]) -> bool:
     threshold = _THRESHOLDS.get(status)
     if threshold is None:
         return False
+    # An unparseable column A (for example a hand edit) would otherwise hide
+    # the row for good. Retrying is safe: dedup, the in-flight check and the
+    # archived retry cap all still apply.
+    if age is None:
+        return True
     return age >= threshold
 
 
-def _humanize(seconds: float) -> str:
+def _humanize(seconds: Optional[float]) -> str:
+    if seconds is None:
+        return "unparseable timestamp"
     if seconds < 0:
-        return "unknown"
+        return "in the future"
     if seconds < 60:
         return f"{seconds:.0f}s"
     if seconds < 3600:
@@ -348,6 +356,11 @@ def sweep() -> Dict[str, int]:
             counts["terminal"] += 1
             continue
         age = _age_seconds(row["timestamp"])
+        if age is None:
+            logger.warning(
+                f"row {sheet_row}: column A timestamp {row['timestamp']!r} "
+                f"cannot be parsed; treating the {status} row as stuck"
+            )
         if not _is_stuck(status, age):
             counts["fresh"] += 1
             logger.info(
