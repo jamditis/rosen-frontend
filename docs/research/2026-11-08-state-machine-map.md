@@ -322,7 +322,7 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 18. Call `terminateSemanticSearch` on the semantic query error path in `App.js`.
 19. Cancel the 180 ms close timer in `RecordModal.js` when the record changes or the component unmounts.
 20. Use functional `setLayout` updaters in `closeWindow` and `minimizeWindow` in `DesktopShell.js`.
-21. Set `db` only after `createTables` succeeds in `sqliteService.js`.
+21. Set `db` only after `createTables` succeeds in `sqliteService.js`. Fixed (the schema is built on a local database, which is closed on failure and published to `db` only after it succeeds).
 22. Move `stampVersion` inside the rollback try in `scripts/bump-version.mjs`. Fixed (the version.json write and the stamp loop now run inside the rollback try).
 23. Delete the pushed branch when `gh pr create` fails in `sync_sheet_to_archive.py`. Fixed (a failed `gh pr create` now deletes the pushed branch and still reports the original error).
 24. Remove the unused `noop` status from the `process_submission.py` docstring, and add `committed` to the sweeper workflow comment. Fixed (both docstrings drop `noop`, and the workflow comment lists `committed` with the new skip and cap rules).
