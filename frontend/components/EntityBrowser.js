@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { html } from '../html.js?v=3.8.67';
 import { Users, Building2, Lightbulb, BookOpen, MapPin, Calendar, Search, ArrowUpDown, ChevronDown, ChevronRight, X, ExternalLink, AlertTriangle, RotateCw } from 'lucide-react';
-import { fetchEntitiesData, getRecordsByEntity } from '../services/archiveService.js?v=3.8.67';
+import { fetchEntitiesData, getRecordsByEntity, resolveEntityId } from '../services/archiveService.js?v=3.8.67';
 import { getEntityScope } from '../services/queryComposition.js?v=3.8.67';
 import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.8.67';
 import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.8.67';
@@ -210,7 +210,14 @@ const EntityBrowser = ({
       return;
     }
 
-    const entity = scopedEntityById.get(selectedEntityId);
+    // A link can still carry an id that was later merged into another entity
+    // (#874). Send it on to the canonical entity instead of dropping it.
+    const entity = scopedEntityById.get(selectedEntityId)
+      || scopedEntityById.get(resolveEntityId(selectedEntityId));
+    if (entity && entity.id !== selectedEntityId && onSelectEntity) {
+      onSelectEntity(entity.id);
+      return;
+    }
     if (entity) {
       if (selectedEntityId !== selectedEntity?.id) {
         entityOpenerRef.current = null;

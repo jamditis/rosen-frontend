@@ -1,0 +1,2 @@
+retired_id,retired_type,retired_name,canonical_id,merged_on,issue,reason
+W0666,Work,PressThink,O0033,2026-08-27,#859,"Same blog registered twice, once as a Work and once as an Organization; mentions and relationships folded into O0033."

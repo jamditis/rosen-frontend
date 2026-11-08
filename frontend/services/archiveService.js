@@ -63,6 +63,25 @@ let entitiesLoadPromise = null;
 let entityById = new Map();        // entity_id -> entity object
 let entityToRecords = new Map();   // entity_id -> Set of record ids
 let recordToEntities = new Map();  // record_id -> Set of entity ids
+let entityRedirects = new Map();   // retired entity_id -> canonical entity_id (#874)
+
+const ENTITY_ID_PATTERN = /^[A-Z][0-9]+$/;
+
+/**
+ * Keep only well-formed retired -> canonical pairs from a payload's
+ * entityRedirects. The map is an aid for old links, not part of the entity
+ * index itself, so a malformed one is dropped rather than failing the load.
+ */
+const toRedirectMap = (raw) => {
+  const map = new Map();
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return map;
+  for (const [retiredId, canonicalId] of Object.entries(raw)) {
+    if (ENTITY_ID_PATTERN.test(retiredId) && typeof canonicalId === 'string' && ENTITY_ID_PATTERN.test(canonicalId)) {
+      map.set(retiredId, canonicalId);
+    }
+  }
+  return map;
+};
 
 /**
  * Build entity lookup maps from loaded archive data
@@ -72,6 +91,7 @@ export const buildEntityMaps = (data) => {
   entityById.clear();
   entityToRecords.clear();
   recordToEntities.clear();
+  entityRedirects = toRedirectMap(data.entityRedirects);
 
   // Build entity ID -> entity object map
   if (data.entities && Array.isArray(data.entities)) {
@@ -101,13 +121,20 @@ export const buildEntityMaps = (data) => {
 /**
  * Get entity by ID
  */
-export const getEntityById = (entityId) => entityById.get(entityId);
+export const getEntityById = (entityId) => entityById.get(resolveEntityId(entityId));
+
+/**
+ * Resolve an entity id through the merge redirects (#874). A retired id
+ * returns the canonical id it was merged into; any other id is returned
+ * unchanged. The exporter flattens chains, so one lookup is enough.
+ */
+export const resolveEntityId = (entityId) => entityRedirects.get(entityId) || entityId;
 
 /**
  * Get all records that mention a specific entity
  */
 export const getRecordsByEntity = (entityId) => {
-  const recordIds = entityToRecords.get(entityId);
+  const recordIds = entityToRecords.get(resolveEntityId(entityId));
   return recordIds ? Array.from(recordIds) : [];
 };
 
@@ -611,7 +638,8 @@ export const fetchEntitiesData = async () => {
         entitiesCache = cached;
         buildEntityMaps({
           entities: cached.entities,
-          records: toRecords(cached)
+          records: toRecords(cached),
+          entityRedirects: cached.entityRedirects
         });
         return cached;
       }
@@ -632,7 +660,8 @@ export const fetchEntitiesData = async () => {
       // Build entity maps for the entity browser
       buildEntityMaps({
         entities: data.entities,
-        records: toRecords(data)
+        records: toRecords(data),
+        entityRedirects: data.entityRedirects
       });
 
       // Cache the result
