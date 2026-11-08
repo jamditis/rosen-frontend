@@ -148,7 +148,7 @@ test('recounts a divergence backlog and restates its note', () => {
   assert.deepEqual(divergence.exampleRelationshipIds, ['RECORD-00002_REL_001']);
 });
 
-test('refuses to rule on a backlog that has reached zero', () => {
+test('enforces a type whose divergence backlog has reached zero', () => {
   const registry = {
     types: {
       Mentions: {
@@ -175,10 +175,13 @@ test('refuses to rule on a backlog that has reached zero', () => {
     asOfDate: '2026-08-27',
   });
 
-  assert.equal(result.problems.length, 1);
-  assert.match(result.problems[0], /endpointEnforcement can be flipped/);
-  // Nothing was rewritten, so the curator sees the old numbers next to the note.
-  assert.equal(result.registry.types.Mentions.endpointDivergence.violatingRows, 1);
+  // Curator ruling (2026-11-08): zero divergence means the endpoint rule
+  // holds for every row, so the refresh enforces it rather than failing the
+  // release. The change is reported so the release PR shows it.
+  assert.deepEqual(result.problems, []);
+  assert.equal(result.registry.types.Mentions.endpointEnforcement, 'enforced');
+  assert.equal(result.registry.types.Mentions.endpointDivergence, undefined);
+  assert.ok(result.changes.some(change => /Mentions endpointEnforcement deferred -> enforced/.test(change)));
 });
 
 test('drops a contradiction block once no reversed pair is left', () => {
