@@ -36,6 +36,8 @@ def _load_script_module():
 
 pytest.importorskip("googleapiclient")
 sweep_stuck = _load_script_module()
+# The autouse fixture below replaces the lookup; keep the real one for its tests.
+_REAL_LIST_ACTIVE = getattr(sweep_stuck, "list_active_submission_rows", None)
 
 
 # ---------- Fixtures ---------------------------------------------------------
@@ -80,6 +82,17 @@ def _env(monkeypatch):
     monkeypatch.setenv("GITHUB_REPO", "jamditis/rosen-frontend")
     monkeypatch.setenv("SHEET_ID", "SHEET-ABC")
     monkeypatch.setenv("SHEET_TAB", "Queue")
+
+
+@pytest.fixture(autouse=True)
+def _no_active_runs(monkeypatch):
+    """Default: no submit-record.yml run is queued or running."""
+    monkeypatch.setattr(
+        sweep_stuck,
+        "list_active_submission_rows",
+        MagicMock(return_value=(set(), 0)),
+        raising=False,
+    )
 
 
 # ---------- Tests ------------------------------------------------------------
@@ -255,3 +268,133 @@ class TestApiResilience:
         sweep_stuck.sweep()
 
         assert dispatch_mock.call_count == 2
+
+
+class TestInFlightRuns:
+    """A row whose submit-record.yml run is still queued or running must wait.
+
+    Re-dispatching it would add a second run to the release FIFO; each extra
+    run dedups, pushes the whole site again and rewrites the row status.
+    """
+
+    def _stuck(self, sheet_row):
+        return _row(
+            _iso_ago(minutes=45),
+            f"https://example.com/row-{sheet_row}",
+            "submitted",
+            sheet_row=sheet_row,
+        )
+
+    def test_skips_row_with_active_run(self, monkeypatch):
+        _env(monkeypatch)
+        _stub_sheet_rows(monkeypatch, [self._stuck(5), self._stuck(6)])
+        monkeypatch.setattr(
+            sweep_stuck,
+            "list_active_submission_rows",
+            MagicMock(return_value=({5}, 0)),
+        )
+        dispatch_mock = _stub_dispatch_ok(monkeypatch)
+
+        counts = sweep_stuck.sweep()
+
+        dispatch_mock.assert_called_once()
+        assert dispatch_mock.call_args.args[0]["sheet_row"] == 6
+        assert counts["in_flight"] == 1
+
+    def test_fails_closed_when_run_lookup_fails(self, monkeypatch, caplog):
+        _env(monkeypatch)
+        _stub_sheet_rows(monkeypatch, [self._stuck(5)])
+        monkeypatch.setattr(
+            sweep_stuck,
+            "list_active_submission_rows",
+            MagicMock(side_effect=RuntimeError("actions api 502")),
+        )
+        dispatch_mock = _stub_dispatch_ok(monkeypatch)
+
+        counts = sweep_stuck.sweep()
+
+        dispatch_mock.assert_not_called()
+        assert counts["in_flight"] == 1
+        assert "actions api 502" in caplog.text
+
+    def test_unattributed_active_run_blocks_every_row(self, monkeypatch):
+        # A run whose title names no row (one started before run-name existed)
+        # could belong to any row, so nothing is dispatched until it ends.
+        _env(monkeypatch)
+        _stub_sheet_rows(monkeypatch, [self._stuck(5)])
+        monkeypatch.setattr(
+            sweep_stuck,
+            "list_active_submission_rows",
+            MagicMock(return_value=(set(), 1)),
+        )
+        dispatch_mock = _stub_dispatch_ok(monkeypatch)
+
+        sweep_stuck.sweep()
+
+        dispatch_mock.assert_not_called()
+
+
+class TestListActiveSubmissionRows:
+
+    def _response(self, status_code, runs):
+        resp = MagicMock()
+        resp.status_code = status_code
+        resp.ok = 200 <= status_code < 300
+        resp.text = "boom"
+        resp.json.return_value = {"total_count": len(runs), "workflow_runs": runs}
+        return resp
+
+    def test_reads_row_from_run_title_for_every_active_status(self, monkeypatch):
+        _env(monkeypatch)
+        calls = []
+
+        def fake_get(url, headers=None, params=None, timeout=None):
+            calls.append(params["status"])
+            if params["status"] == "queued":
+                return self._response(
+                    200, [{"id": 1, "display_title": "Submit record for row 12"}]
+                )
+            if params["status"] == "in_progress":
+                return self._response(
+                    200,
+                    [
+                        {"id": 2, "display_title": "Submit record for row 7"},
+                        {"id": 3, "display_title": "Pillar 3a — submit record"},
+                    ],
+                )
+            return self._response(200, [])
+
+        monkeypatch.setattr(sweep_stuck.requests, "get", fake_get)
+
+        rows, unattributed = _REAL_LIST_ACTIVE()
+
+        assert rows == {12, 7}
+        assert unattributed == 1
+        assert set(calls) == {
+            "requested",
+            "queued",
+            "pending",
+            "waiting",
+            "in_progress",
+        }
+
+    def test_raises_on_api_error(self, monkeypatch):
+        _env(monkeypatch)
+        monkeypatch.setattr(
+            sweep_stuck.requests,
+            "get",
+            MagicMock(return_value=self._response(403, [])),
+        )
+
+        with pytest.raises(RuntimeError):
+            _REAL_LIST_ACTIVE()
+
+    def test_submit_workflow_run_name_carries_the_sheet_row(self):
+        workflow = (
+            _BACKEND.parent / ".github" / "workflows" / "submit-record.yml"
+        ).read_text(encoding="utf-8")
+        line = next(
+            line for line in workflow.splitlines() if line.startswith("run-name:")
+        )
+        title = line.split(":", 1)[1].strip().replace("${{ inputs.sheet_row }}", "42")
+        assert sweep_stuck._row_from_run_title(title) == 42

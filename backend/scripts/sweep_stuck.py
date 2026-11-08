@@ -18,6 +18,11 @@ Terminal statuses (``live``, ``committed``, ``error``, ``duplicate``,
 marks a record whose data is appended but whose live push (SFTP) is not
 configured on this runner -- retrying it would never make it live (#414).
 
+A row whose ``submit-record.yml`` run is still queued or running is skipped,
+because the release FIFO can hold a run for hours. The row number comes from
+the run title (``run-name`` in that workflow). If the run listing fails, or an
+active run's title names no row, nothing is dispatched on that tick.
+
 The dedup check in ``submit-record.yml`` step 2 guarantees the sweep is
 idempotent: An existing canonical record is published again without scraping,
 appending, or allocating another ID. It becomes ``duplicate`` only after a
@@ -42,10 +47,11 @@ import json
 import logging
 import os
 import pathlib
+import re
 import sys
 import time
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Set, Tuple
 
 import requests
 
@@ -148,6 +154,74 @@ def fetch_rows() -> List[Dict[str, Any]]:
 
 # ---------- Workflow dispatch ----------------------------------------------
 
+# Run states in which a submit-record.yml run has not finished yet. Same list
+# as ACTIVE_STATUSES in .github/scripts/wait-release-turn.mjs.
+_ACTIVE_RUN_STATUSES = ("requested", "queued", "pending", "waiting", "in_progress")
+
+# submit-record.yml sets ``run-name: Submit record for row <sheet_row>``. The
+# runs API does not return dispatch inputs, so the title is the only place a
+# listed run names its queue row.
+_RUN_TITLE_ROW = re.compile(r"\bfor row (\d+)\s*$")
+
+
+def _github_headers(token: str) -> Dict[str, str]:
+    return {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+
+def _row_from_run_title(title: str):
+    match = _RUN_TITLE_ROW.search(title or "")
+    return int(match.group(1)) if match else None
+
+
+def list_active_submission_rows() -> Tuple[Set[int], int]:
+    """Return queue rows that have a queued or running submit-record.yml run.
+
+    Returns ``(rows, unattributed)``: ``unattributed`` counts active runs whose
+    title names no row (for example a run started before ``run-name``
+    existed). Raises on any API failure so the caller can fail closed.
+    """
+    token = os.environ.get("GITHUB_TOKEN", "").strip()
+    repo = os.environ.get("GITHUB_REPO", "").strip()
+    if not token or not repo:
+        raise RuntimeError("GITHUB_TOKEN and GITHUB_REPO must be set")
+    workflow = os.environ.get("GITHUB_WORKFLOW_FILENAME", "submit-record.yml")
+    url = f"https://api.github.com/repos/{repo}/actions/workflows/{workflow}/runs"
+    rows: Set[int] = set()
+    unattributed = 0
+    seen = set()
+    for status in _ACTIVE_RUN_STATUSES:
+        for page in range(1, 11):
+            resp = requests.get(
+                url,
+                headers=_github_headers(token),
+                params={"status": status, "per_page": 100, "page": page},
+                timeout=20,
+            )
+            if not 200 <= resp.status_code < 300:
+                raise RuntimeError(
+                    f"listing {status} runs returned {resp.status_code}: "
+                    f"{resp.text[:300]}"
+                )
+            runs = resp.json().get("workflow_runs") or []
+            for run in runs:
+                if run.get("id") in seen:
+                    continue
+                seen.add(run.get("id"))
+                row = _row_from_run_title(run.get("display_title", ""))
+                if row is None:
+                    unattributed += 1
+                else:
+                    rows.add(row)
+            if len(runs) < 100:
+                break
+        else:
+            raise RuntimeError(f"more than 1000 {status} runs; refusing to guess")
+    return rows, unattributed
+
 
 def dispatch_workflow(inputs: Dict[str, Any]) -> Dict[str, Any]:
     """POST a workflow_dispatch with the given inputs.
@@ -165,11 +239,7 @@ def dispatch_workflow(inputs: Dict[str, Any]) -> Dict[str, Any]:
         f"https://api.github.com/repos/{repo}/actions/workflows/"
         f"{workflow}/dispatches"
     )
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
+    headers = _github_headers(token)
     payload = {"ref": ref, "inputs": {k: str(v) for k, v in inputs.items()}}
     resp = requests.post(url, headers=headers, json=payload, timeout=20)
     return {
@@ -235,7 +305,23 @@ def sweep() -> Dict[str, int]:
         "terminal": 0,
         "dispatched": 0,
         "failed": 0,
+        "in_flight": 0,
     }
+    # Look up active runs once, before the first dispatch, so the answer is
+    # not muddied by runs this sweep starts. A failed lookup blocks every
+    # dispatch: a duplicate run costs a full-site push, a skipped tick costs
+    # 30 minutes.
+    active_rows: Set[int] = set()
+    active_error = None
+    unattributed = 0
+    if any(_is_stuck(row["status"], _age_seconds(row["timestamp"])) for row in rows):
+        try:
+            active_rows, unattributed = list_active_submission_rows()
+        except Exception as exc:  # noqa: BLE001 — fail closed below
+            active_error = str(exc)
+            logger.error(
+                f"could not list active submit runs, dispatching nothing: {exc}"
+            )
     sheet_id = os.environ.get("SHEET_ID", "").strip()
     sheet_tab = os.environ.get("SHEET_TAB", "Sheet1").strip() or "Sheet1"
 
@@ -250,6 +336,18 @@ def sweep() -> Dict[str, int]:
             counts["fresh"] += 1
             logger.info(
                 f"row {sheet_row}: {status}={_humanize(age)}, fresh, " "skipping"
+            )
+            continue
+        if active_error is not None or unattributed or sheet_row in active_rows:
+            counts["in_flight"] += 1
+            if active_error is not None:
+                reason = "active-run lookup failed"
+            elif sheet_row in active_rows:
+                reason = "a submit run for this row is queued or running"
+            else:
+                reason = f"{unattributed} active submit run(s) name no row"
+            logger.info(
+                f"row {sheet_row}: {status}={_humanize(age)}, {reason}, skipping"
             )
             continue
         dispatch_url = row["url"]

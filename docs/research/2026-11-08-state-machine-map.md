@@ -303,7 +303,7 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 ## Suggested follow-up issues
 
 1. Measure sweeper age from the last status write, not from column A, and record that time in a new column.
-2. Make the sweeper skip a row when a `submit-record.yml` run for that `sheet_row` is queued or in progress.
+2. Make the sweeper skip a row when a `submit-record.yml` run for that `sheet_row` is queued or in progress. Fixed (the run title now names the row, and the sweeper skips rows with an active run and dispatches nothing when the lookup fails).
 3. Add an attempt counter for `archived` rows and stop sentinel retries after a fixed limit.
 4. Order the release FIFO by run creation time or by `run_attempt` start time, not by run id alone.
 5. Add a tombstone list of retired THREAD ids to the exporter so that it never reuses a number.
