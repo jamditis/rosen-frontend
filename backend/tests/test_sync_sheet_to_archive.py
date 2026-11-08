@@ -575,3 +575,38 @@ def test_nothing_to_sync_when_sheet_matches(tmp_path, monkeypatch):
 
 def test_sync_commit_includes_generated_feeds(tmp_path):
     assert "data/feeds" in sync._changed_paths(tmp_path / "archive.csv")
+
+
+def test_open_sync_pr_deletes_pushed_branch_when_pr_create_fails(tmp_path, monkeypatch):
+    """A pushed branch with no PR is an orphan nobody reviews; remove it."""
+    csv_path = _seed_csv(tmp_path)
+    monkeypatch.setenv("GITHUB_RUN_ID", "777")
+
+    def fake_run(cmd, *args, **kwargs):
+        if cmd[:3] == ["gh", "pr", "create"]:
+            raise subprocess.CalledProcessError(
+                1, cmd, output="", stderr="GraphQL: rate limited"
+            )
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+
+    run_mock = MagicMock(side_effect=fake_run)
+    monkeypatch.setattr(sync.subprocess, "run", run_mock)
+
+    branch, message = sync.open_sync_pr(
+        csv_path,
+        {
+            "rows_changed": 1,
+            "matched": 1,
+            "writes_by_field": {"key_concepts": 1},
+        },
+    )
+
+    assert branch is None
+    assert "rate limited" in message
+    commands = [call.args[0] for call in run_mock.call_args_list]
+    create_index = next(
+        i for i, cmd in enumerate(commands) if cmd[:3] == ["gh", "pr", "create"]
+    )
+    assert ["git", "push", "origin", "--delete", "sync/master-sheet-777"] in commands[
+        create_index + 1 :
+    ]

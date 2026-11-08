@@ -324,7 +324,7 @@ Ranked by severity: data loss or wrong public data first, then stuck automation,
 20. Use functional `setLayout` updaters in `closeWindow` and `minimizeWindow` in `DesktopShell.js`.
 21. Set `db` only after `createTables` succeeds in `sqliteService.js`.
 22. Move `stampVersion` inside the rollback try in `scripts/bump-version.mjs`.
-23. Delete the pushed branch when `gh pr create` fails in `sync_sheet_to_archive.py`.
+23. Delete the pushed branch when `gh pr create` fails in `sync_sheet_to_archive.py`. Fixed (a failed `gh pr create` now deletes the pushed branch and still reports the original error).
 24. Remove the unused `noop` status from the `process_submission.py` docstring, and add `committed` to the sweeper workflow comment.
 25. Use one spelling (`TRUE`/`FALSE`) for `verified` and `needs_review` in all writers, and make one validator enforce it.
 26. Use one shared default filter object for `App.js` and `viewState.js`.

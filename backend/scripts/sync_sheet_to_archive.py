@@ -432,25 +432,44 @@ def open_sync_pr(
             capture_output=True,
             text=True,
         )
-        subprocess.run(
-            [
-                "gh",
-                "pr",
-                "create",
-                "--base",
-                "main",
-                "--head",
-                branch,
-                "--title",
-                title,
-                "--body",
-                body,
-            ],
-            cwd=str(PROJECT_ROOT),
-            check=True,
-            capture_output=True,
-            text=True,
-        )
+        try:
+            subprocess.run(
+                [
+                    "gh",
+                    "pr",
+                    "create",
+                    "--base",
+                    "main",
+                    "--head",
+                    branch,
+                    "--title",
+                    title,
+                    "--body",
+                    body,
+                ],
+                cwd=str(PROJECT_ROOT),
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except subprocess.CalledProcessError:
+            # The branch is already on origin. Without a PR nobody reviews it,
+            # and the next run pushes another; remove it, then report the
+            # original failure.
+            deleted = subprocess.run(
+                ["git", "push", "origin", "--delete", branch],
+                cwd=str(PROJECT_ROOT),
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            if deleted.returncode != 0:
+                print(
+                    f"[sync] could not delete orphaned branch {branch}: "
+                    f"{(deleted.stderr or '').strip()}",
+                    file=sys.stderr,
+                )
+            raise
         return branch, f"opened PR from {branch}"
     except subprocess.CalledProcessError as exc:
         diagnostics = "\n".join(
