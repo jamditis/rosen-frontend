@@ -11,7 +11,7 @@ An entity name is a cross-type duplicate when `data/extracted_entities.csv` hold
 - **1 held.** First Draft has a rule, but its kept row is itself mixed up. See [Held](#held-names-with-a-rule).
 - **40 with no rule.** These are in the [main table](#names-with-no-rule).
 
-Two more lists follow the main table. One covers C0757 "Pressthink", which the issue asked about. The other covers 21 groups whose names differ only in capitalization or punctuation. The exact-name rules never matched those groups.
+Two more lists follow the main table. One covers C0757 "Pressthink", which the issue asked about. The other covers 25 groups whose names differ only in capitalization, spacing or punctuation. The exact-name rules never matched those groups.
 
 Counts are as of 2026-11-08. "Mentions" is `total_mentions`. "Rels" is the number of rows in `data/extracted_relationships.csv` that name the id as source or target.
 
@@ -61,7 +61,7 @@ Two questions settle about a third of the table.
 | PBS Newshour | W0150 Work 1/0; O1381 Organization 1/6 | Organization | Matches the existing "Newshour" rule. |
 | Blue Plate Special | W0181 Work 1/2; O1672 Organization 1/1 | Organization | A PressThink spin-off site (media-outlet precedent). |
 | Scripting News | W0323 Work 4/5; O1742 Organization 1/2 | Organization | Dave Winer's blog (media-outlet precedent). |
-| TimesSelect | W0419 Work 3/15; C1143 Concept 1/1 | Work | A Times subscription product, not an idea; the Concept row is a stray. |
+| TimesSelect | W0419 Work 3/15; C1143 Concept 1/1; also C0906 Concept 1/5 "Times-Select" | Work | A Times subscription product, not an idea; the Concept rows are strays. C0906 is the same product under a hyphenated spelling, so it should go the same way. |
 | McCain News Hunt | W0424 Work 1/1; E0306 Event 1/4 | Event | A one-week crowdsourced review (June 2 to 9) run by OffTheBus and NewsTrust. |
 | Placeblogger.com | W0470 Work 1/5; O1751 Organization 1/2 | Organization | Lisa Williams's company and site (media-outlet precedent). |
 | The View from Nowhere | C0659 Concept 1/27; W0917 Work 1/3 | Concept | W0917 mixes the term with Thomas Nagel's book of that title. Keep the Concept and decide whether Nagel's book needs its own Work row. |
@@ -73,7 +73,7 @@ Two questions settle about a third of the table.
 | Stop the Presses | W0856 Work 1/2; O1533 Organization 1/1 | Organization | Mark Jacob's newsletter (media-outlet precedent). |
 | Threat Modeling | C0962 Concept 1/5; W0871 Work 1/2 | Keep both | The security practice, and Swiderski and Snyder's book of that title. |
 | Project on Public Life and the Press | E0339 Event 1/2; O1616 Organization 1/3 | Organization | The Knight-funded project Rosen directed from 1993 to 1997; it was not an event. |
-| Yahoo News | O1648 Organization 1/2; W0994 Work 1/1 | Organization | A news portal (media-outlet precedent). |
+| Yahoo News | O1648 Organization 1/2; W0994 Work 1/1; also O0679 Organization 2/4 "Yahoo! News" | Organization | A news portal (media-outlet precedent). O0679 is the same outlet with the exclamation mark, so the ruling can also fold O1648 and O0679 together. |
 | Rebooting the News | O1737 Organization 1/2; W1039 Work 1/19 | Organization | Dave Winer's podcast with Rosen, typed like This American Life. Most of the evidence is on W1039. |
 | Authentically Local | O1752 Organization 1/3; C1315 Concept 1/1 | Organization | An association of local sites. The one C1315 relationship links the two rows to each other. A merge would turn it into a self-link, so drop that row rather than re-point it. |
 
@@ -87,7 +87,7 @@ Two questions settle about a third of the table.
 
 | Name | Rows (id, type, mentions, rels) | Suggested keep-type | Reason |
 |------|---------------------------------|---------------------|--------|
-| Pressthink / PressThink | C0757 Concept 1/8; O0033 Organization 253/234 | Keep both | Not merged; the evidence is mixed. In RECORD-00504 and RECORD-00834, "pressthink" is the press's belief system ("their pressthink"), the idea the blog is named for. RECORD-00834_REL_023 already says C0757 Originated By O0033, and a merge would turn that row into a self-link. The three RECORD-00755 rows (Carey, Postman and McLuhan "inspired" Pressthink) read as the blog or Rosen's work. Moving those three to O0033 may be worth a ruling. |
+| Pressthink / PressThink | C0757 Concept 1/8; O0033 Organization 253/234 | Keep both | Not merged; the evidence is mixed. In RECORD-00504 and RECORD-00834, "pressthink" is the press's belief system ("their pressthink"), the idea the blog is named for. RECORD-00834_REL_023 already says C0757 Originated By O0033, and a merge would turn that row into a self-link. The three RECORD-00755 rows (Carey, Postman and McLuhan "inspired" Pressthink) read as the blog or Rosen's work. Moving those three to O0033 may be worth a ruling. C0675 "press think" (Concept 1/3, RECORD-00171: "I also call it press think") is the same idea under another spelling; folding it and C0757 into one Concept row needs no cross-type ruling. |
 
 ## Case and spelling variants
 
@@ -111,8 +111,12 @@ These groups differ only in capitalization or punctuation, so the exact-name rul
 | h2otown.info | O0936 Organization 1/2; W0407 Work 1/0 | Organization | A hyperlocal blog (media-outlet precedent). |
 | Beatblogging.org | O1032 Organization 1/5; W0415 Work 3/2 | Organization | A project website, typed like Assignment Zero. |
 | Off the Bus | W0036 Work 1/12; C1216 Concept 1/1 | Organization: fold W0036 into O0447 OffTheBus | The existing "Off The Bus" rule keeps Organization, and the only Organization for the project is O0447. C1216 is the idea behind the name (contributors without a Big Media calling card) and can stay a Concept. |
-| Cablenewser / CableNewser | W0248 Work 1/1; O1408 Organization 1/0 | Organization | A blog (media-outlet precedent). |
+| Cablenewser / CableNewser / Cable Newser | W0248 Work 1/1; O1408 Organization 1/0; O1361 Organization 1/1 | Organization | Brian Stelter's blog (media-outlet precedent). O1361 and O1408 are both Organization rows for it, so one ruling can fold all three. |
 | The obsolete interview | W0289 Work 1/2; C0899 Concept 1/5 | Keep both | Jeff Jarvis's post and the idea it argued, which other records discuss on its own (policy question 1). |
 | Spot.us | W0518 Work 1/2; O1557 Organization 1/7 | Organization | A crowdfunded journalism platform (media-outlet precedent). |
 | The View from Somewhere | C0837 Concept 1/1; W0928 Work 1/2 | Keep both | Different referents: C0837 is Rosen's phrase in RECORD-00655, and W0928 is Lewis Raven Wallace's book. |
 | Unbreaking news | W0885 Work 1/1; C1059 Concept 1/1 | Keep both | Rob Wijnberg's essay series and the De Correspondent approach it describes (policy question 1). |
+| BloggerConIII / BloggerCon III | E0189 Event 1/0; O1166 Organization 2/0 | Organization, or Event to match Bloggercon | The existing "BloggerCon III" rule keeps Organization, but the Bloggercon row above suggests Event for the same conference series. Pick one type for both. Neither row has relationships. |
+| Spot On / Spot-on | W0184 Work 1/1; O1218 Organization 1/0 | Organization | Chris Nolan's site; RECORD-00593 describes Spot-on's syndication business (media-outlet precedent). |
+| 60 Minutes: Wednesday / 60 Minutes Wednesday | W0158 Work 1/1; O1646 Organization 1/2 | Organization | A CBS News program, typed like 60 Minutes. |
+| Read/Write web / Read-write Web / ReadWriteWeb | C0571 Concept 1/1; C1200 Concept 1/5; O1739 Organization 1/1 | Keep both types | The two Concept rows are the two-way web as an idea and can be folded together. O1739 is the technology news site Rebooting the News cites, a different referent. |

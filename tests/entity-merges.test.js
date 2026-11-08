@@ -203,6 +203,17 @@ describe('frontend resolves a retired entity id (#874)', () => {
 
   it('sends a deep link to a retired id on to the canonical entity in the entity browser', () => {
     const browser = readRepo('frontend/components/EntityBrowser.js');
-    assert.match(browser, /resolveEntityId/, 'EntityBrowser must resolve a retired ?entity= id');
+    // The import alone would satisfy a bare name match, so pin the lookup and
+    // the hand-off of the canonical id back to the router.
+    assert.match(
+      browser,
+      /scopedEntityById\.get\(resolveEntityId\(selectedEntityId\)\)/,
+      'EntityBrowser must look a retired ?entity= id up through resolveEntityId',
+    );
+    assert.match(
+      browser,
+      /entity\.id !== selectedEntityId && onSelectEntity\)\s*\{\s*onSelectEntity\(entity\.id\);/,
+      'EntityBrowser must replace a retired id in the selection with the canonical id',
+    );
   });
 });
