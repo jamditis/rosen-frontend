@@ -55,3 +55,17 @@ changing card or chip sizes.
 An issue can stay open after a PR that said "Refs" instead of "Fixes"
 finished it (#861 and #929). Search merged PRs for the issue number
 before assigning work.
+
+## Merge stacked PRs by moving base branches
+
+GitHub refuses the merge API and auto-merge for any PR it sees as part of a
+stack ("Merging stacked PRs via this endpoint is not supported"). To merge
+the upper PRs, push the top head to each base branch in turn, top down,
+after checking that each base is an ancestor of it. GitHub then marks each
+PR merged. The bottom PR into main still needs Joe's merge in the web UI,
+so ask through the question tool once its checks are green.
+
+## Codex reviews a PR only when it opens
+
+Pushing a fix does not start a new Codex review. Verify the fix with a test
+before merging, because no second automated pass will look at it.
