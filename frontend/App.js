@@ -162,9 +162,7 @@ const DEFAULT_FILTERS = {
   categories: [],
   era: null,
   year: null,
-  publication: [],
   type: null,
-  includeReplies: false,
   recordIds: null,
 };
 

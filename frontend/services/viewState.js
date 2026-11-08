@@ -45,17 +45,20 @@ export const ROUTES = {
 export const DEFAULT_ROUTE = ROUTES.archive;
 
 // Query-param keys. Kept short so shared URLs stay readable. Array filters use
-// repeated keys (?cat=a&cat=b) rather than a comma-joined value: a category or
-// publication name containing a comma would silently corrupt a joined string,
-// and URLSearchParams handles repeated keys and percent-encoding for free.
+// repeated keys (?cat=a&cat=b) rather than a comma-joined value: a category
+// name containing a comma would silently corrupt a joined string, and
+// URLSearchParams handles repeated keys and percent-encoding for free.
+//
+// The URL once carried ?pub= and ?replies=1 as well. No archive control set
+// either filter, records carry no reply flag (export drops short replies), and
+// the archive never filtered on them, so a shared link with them did nothing.
+// They are no longer parsed or written; old links with them still open.
 const PARAM = {
   search: 'q',
   era: 'era',
   year: 'year',
   type: 'type',
-  includeReplies: 'replies',
   categories: 'cat',
-  publication: 'pub',
   record: 'record',
   entity: 'entity',
 };
@@ -71,9 +74,7 @@ export function defaultFilters() {
     categories: [],
     era: null,
     year: null,
-    publication: [],
     type: null,
-    includeReplies: false,
   };
 }
 
@@ -138,9 +139,7 @@ export function parseViewState(href) {
     filters.year = yearRaw;
   }
 
-  filters.includeReplies = params.get(PARAM.includeReplies) === '1';
   filters.categories = params.getAll(PARAM.categories);
-  filters.publication = params.getAll(PARAM.publication);
 
   const selectedRecord = params.get(PARAM.record) || null;
 
@@ -174,13 +173,9 @@ export function viewStateToUrl(viewState, baseHref) {
   if (!isUnset(filters.year) && Number.isFinite(Number(filters.year))) {
     params.set(PARAM.year, String(filters.year));
   }
-  if (filters.includeReplies === true) params.set(PARAM.includeReplies, '1');
 
   for (const category of filters.categories || []) {
     params.append(PARAM.categories, category);
-  }
-  for (const publication of filters.publication || []) {
-    params.append(PARAM.publication, publication);
   }
   if (!isUnset(viewState.selectedRecord)) {
     params.set(PARAM.record, viewState.selectedRecord);

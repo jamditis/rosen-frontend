@@ -29,9 +29,7 @@ describe('defaultFilters', () => {
       categories: [],
       era: null,
       year: null,
-      publication: [],
       type: null,
-      includeReplies: false,
     });
   });
 
@@ -105,10 +103,25 @@ describe('parseViewState', () => {
     assert.strictEqual(parseViewState(`${BASE}?year=`).filters.year, null);
   });
 
-  it('parses includeReplies only when replies=1', () => {
-    assert.strictEqual(parseViewState(`${BASE}?replies=1`).filters.includeReplies, true);
-    assert.strictEqual(parseViewState(`${BASE}?replies=0`).filters.includeReplies, false);
-    assert.strictEqual(parseViewState(BASE).filters.includeReplies, false);
+  // No archive control sets a publication or reply filter, records carry no
+  // reply flag (short replies are dropped at export), and filteredRecords never
+  // applied either value. Parsing them only made ?pub= and ?replies=1 look
+  // like working filters, so the URL contract no longer carries them.
+  it('ignores the retired pub and replies params', () => {
+    const vs = parseViewState(`${BASE}?pub=PressThink&pub=NYU&replies=1`);
+    assert.deepStrictEqual(vs.filters, defaultFilters());
+    assert.equal('publication' in vs.filters, false);
+    assert.equal('includeReplies' in vs.filters, false);
+  });
+
+  it('never writes pub or replies params', () => {
+    const url = viewStateToUrl({
+      route: ROUTES.desktop,
+      routeParams: { desktopAppId: 'archive' },
+      filters: { ...defaultFilters(), publication: ['PressThink'], includeReplies: true },
+    }, BASE);
+    assert.equal(new URL(url).searchParams.has('pub'), false);
+    assert.equal(new URL(url).searchParams.has('replies'), false);
   });
 
   it('parses the selected record', () => {
@@ -241,9 +254,7 @@ describe('round-trip', () => {
         categories: ['Criticism', 'Media theory'],
         era: '2010s',
         year: '2011',
-        publication: ['PressThink', 'NYU'],
         type: 'article',
-        includeReplies: true,
       },
       selectedRecord: 'RECORD-00456',
     },
