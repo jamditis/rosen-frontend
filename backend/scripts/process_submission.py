@@ -30,7 +30,7 @@ Behavior (12-step pipeline from the design's "Architecture" diagram):
    11.  Full release with pair rollback and public byte verification
    12.  Sheet writeback F='live', G=RECORD-NNNNN   (retry once, then exit-non-0)
 
-Status outcomes: ``live | committed | archived | duplicate | error | noop``.
+Status outcomes: ``live | committed | archived | duplicate | error``.
 ``committed`` is terminal: the record is appended but live push (SFTP) is not
 configured on this runner, so the sweeper must not retry it. A job that sets
 ``ROSEN_REQUIRE_TRANSFER=1`` (``submit-record.yml`` does) never reaches it:
@@ -774,7 +774,7 @@ def process_one(
 ) -> Dict[str, Any]:
     """Run the 12-step pipeline for one submission. Returns a result dict.
 
-    Keys: ``status`` (live/committed/archived/duplicate/error/noop), ``record_id``,
+    Keys: ``status`` (live/committed/archived/duplicate/error), ``record_id``,
     ``error``, ``exit_code``.
 
     ``raw_text``: manual fallback. When provided, the network scrape is

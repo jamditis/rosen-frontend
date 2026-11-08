@@ -2432,3 +2432,15 @@ def test_manual_corrupt_reservations_leave_csv_untouched(monkeypatch, csv_with_h
     assert result["status"] == "error"
     assert "reservation failed" in result["error"]
     assert csv_with_headers.read_bytes() == before
+
+
+def test_documented_status_outcomes_are_ones_the_pipeline_writes():
+    """The docstrings list the queue statuses readers and the sweeper rely on.
+
+    No code path returns or writes ``noop``; a sentinel run ends ``live``,
+    ``committed`` or ``archived``.
+    """
+    for doc in (process_submission.__doc__, process_submission.process_one.__doc__):
+        assert "noop" not in doc
+        for status in ("live", "committed", "archived", "duplicate", "error"):
+            assert status in doc

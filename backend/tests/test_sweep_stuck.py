@@ -223,7 +223,7 @@ class TestSkipsFreshRows:
 class TestTerminalStates:
 
     @pytest.mark.parametrize(
-        "status", ["live", "error", "duplicate", "no URL", "invalid URL"]
+        "status", ["live", "committed", "error", "duplicate", "no URL", "invalid URL"]
     )
     def test_skips_terminal_statuses_regardless_of_age(self, monkeypatch, status):
         _env(monkeypatch)
@@ -515,3 +515,18 @@ class TestUnparseableTimestamp:
         sweep_stuck.sweep()
 
         dispatch_mock.assert_not_called()
+
+
+def test_sweeper_workflow_comment_lists_committed_as_terminal():
+    workflow = (
+        _BACKEND.parent / ".github" / "workflows" / "sweep-stuck-rows.yml"
+    ).read_text(encoding="utf-8")
+    header = workflow.split("\non:", 1)[0]
+    terminal = " ".join(
+        line.lstrip("# ").strip()
+        for line in header.splitlines()
+        if line.startswith("#")
+    )
+    assert "Terminal statuses" in terminal
+    clause = terminal.split("Terminal statuses", 1)[1].split("never touched", 1)[0]
+    assert "committed" in clause
