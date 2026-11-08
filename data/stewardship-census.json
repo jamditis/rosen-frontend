@@ -4,7 +4,7 @@
     "compatibility": "additive changes within version 1; semantic changes require a new major version"
   },
   "input": {
-    "commit": "bf77b46af279862a5b3911941a80df4b4239db87",
+    "commit": "b23b4ec24cbdff8e20183e903be805b956f4f917",
     "dirty": false,
     "schema_version": "stewardship-census/1.0.0",
     "files": [
