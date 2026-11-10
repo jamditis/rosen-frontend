@@ -63726,3 +63726,29 @@ Never read it? Today would be a good one.
 
 pressthink.org/2017/01/send...",FALSE,"Bluesky autonomous batch 2026-11-08 22:32:26; decision: context_only; reason=taxonomy_unresolved. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3mzssv2vwos2f; cid=bafyreiarewnej5bcbafd4k6f2xpd3ynijciyosqi4h5cvbiqn2rbpcesne; record_sha256=7ed29ef772bb35d8bc3925a5e8b9dcab2361b2b8188fff710b8a23363d76aa8a. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
 BSKY-03624,"I love the fact that what happened last week has so many layers, revelations, an...",https://bsky.app/profile/jayrosen.bsky.social/post/3mzvwrsqs5c22,Jay Rosen,2026-11-09 22:07:20,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,25,,"I love the fact that what happened last week has so many layers, revelations, and consequences that we can keep learning from it for years.",,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,39,0,2,,at://did:plc:anyesr57bwobytddoohv6ehe/app.bsky.feed.post/3mzvvn32c7s24,Jay Rosen,,,Public Post,2026-11-10 01:47:38,,,,"I love the fact that what happened last week has so many layers, revelations, and consequences that we can keep learning from it for years.","I love the fact that what happened last week has so many layers, revelations, and consequences that we can keep learning from it for years.",FALSE,"Bluesky autonomous batch 2026-11-10 01:47:38; decision: context_only; reason=taxonomy_unresolved. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3mzvwrsqs5c22; cid=bafyreifxvmei7eputbzotgz24dqugtr3m3o2ralliml7miw5qia3nwbowq; record_sha256=013248cd7dd5a3a7f63693962afbb2050394386ca7ca477e10e1aa9f2e44b905. Context references: at://did:plc:anyesr57bwobytddoohv6ehe/app.bsky.feed.post/3mzvvn32c7s24. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
+BSKY-03625,Worth reading Brian Stelter's list of lessons from the midterms...,https://bsky.app/profile/jayrosen.bsky.social/post/3mzy7rqmclk2p,Jay Rosen,2026-11-10 19:53:41,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,46,,"Worth reading Brian Stelter's list of lessons from the midterms. Worth arguing with them too. 
+
+For example:
+
+""Trump’s time as a master media manipulator might be up.""
+
+It's not mastery. Don't say that. It's the fact that he cannot be shamed. Which allows for spectacle.
+
+www.cnn.com/newsletters/...",,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,118,20,7,,,Jay Rosen,,,Public Post,2026-11-10 23:46:16,,,,"Worth reading Brian Stelter's list of lessons from the midterms. Worth arguing with them too. 
+
+For example:
+
+""Trump’s time as a master media manipulator might be up.""
+
+It's not mastery. Don't say that. It's the fact that he cannot be shamed. Which allows for spectacle.
+
+www.cnn.com/newsletters/...","Worth reading Brian Stelter's list of lessons from the midterms. Worth arguing with them too. 
+
+For example:
+
+""Trump’s time as a master media manipulator might be up.""
+
+It's not mastery. Don't say that. It's the fact that he cannot be shamed. Which allows for spectacle.
+
+www.cnn.com/newsletters/...",FALSE,"Bluesky autonomous batch 2026-11-10 23:46:16; decision: context_only; reason=taxonomy_unresolved. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3mzy7rqmclk2p; cid=bafyreibwtn7iinww5mj5p4cujkpdvo55pyg4lptqv3bgojx6b2emwsvsoi; record_sha256=e5e5a7f5af5690ea69762598e525f11f883a53891c08216cab9e6c35b2284a1f. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
+BSKY-03626,Reply by Jay Rosen,https://bsky.app/profile/jayrosen.bsky.social/post/3mzyba7kdlk2p,Jay Rosen,2026-11-10 20:19:40,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,1,,Yes.,,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,5,0,0,,at://did:plc:o6vbm6jlga3rodhachtay3z2/app.bsky.feed.post/3mzyayoohak2l,Jay Rosen,,,Public Post,2026-11-10 23:46:16,,,,Yes.,Yes.,FALSE,"Bluesky autonomous batch 2026-11-10 23:46:16; decision: context_only; reason=brief_or_context_dependent_text. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3mzyba7kdlk2p; cid=bafyreibm4pmhrtlx7zweruni6wwqcbzsb3jbnvwljhd7vjg7br6brutpbm; record_sha256=f88cd281943e05a65bed450976b95b2170309f2b2f497538a3cb326ed5873ca9. Context references: at://did:plc:o6vbm6jlga3rodhachtay3z2/app.bsky.feed.post/3mzyayoohak2l; at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3mzy7rqmclk2p. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
