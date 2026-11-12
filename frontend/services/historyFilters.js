@@ -4,7 +4,7 @@
 // service-worker cache, so App.js must not require a named export that module
 // did not provide. ROUTES and parseViewState exist in both releases.
 
-import { ROUTES, parseViewState } from './viewState.js?v=3.8.74';
+import { ROUTES, parseViewState } from './viewState.js?v=3.8.75';
 
 /**
  * The filters a Back or Forward step to `href` should restore, or null when
