@@ -62,7 +62,7 @@ jobs:
         with:
           # Stewardship projection tests use node:sqlite without a runtime flag,
           # which requires Node 22.13+.
-          node-version: '22'
+          node-version: '22.23.5'
           cache: 'npm'
 
       - name: Install dependencies
