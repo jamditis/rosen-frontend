@@ -15,7 +15,7 @@
 // handler below drop stale cache namespaces after the release takes control
 // (one previous static cache is kept while windows from before activation
 // remain; see the release handoff notes above the activate handler).
-const CACHE_VERSION = '3.8.75';
+const CACHE_VERSION = '3.8.76';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 // This immutable asset revision survives ordinary app releases. Change both

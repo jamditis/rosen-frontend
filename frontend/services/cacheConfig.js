@@ -10,8 +10,8 @@
  */
 
 // Increment to invalidate all caches (e.g. after a breaking payload change).
-// v45: Archive payload changes require fresh client-side data caches.
-export const CACHE_VERSION = 'v45';
+// v46: Archive payload changes require fresh client-side data caches.
+export const CACHE_VERSION = 'v46';
 
 // Entity data is small (~1MB), so a short TTL keeps it current cheaply.
 export const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes
