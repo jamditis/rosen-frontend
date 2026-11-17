@@ -976,6 +976,7 @@ export async function discoverSource(source, {
     accept: sourceAcceptHeader(source),
     conditional,
     fetchImpl,
+    timeoutMs: source.requestTimeoutMs,
   });
   if (!result.ok) return { sourceId: source.id, status: result.reason };
   if (result.notModified) {

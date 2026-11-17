@@ -1308,6 +1308,46 @@ test("the scheduled handler records a bounded internal error message", async () 
   ]);
 });
 
+test("CJR search allows slow headers while every discovery request stays bounded", async (t) => {
+  for (const scenario of [
+    { name: "search accepts headers after 12 seconds", id: "cjr-jay-rosen-search", stage: "feed", elapsed: 12_000, responds: true, status: "candidates_found" },
+    { name: "search aborts at 30 seconds", id: "cjr-jay-rosen-search", stage: "feed", elapsed: 30_000, status: "network_error" },
+    { name: "author still aborts at 10 seconds", id: "cjr-jay-rosen-author", stage: "feed", elapsed: 10_000, status: "network_error" },
+    { name: "search robots still aborts at 10 seconds", id: "cjr-jay-rosen-search", stage: "robots", elapsed: 10_000, status: "robots_network_error" },
+  ]) {
+    await t.test(scenario.name, async (t) => {
+      t.mock.timers.enable({ apis: ["setTimeout"] });
+      let started;
+      const requestStarted = new Promise(resolve => { started = resolve; });
+      const pending = discoverSource(SOURCE_MANIFEST.find(item => item.id === scenario.id), {
+        fetchImpl: async (url, { signal }) => {
+          if (url.endsWith("/robots.txt") && scenario.stage !== "robots") {
+            return response("User-agent: *\nAllow: /");
+          }
+          return new Promise((resolve, reject) => {
+            signal.addEventListener("abort", () => reject(new Error("request deadline")), { once: true });
+            if (scenario.responds) {
+              setTimeout(() => resolve(response(
+                '<rss><channel><item><title>Jay Rosen</title><link>https://www.cjr.org/analysis/jay-rosen.php</link></item></channel></rss>',
+                { headers: { "Content-Type": "application/rss+xml" } },
+              )), scenario.elapsed);
+            }
+            started(signal);
+          });
+        },
+      });
+      const signal = await requestStarted;
+      t.mock.timers.tick(scenario.elapsed - 1);
+      assert.equal(signal.aborted, false);
+      t.mock.timers.tick(1);
+      const outcome = await pending;
+      assert.equal(outcome.status, scenario.status);
+      assert.equal(signal.aborted, !scenario.responds);
+      if (scenario.responds) assert.equal(outcome.candidateCount, 1);
+    });
+  }
+});
+
 test("a transient source result records a per-origin backoff and skips the next run", async () => {
   const checkedAt = "2026-08-14T12:00:00.000Z";
   const firstDatabase = fakeDatabase();

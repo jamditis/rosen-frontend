@@ -127,6 +127,14 @@ Other search hits remain review evidence. The publisher item link is identity;
 GUID is provenance. Source dates retain their written calendar day and offset.
 Fetch success time is separate from article publication time.
 
+CJR search discovery allows 30 seconds for response headers. A direct fetch on
+November 17, 2026 took 11.86 seconds, exceeding the default 10-second deadline;
+30 seconds gives that source headroom while retaining a finite limit. Robots
+requests, the CJR author feed and other discovery sources retain their 10-second
+request deadlines. Response body reads remain limited to 10 seconds. Transient
+failures back off the whole origin, so a failed CJR search can defer the CJR
+author check until the origin is due again.
+
 The version journal `preservation/publisher-feeds/versions.jsonl` contains only
 bibliographic metadata. Descriptions and article bodies are neither captured nor
 republished. Public records explicitly label metadata-only coverage, leave body

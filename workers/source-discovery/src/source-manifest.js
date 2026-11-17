@@ -7,7 +7,7 @@ export const DISCOVERY_USER_AGENT =
   "RosenArchiveDiscovery/0.1 (read-only; https://github.com/jamditis/rosen-frontend/issues/806)";
 
 /** Increment when the reviewed source boundary or adapter shape changes. */
-export const SOURCE_MANIFEST_VERSION = "2026-11-02.1";
+export const SOURCE_MANIFEST_VERSION = "2026-11-17.1";
 
 export const SOURCE_MANIFEST = Object.freeze([
   Object.freeze({
@@ -38,15 +38,16 @@ export const SOURCE_MANIFEST = Object.freeze([
     minimumIntervalHours: 168,
   }),
   ...[
-    ["cjr-jay-rosen-search", "CJR articles about Jay Rosen", "https://www.cjr.org/search/Jay+Rosen/feed/rss2/", "about_jay"],
+    ["cjr-jay-rosen-search", "CJR articles about Jay Rosen", "https://www.cjr.org/search/Jay+Rosen/feed/rss2/", "about_jay", 30_000],
     ["cjr-jay-rosen-author", "Jay Rosen at CJR", "https://www.cjr.org/author/jay-rosen/feed", "by_jay"],
     ["common-dreams-jay-rosen-author", "Jay Rosen at Common Dreams", "https://www.commondreams.org/feeds/community/jay-rosen.rss", "by_jay"],
-  ].map(([id, label, endpoint, relevance]) => {
+  ].map(([id, label, endpoint, relevance, requestTimeoutMs]) => {
     const { origin, pathname } = new URL(endpoint);
     return Object.freeze({ id, label, endpoint, relevance, kind: "rss", ingestion: true,
       robotsUrl: origin + "/robots.txt", fetchOrigins: [origin],
       fetchPathPrefixes: [pathname, "/robots.txt"], candidateOrigins: [origin],
-      candidatePathPrefixes: ["/"], maxCandidates: 100 });
+      candidatePathPrefixes: ["/"], maxCandidates: 100,
+      ...(requestTimeoutMs ? { requestTimeoutMs } : {}) });
   }),
 ]);
 
