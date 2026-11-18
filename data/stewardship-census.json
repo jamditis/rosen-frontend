@@ -4,7 +4,7 @@
     "compatibility": "additive changes within version 1; semantic changes require a new major version"
   },
   "input": {
-    "commit": "ca602c97bcdfe1f1cad285dc02ab70e3008cea19",
+    "commit": "958b9ee8e2d5509156b262d44cce211bf3749222",
     "dirty": false,
     "schema_version": "stewardship-census/1.0.0",
     "files": [
@@ -14,7 +14,7 @@
       },
       {
         "path": "data/social_posts.csv",
-        "sha256": "603a4f8ebc1763b7fe9077bdcca56081e7ad03088fcd0fb5a3ab4740f1262d88"
+        "sha256": "aa7e604cc6ce22f9b77dc8a8b8ea784f6684211eb6abee731468b4b533b10cc5"
       },
       {
         "path": "data/extracted_entities.csv",
@@ -26,19 +26,19 @@
       },
       {
         "path": "data/archive-data.json",
-        "sha256": "40754d57aa4624067eb2a03cc237f91deb507ba8f301ca0a5184ef92e14a15f5"
+        "sha256": "5f789f36c49ed2afac49833881e8f0a0dc3d4e074a7f2affa8ba321027161820"
       },
       {
         "path": "data/archive-core.json",
-        "sha256": "42a0bc77231791fea7a7c96ddd9330d9634dfd26a64d2f21f9e726dfb71fc1c5"
+        "sha256": "78207b54635a4124fc299183e7953106cab97a3e31bcb4a62b4e038e7d599241"
       },
       {
         "path": "data/archive-details.json",
-        "sha256": "78e076ee590a56aa0374255850c98ad96e34cec36365b17d5cb0ab0fad7da4a2"
+        "sha256": "f9205e8a53e3e051d9c4bbf42109bf55f3f81be754bbe0a991ecc169844d6ce8"
       },
       {
         "path": "data/archive-entities.json",
-        "sha256": "a411966131410175665b3cd4023800cf4e5f38be87b46820f734d22bd7b96b5c"
+        "sha256": "832435e210e50b51e0b512a426fad1a86ca12f1ca3f54ccb2d59b2659632601c"
       },
       {
         "path": "data/authored-excerpts.csv",
@@ -48,7 +48,7 @@
   },
   "records": {
     "source": {
-      "total": 31403,
+      "total": 31407,
       "curated": {
         "total": 1220,
         "by_record_type": {
@@ -69,18 +69,18 @@
         }
       },
       "social": {
-        "total": 30183,
+        "total": 30187,
         "by_platform": {
-          "Bluesky": 3553,
+          "Bluesky": 3557,
           "Mastodon": 516,
           "Twitter/X": 26114
         },
         "by_record_type": {
-          "Social Media Post": 30183
+          "Social Media Post": 30187
         },
         "verification": {
           "verified": 29887,
-          "unverified": 296,
+          "unverified": 300,
           "blank": 0
         }
       }
@@ -147,14 +147,14 @@
         "filtered": 0
       },
       "social": {
-        "source": 30183,
+        "source": 30187,
         "published": 25832,
-        "filtered": 4351
+        "filtered": 4355
       }
     },
     "filtered": {
       "classification": "first_match",
-      "total": 4351,
+      "total": 4355,
       "reasons": [
         {
           "id": "curated_unverified",
@@ -4365,7 +4365,7 @@
           "label": "Explicitly unverified",
           "source": "social",
           "order": 5,
-          "count": 211,
+          "count": 215,
           "record_ids": [
             "BSKY-03335",
             "BSKY-03340",
@@ -4577,7 +4577,11 @@
             "BSKY-03646",
             "BSKY-03647",
             "BSKY-03648",
-            "BSKY-03649"
+            "BSKY-03649",
+            "BSKY-03650",
+            "BSKY-03651",
+            "BSKY-03652",
+            "BSKY-03653"
           ]
         },
         {
@@ -4652,39 +4656,39 @@
     },
     "social_source": {
       "url": {
-        "total": 30183,
-        "present": 30145,
+        "total": 30187,
+        "present": 30149,
         "missing": 38
       },
       "raw_text": {
-        "total": 30183,
-        "present": 30178,
+        "total": 30187,
+        "present": 30182,
         "missing": 5
       },
       "summary": {
-        "total": 30183,
+        "total": 30187,
         "present": 58,
-        "missing": 30125
+        "missing": 30129
       },
       "tags": {
-        "total": 30183,
+        "total": 30187,
         "present": 20217,
-        "missing": 9966
+        "missing": 9970
       },
       "concepts": {
-        "total": 30183,
+        "total": 30187,
         "present": 499,
-        "missing": 29684
+        "missing": 29688
       },
       "quote": {
-        "total": 30183,
-        "present": 25775,
+        "total": 30187,
+        "present": 25779,
         "missing": 4408
       },
       "related_ids": {
-        "total": 30183,
+        "total": 30187,
         "present": 8072,
-        "missing": 22111
+        "missing": 22115
       }
     },
     "runtime": {
@@ -4807,7 +4811,7 @@
       },
       "social": {
         "source": {
-          "rows": 30183,
+          "rows": 30187,
           "rows_with_relationship_assertions": 12,
           "relationship_assertions": 12,
           "rows_with_entity_links": 12,
@@ -4824,7 +4828,7 @@
       "social_by_platform": {
         "Bluesky": {
           "source": {
-            "rows": 3553,
+            "rows": 3557,
             "rows_with_relationship_assertions": 10,
             "relationship_assertions": 10,
             "rows_with_entity_links": 10,
@@ -4948,10 +4952,10 @@
   },
   "urls": {
     "source": {
-      "total_rows": 31403,
+      "total_rows": 31407,
       "missing": 38,
-      "external_values": 31365,
-      "unique_external_urls": 31355,
+      "external_values": 31369,
+      "unique_external_urls": 31359,
       "duplicate_external_values": 10,
       "internal_values": 0,
       "malformed_values": 0,
@@ -4971,7 +4975,7 @@
         "berks.psu.edu": 1,
         "blog.bleacherreport.com": 1,
         "bonn-institute.org": 1,
-        "bsky.app": 3515,
+        "bsky.app": 3519,
         "buzzmachine.com": 1,
         "bylinesupplement.com": 1,
         "cascadiadaily.com": 1,
@@ -30481,8 +30485,8 @@
       {
         "metric": "social_source",
         "baseline": 29747,
-        "current": 30183,
-        "delta": 436
+        "current": 30187,
+        "delta": 440
       },
       {
         "metric": "published_curated_source",
