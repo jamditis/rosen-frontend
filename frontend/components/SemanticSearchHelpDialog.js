@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
-import { html } from '../html.js?v=3.8.78';
-import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.78';
+import { html } from '../html.js?v=3.8.79';
+import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.79';
 
 const SemanticSearchHelpDialog = ({
   isOpen,
