@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { html } from '../html.js?v=3.8.79';
+import { html } from '../html.js?v=3.8.80';
 import {
   AlertCircle,
   ArrowLeft,
@@ -15,8 +15,8 @@ import {
   Search,
   Sparkles
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.79';
-import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.79';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.80';
+import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.80';
 
 const normalizeTitle = (title = '') => title
   .toLowerCase()
