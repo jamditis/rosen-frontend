@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=3.8.82';
+import { html } from '../html.js?v=3.8.83';
 import { Archive, ArrowRight, X } from 'lucide-react';
 import {
   readTourState,
   recordTourOutcome,
   shouldShowTourEntry,
   TOUR_OUTCOMES,
-} from '../services/tourState.js?v=3.8.82';
-import { getPrivacyDetailsHref } from '../services/privacyRoute.js?v=3.8.82';
+} from '../services/tourState.js?v=3.8.83';
+import { getPrivacyDetailsHref } from '../services/privacyRoute.js?v=3.8.83';
 
 const getStorage = () => {
   try {
