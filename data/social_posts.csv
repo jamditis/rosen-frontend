@@ -64070,3 +64070,76 @@ More from Peter Baker's take on Bob Woodward's new memoir. www.nytimes.com/2026/
 More from Peter Baker's take on Bob Woodward's new memoir. www.nytimes.com/2026/11/23/u...","""Woodward knows the criticism. He has heard it all before.""
 
 More from Peter Baker's take on Bob Woodward's new memoir. www.nytimes.com/2026/11/23/u...",FALSE,"Bluesky autonomous batch 2026-11-24 18:51:41; decision: context_only; reason=taxonomy_unresolved. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n32xm5p2cc2j; cid=bafyreihxk3cipf2bnu75nusvll5yk3egl56r3nmiv3nz7m2v3y5qvhvzdy; record_sha256=383ef70082ae70d72a24d4733bb1c58a47856d326fcd85b562ea35c59c84570a. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
+BSKY-03669,"Thank you, Fran...",https://bsky.app/profile/jayrosen.bsky.social/post/3n35bs4qecc2z,Jay Rosen,2026-11-25 13:38:11,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,8,,"Thank you, Fran. How did you remember that?",,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,6,1,1,,at://did:plc:ba2m67umahs76dffkwvd6xzw/app.bsky.feed.post/3n35afceq7k2d,Jay Rosen,,,Public Post,2026-11-25 18:52:03,,,,"Thank you, Fran. How did you remember that?","Thank you, Fran. How did you remember that?",FALSE,"Bluesky autonomous batch 2026-11-25 18:52:03; decision: context_only; reason=brief_or_context_dependent_text. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35bs4qecc2z; cid=bafyreicvidxv7tet7j27jrasanvlcb3f4nxydtpeyokiccfsqerrpb5zsa; record_sha256=1801e53b68a95926d7e5380ba5841c62fcdd877243198ecfb34f6fa254f10929. Context references: at://did:plc:ba2m67umahs76dffkwvd6xzw/app.bsky.feed.post/3n35afceq7k2d; at://did:plc:mag6xqpisjwqeeyb37iceypz/app.bsky.feed.post/3n33eewaby22n. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
+BSKY-03670,For inspiration see www...,https://bsky.app/profile/jayrosen.bsky.social/post/3n35gtlzypc22,Jay Rosen,2026-11-25 15:08:30,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,4,,For inspiration see www.niemanlab.org/2026/04/the-...,,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,0,0,0,,at://did:plc:zxb2lwpxo4axkkkgjwqand24/app.bsky.feed.post/3n32c6cbozd2c,Jay Rosen,,,Public Post,2026-11-25 18:52:03,,,,For inspiration see www.niemanlab.org/2026/04/the-...,For inspiration see www.niemanlab.org/2026/04/the-...,FALSE,"Bluesky autonomous batch 2026-11-25 18:52:03; decision: context_only; reason=brief_or_context_dependent_text. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35gtlzypc22; cid=bafyreicvrxdtrvscelbrbfg5wtg654jpnugojowyef4yozpev7w3aev7eq; record_sha256=f215552581e0abe468c9ca2195ec858d5f6eab75d7d2a80505f38f1ff660afa8. Context references: at://did:plc:zxb2lwpxo4axkkkgjwqand24/app.bsky.feed.post/3n32c6cbozd2c. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
+BSKY-03671,"George Packer, Big Thinker for the Atlantic, has apologized to American democrac...",https://bsky.app/profile/jayrosen.bsky.social/post/3n35pv55hfs2m,Jay Rosen,2026-11-25 17:50:25,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,40,,"George Packer, Big Thinker for the Atlantic, has apologized to American democracy.
+
+""I overrated Trump’s competence as a dictator, and I underrated the resilience of American democracy.""
+
+ (I love the practice. Ask democracy for forgiveness.)
+
+See next slide 1/2
+
+www.theatlantic.com/ideas/2026/1...","Rosen writes on Bluesky: ""George Packer, Big Thinker for the Atlantic, has apologized to American democracy. ""I overrated Trump’s competence as a dictator, and I underrated the resilience of American democracy."" (I love the practice. Ask democracy for forgiveness.) See next slide 1/2""",Politics & Democracy,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,69,17,6,,,Jay Rosen,,,Public Post,2026-11-25 18:52:03,,,,"George Packer, Big Thinker for the Atlantic, has apologized to American democracy.
+
+""I overrated Trump’s competence as a dictator, and I underrated the resilience of American democracy.""
+
+ (I love the practice. Ask democracy for forgiveness.)
+
+See next slide 1/2
+
+www.theatlantic.com/ideas/2026/1...","George Packer, Big Thinker for the Atlantic, has apologized to American democracy.
+
+""I overrated Trump’s competence as a dictator, and I underrated the resilience of American democracy.""
+
+ (I love the practice. Ask democracy for forgiveness.)
+
+See next slide 1/2
+
+www.theatlantic.com/ideas/2026/1...",TRUE,Bluesky autonomous batch 2026-11-25 18:52:03; decision: admit. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35pv55hfs2m; cid=bafyreibx7uewlewn7g4e5i5guuhiq2zb4tw5hncwthmhxjdsidzc32z4vq; record_sha256=2b408dfa3f689f0df02567f6dfb1bc8ec12b73270beb50df523e921a0efc94f6. Deterministic source text and the archive taxonomy support standalone admission.
+BSKY-03672,Reply by Jay Rosen,https://bsky.app/profile/jayrosen.bsky.social/post/3n35pvca4ic2m,Jay Rosen,2026-11-25 17:50:25,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,1,,—,,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,11,3,1,,at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35pv55hfs2m,Jay Rosen,,,Public Post,2026-11-25 18:52:03,,,,—,—,FALSE,"Bluesky autonomous batch 2026-11-25 18:52:03; decision: context_only; reason=brief_or_context_dependent_text. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35pvca4ic2m; cid=bafyreiestwlbxukcntvgzdqcv7vo3skrhintiz4i3xts5gh4qlpc7od2tm; record_sha256=8089c109d3166e2896f50e2927c7c8502e6512e07ed3fb055299cd76d410ab7b. Context references: at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35pv55hfs2m. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
+BSKY-03673,"Meanwhile, my 2017 post — with receipts...",https://bsky.app/profile/jayrosen.bsky.social/post/3n35pvcabek2m,Jay Rosen,2026-11-25 17:50:25,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,46,,"Meanwhile, my 2017 post —  with receipts! —  examined the claim that Trump is some kind of media wizard.
+
+pressthink.org/2017/05/gett...
+
+I wrote: ""That our President is a master of media manipulation is a view commonly expressed by American journalists. I doubt it."" 
+
+Read and compare. 2/2","Replying to @jayrosen.bsky.social on Bluesky, Rosen writes: ""Meanwhile, my 2017 post — with receipts! — examined the claim that Trump is some kind of media wizard. I wrote: ""That our President is a master of media manipulation is a view commonly expressed by American journalists. I doubt it."" Read and compare. 2/2""",Politics & Democracy,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,52,6,1,,at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35pvca4ic2m,Jay Rosen,,,Public Post,2026-11-25 18:52:03,,,,"Meanwhile, my 2017 post —  with receipts! —  examined the claim that Trump is some kind of media wizard.
+
+pressthink.org/2017/05/gett...
+
+I wrote: ""That our President is a master of media manipulation is a view commonly expressed by American journalists. I doubt it."" 
+
+Read and compare. 2/2","Meanwhile, my 2017 post —  with receipts! —  examined the claim that Trump is some kind of media wizard.
+
+pressthink.org/2017/05/gett...
+
+I wrote: ""That our President is a master of media manipulation is a view commonly expressed by American journalists. I doubt it."" 
+
+Read and compare. 2/2",TRUE,Bluesky autonomous batch 2026-11-25 18:52:03; decision: admit. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35pvcabek2m; cid=bafyreich6cpkk2rscrq7gafj4gorl6dmbyz3tlespnb7yhty25ezk4ygv4; record_sha256=2005f787d4f9d5ff38a5249cd3cadd06804b272a753aac2dd751746d4df3cfd6. Context references: at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35pvca4ic2m; at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35pv55hfs2m. Deterministic source text and the archive taxonomy support standalone admission.
+BSKY-03674,Thanks Ann...,https://bsky.app/profile/jayrosen.bsky.social/post/3n35s4jjcps2s,Jay Rosen,2026-11-25 18:30:20,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,51,,"Thanks Ann.
+
+To render judgement as psychologists might is not our role, they would say.
+
+But of course, that's when you go and find experts. 
+
+This is a president who requires a different approach. They didn't want that. They wanted to be able to use their press think from years before.",,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,2,0,0,,at://did:plc:llhroqypdcmiew2kpur6g37u/app.bsky.feed.post/3n35qlmmugk2i,Jay Rosen,,,Public Post,2026-11-25 18:52:03,,,,"Thanks Ann.
+
+To render judgement as psychologists might is not our role, they would say.
+
+But of course, that's when you go and find experts. 
+
+This is a president who requires a different approach. They didn't want that. They wanted to be able to use their press think from years before.","Thanks Ann.
+
+To render judgement as psychologists might is not our role, they would say.
+
+But of course, that's when you go and find experts. 
+
+This is a president who requires a different approach. They didn't want that. They wanted to be able to use their press think from years before.",FALSE,"Bluesky autonomous batch 2026-11-25 18:52:03; decision: context_only; reason=taxonomy_unresolved. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35s4jjcps2s; cid=bafyreieeh5y5x7hpqweiyw4dtmxjw4goghpj4q2td5qrqoloi4y5vtvehe; record_sha256=c31206bffe8558c9c0da4efe8c0c52d0a1b99a27c99bd2cb7aed8705a7a5b910. Context references: at://did:plc:llhroqypdcmiew2kpur6g37u/app.bsky.feed.post/3n35qlmmugk2i; at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35pv55hfs2m. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."
+BSKY-03675,He's not a media wizard or even a strong communicator...,https://bsky.app/profile/jayrosen.bsky.social/post/3n35sqitrmk2t,Jay Rosen,2026-11-25 18:41:30,Bluesky,Bluesky,Bluesky,Social Media Post,Tweet/Thread,21,,"He's not a media wizard or even a strong communicator. But he can generate power in other ways. 
+
+That's my view.",,,,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,0,0,0,,at://did:plc:o2i3dlyfi3zadu2wgcizfuxw/app.bsky.feed.post/3n35qytdg222r,Jay Rosen,,,Public Post,2026-11-25 18:52:03,,,,"He's not a media wizard or even a strong communicator. But he can generate power in other ways. 
+
+That's my view.","He's not a media wizard or even a strong communicator. But he can generate power in other ways. 
+
+That's my view.",FALSE,"Bluesky autonomous batch 2026-11-25 18:52:03; decision: context_only; reason=taxonomy_unresolved. Public source evidence from the public API endpoint https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed: uri=at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35sqitrmk2t; cid=bafyreids52yfvjtmjqe5g24xkerq6s3c6l2i4rga4rnl3vfuxjrfck5ccq; record_sha256=fda2106b4bd453d26fa29f57c48883758c5dd8ca65bf509af40064fe7eb6925a. Context references: at://did:plc:o2i3dlyfi3zadu2wgcizfuxw/app.bsky.feed.post/3n35qytdg222r; at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3n35pv55hfs2m. Standalone archive admission not verified; source identity and text were confirmed, but this item remains context only."

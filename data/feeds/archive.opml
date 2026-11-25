@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen&apos;s Internet Archive</title>
-    <dateCreated>Tue, 24 Nov 2026 18:52:17 GMT</dateCreated>
-    <dateModified>Tue, 24 Nov 2026 18:52:17 GMT</dateModified>
+    <dateCreated>Wed, 25 Nov 2026 18:52:39 GMT</dateCreated>
+    <dateModified>Wed, 25 Nov 2026 18:52:39 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -356,6 +356,7 @@
         <outline text="The plan is to have no plan" type="link" url="https://www.adbusters.org/article/the-plan-is-to-have-no-plan" created="2020-05-04"/>
       </outline>
       <outline text="Platform Transition &amp; Future Models (2021-Present)" type="category">
+        <outline text="George Packer, Big Thinker for the Atlantic, has apologized to American democracy." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3n35pv55hfs2m" created="2026-11-25"/>
         <outline text="Most important post I have read since the election..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3n25q57jvz22y" created="2026-11-13"/>
         <outline text="The most important post I have read since the election..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3n27bqeuigc2e" created="2026-11-13"/>
         <outline text="One of my favorite journalists operating now..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3n2a2u2zyms2u" created="2026-11-13"/>
@@ -407,7 +408,6 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="Bangor Daily News states what its journalism stands for" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mumtbz2ayk23" created="2026-09-03"/>
         <outline text="Truth Social mentions as unpaid promotion" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mumwnqgbcc2e" created="2026-09-03"/>
         <outline text="How far Bangor Daily News moves beyond impartiality" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mun5dezpt22r" created="2026-09-03"/>
-        <outline text="The pull of journalism&apos;s industry consensus" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mungmnhvz22m" created="2026-09-03"/>
       </outline>
     </outline>
     <outline text="By Category">
@@ -469,7 +469,8 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="Finally..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog4ns5tvk22"/>
         <outline text="One thing to keep your eye on as Paramount takes control:  what happen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modgj3bfys2l"/>
       </outline>
-      <outline text="Politics &amp; Democracy (7820)" type="category">
+      <outline text="Politics &amp; Democracy (7821)" type="category">
+        <outline text="George Packer, Big Thinker for the Atlantic, has apologized to American democracy." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3n35pv55hfs2m"/>
         <outline text="Most important post I have read since the election..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3n25q57jvz22y"/>
         <outline text="The most important post I have read since the election..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3n27bqeuigc2e"/>
         <outline text="Margaret Sullivan grades midterm coverage" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mxtriyyquk2o"/>
@@ -496,7 +497,6 @@ This paragraph says more about &quot;both sides&quot; j..." type="link" url="htt
         <outline text="A reader&apos;s comparison with George Lakoff" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mu45rrmmm22q"/>
         <outline text="Two weeks of reading for a journalism course" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mu3juxw4zk23"/>
         <outline text="Election coverage: The stakes beyond the polls" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mtymkmy7pk2b"/>
-        <outline text="You may know that I try to show newsrooms that they have an alternative to the h..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mt2mi7jej22l"/>
       </outline>
       <outline text="Audience &amp; Public Engagement (3785)" type="category">
         <outline text="Going Digital: The People Formerly Known as the Audience" type="link" url="https://thepoint.com.au/opinions/261030-going-digital-the-people-formerly-known-as-the-audience"/>

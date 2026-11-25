@@ -1,7 +1,61 @@
 {
   "version": "1.1.0",
-  "generated": "2026-11-24T18:52:15.514Z",
+  "generated": "2026-11-25T18:52:37.561Z",
   "records": [
+    {
+      "id": "THREAD-00020",
+      "title": "George Packer, Big Thinker for the Atlantic, has apologized to American democracy.",
+      "author": "Jay Rosen",
+      "date": "2026-11-25",
+      "year": "2026",
+      "era": "Platform Transition & Future Models (2021-Present)",
+      "pub": "Bluesky",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3n35pv55hfs2m",
+      "summary": "A 3-post Bluesky thread by Jay Rosen.",
+      "quote": "George Packer, Big Thinker for the Atlantic, has apologized to American democracy.\n\n\"I overrated Trump’s competence as a dictator, and I underrated the resilience of American democracy.\"\n\n (I love the",
+      "categories": [
+        "Politics & Democracy"
+      ],
+      "concepts": [],
+      "tags": [],
+      "verified": true,
+      "type": "social",
+      "relatedIds": [],
+      "thread_data": {
+        "thread_id": "BSKY-03671",
+        "total_posts": 3,
+        "max_depth": 2,
+        "posts": [
+          {
+            "number": 1,
+            "id": "BSKY-03671",
+            "content": "George Packer, Big Thinker for the Atlantic, has apologized to American democracy.\n\n\"I overrated Trump’s competence as a dictator, and I underrated the resilience of American democracy.\"\n\n (I love the practice. Ask democracy for forgiveness.)\n\nSee next slide 1/2\n\nwww.theatlantic.com/ideas/2026/1...",
+            "date": "2026-11-25 17:50:25",
+            "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3n35pv55hfs2m",
+            "depth": 0,
+            "parent_id": null
+          },
+          {
+            "number": 2,
+            "id": "BSKY-03672",
+            "content": "—",
+            "date": "2026-11-25 17:50:25",
+            "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3n35pvca4ic2m",
+            "depth": 1,
+            "parent_id": "BSKY-03671"
+          },
+          {
+            "number": 3,
+            "id": "BSKY-03673",
+            "content": "Meanwhile, my 2017 post —  with receipts! —  examined the claim that Trump is some kind of media wizard.\n\npressthink.org/2017/05/gett...\n\nI wrote: \"That our President is a master of media manipulation is a view commonly expressed by American journalists. I doubt it.\" \n\nRead and compare. 2/2",
+            "date": "2026-11-25 17:50:25",
+            "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3n35pvcabek2m",
+            "depth": 2,
+            "parent_id": "BSKY-03672"
+          }
+        ]
+      }
+    },
     {
       "id": "BSKY-03634",
       "title": "Most important post I have read since the election...",
@@ -814184,6 +814238,7 @@
     "George Packer",
     "George Packer addressed that",
     "George Packer essay",
+    "George Packer, Big Thinker for the Atlantic, has apologized to American democrac...",
     "George Pataki",
     "George Soros",
     "George Steinbrenner",
@@ -823900,6 +823955,7 @@
     "Meanwhile, in Australia: Battered by 9 years of \"conservative\" government, the...",
     "Meanwhile, in Chicago: \"Nonprofit news is assuming a prominence once reserved...",
     "Meanwhile, in New Zealand: \"We commit to acknowledging wrongs that have been...",
+    "Meanwhile, my 2017 post — with receipts...",
     "Meanwhile, predicts the Palm Beach Troll will be allowed back on one of the...",
     "Meanwhile, says it will no longer advertise itself on Twitter because silencing...",
     "Meanwhile, says liberal media critics are winning",
