@@ -4,7 +4,7 @@
     "compatibility": "additive changes within version 1; semantic changes require a new major version"
   },
   "input": {
-    "commit": "ad752ee8f2685f0efb695b9c72e7c13ec3dc4cd8",
+    "commit": "49645a061aaa0b11797a41f265b64178ee62a6be",
     "dirty": false,
     "schema_version": "stewardship-census/1.0.0",
     "files": [
@@ -14,7 +14,7 @@
       },
       {
         "path": "data/social_posts.csv",
-        "sha256": "b731ff72c441605845c5f21959dbe9d08f856a8b7af8141c33c7f8da81b39f40"
+        "sha256": "e300e2260a927144bd365d0d42144df46a70e3082bda0373c0e832c64d9f6e9a"
       },
       {
         "path": "data/extracted_entities.csv",
@@ -26,19 +26,19 @@
       },
       {
         "path": "data/archive-data.json",
-        "sha256": "500f80f7dffb4b3ab811dce1d78cbe69ba882316085b61eab671d1f252464f75"
+        "sha256": "a8fb72ad7d6248d9242a42c890a917707430f5cc19fc31341879b858302bfa0c"
       },
       {
         "path": "data/archive-core.json",
-        "sha256": "9b7764de768c05eaf07bd4ee151c90b3d52135f936df29a0329c7fdb796b599c"
+        "sha256": "3c22169c2c5cb7d0746dfdee3117e125d7954e22c083a1672a2b845babb7e9fa"
       },
       {
         "path": "data/archive-details.json",
-        "sha256": "5dda3318c29247dd200388c1e7b5b8b6c70c3bd3d097dc35fc6f1e8537a8d005"
+        "sha256": "78feab6a2918f338a15ea623232162fe2dcd8e4d79c6332dd79d59766d5b4069"
       },
       {
         "path": "data/archive-entities.json",
-        "sha256": "a0f18f879727aa59cfe6c016bdc2782f7535aec0873945fe65b78e9cefaf2ac9"
+        "sha256": "e536afd8cba0dea963e4e0bd8394ad277188b661e72b6c48a1004dc0ae21cf60"
       },
       {
         "path": "data/authored-excerpts.csv",
@@ -48,7 +48,7 @@
   },
   "records": {
     "source": {
-      "total": 31422,
+      "total": 31429,
       "curated": {
         "total": 1220,
         "by_record_type": {
@@ -69,28 +69,28 @@
         }
       },
       "social": {
-        "total": 30202,
+        "total": 30209,
         "by_platform": {
-          "Bluesky": 3572,
+          "Bluesky": 3579,
           "Mastodon": 516,
           "Twitter/X": 26114
         },
         "by_record_type": {
-          "Social Media Post": 30202
+          "Social Media Post": 30209
         },
         "verification": {
-          "verified": 29887,
-          "unverified": 315,
+          "verified": 29889,
+          "unverified": 320,
           "blank": 0
         }
       }
     },
     "runtime": {
-      "total": 27062,
+      "total": 27063,
       "by_type": {
         "Dissertation": 1,
         "article": 1220,
-        "social": 25841
+        "social": 25842
       },
       "source_backed": {
         "total": 27052,
@@ -117,7 +117,7 @@
         }
       },
       "generated": {
-        "thread_containers": 9,
+        "thread_containers": 10,
         "thread_container_ids": [
           "THREAD-00011",
           "THREAD-00012",
@@ -127,7 +127,8 @@
           "THREAD-00016",
           "THREAD-00017",
           "THREAD-00018",
-          "THREAD-00019"
+          "THREAD-00019",
+          "THREAD-00020"
         ],
         "injected": 1,
         "injected_ids": [
@@ -135,7 +136,7 @@
         ]
       },
       "verification": {
-        "verified": 27062,
+        "verified": 27063,
         "unverified": 0,
         "blank": 0
       }
@@ -147,14 +148,14 @@
         "filtered": 0
       },
       "social": {
-        "source": 30202,
+        "source": 30209,
         "published": 25832,
-        "filtered": 4370
+        "filtered": 4377
       }
     },
     "filtered": {
       "classification": "first_match",
-      "total": 4370,
+      "total": 4377,
       "reasons": [
         {
           "id": "curated_unverified",
@@ -193,7 +194,7 @@
           "label": "Thread member",
           "source": "social",
           "order": 1,
-          "count": 150,
+          "count": 153,
           "record_ids": [
             "BSKY-00580",
             "BSKY-00581",
@@ -344,7 +345,10 @@
             "BSKY-03283",
             "BSKY-03409",
             "BSKY-03410",
-            "BSKY-03412"
+            "BSKY-03412",
+            "BSKY-03671",
+            "BSKY-03672",
+            "BSKY-03673"
           ]
         },
         {
@@ -4365,7 +4369,7 @@
           "label": "Explicitly unverified",
           "source": "social",
           "order": 5,
-          "count": 230,
+          "count": 234,
           "record_ids": [
             "BSKY-03335",
             "BSKY-03340",
@@ -4596,7 +4600,11 @@
             "BSKY-03665",
             "BSKY-03666",
             "BSKY-03667",
-            "BSKY-03668"
+            "BSKY-03668",
+            "BSKY-03669",
+            "BSKY-03670",
+            "BSKY-03674",
+            "BSKY-03675"
           ]
         },
         {
@@ -4671,74 +4679,74 @@
     },
     "social_source": {
       "url": {
-        "total": 30202,
-        "present": 30164,
+        "total": 30209,
+        "present": 30171,
         "missing": 38
       },
       "raw_text": {
-        "total": 30202,
-        "present": 30197,
+        "total": 30209,
+        "present": 30204,
         "missing": 5
       },
       "summary": {
-        "total": 30202,
-        "present": 58,
-        "missing": 30144
+        "total": 30209,
+        "present": 60,
+        "missing": 30149
       },
       "tags": {
-        "total": 30202,
+        "total": 30209,
         "present": 20217,
-        "missing": 9985
+        "missing": 9992
       },
       "concepts": {
-        "total": 30202,
+        "total": 30209,
         "present": 499,
-        "missing": 29703
+        "missing": 29710
       },
       "quote": {
-        "total": 30202,
-        "present": 25794,
+        "total": 30209,
+        "present": 25801,
         "missing": 4408
       },
       "related_ids": {
-        "total": 30202,
+        "total": 30209,
         "present": 8072,
-        "missing": 22130
+        "missing": 22137
       }
     },
     "runtime": {
       "url": {
-        "total": 27062,
-        "present": 27062,
+        "total": 27063,
+        "present": 27063,
         "missing": 0
       },
       "summary": {
-        "total": 27062,
-        "present": 27062,
+        "total": 27063,
+        "present": 27063,
         "missing": 0
       },
       "tags": {
-        "total": 27062,
+        "total": 27063,
         "present": 18187,
-        "missing": 8875
+        "missing": 8876
       },
       "concepts": {
-        "total": 27062,
+        "total": 27063,
         "present": 1416,
-        "missing": 25646
+        "missing": 25647
       },
       "quote": {
-        "total": 27062,
-        "present": 27057,
+        "total": 27063,
+        "present": 27058,
         "missing": 5
       },
       "related_ids": {
-        "total": 27062,
+        "total": 27063,
         "present": 1067,
-        "missing": 25995
+        "missing": 25996
       },
       "raw_text": {
-        "total": 27062,
+        "total": 27063,
         "present": null,
         "missing": null,
         "status": "not_shipped_by_design"
@@ -4826,7 +4834,7 @@
       },
       "social": {
         "source": {
-          "rows": 30202,
+          "rows": 30209,
           "rows_with_relationship_assertions": 12,
           "relationship_assertions": 12,
           "rows_with_entity_links": 12,
@@ -4843,7 +4851,7 @@
       "social_by_platform": {
         "Bluesky": {
           "source": {
-            "rows": 3572,
+            "rows": 3579,
             "rows_with_relationship_assertions": 10,
             "relationship_assertions": 10,
             "rows_with_entity_links": 10,
@@ -4967,10 +4975,10 @@
   },
   "urls": {
     "source": {
-      "total_rows": 31422,
+      "total_rows": 31429,
       "missing": 38,
-      "external_values": 31384,
-      "unique_external_urls": 31374,
+      "external_values": 31391,
+      "unique_external_urls": 31381,
       "duplicate_external_values": 10,
       "internal_values": 0,
       "malformed_values": 0,
@@ -4990,7 +4998,7 @@
         "berks.psu.edu": 1,
         "blog.bleacherreport.com": 1,
         "bonn-institute.org": 1,
-        "bsky.app": 3534,
+        "bsky.app": 3541,
         "buzzmachine.com": 1,
         "bylinesupplement.com": 1,
         "cascadiadaily.com": 1,
@@ -5104,10 +5112,10 @@
       }
     },
     "runtime": {
-      "total_rows": 27062,
+      "total_rows": 27063,
       "missing": 0,
-      "external_values": 27061,
-      "unique_external_urls": 27061,
+      "external_values": 27062,
+      "unique_external_urls": 27062,
       "duplicate_external_values": 0,
       "internal_values": 1,
       "malformed_values": 0,
@@ -5127,7 +5135,7 @@
         "berks.psu.edu": 1,
         "blog.bleacherreport.com": 1,
         "bonn-institute.org": 1,
-        "bsky.app": 2863,
+        "bsky.app": 2864,
         "buzzmachine.com": 1,
         "bylinesupplement.com": 1,
         "cascadiadaily.com": 1,
@@ -30500,8 +30508,8 @@
       {
         "metric": "social_source",
         "baseline": 29747,
-        "current": 30202,
-        "delta": 455
+        "current": 30209,
+        "delta": 462
       },
       {
         "metric": "published_curated_source",
@@ -30518,8 +30526,8 @@
       {
         "metric": "generated_thread_containers",
         "baseline": 8,
-        "current": 9,
-        "delta": 1
+        "current": 10,
+        "delta": 2
       },
       {
         "metric": "injected_records",
@@ -30530,8 +30538,8 @@
       {
         "metric": "published_total",
         "baseline": 26616,
-        "current": 27062,
-        "delta": 446
+        "current": 27063,
+        "delta": 447
       },
       {
         "metric": "entities",
